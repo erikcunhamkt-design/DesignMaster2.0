@@ -1,4 +1,5 @@
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -16,6 +17,23 @@ const niches = [
 ];
 
 export function ProjectScenarioSection({ config, onUpdate }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const newUrls: string[] = [];
+    Array.from(files).forEach((file) => {
+      newUrls.push(URL.createObjectURL(file));
+    });
+    onUpdate({ sceneryPhotos: [...config.sceneryPhotos, ...newUrls] });
+    e.target.value = '';
+  };
+
+  const removePhoto = (index: number) => {
+    onUpdate({ sceneryPhotos: config.sceneryPhotos.filter((_, i) => i !== index) });
+  };
+
   return (
     <div className="space-y-3">
       <div>
@@ -60,10 +78,40 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
       </div>
 
       {config.sceneryPhotosEnabled && (
-        <button className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors">
-          <Plus className="h-4 w-4" />
-          <span className="text-xs font-medium">UPLOAD CENÁRIO</span>
-        </button>
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+
+          {config.sceneryPhotos.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {config.sceneryPhotos.map((url, i) => (
+                <div key={i} className="relative h-16 w-16 rounded-lg overflow-hidden border border-border group">
+                  <img src={url} alt={`Cenário ${i + 1}`} className="h-full w-full object-cover" />
+                  <button
+                    onClick={() => removePhoto(i)}
+                    className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="text-xs font-medium">UPLOAD CENÁRIO</span>
+          </button>
+        </>
       )}
     </div>
   );
