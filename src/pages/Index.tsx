@@ -90,7 +90,7 @@ const Index = () => {
         onAdd={addProject}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {activePage === 'criar' && activeProject && (
           <>
             <PreviewPanel state={previewState} imageUrl={generatedImage} />
