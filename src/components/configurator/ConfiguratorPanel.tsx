@@ -9,16 +9,18 @@ import { CompositionSection } from './sections/CompositionSection';
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Copy } from 'lucide-react';
+import { Sparkles, Copy, Loader2 } from 'lucide-react';
 
 interface ConfiguratorPanelProps {
   config: ProjectConfig;
   onUpdate: (patch: Partial<ProjectConfig>) => void;
+  onGenerate: () => void;
+  isGenerating: boolean;
 }
 
-export function ConfiguratorPanel({ config, onUpdate }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating }: ConfiguratorPanelProps) {
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
-    (!config.textEnabled || config.text01.length >= 3);
+    (!config.textEnabled || config.text01.length >= 3) && !isGenerating;
 
   return (
     <div className="flex w-[380px] shrink-0 flex-col border-r border-border bg-card">
@@ -67,10 +69,15 @@ export function ConfiguratorPanel({ config, onUpdate }: ConfiguratorPanelProps) 
       <div className="border-t border-border p-4 space-y-2">
         <Button
           disabled={!canGenerate}
+          onClick={onGenerate}
           className="w-full gap-2 bg-primary hover:bg-primary/90"
         >
-          <Sparkles className="h-4 w-4" />
-          Gerar Imagem
+          {isGenerating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {isGenerating ? 'Gerando...' : 'Gerar Imagem'}
         </Button>
         <Button variant="outline" className="w-full gap-2 text-xs">
           <Copy className="h-3.5 w-3.5" />
