@@ -35,6 +35,7 @@ export interface ProjectConfig {
 
   // Referências
   styleReferences: string[];
+  referenceAttributes: Record<number, string[]>;
 
   // Atributos Visuais
   sobriety: number;
@@ -76,6 +77,7 @@ export const defaultConfig: ProjectConfig = {
   floatingElementsText: '',
   verticalPosition: 'centralizado',
   styleReferences: [],
+  referenceAttributes: {},
   sobriety: 50,
   visualStyleEnabled: false,
   visualStyle: '',
