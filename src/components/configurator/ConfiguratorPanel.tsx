@@ -23,7 +23,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating }
     (!config.textEnabled || config.text01.length >= 3) && !isGenerating;
 
   return (
-    <div className="flex w-[380px] shrink-0 flex-col border-r border-border bg-card">
+    <div className="flex w-[360px] shrink-0 flex-col border-l border-border bg-card">
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
         <section>
           <SectionLabel>Sujeito Principal</SectionLabel>
