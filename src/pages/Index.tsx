@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AppSidebar } from '@/components/layout/AppSidebar';
-import { Topbar } from '@/components/layout/Topbar';
+import { TopNav } from '@/components/layout/TopNav';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
@@ -35,7 +34,6 @@ const Index = () => {
     try {
       const { prompt, negativePrompt } = composePrompt(activeProject.config);
 
-      // Convert blob URLs to base64 for reference images
       const referenceImages: string[] = [];
       const allRefs = [
         ...activeProject.config.subjectPhotos,
@@ -58,13 +56,8 @@ const Index = () => {
         body: { prompt, negativePrompt, referenceImages },
       });
 
-      if (error) {
-        throw new Error(error.message || 'Erro na geração');
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw new Error(error.message || 'Erro na geração');
+      if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
         setGeneratedImage(data.imageUrl);
@@ -83,44 +76,44 @@ const Index = () => {
   }, [activeProject]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
-      <AppSidebar activePage={activePage} onNavigate={setActivePage} />
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+      <TopNav
+        activePage={activePage}
+        onNavigate={setActivePage}
+        onNewProject={addProject}
+      />
+      <ProjectTabs
+        projects={projects}
+        activeId={activeProjectId}
+        onSelect={setActiveProjectId}
+        onClose={removeProject}
+        onAdd={addProject}
+      />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onNewProject={addProject} />
-        <ProjectTabs
-          projects={projects}
-          activeId={activeProjectId}
-          onSelect={setActiveProjectId}
-          onClose={removeProject}
-          onAdd={addProject}
-        />
+      <div className="flex flex-1 overflow-hidden">
+        {activePage === 'criar' && activeProject && (
+          <>
+            <PreviewPanel state={previewState} imageUrl={generatedImage} />
+            <ConfiguratorPanel
+              config={activeProject.config}
+              onUpdate={updateConfig}
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+            />
+          </>
+        )}
 
-        <div className="flex flex-1 overflow-hidden">
-          {activePage === 'criar' && activeProject && (
-            <>
-              <ConfiguratorPanel
-                config={activeProject.config}
-                onUpdate={updateConfig}
-                onGenerate={handleGenerate}
-                isGenerating={isGenerating}
-              />
-              <PreviewPanel state={previewState} imageUrl={generatedImage} />
-            </>
-          )}
+        {activePage === 'explorar' && (
+          <div className="flex flex-1 items-center justify-center text-muted-foreground">
+            <p className="text-sm">Explorar — Em breve</p>
+          </div>
+        )}
 
-          {activePage === 'explorar' && (
-            <div className="flex flex-1 items-center justify-center text-muted-foreground">
-              <p className="text-sm">Explorar — Em breve</p>
-            </div>
-          )}
-
-          {activePage === 'galeria' && (
-            <div className="flex flex-1 items-center justify-center text-muted-foreground">
-              <p className="text-sm">Minha Galeria — Em breve</p>
-            </div>
-          )}
-        </div>
+        {activePage === 'galeria' && (
+          <div className="flex flex-1 items-center justify-center text-muted-foreground">
+            <p className="text-sm">Minha Galeria — Em breve</p>
+          </div>
+        )}
       </div>
     </div>
   );
