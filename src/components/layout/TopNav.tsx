@@ -1,17 +1,18 @@
-import { Compass, PenTool, Image, Zap, Plus, Search, User, Activity } from 'lucide-react';
+import { Compass, PenTool, Image, Zap, Plus, Search, User, Activity, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 interface TopNavProps {
-  activePage: 'explorar' | 'criar' | 'galeria';
-  onNavigate: (page: 'explorar' | 'criar' | 'galeria') => void;
+  activePage: 'explorar' | 'criar' | 'galeria' | 'extrator';
+  onNavigate: (page: 'explorar' | 'criar' | 'galeria' | 'extrator') => void;
   onNewProject: () => void;
 }
 
 const navItems = [
   { id: 'explorar' as const, label: 'Explorar', icon: Compass },
   { id: 'criar' as const, label: 'Criar', icon: PenTool },
+  { id: 'extrator' as const, label: 'Extrator', icon: Wand2 },
   { id: 'galeria' as const, label: 'Galeria', icon: Image },
 ];
 

@@ -4,12 +4,13 @@ import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
 import { useProjectStore } from '@/hooks/useProjectStore';
-import { composePrompt } from '@/lib/promptComposer';
+import { buildGenerationRequest } from '@/core/prompt/PromptAgent';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import ExtractorPage from '@/pages/ExtractorPage';
 
 const Index = () => {
-  const [activePage, setActivePage] = useState<'explorar' | 'criar' | 'galeria'>('criar');
+  const [activePage, setActivePage] = useState<'explorar' | 'criar' | 'galeria' | 'extrator'>('criar');
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -32,18 +33,13 @@ const Index = () => {
     setGeneratedImage(undefined);
 
     try {
-      const { prompt, negativePrompt } = composePrompt(activeProject.config);
+      const genRequest = buildGenerationRequest(activeProject.config);
 
+      // Convert reference URLs to base64
       const referenceImages: string[] = [];
-      const allRefs = [
-        ...activeProject.config.subjectPhotos,
-        ...activeProject.config.styleReferences,
-        ...(activeProject.config.sceneryPhotosEnabled ? activeProject.config.sceneryPhotos : []),
-      ];
-
-      for (const refUrl of allRefs.slice(0, 5)) {
+      for (const ref of genRequest.references.slice(0, 5)) {
         try {
-          const resp = await fetch(refUrl);
+          const resp = await fetch(ref.url);
           const blob = await resp.blob();
           const base64 = await blobToBase64(blob);
           referenceImages.push(base64);
@@ -53,7 +49,11 @@ const Index = () => {
       }
 
       const { data, error } = await supabase.functions.invoke('generate-image', {
-        body: { prompt, negativePrompt, referenceImages },
+        body: {
+          prompt: genRequest.prompt,
+          negativePrompt: genRequest.negative_prompt,
+          referenceImages,
+        },
       });
 
       if (error) throw new Error(error.message || 'Erro na geração');
@@ -82,18 +82,20 @@ const Index = () => {
         onNavigate={setActivePage}
         onNewProject={addProject}
       />
-      <ProjectTabs
-        projects={projects}
-        activeId={activeProjectId}
-        onSelect={setActiveProjectId}
-        onClose={removeProject}
-        onAdd={addProject}
-      />
+      {activePage === 'criar' && (
+        <ProjectTabs
+          projects={projects}
+          activeId={activeProjectId}
+          onSelect={setActiveProjectId}
+          onClose={removeProject}
+          onAdd={addProject}
+        />
+      )}
 
       <div className="flex flex-1 overflow-hidden relative">
         {activePage === 'criar' && activeProject && (
           <>
-            <PreviewPanel state={previewState} imageUrl={generatedImage} />
+            <PreviewPanel state={previewState} imageUrl={generatedImage} config={activeProject.config} />
             <ConfiguratorPanel
               config={activeProject.config}
               onUpdate={updateConfig}
@@ -102,6 +104,8 @@ const Index = () => {
             />
           </>
         )}
+
+        {activePage === 'extrator' && <ExtractorPage />}
 
         {activePage === 'explorar' && (
           <div className="flex flex-1 items-center justify-center text-muted-foreground">
