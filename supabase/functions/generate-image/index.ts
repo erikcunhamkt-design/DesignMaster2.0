@@ -40,29 +40,53 @@ serve(async (req) => {
       }
     }
 
-    console.log("Calling Nano Banana Pro for image generation...");
-
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+    // Try generation with references first, then without on failure
+    async function callModel(refs: any[]): Promise<Response> {
+      const content: any[] = [
+        {
+          type: "text",
+          text: `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`,
         },
-        body: JSON.stringify({
-          model: "google/gemini-3-pro-image-preview",
-          messages: [
-            {
-              role: "user",
-              content: userContent,
-            },
-          ],
-          modalities: ["image", "text"],
-        }),
-      }
-    );
+        ...refs,
+      ];
 
+      console.log(`Calling Nano Banana Pro (${refs.length} refs)...`);
+
+      return fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3-pro-image-preview",
+            messages: [{ role: "user", content }],
+            modalities: ["image", "text"],
+          }),
+        }
+      );
+    }
+
+    // Build ref entries (limit size)
+    const refEntries: any[] = [];
+    if (referenceImages && referenceImages.length > 0) {
+      for (const refImg of referenceImages.slice(0, 3)) {
+        refEntries.push({ type: "image_url", image_url: { url: refImg } });
+      }
+    }
+
+    // Attempt 1: with references
+    let response = await callModel(refEntries);
+
+    // If failed with refs, retry without
+    if (!response.ok && refEntries.length > 0) {
+      console.log("Retrying without reference images...");
+      response = await callModel([]);
+    }
+
+    // If still failed, one more retry
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
@@ -80,8 +104,16 @@ serve(async (req) => {
         );
       }
 
+      // Final retry after short delay
+      await new Promise(r => setTimeout(r, 2000));
+      response = await callModel([]);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Final AI gateway error:", response.status, errorText);
       return new Response(
-        JSON.stringify({ error: `Erro na geração: ${response.status}` }),
+        JSON.stringify({ error: `Erro na geração: ${response.status}. Tente novamente.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
