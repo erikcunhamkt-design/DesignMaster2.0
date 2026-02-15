@@ -9,23 +9,16 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 
-const ATTRIBUTE_OPTIONS = [
-  { id: 'estilo', label: 'Estilo Visual' },
-  { id: 'iluminacao', label: 'Iluminação' },
-  { id: 'pose', label: 'Pose / Posição' },
-  { id: 'cores', label: 'Paleta de Cores' },
-  { id: 'composicao', label: 'Composição' },
-  { id: 'textura', label: 'Textura / Material' },
-] as const;
-
-export type ReferenceAttribute = (typeof ATTRIBUTE_OPTIONS)[number]['id'];
-
-export interface StyleReference {
-  url: string;
-  attributes: ReferenceAttribute[];
-}
+const SUGGESTION_CHIPS = [
+  { label: 'Estilo visual', template: 'Quero aproveitar o estilo visual: ' },
+  { label: 'Iluminação', template: 'Quero aproveitar a iluminação: ' },
+  { label: 'Paleta de cores', template: 'Quero aproveitar a paleta de cores: ' },
+  { label: 'Composição', template: 'Quero aproveitar a composição: ' },
+  { label: 'Textura/material', template: 'Quero aproveitar a textura/material: ' },
+  { label: 'Pose/posição', template: 'Quero aproveitar a pose/posição: ' },
+];
 
 interface Props {
   config: ProjectConfig;
@@ -35,57 +28,69 @@ interface Props {
 export function ReferencesSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
-  const [selectedAttrs, setSelectedAttrs] = useState<ReferenceAttribute[]>(['estilo']);
+  const [noteText, setNoteText] = useState('');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
     const file = files[0];
     if (config.styleReferences.length >= 4) return;
-
     const url = URL.createObjectURL(file);
     setPendingUrl(url);
-    setSelectedAttrs(['estilo']);
+    setNoteText('');
     e.target.value = '';
   };
 
   const confirmReference = () => {
     if (!pendingUrl) return;
-    // Store the URL in styleReferences (keeping backward compatibility)
-    onUpdate({ styleReferences: [...config.styleReferences, pendingUrl] });
-    // Store attributes in the referenceAttributes map
+    const newIndex = config.styleReferences.length;
+    const notes = { ...(config.referenceNotes || {}) };
+    notes[newIndex] = noteText;
+    // Keep referenceAttributes for backward compat (empty for new refs)
     const attrs = { ...(config.referenceAttributes || {}) };
-    attrs[config.styleReferences.length] = selectedAttrs;
-    onUpdate({ referenceAttributes: attrs });
+    attrs[newIndex] = [];
+    onUpdate({
+      styleReferences: [...config.styleReferences, pendingUrl],
+      referenceAttributes: attrs,
+      referenceNotes: notes,
+    });
     setPendingUrl(null);
-  };
-
-  const toggleAttr = (attr: ReferenceAttribute) => {
-    setSelectedAttrs((prev) =>
-      prev.includes(attr) ? prev.filter((a) => a !== attr) : [...prev, attr]
-    );
   };
 
   const removeRef = (index: number) => {
     const newRefs = config.styleReferences.filter((_, i) => i !== index);
     const attrs = { ...(config.referenceAttributes || {}) };
+    const notes = { ...(config.referenceNotes || {}) };
     delete attrs[index];
+    delete notes[index];
     // Re-index
-    const reindexed: Record<number, ReferenceAttribute[]> = {};
+    const reindexedAttrs: Record<number, string[]> = {};
+    const reindexedNotes: Record<number, string> = {};
     let newIdx = 0;
     for (let i = 0; i < config.styleReferences.length; i++) {
       if (i === index) continue;
-      if (attrs[i]) reindexed[newIdx] = attrs[i] as ReferenceAttribute[];
+      if (attrs[i]) reindexedAttrs[newIdx] = attrs[i] as string[];
+      if (notes[i]) reindexedNotes[newIdx] = notes[i];
       newIdx++;
     }
-    onUpdate({ styleReferences: newRefs, referenceAttributes: reindexed });
+    onUpdate({
+      styleReferences: newRefs,
+      referenceAttributes: reindexedAttrs,
+      referenceNotes: reindexedNotes,
+    });
   };
 
-  const getAttrLabels = (index: number) => {
-    const attrs = config.referenceAttributes?.[index] as ReferenceAttribute[] | undefined;
-    if (!attrs || attrs.length === 0) return null;
-    return attrs.map((a) => ATTRIBUTE_OPTIONS.find((o) => o.id === a)?.label || a);
+  const getNotePreview = (index: number) => {
+    const note = config.referenceNotes?.[index];
+    if (note) return note;
+    // Fallback: show old attribute labels
+    const attrs = config.referenceAttributes?.[index] as string[] | undefined;
+    if (attrs && attrs.length > 0) return attrs.join(', ');
+    return null;
+  };
+
+  const insertChip = (template: string) => {
+    setNoteText((prev) => (prev ? `${prev}\n${template}` : template));
   };
 
   return (
@@ -111,14 +116,10 @@ export function ReferencesSection({ config, onUpdate }: Props) {
                   <X className="h-2.5 w-2.5" />
                 </button>
               </div>
-              {getAttrLabels(i) && (
-                <div className="mt-1 flex flex-wrap gap-0.5">
-                  {getAttrLabels(i)!.map((label) => (
-                    <span key={label} className="text-[8px] bg-primary/10 text-primary px-1 py-0.5 rounded">
-                      {label}
-                    </span>
-                  ))}
-                </div>
+              {getNotePreview(i) && (
+                <p className="mt-1 max-w-[80px] text-[8px] text-muted-foreground truncate" title={getNotePreview(i)!}>
+                  {getNotePreview(i)}
+                </p>
               )}
             </div>
           ))}
@@ -139,29 +140,37 @@ export function ReferencesSection({ config, onUpdate }: Props) {
         {config.styleReferences.length}/4 referências adicionais de estilo
       </p>
 
-      {/* Attribute selection dialog */}
+      {/* Brief dialog */}
       <Dialog open={!!pendingUrl} onOpenChange={(open) => !open && setPendingUrl(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-sm">O que deseja usar desta referência?</DialogTitle>
+            <DialogTitle className="text-sm">O que você quer aproveitar desta referência?</DialogTitle>
           </DialogHeader>
 
           {pendingUrl && (
             <div className="flex gap-4">
-              <img src={pendingUrl} alt="Preview" className="h-24 w-24 rounded-lg object-cover border border-border shrink-0" />
-              <div className="flex flex-col gap-2 flex-1">
-                {ATTRIBUTE_OPTIONS.map((attr) => (
-                  <label
-                    key={attr.id}
-                    className="flex items-center gap-2 cursor-pointer text-xs"
-                  >
-                    <Checkbox
-                      checked={selectedAttrs.includes(attr.id)}
-                      onCheckedChange={() => toggleAttr(attr.id)}
-                    />
-                    {attr.label}
-                  </label>
-                ))}
+              <img src={pendingUrl} alt="Preview" className="h-28 w-28 rounded-lg object-cover border border-border shrink-0" />
+              <div className="flex flex-col gap-3 flex-1 min-w-0">
+                <VoiceTextField
+                  textarea
+                  rows={4}
+                  placeholder={"Ex: Quero a mesma iluminação neon azul e a composição com o sujeito à esquerda.\nDescreva livremente o que quer aproveitar..."}
+                  value={noteText}
+                  onChange={setNoteText}
+                  className="bg-muted border-none text-xs resize-none"
+                />
+                <div className="flex flex-wrap gap-1">
+                  {SUGGESTION_CHIPS.map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onClick={() => insertChip(chip.template)}
+                      className="text-[9px] px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      + {chip.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -173,7 +182,6 @@ export function ReferencesSection({ config, onUpdate }: Props) {
             <Button
               size="sm"
               onClick={confirmReference}
-              disabled={selectedAttrs.length === 0}
               className="gap-1"
             >
               <Check className="h-3.5 w-3.5" />
