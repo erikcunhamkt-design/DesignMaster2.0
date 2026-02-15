@@ -24,7 +24,7 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
     setTimeout(() => {
       const link = document.createElement('a');
       link.href = imageUrl;
-      link.download = `spark-snap-${Date.now()}.png`;
+      link.download = `design-master-${Date.now()}.png`;
       link.click();
       setDownloadState('done');
       setTimeout(() => setDownloadState('idle'), 2000);

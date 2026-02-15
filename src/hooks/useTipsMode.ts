@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'spark-snap-tips-mode';
+const STORAGE_KEY = 'design-master-tips-mode';
 
 export function useTipsMode() {
   const [enabled, setEnabled] = useState(() => {

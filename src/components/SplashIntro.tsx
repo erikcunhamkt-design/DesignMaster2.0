@@ -83,8 +83,8 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
             className="text-5xl md:text-7xl font-display font-bold tracking-tight"
             style={{ color: 'hsl(var(--foreground))' }}
           >
-            Spark
-            <span style={{ color: 'hsl(var(--primary))' }}>Snap</span>
+            Design
+            <span style={{ color: 'hsl(var(--primary))' }}>Master</span>
           </h1>
 
           {/* Light sweep */}
