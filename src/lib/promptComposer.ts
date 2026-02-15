@@ -88,10 +88,11 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   }
 
   // 6. Colors & lighting
-  const ambCol = config.colorMode === 'manual' ? config.ambientColor : config.autoAmbientColor;
-  const rimCol = config.colorMode === 'manual' ? config.rimLightColor : config.autoRimLightColor;
-  const fillCol = config.colorMode === 'manual' ? config.complementaryLightColor : config.autoComplementaryLightColor;
-  parts.push(`ambient color: ${ambCol}, rim light: ${rimCol}, complementary light: ${fillCol}`);
+  if (config.colorMode === 'manual') {
+    parts.push(`ambient color: ${config.ambientColor}, rim light: ${config.rimLightColor}, complementary light: ${config.complementaryLightColor}`);
+  } else {
+    parts.push('choose the most coherent color palette for lighting based on the design context');
+  }
 
   // 7. Style
   if (config.visualStyleEnabled && config.visualStyle) {
