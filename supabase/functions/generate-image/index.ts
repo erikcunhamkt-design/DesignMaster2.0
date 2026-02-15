@@ -42,7 +42,7 @@ serve(async (req) => {
       }
     }
 
-    const model = "gemini-2.5-flash-image";
+    const model = "gemini-3-pro-image-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     console.log(`Calling Google Gemini ${model} directly...`);
