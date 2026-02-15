@@ -10,7 +10,10 @@ import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { ApiKeySection } from './sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Copy, Loader2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Sparkles, Copy, Loader2, Lightbulb } from 'lucide-react';
+import { useTipsMode } from '@/hooks/useTipsMode';
+import { tipsConfig } from '@/data/tipsConfig';
 
 interface ConfiguratorPanelProps {
   config: ProjectConfig;
@@ -22,54 +25,65 @@ interface ConfiguratorPanelProps {
 }
 
 export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, onChangeApiKey }: ConfiguratorPanelProps) {
+  const { tipsEnabled, setTipsEnabled } = useTipsMode();
+
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
     (!config.textEnabled || config.text01.length >= 3) && !isGenerating && apiKey.length >= 10;
 
   return (
     <div className="flex w-[360px] shrink-0 flex-col border-l border-border bg-card">
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
+        {/* Tips Mode Toggle */}
+        <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Lightbulb className="h-3.5 w-3.5" />
+            Modo Dicas
+          </span>
+          <Switch checked={tipsEnabled} onCheckedChange={setTipsEnabled} />
+        </div>
+
         <section>
-          <SectionLabel>🔑 API Key do Google</SectionLabel>
+          <SectionLabel tip={tipsConfig['api-key']} tipsEnabled={tipsEnabled}>🔑 API Key do Google</SectionLabel>
           <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
         </section>
 
         <section>
-          <SectionLabel>Sujeito Principal</SectionLabel>
+          <SectionLabel tip={tipsConfig['sujeito']} tipsEnabled={tipsEnabled}>Sujeito Principal</SectionLabel>
           <SubjectSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Dimensões</SectionLabel>
+          <SectionLabel tip={tipsConfig['dimensoes']} tipsEnabled={tipsEnabled}>Dimensões</SectionLabel>
           <DimensionsSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Texto</SectionLabel>
+          <SectionLabel tip={tipsConfig['texto']} tipsEnabled={tipsEnabled}>Texto</SectionLabel>
           <TextSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Projeto & Cenário</SectionLabel>
+          <SectionLabel tip={tipsConfig['projeto-cenario']} tipsEnabled={tipsEnabled}>Projeto & Cenário</SectionLabel>
           <ProjectScenarioSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Cores & Iluminação</SectionLabel>
+          <SectionLabel tip={tipsConfig['cores']} tipsEnabled={tipsEnabled}>Cores & Iluminação</SectionLabel>
           <ColorsSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Composição</SectionLabel>
+          <SectionLabel tip={tipsConfig['composicao']} tipsEnabled={tipsEnabled}>Composição</SectionLabel>
           <CompositionSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Referências de Estilo</SectionLabel>
+          <SectionLabel tip={tipsConfig['referencias']} tipsEnabled={tipsEnabled}>Referências de Estilo</SectionLabel>
           <ReferencesSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
-          <SectionLabel>Atributos Visuais & Estilo</SectionLabel>
+          <SectionLabel tip={tipsConfig['estilo-visual']} tipsEnabled={tipsEnabled}>Atributos Visuais & Estilo</SectionLabel>
           <VisualStyleSection config={config} onUpdate={onUpdate} />
         </section>
       </div>
