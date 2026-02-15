@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Download, Check, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export default function MagneticCoversPage() {
   const [style, setStyle] = useState('');
   const [elements, setElements] = useState('');
   const [extra, setExtra] = useState('');
+  const [format, setFormat] = useState('feed');
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
@@ -35,7 +37,7 @@ export default function MagneticCoversPage() {
           character,
           style,
           elements,
-          extra,
+          extra: (extra + getFormatPromptSuffix(format)).trim(),
           referenceImages: [],
           googleApiKey: apiKey,
         },
@@ -101,6 +103,8 @@ export default function MagneticCoversPage() {
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">Elementos gráficos</p>
               <Input value={elements} onChange={e => setElements(e.target.value)} placeholder="Ex: raios, coroa, chamas, partículas..." className="h-9 bg-secondary/40 border-border/15 text-xs rounded-lg" />
             </div>
+
+            <FormatSelector value={format} onChange={setFormat} />
 
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">Detalhes extras</p>
