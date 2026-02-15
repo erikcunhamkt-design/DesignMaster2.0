@@ -3,6 +3,7 @@ export interface PromptTemplate {
   title: string;
   tags: string[];
   prompt: string;
+  negativePrompt?: string;
   category: string;
   imageUrl?: string;
 }
