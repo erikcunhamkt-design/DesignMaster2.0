@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.prompt-ai]
 verify_jwt = false
+
+[functions.analyze-image]
+verify_jwt = false
