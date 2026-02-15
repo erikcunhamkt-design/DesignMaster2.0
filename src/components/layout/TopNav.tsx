@@ -23,22 +23,22 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
   const hasKey = apiKey.length >= 10;
 
   return (
-    <header className="relative z-30 flex h-12 items-center border-b border-border/40 bg-background/80 backdrop-blur-xl px-4 gap-3">
+    <header className="relative z-30 flex h-14 items-center border-b border-border/30 bg-background/95 backdrop-blur-xl px-5 gap-4">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 shrink-0 mr-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary/90 to-primary/40 text-primary-foreground shadow-glow-sm">
-          <Zap className="h-3.5 w-3.5" />
+      <div className="flex items-center gap-3 shrink-0 mr-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
+          <Zap className="h-4 w-4" />
         </div>
-        <span className="font-display text-sm font-bold tracking-tight text-foreground hidden lg:block">
-          Spark<span className="text-primary">Snap</span>
+        <span className="font-display text-base font-bold tracking-tight text-foreground hidden lg:block">
+          Spark<span className="text-gradient">Snap</span>
         </span>
       </div>
 
       {/* Divider */}
-      <div className="h-5 w-px bg-border/50" />
+      <div className="h-6 w-px bg-border/40" />
 
       {/* Nav items */}
-      <nav className="flex items-center gap-0.5">
+      <nav className="flex items-center gap-1">
         {navItems.map((item) => {
           const active = activePage === item.id;
           return (
@@ -46,16 +46,16 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={cn(
-                'relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium tracking-wide transition-all duration-200',
+                'relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium tracking-wide transition-all duration-300',
                 active
-                  ? 'text-foreground bg-secondary/80'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40'
+                  ? 'text-foreground bg-secondary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
               )}
             >
-              <item.icon className="h-3.5 w-3.5" />
+              <item.icon className={cn('h-3.5 w-3.5', active && 'text-primary')} />
               <span className="hidden sm:inline">{item.label}</span>
               {active && (
-                <span className="absolute -bottom-[7px] left-2 right-2 h-[2px] rounded-full bg-primary shadow-glow-sm" />
+                <span className="absolute -bottom-[9px] left-3 right-3 h-[2px] rounded-full bg-primary shadow-glow-sm" />
               )}
             </button>
           );
@@ -71,19 +71,19 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
           <PopoverTrigger asChild>
             <button
               className={cn(
-                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all duration-200 border',
+                'flex items-center gap-2 rounded-lg px-3 py-1.5 text-[10px] font-semibold tracking-wider uppercase transition-all duration-300 border',
                 hasKey
-                  ? 'bg-primary/5 text-primary/80 border-primary/15 hover:bg-primary/10 hover:text-primary'
-                  : 'bg-destructive/5 text-destructive/70 border-destructive/15 hover:bg-destructive/10'
+                  ? 'bg-primary/8 text-primary/90 border-primary/20 hover:bg-primary/12 hover:text-primary'
+                  : 'bg-destructive/8 text-destructive/80 border-destructive/20 hover:bg-destructive/12'
               )}
             >
-              <span className={cn('h-1.5 w-1.5 rounded-full', hasKey ? 'bg-primary' : 'bg-destructive')} />
+              <span className={cn('h-1.5 w-1.5 rounded-full animate-pulse', hasKey ? 'bg-primary' : 'bg-destructive')} />
               <KeyRound className="h-3 w-3" />
               <span className="hidden md:inline">API</span>
-              <ChevronDown className="h-2.5 w-2.5 opacity-40" />
+              <ChevronDown className="h-2.5 w-2.5 opacity-50" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3">
+          <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3 rounded-xl">
             <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
           </PopoverContent>
         </Popover>
@@ -93,15 +93,15 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
       <Button
         size="sm"
         onClick={onNewProject}
-        className="h-7 gap-1 text-[10px] font-semibold tracking-wide rounded-md bg-secondary hover:bg-secondary/80 text-foreground border border-border/50 shadow-none transition-all duration-200"
+        className="h-8 gap-1.5 text-[10px] font-semibold tracking-wider rounded-lg bg-secondary hover:bg-secondary/80 text-foreground border border-border/40 shadow-none transition-all duration-300 uppercase"
       >
         <Plus className="h-3 w-3" />
         <span className="hidden sm:inline">Novo</span>
       </Button>
 
       {/* User avatar */}
-      <button className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary/60 border border-border/40 text-muted-foreground hover:text-foreground hover:border-primary/20 transition-all duration-200 shrink-0">
-        <User className="h-3 w-3" />
+      <button className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary border border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-secondary/80 transition-all duration-300 shrink-0">
+        <User className="h-3.5 w-3.5" />
       </button>
     </header>
   );
