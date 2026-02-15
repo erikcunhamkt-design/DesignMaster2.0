@@ -118,11 +118,16 @@ export default function UpscalePage() {
     setIsAnalyzing(true);
     setAnalysis(null);
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-image', {
-        body: { imageBase64 },
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ imageBase64 }),
       });
-      if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || `Erro ${response.status}`);
       if (data?.analysis) {
         setAnalysis(data.analysis);
         toast.success('Análise concluída!');
