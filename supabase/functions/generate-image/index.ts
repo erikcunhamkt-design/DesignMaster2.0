@@ -21,7 +21,7 @@ serve(async (req) => {
       );
     }
 
-    const fullPrompt = `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
+    const fullPrompt = `Generate this image. The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
     // Build parts array
     const parts: any[] = [{ text: fullPrompt }];

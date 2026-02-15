@@ -17,7 +17,8 @@ Generate a professional product photograph with the following requirements:
 - Professional post-production quality
 - 8K photorealistic rendering, no AI artifacts
 - NO real humans in the image
-- Output should look like a real studio photograph, not AI-generated`;
+- Output should look like a real studio photograph, not AI-generated
+- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
 
 const COVERS_SYSTEM = `You are a specialist in creating magnetic, attention-grabbing cover images.
 Generate a powerful cover image with the following requirements:
@@ -30,7 +31,8 @@ Generate a powerful cover image with the following requirements:
 - Powerful, magnetic atmosphere
 - Professional quality suitable for social media covers, thumbnails, and banners
 - Ultra-realistic animal rendering if applicable
-- 8K quality, sharp focus, no artifacts`;
+- 8K quality, sharp focus, no artifacts
+- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
