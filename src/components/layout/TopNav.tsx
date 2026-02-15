@@ -1,4 +1,5 @@
-import { Compass, PenTool, Image, Zap, Plus, User, Wand2, KeyRound, ChevronDown } from 'lucide-react';
+import { Compass, PenTool, Image, Plus, User, Wand2, KeyRound, ChevronDown } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -26,9 +27,7 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
     <header className="relative z-30 flex h-14 items-center border-b border-border/30 bg-background/95 backdrop-blur-xl px-5 gap-4">
       {/* Logo */}
       <div className="flex items-center gap-3 shrink-0 mr-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-          <Zap className="h-4 w-4" />
-        </div>
+        <img src={logoImg} alt="Design Master" className="h-8 w-8 rounded-lg shadow-glow-sm" />
         <span className="font-display text-base font-bold tracking-tight text-foreground hidden lg:block">
           Design<span className="text-gradient">Master</span>
         </span>
