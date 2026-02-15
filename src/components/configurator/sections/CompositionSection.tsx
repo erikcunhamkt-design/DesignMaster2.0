@@ -1,7 +1,7 @@
 import { User, Users, PersonStanding, ArrowUp, Minus, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
 
 interface Props {
@@ -51,10 +51,10 @@ export function CompositionSection({ config, onUpdate }: Props) {
       </div>
 
       {config.floatingElements && (
-        <Input
+        <VoiceTextField
           placeholder="Ex: Notas de dólar, moedas..."
           value={config.floatingElementsText}
-          onChange={(e) => onUpdate({ floatingElementsText: e.target.value })}
+          onChange={(v) => onUpdate({ floatingElementsText: v })}
           className="h-8 bg-muted border-none text-xs"
         />
       )}

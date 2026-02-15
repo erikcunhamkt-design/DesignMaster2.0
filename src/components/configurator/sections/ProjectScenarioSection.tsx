@@ -1,7 +1,7 @@
 import { Plus, X } from 'lucide-react';
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { Switch } from '@/components/ui/switch';
 import { ProjectConfig } from '@/types/project';
 
@@ -38,10 +38,10 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
     <div className="space-y-3">
       <div>
         <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Nicho / Projeto</p>
-        <Input
+        <VoiceTextField
           placeholder="Ex: Trader de Elite"
           value={config.niche}
-          onChange={(e) => onUpdate({ niche: e.target.value })}
+          onChange={(v) => onUpdate({ niche: v })}
           className="h-8 bg-muted border-none text-xs mb-2"
         />
         <div className="flex flex-wrap gap-1">
@@ -62,10 +62,10 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      <Input
+      <VoiceTextField
         placeholder="Ambiente (Ex: Escritório Moderno)"
         value={config.environment}
-        onChange={(e) => onUpdate({ environment: e.target.value })}
+        onChange={(v) => onUpdate({ environment: v })}
         className="h-8 bg-muted border-none text-xs"
       />
 
