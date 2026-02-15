@@ -1,6 +1,6 @@
-import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Maximize2 } from 'lucide-react';
+import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Maximize2, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ProjectConfig } from '@/types/project';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
@@ -14,14 +14,22 @@ interface PreviewPanelProps {
 export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
   const [zoom, setZoom] = useState(100);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
 
-  const handleDownload = () => {
+  const handleDownload = useCallback(() => {
     if (!imageUrl) return;
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `spark-snap-${Date.now()}.png`;
-    link.click();
-  };
+    setDownloadState('loading');
+    
+    // Simulate brief loading for UX
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `spark-snap-${Date.now()}.png`;
+      link.click();
+      setDownloadState('done');
+      setTimeout(() => setDownloadState('idle'), 2000);
+    }, 600);
+  }, [imageUrl]);
 
   const hasTextOverlay = config?.textEnabled && config.textMode === 'camada' && (config.text01 || config.text02 || config.cta);
 
@@ -34,22 +42,24 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
   const overlayPos = getOverlayPosition();
 
+  const downloadLabel = downloadState === 'loading' ? 'Preparando…' : downloadState === 'done' ? 'Baixado' : 'Baixar';
+  const DownloadIcon = downloadState === 'loading' ? Loader2 : downloadState === 'done' ? Check : Download;
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background relative">
       {/* Cinematic ambient */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="ambient-glow w-[600px] h-[600px] bg-primary -top-48 -left-48" />
         <div className="ambient-glow w-[400px] h-[400px] bg-accent -bottom-40 -right-40" />
-        {/* Subtle dot grid */}
-        <div className="absolute inset-0 opacity-[0.012]" style={{
-          backgroundImage: 'radial-gradient(circle, hsl(220 12% 30%) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+        <div className="absolute inset-0 opacity-[0.01]" style={{
+          backgroundImage: 'radial-gradient(circle, hsl(220 12% 25%) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
         }} />
       </div>
 
       {/* Toolbar */}
       {state === 'concluido' && imageUrl && (
-        <div className="relative z-10 flex items-center justify-between border-b border-border/15 px-5 py-2.5 bg-background/60 backdrop-blur-md shrink-0">
+        <div className="relative z-10 flex items-center justify-between border-b border-border/10 px-5 py-2.5 bg-background/50 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={() => setZoom(Math.max(25, zoom - 25))}>
               <ZoomOut className="h-3.5 w-3.5" />
@@ -71,10 +81,16 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
                 Texto
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={handleDownload} className="h-7 gap-1.5 text-[10px] rounded-lg font-medium border-border/30 hover:border-primary/30">
-              <Download className="h-3 w-3" />
-              Export
-            </Button>
+
+            {/* Premium Download Button */}
+            <button
+              onClick={handleDownload}
+              disabled={downloadState === 'loading'}
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-semibold tracking-wide bg-secondary/60 border border-border/20 text-foreground/80 hover:bg-secondary hover:text-foreground hover:border-primary/20 hover:shadow-glow-sm transition-all duration-300 disabled:opacity-50"
+            >
+              <DownloadIcon className={`h-3 w-3 ${downloadState === 'loading' ? 'animate-spin' : ''} ${downloadState === 'done' ? 'text-primary' : ''}`} />
+              {downloadLabel}
+            </button>
           </div>
         </div>
       )}
@@ -83,17 +99,19 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
       <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-12">
         {state === 'aguardando' && (
           <div className="flex flex-col items-center gap-10 animate-fade-up">
-            {/* Floating icon */}
+            {/* Premium empty state */}
             <div className="relative">
-              <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-border/15 bg-card/40 shadow-inner-glow animate-float">
-                <ImageIcon className="h-10 w-10 text-muted-foreground/25" />
+              <div className="flex h-28 w-28 items-center justify-center rounded-3xl border border-border/10 bg-card/30 animate-float">
+                <ImageIcon className="h-12 w-12 text-muted-foreground/15" />
               </div>
-              <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-primary/4 to-accent/4 -z-10 animate-breathe" />
+              <div className="absolute -inset-8 rounded-[2rem] bg-gradient-to-br from-primary/3 to-accent/3 -z-10 animate-breathe" />
             </div>
-            <div className="text-center space-y-3">
-              <p className="font-display text-2xl font-bold tracking-tight text-foreground/80">Pronto para criar</p>
-              <p className="text-xs text-muted-foreground/50 max-w-[280px] leading-relaxed">
-                Configure seu criativo no painel e clique em <span className="text-primary font-semibold">Gerar</span>
+            <div className="text-center space-y-3 max-w-xs">
+              <p className="font-display text-xl font-bold tracking-tight text-foreground/70">
+                Seu Studio está pronto
+              </p>
+              <p className="text-xs text-muted-foreground/40 leading-relaxed">
+                Configure no <span className="text-foreground/60 font-medium">Creative Dock</span> e clique em <span className="text-primary font-semibold">Gerar</span>
               </p>
             </div>
           </div>
@@ -101,19 +119,18 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
         {state === 'gerando' && (
           <div className="flex flex-col items-center gap-10 animate-fade-up">
-            <div className="relative h-24 w-24">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 animate-breathe" />
-              <div className="absolute inset-[3px] rounded-xl bg-background/70 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="h-9 w-9 text-primary animate-pulse-glow" />
+            <div className="relative h-28 w-28">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/12 to-accent/8 animate-breathe" />
+              <div className="absolute inset-[3px] rounded-[1.4rem] bg-background/70 backdrop-blur-sm flex items-center justify-center">
+                <Sparkles className="h-10 w-10 text-primary animate-pulse-glow" />
               </div>
             </div>
             <div className="text-center space-y-2.5">
-              <p className="font-display text-2xl font-bold tracking-tight text-foreground/80">Gerando...</p>
-              <p className="text-xs text-muted-foreground/45">IA processando seu criativo</p>
+              <p className="font-display text-xl font-bold tracking-tight text-foreground/70">Criando...</p>
+              <p className="text-xs text-muted-foreground/40">IA processando seu criativo</p>
             </div>
-            {/* Progress bar */}
-            <div className="w-48 h-[3px] rounded-full overflow-hidden bg-border/20">
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+            <div className="w-56 h-[2px] rounded-full overflow-hidden bg-border/15">
+              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/50 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
             </div>
           </div>
         )}
@@ -123,9 +140,8 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
             <img
               src={imageUrl}
               alt="Imagem gerada"
-              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.04]"
+              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.03]"
             />
-            {/* Hover overlay */}
             <div className="absolute inset-0 rounded-xl bg-background/0 group-hover:bg-background/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
               <Maximize2 className="h-6 w-6 text-foreground/50" />
             </div>
