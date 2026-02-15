@@ -214,6 +214,7 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   // Style references = inspiration (lowest strength, never override identity)
   config.styleReferences.forEach((url, i) => {
     const attrs = config.referenceAttributes?.[i] as string[] | undefined;
+    const note = config.referenceNotes?.[i];
     references.push({
       url,
       role: 'inspiration',
@@ -221,6 +222,10 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
       preserve_identity: false,
       attributes: attrs,
     });
+    // Add reference note to prompt if available
+    if (note) {
+      parts.push(`reference image ${i + 1} guidance: ${note}`);
+    }
   });
 
   return {
