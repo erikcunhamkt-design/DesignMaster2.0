@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection } from '@/components/configurator/sections/ApiKeySection';
+import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 
 interface TopNavProps {
   activePage: 'explorar' | 'criar' | 'galeria' | 'extrator';
@@ -31,6 +32,7 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
         <span className="font-display text-base font-bold tracking-tight text-foreground hidden lg:block">
           Design<span className="text-gradient">Master</span>
         </span>
+        <SubscriptionBadge />
       </div>
 
       {/* Divider */}
