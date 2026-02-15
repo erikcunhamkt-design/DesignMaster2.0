@@ -1,4 +1,4 @@
-import { ImageIcon, Download, ZoomIn, ZoomOut, Type } from 'lucide-react';
+import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { ProjectConfig } from '@/types/project';
@@ -25,7 +25,6 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
   const hasTextOverlay = config?.textEnabled && config.textMode === 'camada' && (config.text01 || config.text02 || config.cta);
 
-  // Determine overlay position based on vertical position setting
   const getOverlayPosition = () => {
     if (!config) return 'bottom';
     if (config.verticalPosition === 'cima') return 'bottom';
@@ -36,16 +35,16 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
   const overlayPos = getOverlayPosition();
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-background">
+    <div className="flex flex-1 flex-col overflow-hidden bg-background relative noise">
       {/* Toolbar */}
       {state === 'concluido' && imageUrl && (
-        <div className="flex items-center justify-between border-b border-border px-4 py-2 bg-card/50 shrink-0">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(Math.max(25, zoom - 25))}>
+        <div className="relative z-10 flex items-center justify-between border-b border-border/30 px-5 py-2.5 glass shrink-0">
+          <div className="flex items-center gap-1.5">
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={() => setZoom(Math.max(25, zoom - 25))}>
               <ZoomOut className="h-3.5 w-3.5" />
             </Button>
-            <span className="text-[10px] font-mono text-muted-foreground w-8 text-center">{zoom}%</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(Math.min(200, zoom + 25))}>
+            <span className="text-[10px] font-mono font-medium text-muted-foreground w-10 text-center tabular-nums">{zoom}%</span>
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={() => setZoom(Math.min(200, zoom + 25))}>
               <ZoomIn className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -55,13 +54,13 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
                 size="sm"
                 variant={showOverlay ? 'default' : 'outline'}
                 onClick={() => setShowOverlay(!showOverlay)}
-                className="h-7 gap-1.5 text-[10px]"
+                className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold"
               >
                 <Type className="h-3 w-3" />
                 Texto
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={handleDownload} className="h-7 gap-1.5 text-[10px]">
+            <Button size="sm" variant="outline" onClick={handleDownload} className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold border-border/50">
               <Download className="h-3 w-3" />
               Download
             </Button>
@@ -70,24 +69,37 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
       )}
 
       {/* Canvas area */}
-      <div className="flex flex-1 items-center justify-center overflow-auto p-6">
+      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-8">
         {state === 'aguardando' && (
-          <div className="flex flex-col items-center gap-4 text-muted-foreground">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-border">
-              <ImageIcon className="h-10 w-10" />
+          <div className="flex flex-col items-center gap-6 text-muted-foreground animate-fade-up">
+            <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-border/30 bg-secondary/30 shadow-elevation-1">
+              <ImageIcon className="h-10 w-10 text-muted-foreground/50" />
             </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-foreground">AGUARDANDO CRIAÇÃO</p>
-              <p className="mt-1 text-xs">Preencha as configurações e clique em "Gerar Imagem"</p>
+            <div className="text-center space-y-2">
+              <p className="text-base font-bold tracking-tight text-foreground/80">Aguardando criação</p>
+              <p className="text-xs text-muted-foreground/70 max-w-[280px]">
+                Configure seu criativo no painel ao lado e clique em <span className="text-primary font-semibold">Gerar Imagem</span>
+              </p>
             </div>
           </div>
         )}
 
         {state === 'gerando' && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-20 w-20 rounded-2xl bg-primary/20 animate-pulse" />
-            <p className="text-sm font-semibold text-primary">GERANDO...</p>
-            <p className="text-xs text-muted-foreground">Isso pode levar alguns segundos</p>
+          <div className="flex flex-col items-center gap-6 animate-fade-up">
+            <div className="relative h-24 w-24">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 animate-pulse" />
+              <div className="absolute inset-1 rounded-xl bg-background/50 flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-base font-bold tracking-tight text-foreground/80">Gerando criativo...</p>
+              <p className="text-xs text-muted-foreground/70">Isso pode levar alguns segundos</p>
+            </div>
+            {/* Shimmer bar */}
+            <div className="w-48 h-1 rounded-full overflow-hidden bg-secondary">
+              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+            </div>
           </div>
         )}
 
@@ -96,7 +108,7 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
             <img
               src={imageUrl}
               alt="Imagem gerada"
-              className="object-contain rounded-lg shadow-lg transition-all duration-200 w-full h-full"
+              className="object-contain rounded-xl shadow-elevation-3 transition-all duration-300 w-full h-full ring-1 ring-white/5"
             />
             {/* Text Overlay */}
             {hasTextOverlay && showOverlay && (
@@ -147,6 +159,12 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
             )}
           </div>
         )}
+      </div>
+
+      {/* Subtle gradient overlay at edges */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/50 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background/50 to-transparent" />
       </div>
     </div>
   );
