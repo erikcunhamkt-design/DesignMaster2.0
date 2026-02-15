@@ -124,7 +124,7 @@ export default function UpscalePage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ imageBase64 }),
+        body: JSON.stringify({ imageBase64, googleApiKey: apiKey }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.error || `Erro ${response.status}`);
@@ -211,7 +211,7 @@ export default function UpscalePage() {
             {imageBase64 && (
               <Button
                 onClick={handleAnalyze}
-                disabled={isAnalyzing}
+                disabled={isAnalyzing || apiKey.length < 10}
                 variant="outline"
                 className="w-full h-10 gap-2 rounded-xl text-xs font-bold border-border/30 hover:border-primary/40"
               >

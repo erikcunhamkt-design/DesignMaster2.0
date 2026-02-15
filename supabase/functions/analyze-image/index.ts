@@ -12,9 +12,14 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64 } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const { imageBase64, googleApiKey } = await req.json();
+
+    if (!googleApiKey || googleApiKey.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!imageBase64) {
       return new Response(
@@ -23,18 +28,16 @@ serve(async (req) => {
       );
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
-        messages: [
-          {
-            role: "system",
-            content: `You are a professional image quality analyst. Analyze the provided image and return a JSON assessment. Be concise and precise. Answer in Portuguese (BR).
+    // Extract base64 data from data URL
+    const match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+    if (!match) {
+      return new Response(
+        JSON.stringify({ error: "Formato de imagem inválido." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const systemPrompt = `You are a professional image quality analyst. Analyze the provided image and return a JSON assessment. Be concise and precise. Answer in Portuguese (BR).
 
 Return ONLY valid JSON with this exact structure:
 {
@@ -49,44 +52,43 @@ Return ONLY valid JSON with this exact structure:
     "colors": "<desbotadas|naturais|saturadas>",
     "compression": "<sem artefatos|artefatos leves|artefatos visíveis>"
   }
-}`
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Analyze this image quality in detail." },
-              { type: "image_url", image_url: { url: imageBase64 } }
-            ]
-          }
-        ],
+}`;
+
+    const model = "gemini-2.5-flash";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: `${systemPrompt}\n\nAnalyze this image quality in detail.` },
+            { inlineData: { mimeType: match[1], data: match[2] } }
+          ]
+        }],
+        generationConfig: { responseMimeType: "application/json" },
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Google API error:", response.status, errorText);
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit excedido. Aguarde." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "Erro na análise." }), {
+      return new Response(JSON.stringify({ error: `Erro na API: ${response.status}` }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Try to parse JSON from the response
     let analysis;
     try {
-      // Extract JSON from potential markdown code blocks
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, content];
       analysis = JSON.parse(jsonMatch[1].trim());
     } catch {
@@ -96,13 +98,7 @@ Return ONLY valid JSON with this exact structure:
         resolution_estimate: "desconhecida",
         issues: ["Não foi possível analisar completamente"],
         suggestions: ["Tente enviar a imagem novamente"],
-        details: {
-          sharpness: "média",
-          noise_level: "médio",
-          lighting: "equilibrada",
-          colors: "naturais",
-          compression: "artefatos leves"
-        }
+        details: { sharpness: "média", noise_level: "médio", lighting: "equilibrada", colors: "naturais", compression: "artefatos leves" }
       };
     }
 
