@@ -13,9 +13,9 @@ export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const quantities = [1, 2, 3, 4, 5];
   const positions = [
-    { id: 'esquerda' as const, label: 'Esquerda', icon: AlignLeft },
+    { id: 'esquerda' as const, label: 'Esq', icon: AlignLeft },
     { id: 'centro' as const, label: 'Centro', icon: AlignCenter },
-    { id: 'direita' as const, label: 'Direita', icon: AlignRight },
+    { id: 'direita' as const, label: 'Dir', icon: AlignRight },
   ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,19 +46,18 @@ export function SubjectSection({ config, onUpdate }: Props) {
         onChange={handleFileSelect}
       />
 
+      {/* Photos */}
       <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Fotos do Sujeito</p>
-
         {config.subjectPhotos.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             {config.subjectPhotos.map((url, i) => (
-              <div key={i} className="relative h-16 w-16 rounded-lg overflow-hidden border border-border group">
+              <div key={i} className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group">
                 <img src={url} alt={`Sujeito ${i + 1}`} className="h-full w-full object-cover" />
                 <button
                   onClick={() => removePhoto(i)}
-                  className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="h-2.5 w-2.5" />
+                  <X className="h-2 w-2" />
                 </button>
               </div>
             ))}
@@ -67,76 +66,79 @@ export function SubjectSection({ config, onUpdate }: Props) {
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex h-20 w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+          className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200"
         >
-          <Plus className="h-4 w-4" />
-          <span className="text-xs font-medium">UPLOAD</span>
+          <Plus className="h-3.5 w-3.5" />
+          <span className="text-[10px] font-medium tracking-wide uppercase">Upload</span>
         </button>
       </div>
 
-      <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Quantidade</p>
-        <div className="flex gap-1.5">
-          {quantities.map((q) => (
-            <button
-              key={q}
-              onClick={() => onUpdate({ quantity: q })}
-              className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors',
-                config.quantity === q
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {q}
-            </button>
-          ))}
+      {/* Quantity + Gender row */}
+      <div className="flex gap-3">
+        <div className="flex-1">
+          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Qtd</p>
+          <div className="flex gap-1">
+            {quantities.map((q) => (
+              <button
+                key={q}
+                onClick={() => onUpdate({ quantity: q })}
+                className={cn(
+                  'flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-all duration-150',
+                  config.quantity === q
+                    ? 'bg-primary/15 text-primary border border-primary/30'
+                    : 'bg-secondary/50 text-muted-foreground hover:text-foreground border border-transparent'
+                )}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Gênero</p>
-        <div className="flex gap-1.5">
-          {(['masculino', 'feminino'] as const).map((g) => (
-            <button
-              key={g}
-              onClick={() => onUpdate({ gender: g })}
-              className={cn(
-                'flex-1 rounded-md py-1.5 text-xs font-medium capitalize transition-colors',
-                config.gender === g
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {g}
-            </button>
-          ))}
+        <div>
+          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
+          <div className="flex gap-1">
+            {(['masculino', 'feminino'] as const).map((g) => (
+              <button
+                key={g}
+                onClick={() => onUpdate({ gender: g })}
+                className={cn(
+                  'rounded-md px-3 py-1.5 text-[10px] font-medium capitalize transition-all duration-150 border',
+                  config.gender === g
+                    ? 'bg-primary/15 text-primary border-primary/30'
+                    : 'bg-secondary/50 text-muted-foreground hover:text-foreground border-transparent'
+                )}
+              >
+                {g === 'masculino' ? 'M' : 'F'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       <VoiceTextField
         textarea
-        placeholder="Descrição da pose ou roupa (opcional)..."
+        placeholder="Descrição da pose ou roupa..."
         value={config.poseDescription}
         onChange={(v) => onUpdate({ poseDescription: v })}
-        className="min-h-[60px] resize-none bg-muted border-none text-xs"
+        className="min-h-[52px] resize-none bg-secondary/30 border-border/20 text-[11px]"
       />
 
+      {/* Position */}
       <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Posição do Sujeito</p>
-        <div className="grid grid-cols-3 gap-1.5">
+        <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Posição</p>
+        <div className="grid grid-cols-3 gap-1">
           {positions.map((pos) => (
             <button
               key={pos.id}
               onClick={() => onUpdate({ subjectPosition: pos.id })}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-lg py-2.5 text-[10px] font-medium transition-colors',
+                'flex flex-col items-center gap-0.5 rounded-md py-2 text-[9px] font-medium transition-all duration-150 border',
                 config.subjectPosition === pos.id
-                  ? 'bg-primary/15 text-primary border border-primary/30'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/10 text-primary border-primary/25'
+                  : 'bg-secondary/30 text-muted-foreground hover:text-foreground border-transparent'
               )}
             >
-              <pos.icon className="h-4 w-4" />
+              <pos.icon className="h-3 w-3" />
               {pos.label}
             </button>
           ))}

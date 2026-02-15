@@ -17,12 +17,12 @@ const styles = [
 
 export function VisualStyleSection({ config, onUpdate }: Props) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Sobriedade */}
       <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-2">Sobriedade</p>
+        <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-2 tracking-wide">Sobriedade</p>
         <div className="flex items-center gap-2">
-          <span className="text-[9px] text-muted-foreground">Criativo</span>
+          <span className="text-[8px] text-muted-foreground/50 w-12">Criativo</span>
           <Slider
             value={[config.sobriety]}
             onValueChange={([v]) => onUpdate({ sobriety: v })}
@@ -31,13 +31,13 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
             step={1}
             className="flex-1"
           />
-          <span className="text-[9px] text-muted-foreground">Profissional</span>
+          <span className="text-[8px] text-muted-foreground/50 w-12 text-right">Pro</span>
         </div>
       </div>
 
       {/* Estilo Visual */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-foreground">Ativar Estilo Visual</span>
+        <span className="text-[10px] font-medium text-foreground/70">Estilo Visual</span>
         <Switch
           checked={config.visualStyleEnabled}
           onCheckedChange={(v) => onUpdate({ visualStyleEnabled: v })}
@@ -45,16 +45,16 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
       </div>
 
       {config.visualStyleEnabled && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1">
           {styles.map((s) => (
             <button
               key={s}
               onClick={() => onUpdate({ visualStyle: s })}
               className={cn(
-                'rounded-md px-2.5 py-1.5 text-[10px] font-medium transition-colors',
+                'rounded-full px-2 py-0.5 text-[9px] font-medium transition-all duration-150 border',
                 config.visualStyle === s
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/12 text-primary border-primary/25'
+                  : 'bg-secondary/30 text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/50'
               )}
             >
               {s}
@@ -66,14 +66,14 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
       {/* Toggles */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-foreground">Usar Desfoque (Blur)?</span>
+          <span className="text-[10px] text-foreground/70">Desfoque (Blur)</span>
           <Switch
             checked={config.useBlur}
             onCheckedChange={(v) => onUpdate({ useBlur: v })}
           />
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-foreground">Usar Degradê Lateral?</span>
+          <span className="text-[10px] text-foreground/70">Degradê Lateral</span>
           <Switch
             checked={config.useSideGradient}
             onCheckedChange={(v) => onUpdate({ useSideGradient: v })}
@@ -84,7 +84,7 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
       {/* Prompt Adicional */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-foreground">Prompt Adicional</span>
+          <span className="text-[10px] font-medium text-foreground/70">Prompt Extra</span>
           <Switch
             checked={config.additionalPromptEnabled}
             onCheckedChange={(v) => onUpdate({ additionalPromptEnabled: v })}
@@ -93,10 +93,10 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
         {config.additionalPromptEnabled && (
           <VoiceTextField
             textarea
-            placeholder="Instruções adicionais para o modelo..."
+            placeholder="Instruções adicionais..."
             value={config.additionalPrompt}
             onChange={(v) => onUpdate({ additionalPrompt: v })}
-            className="min-h-[60px] resize-none bg-muted border-none text-xs"
+            className="min-h-[48px] resize-none bg-secondary/30 border-border/20 text-[10px]"
           />
         )}
       </div>
