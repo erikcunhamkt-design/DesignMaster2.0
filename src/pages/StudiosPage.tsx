@@ -1,6 +1,7 @@
 import { studios } from '@/data/studios';
 import { StudioCard } from '@/components/StudioCard';
 import logoImg from '@/assets/logo.png';
+import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 
 export default function StudiosPage() {
   return (
@@ -22,6 +23,7 @@ export default function StudiosPage() {
           <span className="font-display text-base font-bold tracking-tight text-foreground">
             Design<span className="text-gradient">Master</span>
           </span>
+          <SubscriptionBadge />
         </div>
       </header>
 
