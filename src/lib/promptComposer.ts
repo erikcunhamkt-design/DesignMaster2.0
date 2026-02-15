@@ -155,11 +155,8 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   const isNonRealist = config.visualStyleEnabled && config.visualStyle && nonRealistStyles.has(config.visualStyle);
 
   if (hasHuman && !isNonRealist) {
-    parts.push('ultra photorealistic, extreme realism, cinematic dramatic lighting with deep shadows and strong rim light, visible skin pores in close-up detail, natural skin micro-texture with fine wrinkles and imperfections, highly detailed beard and facial hair strand-by-strand with individual hair shine and light reflections');
-    parts.push('sharp focused eyes with vivid natural catchlight and iris detail, realistic eyelashes individually rendered, natural eyebrow hair texture');
-    parts.push('hyper-detailed lip anatomy with natural fissures and cracks, realistic lip moisture and subtle color variation, well-defined lip contour and vermilion border');
-    parts.push('hair rendered strand-by-strand with natural shine and light play, individual hair strands catching light, volumetric hair detail');
-    parts.push('ultra sharp focus, 8k resolution, ultra HD, shot on Hasselblad H6D-400c, 100mm macro lens detail, premium quality, masterpiece, professional studio photography');
+    parts.push('ultra photorealistic, extreme realism, cinematic lighting, skin pores detailed, natural facial texture, highly detailed lips and mouth anatomy, well-defined facial expressions, sharp eyes with natural catchlight, realistic hair strands strand-by-strand, high micro-texture detail, ultra sharp focus, 8k, ultra HD, premium quality, masterpiece');
+    parts.push('natural healthy lip texture, correct lip contour and anatomy');
   }
 
   let negativePrompt = 'deformed hands, extra fingers, bad anatomy, blurry text, misspelled text, watermark, logo, low quality, blurry, pixelated, oversaturated, duplicate, disfigured face, extra limbs';

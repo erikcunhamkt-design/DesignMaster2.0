@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -101,10 +101,6 @@ export default {
           "0%, 100%": { opacity: "0.5", transform: "scale(1)" },
           "50%": { opacity: "0.8", transform: "scale(1.05)" },
         },
-        "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px -5px hsl(270 60% 58% / 0.3)" },
-          "50%": { boxShadow: "0 0 30px -5px hsl(270 60% 58% / 0.5)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -114,16 +110,15 @@ export default {
         "fade-up": "fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "float": "float 4s ease-in-out infinite",
         "breathe": "breathe 4s ease-in-out infinite",
-        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
       },
       boxShadow: {
-        "glow-sm": "0 0 20px -5px hsl(var(--primary) / 0.15)",
-        "glow-md": "0 0 40px -10px hsl(var(--primary) / 0.25)",
-        "glow-lg": "0 0 60px -15px hsl(var(--primary) / 0.35)",
-        "elevation-1": "0 1px 3px hsl(260 20% 2% / 0.4), 0 1px 2px hsl(260 20% 2% / 0.25)",
-        "elevation-2": "0 4px 16px hsl(260 20% 2% / 0.5), 0 2px 6px hsl(260 20% 2% / 0.3)",
-        "elevation-3": "0 16px 48px hsl(260 20% 2% / 0.6), 0 6px 16px hsl(260 20% 2% / 0.35)",
-        "inner-glow": "inset 0 1px 0 hsl(260 12% 20% / 0.5), inset 0 -1px 0 hsl(260 20% 4% / 0.5)",
+        "glow-sm": "0 0 20px -5px hsl(var(--primary) / 0.12)",
+        "glow-md": "0 0 40px -10px hsl(var(--primary) / 0.2)",
+        "glow-lg": "0 0 60px -15px hsl(var(--primary) / 0.3)",
+        "elevation-1": "0 1px 3px hsl(225 30% 2% / 0.4), 0 1px 2px hsl(225 30% 2% / 0.25)",
+        "elevation-2": "0 4px 16px hsl(225 30% 2% / 0.5), 0 2px 6px hsl(225 30% 2% / 0.3)",
+        "elevation-3": "0 16px 48px hsl(225 30% 2% / 0.6), 0 6px 16px hsl(225 30% 2% / 0.35)",
+        "inner-glow": "inset 0 1px 0 hsl(225 15% 18% / 0.5), inset 0 -1px 0 hsl(225 30% 3% / 0.5)",
       },
     },
   },
