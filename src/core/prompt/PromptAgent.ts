@@ -116,11 +116,12 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   }
 
   // ─── 4. COLOR PALETTE (third priority) ───
-  const ambCol = config.colorMode === 'manual' ? config.ambientColor : config.autoAmbientColor;
-  const rimCol = config.colorMode === 'manual' ? config.rimLightColor : config.autoRimLightColor;
-  const fillCol = config.colorMode === 'manual' ? config.complementaryLightColor : config.autoComplementaryLightColor;
-  parts.push(`color palette: ambient ${ambCol}, rim light ${rimCol}, complementary accent ${fillCol}`);
-  parts.push('colors applied through lighting and environment, cohesive color harmony');
+  if (config.colorMode === 'manual') {
+    parts.push(`color palette: ambient ${config.ambientColor}, rim light ${config.rimLightColor}, complementary accent ${config.complementaryLightColor}`);
+    parts.push('colors applied through lighting and environment, cohesive color harmony');
+  } else {
+    parts.push('choose the most coherent and harmonious color palette for the lighting and environment based on the overall design context, niche, and mood');
+  }
 
   // ─── 5. COMPOSITION / FRAMING (fourth priority) ───
   if (config.framing === 'closeup') {
