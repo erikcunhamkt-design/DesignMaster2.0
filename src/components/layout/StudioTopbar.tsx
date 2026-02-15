@@ -3,6 +3,7 @@ import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { cn } from '@/lib/utils';
 
 interface StudioTopbarProps {
@@ -34,6 +35,7 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
         <span className="font-display text-sm font-bold tracking-tight text-foreground">
           {title}
         </span>
+        <SubscriptionBadge compact={false} />
       </div>
 
       <div className="flex-1" />
