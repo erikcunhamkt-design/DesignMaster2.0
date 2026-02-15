@@ -23,9 +23,14 @@ export interface ProjectConfig {
   sceneryPhotos: string[];
 
   // Cores & Iluminação
+  colorMode: 'auto' | 'manual';
   ambientColor: string;
   rimLightColor: string;
   complementaryLightColor: string;
+  autoAmbientColor: string;
+  autoRimLightColor: string;
+  autoComplementaryLightColor: string;
+  autoColorRationale: string;
 
   // Composição
   framing: 'closeup' | 'plano-medio' | 'plano-americano';
@@ -69,9 +74,14 @@ export const defaultConfig: ProjectConfig = {
   environment: '',
   sceneryPhotosEnabled: false,
   sceneryPhotos: [],
+  colorMode: 'auto',
   ambientColor: '#8B5CF6',
   rimLightColor: '#3B82F6',
   complementaryLightColor: '#F59E0B',
+  autoAmbientColor: '#8B5CF6',
+  autoRimLightColor: '#3B82F6',
+  autoComplementaryLightColor: '#F59E0B',
+  autoColorRationale: 'Paleta padrão cinematográfica.',
   framing: 'plano-medio',
   floatingElements: false,
   floatingElementsText: '',

@@ -88,7 +88,10 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   }
 
   // 6. Colors & lighting
-  parts.push(`ambient color: ${config.ambientColor}, rim light: ${config.rimLightColor}, complementary light: ${config.complementaryLightColor}`);
+  const ambCol = config.colorMode === 'manual' ? config.ambientColor : config.autoAmbientColor;
+  const rimCol = config.colorMode === 'manual' ? config.rimLightColor : config.autoRimLightColor;
+  const fillCol = config.colorMode === 'manual' ? config.complementaryLightColor : config.autoComplementaryLightColor;
+  parts.push(`ambient color: ${ambCol}, rim light: ${rimCol}, complementary light: ${fillCol}`);
 
   // 7. Style
   if (config.visualStyleEnabled && config.visualStyle) {
