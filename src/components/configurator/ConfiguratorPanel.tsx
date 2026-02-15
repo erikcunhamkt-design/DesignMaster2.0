@@ -8,6 +8,7 @@ import { ColorsSection } from './sections/ColorsSection';
 import { CompositionSection } from './sections/CompositionSection';
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
+import { ApiKeySection } from './sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Copy, Loader2 } from 'lucide-react';
 
@@ -16,15 +17,22 @@ interface ConfiguratorPanelProps {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
   onGenerate: () => void;
   isGenerating: boolean;
+  apiKey: string;
+  onChangeApiKey: (key: string) => void;
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, onChangeApiKey }: ConfiguratorPanelProps) {
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
-    (!config.textEnabled || config.text01.length >= 3) && !isGenerating;
+    (!config.textEnabled || config.text01.length >= 3) && !isGenerating && apiKey.length >= 10;
 
   return (
     <div className="flex w-[360px] shrink-0 flex-col border-l border-border bg-card">
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
+        <section>
+          <SectionLabel>🔑 API Key do Google</SectionLabel>
+          <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
+        </section>
+
         <section>
           <SectionLabel>Sujeito Principal</SectionLabel>
           <SubjectSection config={config} onUpdate={onUpdate} />

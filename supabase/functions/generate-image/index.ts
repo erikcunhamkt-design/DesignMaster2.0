@@ -12,119 +12,103 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, negativePrompt, referenceImages } = await req.json();
+    const { prompt, negativePrompt, referenceImages, googleApiKey } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
       return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Build messages for the image generation model
-    const userContent: any[] = [
-      {
-        type: "text",
-        text: `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`,
-      },
-    ];
+    const fullPrompt = `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
-    // Add reference images if provided
-    if (referenceImages && referenceImages.length > 0) {
-      for (const refImg of referenceImages) {
-        userContent.push({
-          type: "image_url",
-          image_url: { url: refImg },
-        });
-      }
-    }
+    // Build parts array
+    const parts: any[] = [{ text: fullPrompt }];
 
-    // Try generation with references first, then without on failure
-    async function callModel(refs: any[]): Promise<Response> {
-      const content: any[] = [
-        {
-          type: "text",
-          text: `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`,
-        },
-        ...refs,
-      ];
-
-      console.log(`Calling Nano Banana Pro (${refs.length} refs)...`);
-
-      return fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-3-pro-image-preview",
-            messages: [{ role: "user", content }],
-            modalities: ["image", "text"],
-          }),
-        }
-      );
-    }
-
-    // Build ref entries (limit size)
-    const refEntries: any[] = [];
+    // Add reference images as inline data
     if (referenceImages && referenceImages.length > 0) {
       for (const refImg of referenceImages.slice(0, 3)) {
-        refEntries.push({ type: "image_url", image_url: { url: refImg } });
+        // refImg is a data URL like "data:image/png;base64,..."
+        const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          parts.push({
+            inlineData: {
+              mimeType: match[1],
+              data: match[2],
+            },
+          });
+        }
       }
     }
 
-    // Attempt 1: with references
-    let response = await callModel(refEntries);
+    const model = "gemini-2.5-flash-image";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
-    // If failed with refs, retry without
-    if (!response.ok && refEntries.length > 0) {
-      console.log("Retrying without reference images...");
-      response = await callModel([]);
-    }
+    console.log(`Calling Google Gemini ${model} directly...`);
 
-    // If still failed, one more retry
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts }],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+        },
+      }),
+    });
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Google API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }),
+          JSON.stringify({ error: "Limite de requisições excedido na API do Google. Aguarde e tente novamente." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 400) {
         return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao seu workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Requisição inválida. Verifique o prompt e tente novamente." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 403) {
+        return new Response(
+          JSON.stringify({ error: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      // Final retry after short delay
-      await new Promise(r => setTimeout(r, 2000));
-      response = await callModel([]);
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Final AI gateway error:", response.status, errorText);
       return new Response(
-        JSON.stringify({ error: `Erro na geração: ${response.status}. Tente novamente.` }),
+        JSON.stringify({ error: `Erro na API do Google: ${response.status}. Tente novamente.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    const textResponse = data.choices?.[0]?.message?.content || "";
+
+    // Extract image from Google's response format
+    let imageUrl: string | null = null;
+    let textResponse = "";
+
+    const candidates = data.candidates;
+    if (candidates && candidates.length > 0) {
+      const contentParts = candidates[0]?.content?.parts || [];
+      for (const part of contentParts) {
+        if (part.inlineData) {
+          imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        }
+        if (part.text) {
+          textResponse += part.text;
+        }
+      }
+    }
 
     if (!imageUrl) {
       return new Response(
-        JSON.stringify({ error: "Nenhuma imagem foi gerada. Tente novamente com outro prompt." }),
+        JSON.stringify({ error: "Nenhuma imagem foi gerada. Tente com outro prompt." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
