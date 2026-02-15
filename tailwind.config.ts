@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -80,11 +84,29 @@ export default {
           "0%, 100%": { opacity: "0.4" },
           "50%": { opacity: "1" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "shimmer": "shimmer 2s linear infinite",
+        "fade-up": "fade-up 0.5s ease-out forwards",
+      },
+      boxShadow: {
+        "glow-sm": "0 0 20px -5px hsl(var(--primary) / 0.15)",
+        "glow-md": "0 0 40px -10px hsl(var(--primary) / 0.25)",
+        "glow-lg": "0 0 60px -15px hsl(var(--primary) / 0.35)",
+        "elevation-1": "0 1px 3px hsl(220 25% 3% / 0.3), 0 1px 2px hsl(220 25% 3% / 0.2)",
+        "elevation-2": "0 4px 12px hsl(220 25% 3% / 0.4), 0 2px 4px hsl(220 25% 3% / 0.2)",
+        "elevation-3": "0 12px 40px hsl(220 25% 3% / 0.5), 0 4px 12px hsl(220 25% 3% / 0.25)",
       },
     },
   },

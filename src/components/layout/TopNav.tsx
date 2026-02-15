@@ -24,14 +24,14 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
   const hasKey = apiKey.length >= 10;
 
   return (
-    <header className="flex h-12 items-center border-b border-border bg-card px-4 gap-6">
+    <header className="relative z-30 flex h-14 items-center border-b border-border/50 glass px-5 gap-5">
       {/* Logo */}
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm shadow-primary/20 shrink-0">
-        <Zap className="h-4 w-4" />
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/50 text-primary-foreground shadow-glow-sm shrink-0">
+        <Zap className="h-4.5 w-4.5" />
       </div>
 
       {/* Nav items */}
-      <nav className="flex items-center gap-1">
+      <nav className="flex items-center gap-0.5">
         {navItems.map((item) => {
           const active = activePage === item.id;
           return (
@@ -39,14 +39,17 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200',
+                'relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-[11px] font-semibold tracking-wide uppercase transition-all duration-200',
                 active
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <item.icon className="h-3.5 w-3.5" />
               {item.label}
+              {active && (
+                <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary" />
+              )}
             </button>
           );
         })}
@@ -56,11 +59,11 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
       <div className="flex-1" />
 
       {/* Search */}
-      <div className="relative max-w-[200px]">
-        <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative max-w-[220px]">
+        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Buscar..."
-          className="h-7 pl-7 bg-muted border-none text-[11px] rounded-lg w-full"
+          className="h-8 pl-9 bg-secondary/50 border-border/50 text-xs rounded-full w-full placeholder:text-muted-foreground/60 focus-visible:ring-1 focus-visible:ring-primary/30"
         />
       </div>
 
@@ -70,26 +73,29 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
           <PopoverTrigger asChild>
             <button
               className={cn(
-                'flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold tracking-wide transition-colors',
+                'flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-bold tracking-wider uppercase transition-all duration-200 border',
                 hasKey
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-destructive/10 text-destructive'
+                  ? 'bg-primary/8 text-primary border-primary/20 hover:bg-primary/12'
+                  : 'bg-destructive/8 text-destructive border-destructive/20 hover:bg-destructive/12'
               )}
             >
               <KeyRound className="h-3 w-3" />
               <span className="hidden sm:inline">API KEY</span>
-              <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+              <ChevronDown className="h-2.5 w-2.5 opacity-50" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-3">
+          <PopoverContent align="end" className="w-80 p-4 glass glass-border shadow-elevation-3">
             <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
           </PopoverContent>
         </Popover>
       )}
 
       {/* Status */}
-      <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary tracking-wide">
-        <Activity className="h-3 w-3" />
+      <div className="flex items-center gap-2 rounded-full bg-primary/8 border border-primary/20 px-3.5 py-1.5 text-[10px] font-bold text-primary tracking-wider uppercase">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+        </span>
         ONLINE
       </div>
 
@@ -97,14 +103,14 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
       <Button
         size="sm"
         onClick={onNewProject}
-        className="h-7 gap-1 text-[10px] font-semibold rounded-lg bg-primary hover:bg-primary/85 text-primary-foreground shadow-sm shadow-primary/20"
+        className="h-8 gap-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow-sm transition-all duration-200 hover:shadow-glow-md"
       >
-        <Plus className="h-3 w-3" />
+        <Plus className="h-3.5 w-3.5" />
         Novo
       </Button>
 
       {/* User */}
-      <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0">
+      <button className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all duration-200 shrink-0">
         <User className="h-3.5 w-3.5" />
       </button>
     </header>
