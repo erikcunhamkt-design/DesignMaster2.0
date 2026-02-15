@@ -149,7 +149,21 @@ export function composePrompt(config: ProjectConfig): PromptResult {
 
   parts.push('high quality, professional, sharp details, studio lighting');
 
-  const negativePrompt = 'deformed hands, extra fingers, bad anatomy, blurry text, misspelled text, watermark, logo, low quality, blurry, pixelated, oversaturated, duplicate, disfigured face, extra limbs';
+  // Ultra realism boost for human subjects (unless non-realist style)
+  const nonRealistStyles = new Set(['Cartoon', 'Lúdico', 'Interface UI']);
+  const hasHuman = config.subjectPhotos.length > 0 || !!config.poseDescription || !!config.expression || !!config.expressionCustom;
+  const isNonRealist = config.visualStyleEnabled && config.visualStyle && nonRealistStyles.has(config.visualStyle);
+
+  if (hasHuman && !isNonRealist) {
+    parts.push('ultra photorealistic, extreme realism, cinematic lighting, skin pores detailed, natural facial texture, highly detailed lips and mouth anatomy, well-defined facial expressions, sharp eyes with natural catchlight, realistic hair strands strand-by-strand, high micro-texture detail, ultra sharp focus, 8k, ultra HD, premium quality, masterpiece');
+    parts.push('natural healthy lip texture, correct lip contour and anatomy');
+  }
+
+  let negativePrompt = 'deformed hands, extra fingers, bad anatomy, blurry text, misspelled text, watermark, logo, low quality, blurry, pixelated, oversaturated, duplicate, disfigured face, extra limbs';
+
+  if (hasHuman && !isNonRealist) {
+    negativePrompt += ', cracked lips, overly dry lips, deformed mouth, weird teeth, extra teeth, asymmetrical eyes, uncanny face, plastic skin, waxy skin, over-smoothed skin, blurry eyes, low detail skin, mushy hair';
+  }
 
   return {
     prompt: parts.join('. '),

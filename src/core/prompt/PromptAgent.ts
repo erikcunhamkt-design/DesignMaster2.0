@@ -68,6 +68,30 @@ const BASE_NEGATIVE = 'low-res, blurry, noise, watermark, text artifacts, logo a
 
 const TEXT_NEGATIVE = 'garbled text, misspelled words, distorted typography, unreadable text, broken letters, overlapping characters';
 
+// ── ULTRA REALISM (human subjects) ──
+const HUMAN_REALISM_BOOST = 'ultra photorealistic, extreme realism, cinematic lighting, skin pores detailed, natural pores, natural facial texture, no plastic skin, highly detailed lips and mouth anatomy, well-defined facial expressions, sharp eyes with natural catchlight, realistic hair strands strand-by-strand, realistic beard and mustache detail strand-by-strand, high micro-texture detail, ultra sharp focus, 8k, ultra HD, premium quality, masterpiece';
+
+const HUMAN_NEGATIVE_BOOST = 'cracked lips, overly dry lips, deformed mouth, weird teeth, extra teeth, asymmetrical eyes, uncanny face, plastic skin, waxy skin, over-smoothed skin, blurry eyes, low detail skin, mushy hair, artifacts, low quality';
+
+const HUMAN_LIPS_BOOST = 'natural healthy lip texture, correct lip contour and anatomy, no artificial appearance';
+
+// Styles that should NOT receive the ultra-realism boost
+const NON_REALIST_STYLES = new Set([
+  'Cartoon', 'Lúdico', 'Interface UI',
+]);
+
+/** Returns true when the prompt context implies a real human subject */
+function isHumanSubject(config: ProjectConfig): boolean {
+  // The app always has a gendered subject; if subjectPhotos exist it's clearly a person
+  return config.subjectPhotos.length > 0 || !!config.poseDescription || !!config.expression || !!config.expressionCustom;
+}
+
+/** Returns true when the user picked a non-realistic visual style */
+function isNonRealistStyle(config: ProjectConfig): boolean {
+  if (!config.visualStyleEnabled || !config.visualStyle) return false;
+  return NON_REALIST_STYLES.has(config.visualStyle);
+}
+
 // ── Main builder ──
 export function buildGenerationRequest(config: ProjectConfig): GenerationRequest {
   const parts: string[] = [];
@@ -195,6 +219,13 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   // ─── 12. ADDITIONAL PROMPT ───
   if (config.additionalPromptEnabled && config.additionalPrompt) {
     parts.push(config.additionalPrompt);
+  }
+
+  // ─── ULTRA REALISM BOOST (auto for human subjects) ───
+  if (isHumanSubject(config) && !isNonRealistStyle(config)) {
+    parts.push(HUMAN_REALISM_BOOST);
+    parts.push(HUMAN_LIPS_BOOST);
+    negativeParts.push(HUMAN_NEGATIVE_BOOST);
   }
 
   // ─── ALWAYS INJECT BASE STYLE ───
