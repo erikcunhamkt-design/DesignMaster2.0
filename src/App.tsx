@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import StudiosPage from "./pages/StudiosPage";
 import Index from "./pages/Index";
 import ExtractorPage from "./pages/ExtractorPage";
@@ -15,6 +16,7 @@ import MagneticCoversPage from "./pages/MagneticCoversPage";
 import PromptGalleryPage from "./pages/PromptGalleryPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
+import { StudioTopbar } from "./components/layout/StudioTopbar";
 
 const queryClient = new QueryClient();
 
@@ -29,17 +31,16 @@ const App = () => {
         {showIntro && <SplashIntro onComplete={() => setShowIntro(false)} />}
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<StudiosPage />} />
-            <Route path="/studio/criador" element={<Index />} />
-            <Route path="/studio/extrator" element={<ExtractorWrapper />} />
-            <Route path="/studio/prompt-builder" element={<PromptBuilderPage />} />
-            <Route path="/studio/upscale" element={<UpscalePage />} />
-            <Route path="/studio/markdown" element={<MarkdownGeneratorPage />} />
-            <Route path="/studio/produtos" element={<ProductsStudioPage />} />
-            <Route path="/studio/capas" element={<MagneticCoversPage />} />
-            <Route path="/studio/galeria" element={<PromptGalleryPage />} />
-            {/* Legacy route redirect */}
-            <Route path="/criar/:creatorId" element={<Index />} />
+            <Route path="/" element={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />
+            <Route path="/studio/criador" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/studio/extrator" element={<ProtectedRoute><ExtractorWrapper /></ProtectedRoute>} />
+            <Route path="/studio/prompt-builder" element={<ProtectedRoute><PromptBuilderPage /></ProtectedRoute>} />
+            <Route path="/studio/upscale" element={<ProtectedRoute><UpscalePage /></ProtectedRoute>} />
+            <Route path="/studio/markdown" element={<ProtectedRoute><MarkdownGeneratorPage /></ProtectedRoute>} />
+            <Route path="/studio/produtos" element={<ProtectedRoute><ProductsStudioPage /></ProtectedRoute>} />
+            <Route path="/studio/capas" element={<ProtectedRoute><MagneticCoversPage /></ProtectedRoute>} />
+            <Route path="/studio/galeria" element={<ProtectedRoute><PromptGalleryPage /></ProtectedRoute>} />
+            <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
@@ -47,9 +48,6 @@ const App = () => {
     </QueryClientProvider>
   );
 };
-
-// Wrap ExtractorPage with StudioTopbar
-import { StudioTopbar } from "./components/layout/StudioTopbar";
 
 function ExtractorWrapper() {
   return (
