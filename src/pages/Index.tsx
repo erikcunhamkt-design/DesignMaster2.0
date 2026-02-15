@@ -84,6 +84,8 @@ const Index = () => {
         activePage={activePage}
         onNavigate={setActivePage}
         onNewProject={addProject}
+        apiKey={apiKey}
+        onChangeApiKey={setApiKey}
       />
       {activePage === 'criar' && (
         <ProjectTabs
@@ -105,7 +107,6 @@ const Index = () => {
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
               apiKey={apiKey}
-              onChangeApiKey={setApiKey}
             />
           </>
         )}

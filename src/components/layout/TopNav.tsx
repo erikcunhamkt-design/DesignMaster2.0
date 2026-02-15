@@ -1,12 +1,16 @@
-import { Compass, PenTool, Image, Zap, Plus, Search, User, Activity, Wand2 } from 'lucide-react';
+import { Compass, PenTool, Image, Zap, Plus, Search, User, Activity, Wand2, KeyRound, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { ApiKeySection } from '@/components/configurator/sections/ApiKeySection';
 
 interface TopNavProps {
   activePage: 'explorar' | 'criar' | 'galeria' | 'extrator';
   onNavigate: (page: 'explorar' | 'criar' | 'galeria' | 'extrator') => void;
   onNewProject: () => void;
+  apiKey?: string;
+  onChangeApiKey?: (key: string) => void;
 }
 
 const navItems = [
@@ -16,7 +20,9 @@ const navItems = [
   { id: 'galeria' as const, label: 'Galeria', icon: Image },
 ];
 
-export function TopNav({ activePage, onNavigate, onNewProject }: TopNavProps) {
+export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onChangeApiKey }: TopNavProps) {
+  const hasKey = apiKey.length >= 10;
+
   return (
     <header className="flex h-12 items-center border-b border-border bg-card px-4 gap-6">
       {/* Logo */}
@@ -58,8 +64,31 @@ export function TopNav({ activePage, onNavigate, onNewProject }: TopNavProps) {
         />
       </div>
 
+      {/* API Key Pill */}
+      {onChangeApiKey && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className={cn(
+                'flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold tracking-wide transition-colors',
+                hasKey
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-destructive/10 text-destructive'
+              )}
+            >
+              <KeyRound className="h-3 w-3" />
+              <span className="hidden sm:inline">API KEY</span>
+              <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-3">
+            <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
+          </PopoverContent>
+        </Popover>
+      )}
+
       {/* Status */}
-      <div className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary tracking-wide">
+      <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary tracking-wide">
         <Activity className="h-3 w-3" />
         ONLINE
       </div>
