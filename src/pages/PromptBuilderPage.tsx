@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Wand2, Copy, Check, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +22,7 @@ export default function PromptBuilderPage() {
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
+  const { apiKey } = useGoogleApiKey();
   const toggleChip = (chip: string, list: string[], setList: (v: string[]) => void) => {
     setList(list.includes(chip) ? list.filter(c => c !== chip) : [...list, chip]);
   };
@@ -39,6 +40,7 @@ export default function PromptBuilderPage() {
           styles: selectedStyles,
           categories: selectedCategories,
           extra,
+          googleApiKey: apiKey,
         },
       });
       if (error) throw new Error(error.message);
@@ -61,7 +63,7 @@ export default function PromptBuilderPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Criador de Prompts" showApiKey={false} />
+      <StudioTopbar title="Criador de Prompts" />
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Builder */}
         <div className="w-[440px] shrink-0 border-r border-border/15 bg-card/20 flex flex-col overflow-y-auto">
@@ -127,7 +129,7 @@ export default function PromptBuilderPage() {
               <Textarea value={extra} onChange={e => setExtra(e.target.value)} placeholder="Detalhes adicionais..." className="min-h-[80px] bg-secondary/40 border-border/15 text-xs rounded-lg resize-none" />
             </div>
 
-            <Button onClick={handleGenerate} disabled={isLoading || !subject} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-glow-md">
+            <Button onClick={handleGenerate} disabled={isLoading || !subject || apiKey.length < 10} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-glow-md">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               {isLoading ? 'Gerando...' : 'Gerar Prompt'}
             </Button>
