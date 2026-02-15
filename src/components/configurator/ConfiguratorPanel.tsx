@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ProjectConfig } from '@/types/project';
 import { SectionLabel } from './SectionLabel';
 import { SubjectSection } from './sections/SubjectSection';
@@ -10,8 +11,9 @@ import { CharacterDirectionSection } from './sections/CharacterDirectionSection'
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Sparkles, Copy, Loader2, Lightbulb } from 'lucide-react';
+import { Sparkles, Copy, Loader2, Eye, Move, Aperture, Palette, Type, Settings2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
 import { tipsConfig } from '@/data/tipsConfig';
 
@@ -23,73 +25,131 @@ interface ConfiguratorPanelProps {
   apiKey: string;
 }
 
+const dockTabs = [
+  { id: 'look', label: 'Look', icon: Eye },
+  { id: 'pose', label: 'Pose', icon: Move },
+  { id: 'lens', label: 'Lens', icon: Aperture },
+  { id: 'color', label: 'Color', icon: Palette },
+  { id: 'text', label: 'Text', icon: Type },
+  { id: 'pro', label: 'Pro', icon: Settings2 },
+] as const;
+
+type DockTab = typeof dockTabs[number]['id'];
+
 export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
-  const { tipsEnabled, setTipsEnabled } = useTipsMode();
+  const [activeTab, setActiveTab] = useState<DockTab>('look');
+  const { tipsEnabled } = useTipsMode();
 
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
     (!config.textEnabled || config.text01.length >= 3) && !isGenerating && apiKey.length >= 10;
 
+  const applyPreset = (preset: typeof creativePresets[number]) => {
+    onUpdate(preset.values);
+  };
+
   return (
-    <div className="flex w-[380px] shrink-0 flex-col border-l border-border/15 bg-card/30 backdrop-blur-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border/10 px-5 py-3">
-        <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/60 font-display">Configurações</h2>
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-3 w-3 text-muted-foreground/35" />
-          <span className="text-[10px] font-medium text-muted-foreground/40">Dicas</span>
-          <Switch checked={tipsEnabled} onCheckedChange={setTipsEnabled} className="scale-[0.65] origin-right" />
-        </div>
+    <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-card/20">
+      {/* Dock Tab Bar */}
+      <div className="flex items-center border-b border-border/10 px-2 py-1.5 gap-0.5 shrink-0">
+        {dockTabs.map((tab) => {
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'flex flex-1 flex-col items-center gap-0.5 py-1.5 rounded-lg text-[9px] font-semibold tracking-wide transition-all duration-300',
+                active
+                  ? 'text-primary bg-primary/8'
+                  : 'text-muted-foreground/50 hover:text-foreground/70 hover:bg-secondary/30'
+              )}
+            >
+              <tab.icon className={cn('h-3.5 w-3.5', active && 'text-primary')} />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
-        <section>
-          <SectionLabel tip={tipsConfig['sujeito']} tipsEnabled={tipsEnabled}>Sujeito</SectionLabel>
-          <SubjectSection config={config} onUpdate={onUpdate} />
-        </section>
+      {/* Presets Row */}
+      <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-border/8 overflow-x-auto shrink-0">
+        {creativePresets.map((preset) => (
+          <button
+            key={preset.id}
+            onClick={() => applyPreset(preset)}
+            className="flex items-center gap-1.5 shrink-0 rounded-lg border border-border/15 bg-secondary/20 px-2.5 py-1.5 text-[9px] font-medium text-foreground/60 hover:bg-secondary/40 hover:text-foreground hover:border-primary/20 transition-all duration-300"
+          >
+            <span className="text-xs">{preset.emoji}</span>
+            <span className="whitespace-nowrap">{preset.name}</span>
+          </button>
+        ))}
+      </div>
 
-        <section>
-          <SectionLabel tip={tipsConfig['dimensoes']} tipsEnabled={tipsEnabled}>Dimensões</SectionLabel>
-          <DimensionsSection config={config} onUpdate={onUpdate} />
-        </section>
+      {/* Tab Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+        {activeTab === 'look' && (
+          <>
+            <section>
+              <SectionLabel tip={tipsConfig['sujeito']} tipsEnabled={tipsEnabled}>Sujeito</SectionLabel>
+              <SubjectSection config={config} onUpdate={onUpdate} />
+            </section>
+            <section>
+              <SectionLabel tip={tipsConfig['estilo-visual']} tipsEnabled={tipsEnabled}>Estilo Visual</SectionLabel>
+              <VisualStyleSection config={config} onUpdate={onUpdate} />
+            </section>
+          </>
+        )}
 
-        <section>
-          <SectionLabel tip={tipsConfig['direcao']} tipsEnabled={tipsEnabled}>Direção do Personagem</SectionLabel>
-          <CharacterDirectionSection config={config} onUpdate={onUpdate} />
-        </section>
+        {activeTab === 'pose' && (
+          <section>
+            <SectionLabel tip={tipsConfig['direcao']} tipsEnabled={tipsEnabled}>Direção do Personagem</SectionLabel>
+            <CharacterDirectionSection config={config} onUpdate={onUpdate} />
+          </section>
+        )}
 
-        <section>
-          <SectionLabel tip={tipsConfig['texto']} tipsEnabled={tipsEnabled}>Texto</SectionLabel>
-          <TextSection config={config} onUpdate={onUpdate} />
-        </section>
+        {activeTab === 'lens' && (
+          <>
+            <section>
+              <SectionLabel tip={tipsConfig['dimensoes']} tipsEnabled={tipsEnabled}>Dimensões</SectionLabel>
+              <DimensionsSection config={config} onUpdate={onUpdate} />
+            </section>
+            <section>
+              <SectionLabel tip={tipsConfig['composicao']} tipsEnabled={tipsEnabled}>Composição</SectionLabel>
+              <CompositionSection config={config} onUpdate={onUpdate} />
+            </section>
+          </>
+        )}
 
-        <section>
-          <SectionLabel tip={tipsConfig['projeto-cenario']} tipsEnabled={tipsEnabled}>Projeto & Cenário</SectionLabel>
-          <ProjectScenarioSection config={config} onUpdate={onUpdate} />
-        </section>
+        {activeTab === 'color' && (
+          <section>
+            <SectionLabel tip={tipsConfig['cores']} tipsEnabled={tipsEnabled}>Cores & Iluminação</SectionLabel>
+            <ColorsSection config={config} onUpdate={onUpdate} />
+          </section>
+        )}
 
-        <section>
-          <SectionLabel tip={tipsConfig['cores']} tipsEnabled={tipsEnabled}>Cores & Iluminação</SectionLabel>
-          <ColorsSection config={config} onUpdate={onUpdate} />
-        </section>
+        {activeTab === 'text' && (
+          <section>
+            <SectionLabel tip={tipsConfig['texto']} tipsEnabled={tipsEnabled}>Texto</SectionLabel>
+            <TextSection config={config} onUpdate={onUpdate} />
+          </section>
+        )}
 
-        <section>
-          <SectionLabel tip={tipsConfig['composicao']} tipsEnabled={tipsEnabled}>Composição</SectionLabel>
-          <CompositionSection config={config} onUpdate={onUpdate} />
-        </section>
-
-        <section>
-          <SectionLabel tip={tipsConfig['referencias']} tipsEnabled={tipsEnabled}>Referências</SectionLabel>
-          <ReferencesSection config={config} onUpdate={onUpdate} />
-        </section>
-
-        <section>
-          <SectionLabel tip={tipsConfig['estilo-visual']} tipsEnabled={tipsEnabled}>Estilo Visual</SectionLabel>
-          <VisualStyleSection config={config} onUpdate={onUpdate} />
-        </section>
+        {activeTab === 'pro' && (
+          <>
+            <section>
+              <SectionLabel tip={tipsConfig['projeto-cenario']} tipsEnabled={tipsEnabled}>Projeto & Cenário</SectionLabel>
+              <ProjectScenarioSection config={config} onUpdate={onUpdate} />
+            </section>
+            <section>
+              <SectionLabel tip={tipsConfig['referencias']} tipsEnabled={tipsEnabled}>Referências</SectionLabel>
+              <ReferencesSection config={config} onUpdate={onUpdate} />
+            </section>
+          </>
+        )}
       </div>
 
       {/* Footer actions */}
-      <div className="border-t border-border/10 p-5 space-y-2.5">
+      <div className="border-t border-border/10 p-4 space-y-2">
         <Button
           disabled={!canGenerate}
           onClick={onGenerate}
