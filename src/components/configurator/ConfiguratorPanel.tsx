@@ -8,7 +8,6 @@ import { ColorsSection } from './sections/ColorsSection';
 import { CompositionSection } from './sections/CompositionSection';
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
-import { ApiKeySection } from './sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Sparkles, Copy, Loader2, Lightbulb } from 'lucide-react';
@@ -21,10 +20,9 @@ interface ConfiguratorPanelProps {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
-  onChangeApiKey: (key: string) => void;
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, onChangeApiKey }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
   const { tipsEnabled, setTipsEnabled } = useTipsMode();
 
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
@@ -42,10 +40,6 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           <Switch checked={tipsEnabled} onCheckedChange={setTipsEnabled} />
         </div>
 
-        <section>
-          <SectionLabel tip={tipsConfig['api-key']} tipsEnabled={tipsEnabled}>🔑 API Key do Google</SectionLabel>
-          <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
-        </section>
 
         <section>
           <SectionLabel tip={tipsConfig['sujeito']} tipsEnabled={tipsEnabled}>Sujeito Principal</SectionLabel>
