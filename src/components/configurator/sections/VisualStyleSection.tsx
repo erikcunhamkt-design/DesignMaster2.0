@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
 
 interface Props {
@@ -91,10 +91,11 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
           />
         </div>
         {config.additionalPromptEnabled && (
-          <Textarea
+          <VoiceTextField
+            textarea
             placeholder="Instruções adicionais para o modelo..."
             value={config.additionalPrompt}
-            onChange={(e) => onUpdate({ additionalPrompt: e.target.value })}
+            onChange={(v) => onUpdate({ additionalPrompt: v })}
             className="min-h-[60px] resize-none bg-muted border-none text-xs"
           />
         )}

@@ -1,7 +1,7 @@
 import { Plus, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Textarea } from '@/components/ui/textarea';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
 
 interface Props {
@@ -114,10 +114,11 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      <Textarea
+      <VoiceTextField
+        textarea
         placeholder="Descrição da pose ou roupa (opcional)..."
         value={config.poseDescription}
-        onChange={(e) => onUpdate({ poseDescription: e.target.value })}
+        onChange={(v) => onUpdate({ poseDescription: v })}
         className="min-h-[60px] resize-none bg-muted border-none text-xs"
       />
 

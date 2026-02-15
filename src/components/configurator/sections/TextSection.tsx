@@ -1,5 +1,5 @@
 import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
+import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
 
@@ -21,22 +21,22 @@ export function TextSection({ config, onUpdate }: Props) {
 
       {config.textEnabled && (
         <div className="space-y-2">
-          <Input
+          <VoiceTextField
             placeholder="Texto 01 (headline)"
             value={config.text01}
-            onChange={(e) => onUpdate({ text01: e.target.value })}
+            onChange={(v) => onUpdate({ text01: v })}
             className="h-8 bg-muted border-none text-xs"
           />
-          <Input
+          <VoiceTextField
             placeholder="Texto 02 (subheadline)"
             value={config.text02}
-            onChange={(e) => onUpdate({ text02: e.target.value })}
+            onChange={(v) => onUpdate({ text02: v })}
             className="h-8 bg-muted border-none text-xs"
           />
-          <Input
+          <VoiceTextField
             placeholder="CTA"
             value={config.cta}
-            onChange={(e) => onUpdate({ cta: e.target.value })}
+            onChange={(v) => onUpdate({ cta: v })}
             className="h-8 bg-muted border-none text-xs"
           />
 
