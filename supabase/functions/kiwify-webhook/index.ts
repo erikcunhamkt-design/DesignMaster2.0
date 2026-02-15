@@ -1,128 +1,271 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// ---------- Helpers ----------
+function json(data: unknown, status = 200, headers: Record<string, string> = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+}
 
+function cors(req: Request) {
+  const origin = req.headers.get("origin") || "*";
+  const reqHeaders = req.headers.get("access-control-request-headers") || "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": reqHeaders,
+    "Vary": "Origin",
+  };
+}
+
+function nowISO() {
+  return new Date().toISOString();
+}
+
+function addMonthsISO(months: number) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString();
+}
+
+function addYearsISO(years: number) {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + years);
+  return d.toISOString();
+}
+
+type Plan = "monthly" | "yearly" | "lifetime";
+
+function planFromProductNameOrUrl(payload: any): Plan | null {
+  const name =
+    (payload?.product?.name ||
+      payload?.product_name ||
+      payload?.product?.title ||
+      payload?.offer?.name ||
+      "") as string;
+
+  const slug =
+    (payload?.product?.slug ||
+      payload?.product_slug ||
+      payload?.checkout_url ||
+      "") as string;
+
+  const text = `${name} ${slug}`.toLowerCase();
+
+  if (text.includes("vital") || text.includes("lifetime")) return "lifetime";
+  if (text.includes("anual") || text.includes("year")) return "yearly";
+  if (text.includes("mensal") || text.includes("month")) return "monthly";
+
+  return null;
+}
+
+function planFromProductId(payload: any): Plan | null {
+  const productId =
+    payload?.product?.id ||
+    payload?.product_id ||
+    payload?.data?.product_id ||
+    payload?.data?.product?.id;
+
+  const monthly = Deno.env.get("KIWIFY_MONTHLY_PRODUCT_ID");
+  const yearly = Deno.env.get("KIWIFY_YEARLY_PRODUCT_ID");
+  const lifetime = Deno.env.get("KIWIFY_LIFETIME_PRODUCT_ID");
+
+  if (!productId) return null;
+  if (monthly && String(productId) === monthly) return "monthly";
+  if (yearly && String(productId) === yearly) return "yearly";
+  if (lifetime && String(productId) === lifetime) return "lifetime";
+  return null;
+}
+
+function computeExpiresAt(plan: Plan): string | null {
+  if (plan === "lifetime") return null;
+  if (plan === "monthly") return addMonthsISO(1);
+  return addYearsISO(1);
+}
+
+function getEmail(payload: any): string | null {
+  const email =
+    payload?.customer?.email ||
+    payload?.buyer?.email ||
+    payload?.client?.email ||
+    payload?.email ||
+    payload?.data?.customer?.email ||
+    payload?.data?.buyer?.email;
+
+  return email ? String(email).trim().toLowerCase() : null;
+}
+
+function getTrigger(payload: any): string {
+  return String(
+    payload?.trigger ||
+      payload?.event ||
+      payload?.type ||
+      payload?.name ||
+      payload?.event_name ||
+      payload?.data?.event ||
+      ""
+  ).toLowerCase();
+}
+
+function getEventId(payload: any): string {
+  return String(
+    payload?.event_id ||
+      payload?.id ||
+      payload?.reference ||
+      payload?.data?.id ||
+      payload?.data?.event_id ||
+      crypto.randomUUID()
+  );
+}
+
+function getOrderId(payload: any): string | null {
+  const id =
+    payload?.order_id ||
+    payload?.sale_id ||
+    payload?.purchase_id ||
+    payload?.data?.order_id ||
+    payload?.data?.sale_id ||
+    payload?.data?.id ||
+    payload?.id;
+  return id ? String(id) : null;
+}
+
+function getSubscriptionId(payload: any): string | null {
+  const id =
+    payload?.subscription_id ||
+    payload?.subscription?.id ||
+    payload?.data?.subscription_id ||
+    payload?.data?.subscription?.id;
+  return id ? String(id) : null;
+}
+
+function isActivateTrigger(trigger: string) {
+  return (
+    trigger.includes("aprovada") ||
+    trigger.includes("approved") ||
+    trigger.includes("payment_approved") ||
+    trigger.includes("compra_aprovada") ||
+    trigger.includes("subscription_renewed") ||
+    trigger.includes("renewed")
+  );
+}
+
+function isDeactivateTrigger(trigger: string) {
+  return (
+    trigger.includes("reembolsada") ||
+    trigger.includes("refunded") ||
+    trigger.includes("chargeback") ||
+    trigger.includes("subscription_canceled") ||
+    trigger.includes("canceled") ||
+    trigger.includes("subscription_late") ||
+    trigger.includes("late")
+  );
+}
+
+// ---------- Handler ----------
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsHeaders = cors(req);
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405, corsHeaders);
 
+  let payload: any;
   try {
-    // Validate token
-    const webhookToken = Deno.env.get("KIWIFY_WEBHOOK_TOKEN");
-    const url = new URL(req.url);
-    const token = url.searchParams.get("token") || req.headers.get("x-webhook-token");
-
-    if (webhookToken && token !== webhookToken) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const body = await req.json();
-    const eventType = body.order_status || body.event || body.type;
-    const email = body.Customer?.email || body.customer?.email || body.email;
-    const orderId = body.order_id || body.Order?.order_id;
-    const subscriptionId = body.subscription_id || body.Subscription?.id;
-
-    if (!email) {
-      return new Response(JSON.stringify({ error: "No email in payload" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Idempotency check
-    const eventId = `${orderId || subscriptionId || email}_${eventType}_${Date.now()}`;
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { data: existingEvent } = await supabase
-      .from("webhook_events")
-      .select("event_id")
-      .eq("event_id", eventId)
-      .maybeSingle();
-
-    if (existingEvent) {
-      return new Response(JSON.stringify({ message: "Already processed" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    await supabase.from("webhook_events").insert({ event_id: eventId });
-
-    // Determine plan from product or body
-    const productName = (body.Product?.name || body.product_name || "").toLowerCase();
-    let plan = "monthly";
-    if (productName.includes("anual") || productName.includes("yearly")) plan = "yearly";
-    if (productName.includes("vitalicio") || productName.includes("lifetime")) plan = "lifetime";
-
-    // Handle events
-    const normalizedEvent = eventType?.toLowerCase() || "";
-
-    if (
-      normalizedEvent.includes("approved") ||
-      normalizedEvent.includes("aprovada") ||
-      normalizedEvent.includes("paid") ||
-      normalizedEvent.includes("renewed")
-    ) {
-      // Activate license
-      const expiresAt =
-        plan === "lifetime"
-          ? null
-          : plan === "yearly"
-          ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-      const { data: license } = await supabase
-        .from("licenses")
-        .select("user_id")
-        .eq("email", email)
-        .maybeSingle();
-
-      if (license) {
-        await supabase
-          .from("licenses")
-          .update({
-            status: "active",
-            plan,
-            expires_at: expiresAt,
-            kiwify_order_id: orderId || null,
-            kiwify_subscription_id: subscriptionId || null,
-          })
-          .eq("email", email);
-      }
-      // If no license yet, user hasn't signed up — will be activated when they do
-    } else if (
-      normalizedEvent.includes("refund") ||
-      normalizedEvent.includes("reembolsada") ||
-      normalizedEvent.includes("chargeback") ||
-      normalizedEvent.includes("canceled") ||
-      normalizedEvent.includes("late")
-    ) {
-      // Deactivate license
-      await supabase
-        .from("licenses")
-        .update({ status: "inactive" })
-        .eq("email", email);
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error("Webhook error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    payload = await req.json();
+  } catch {
+    return json({ error: "invalid_json" }, 400, corsHeaders);
   }
+
+  // Validate webhook token
+  const expected = (Deno.env.get("KIWIFY_WEBHOOK_TOKEN") || "").trim();
+  const headerToken =
+    (req.headers.get("x-kiwify-token") || "").trim() ||
+    (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  const bodyToken = String(payload?.token || payload?.webhook_token || "").trim();
+
+  if (expected && headerToken !== expected && bodyToken !== expected) {
+    return json({ error: "unauthorized" }, 401, corsHeaders);
+  }
+
+  const email = getEmail(payload);
+  if (!email) return json({ error: "missing_email", payload }, 400, corsHeaders);
+
+  const trigger = getTrigger(payload);
+  const eventId = getEventId(payload);
+  const orderId = getOrderId(payload);
+  const subscriptionId = getSubscriptionId(payload);
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceRole) {
+    return json({ error: "missing_supabase_secrets" }, 500, corsHeaders);
+  }
+
+  const admin = createClient(supabaseUrl, serviceRole);
+
+  // Idempotency
+  const { error: idemErr } = await admin.from("webhook_events").insert({ event_id: eventId });
+  if (idemErr) {
+    return json({ ok: true, skipped: true, eventId }, 200, corsHeaders);
+  }
+
+  // Find user by email
+  const { data: usersData, error: usersErr } = await admin.auth.admin.listUsers();
+  if (usersErr) return json({ error: "cannot_list_users", details: usersErr }, 500, corsHeaders);
+
+  const user = usersData.users.find((u) => (u.email || "").toLowerCase() === email);
+  if (!user) {
+    return json({ ok: true, pending_user: true, email }, 200, corsHeaders);
+  }
+
+  // Determine plan
+  const plan = planFromProductId(payload) || planFromProductNameOrUrl(payload);
+  if (!plan) {
+    return json(
+      { error: "unknown_plan", hint: "Configure KIWIFY_*_PRODUCT_ID or adjust fallback.", payload },
+      400,
+      corsHeaders
+    );
+  }
+
+  // Activate / deactivate
+  const activate = isActivateTrigger(trigger);
+  const deactivate = isDeactivateTrigger(trigger);
+
+  if (!activate && !deactivate) {
+    return json({ ok: true, ignored: true, trigger, plan }, 200, corsHeaders);
+  }
+
+  const status = activate ? "active" : "inactive";
+  const expiresAt = activate ? computeExpiresAt(plan) : null;
+
+  const { error: upErr } = await admin.from("licenses").upsert(
+    {
+      user_id: user.id,
+      email,
+      plan,
+      status,
+      expires_at: plan === "lifetime" ? null : expiresAt,
+      kiwify_order_id: orderId,
+      kiwify_subscription_id: subscriptionId,
+      updated_at: nowISO(),
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (upErr) return json({ error: "db_upsert_failed", details: upErr }, 500, corsHeaders);
+
+  return json(
+    {
+      ok: true,
+      user_id: user.id,
+      email,
+      plan,
+      status,
+      expires_at: plan === "lifetime" ? null : expiresAt,
+      trigger,
+    },
+    200,
+    corsHeaders
+  );
 });
