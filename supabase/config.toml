@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.kiwify-webhook]
 verify_jwt = false
+
+[functions.validate-access-key]
+verify_jwt = false

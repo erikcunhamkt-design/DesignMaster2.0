@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
-import { Crown, Zap, Star } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Crown, Zap, Star, Key } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
 
 const plans = [
@@ -34,10 +38,33 @@ const plans = [
 const PaywallPage = () => {
   const { user, signOut } = useAuth();
   const { license } = useLicense();
+  const [accessKey, setAccessKey] = useState('');
+  const [validating, setValidating] = useState(false);
 
   const handleSelect = (baseUrl: string) => {
     const url = `${baseUrl}?email=${encodeURIComponent(user?.email || '')}`;
     window.open(url, '_blank');
+  };
+
+  const handleKeySubmit = async () => {
+    if (!accessKey.trim() || !user) return;
+    setValidating(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('validate-access-key', {
+        body: { key: accessKey.trim(), userId: user.id },
+      });
+
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error === 'invalid_key' ? 'Chave inválida' : data.error);
+
+      toast.success('Acesso ativado com sucesso!');
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || 'Chave inválida');
+    } finally {
+      setValidating(false);
+    }
   };
 
   return (
@@ -70,6 +97,25 @@ const PaywallPage = () => {
               </button>
             );
           })}
+        </div>
+
+        {/* Access Key Section */}
+        <div className="pt-4 border-t border-border space-y-3">
+          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+            <Key className="h-3 w-3" /> Possui uma chave de acesso?
+          </p>
+          <div className="flex gap-2 max-w-sm mx-auto">
+            <Input
+              type="password"
+              placeholder="Cole sua chave aqui"
+              value={accessKey}
+              onChange={(e) => setAccessKey(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleKeySubmit()}
+            />
+            <Button onClick={handleKeySubmit} disabled={validating || !accessKey.trim()} size="sm">
+              {validating ? '...' : 'Ativar'}
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center justify-center gap-4 pt-4">
