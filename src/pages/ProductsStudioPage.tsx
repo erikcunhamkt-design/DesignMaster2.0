@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Upload, Loader2, Download, Check, ShoppingBag, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export default function ProductsStudioPage() {
   const [lighting, setLighting] = useState('');
   const [background, setBackground] = useState('');
   const [extra, setExtra] = useState('');
+  const [format, setFormat] = useState('feed');
   const [productImage, setProductImage] = useState<string | null>(null);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -46,7 +48,7 @@ export default function ProductsStudioPage() {
           productType,
           lighting,
           background,
-          extra,
+          extra: (extra + getFormatPromptSuffix(format)).trim(),
           referenceImages: productImage ? [productImage] : [],
           googleApiKey: apiKey,
         },
@@ -131,6 +133,8 @@ export default function ProductsStudioPage() {
                 ))}
               </div>
             </div>
+
+            <FormatSelector value={format} onChange={setFormat} />
 
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">Detalhes extras</p>
