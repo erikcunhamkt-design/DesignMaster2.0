@@ -59,6 +59,19 @@ export function composePrompt(config: ProjectConfig): PromptResult {
     parts.push(config.poseDescription);
   }
 
+  // Character direction
+  const dirExpression = config.expression || config.expressionCustom;
+  const dirPose = config.pose || config.poseCustom;
+  const dirAngle = config.cameraAngle || config.cameraAngleCustom;
+  const dirLens = config.lens || config.lensCustom;
+  const dirGaze = config.gazeDirection || config.gazeDirectionCustom;
+
+  if (dirExpression) parts.push(`facial expression: ${dirExpression}`);
+  if (dirPose) parts.push(`body pose: ${dirPose}`);
+  if (dirAngle) parts.push(`camera angle: ${dirAngle}`);
+  if (dirLens) parts.push(`shot with ${dirLens} lens`);
+  if (dirGaze) parts.push(`gaze direction: ${dirGaze}`);
+
   // Subject position
   if (config.subjectPosition === 'esquerda') {
     parts.push('subject positioned on the left side of the frame');

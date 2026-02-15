@@ -12,6 +12,15 @@ export const tipsConfig: Record<string, TipData> = {
       'A chave é armazenada apenas localmente no seu navegador.',
     ],
   },
+  'direcao': {
+    title: 'Direção do Personagem',
+    bullets: [
+      'Use chips para selecionar rapidamente ou digite livremente.',
+      'Presets aplicam combinações testadas com 1 clique.',
+      '"Surpreender" gera uma combinação aleatória coerente.',
+    ],
+    example: 'Ex: 85mm + 3/4 + olhar para câmera = retrato premium clássico',
+  },
   'sujeito': {
     title: 'Pose do Sujeito',
     bullets: [

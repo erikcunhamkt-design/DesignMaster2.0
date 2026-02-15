@@ -106,6 +106,19 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     parts.push(`pose: ${config.poseDescription}`);
   }
 
+  // ─── CHARACTER DIRECTION ───
+  const dirExpression = config.expression || config.expressionCustom;
+  const dirPose = config.pose || config.poseCustom;
+  const dirAngle = config.cameraAngle || config.cameraAngleCustom;
+  const dirLens = config.lens || config.lensCustom;
+  const dirGaze = config.gazeDirection || config.gazeDirectionCustom;
+
+  if (dirExpression) parts.push(`facial expression: ${dirExpression}`);
+  if (dirPose) parts.push(`body pose: ${dirPose}`);
+  if (dirAngle) parts.push(`camera angle: ${dirAngle}`);
+  if (dirLens) parts.push(`shot with ${dirLens} lens`);
+  if (dirGaze) parts.push(`gaze direction: ${dirGaze}`);
+
   // Subject horizontal position
   if (config.subjectPosition === 'esquerda') {
     parts.push('subject positioned on the left third of frame, following rule of thirds');

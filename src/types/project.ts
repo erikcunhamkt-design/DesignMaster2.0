@@ -43,6 +43,18 @@ export interface ProjectConfig {
   referenceAttributes: Record<number, string[]>;
   referenceNotes: Record<number, string>;
 
+  // Direção do Personagem
+  expression: string;
+  expressionCustom: string;
+  pose: string;
+  poseCustom: string;
+  cameraAngle: string;
+  cameraAngleCustom: string;
+  lens: string;
+  lensCustom: string;
+  gazeDirection: string;
+  gazeDirectionCustom: string;
+
   // Atributos Visuais
   sobriety: number;
   visualStyleEnabled: boolean;
@@ -90,6 +102,16 @@ export const defaultConfig: ProjectConfig = {
   styleReferences: [],
   referenceAttributes: {},
   referenceNotes: {},
+  expression: '',
+  expressionCustom: '',
+  pose: '',
+  poseCustom: '',
+  cameraAngle: '',
+  cameraAngleCustom: '',
+  lens: '',
+  lensCustom: '',
+  gazeDirection: '',
+  gazeDirectionCustom: '',
   sobriety: 50,
   visualStyleEnabled: false,
   visualStyle: '',

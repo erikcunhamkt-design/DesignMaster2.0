@@ -6,6 +6,7 @@ import { TextSection } from './sections/TextSection';
 import { ProjectScenarioSection } from './sections/ProjectScenarioSection';
 import { ColorsSection } from './sections/ColorsSection';
 import { CompositionSection } from './sections/CompositionSection';
+import { CharacterDirectionSection } from './sections/CharacterDirectionSection';
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,11 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
         <section>
           <SectionLabel tip={tipsConfig['dimensoes']} tipsEnabled={tipsEnabled}>Dimensões</SectionLabel>
           <DimensionsSection config={config} onUpdate={onUpdate} />
+        </section>
+
+        <section>
+          <SectionLabel tip={tipsConfig['direcao']} tipsEnabled={tipsEnabled}>Direção do Personagem</SectionLabel>
+          <CharacterDirectionSection config={config} onUpdate={onUpdate} />
         </section>
 
         <section>
