@@ -6,7 +6,43 @@ import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { toast } from 'sonner';
 
-const UPSCALE_PROMPT = `Analyze the provided image and perform a high-quality restoration and upscale process, increasing the resolution to true 4K while strictly preserving the original composition, proportions, framing, identity, and visual intent. Enhance overall sharpness and clarity without introducing artifacts, halos, oversharpening, or artificial textures. Restore fine details naturally, improving micro-textures and surface definition. Apply realistic texture reconstruction: skin with natural pores and subtle imperfections, accurate material surfaces (fabric weave, leather grain, metal reflections, glass clarity, hair strands), refined object and environment details. Correct colors, contrast, and exposure only if necessary: balance white levels naturally, improve dynamic range without crushing shadows or blowing highlights, preserve original color palette and mood. Intelligent noise reduction: remove digital noise and compression artifacts while preserving fine detail and texture. Lighting must remain physically consistent with the original image: no new light sources, no relighting, subtle enhancement of depth only if needed. Final output must look like a professionally shot, high-resolution photograph: ultra-clean, natural, photorealistic, true-to-source. Do not change pose, expression, anatomy, or geometry. Do not add or remove elements. Do not stylize, dramatize, or reinterpret. Do not alter identity.`;
+const UPSCALE_PROMPT = `Analyze the provided image and perform a high-quality restoration and upscale process, increasing the resolution to true 4K while strictly preserving the original composition, proportions, framing, identity, and visual intent.
+
+Enhance overall sharpness and clarity without introducing artifacts, halos, oversharpening, or artificial edges. Restore fine details naturally, improving micro-textures and surface definition.
+
+Apply realistic texture reconstruction:
+– Skin: natural skin texture with visible pores, subtle imperfections, realistic softness and depth (no plastic or AI-smoothed look)
+– Materials: accurate surface textures such as fabric weave, leather grain, metal micro-scratches, paint reflections, glass clarity, hair strands, and natural edges
+– Objects and environments: refined details while maintaining realism and scale
+
+Correct colors, contrast, and exposure only if necessary:
+– Balance white levels naturally
+– Improve dynamic range without crushing shadows or blowing highlights
+– Preserve original color palette and mood
+– Avoid color shifting, oversaturation, or stylistic reinterpretation
+
+Noise reduction should be intelligent and selective:
+– Remove digital noise and compression artifacts
+– Preserve fine detail and texture
+– Maintain cinematic depth and realism
+
+Lighting must remain physically consistent with the original image:
+– No new light sources
+– No relighting or dramatic changes
+– Subtle enhancement of depth and separation only if needed
+
+Final output must look like a professionally shot, high-resolution photograph, not AI-generated:
+– Ultra-clean
+– Natural
+– Photorealistic
+– True-to-source
+
+RULES:
+– Do not change pose, expression, anatomy, or geometry
+– Do not add or remove elements
+– Do not stylize, dramatize, or reinterpret
+– Do not alter identity
+– Focus exclusively on quality restoration and resolution enhancement`;
 
 export default function UpscalePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
