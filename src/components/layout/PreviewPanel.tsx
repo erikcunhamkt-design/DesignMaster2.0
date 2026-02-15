@@ -82,15 +82,6 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
               </Button>
             )}
 
-            {/* Premium Download Button */}
-            <button
-              onClick={handleDownload}
-              disabled={downloadState === 'loading'}
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] font-semibold tracking-wide bg-secondary/60 border border-border/20 text-foreground/80 hover:bg-secondary hover:text-foreground hover:border-primary/20 hover:shadow-glow-sm transition-all duration-300 disabled:opacity-50"
-            >
-              <DownloadIcon className={`h-3 w-3 ${downloadState === 'loading' ? 'animate-spin' : ''} ${downloadState === 'done' ? 'text-primary' : ''}`} />
-              {downloadLabel}
-            </button>
           </div>
         </div>
       )}
@@ -142,9 +133,16 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
               alt="Imagem gerada"
               className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.03]"
             />
-            <div className="absolute inset-0 rounded-xl bg-background/0 group-hover:bg-background/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <Maximize2 className="h-6 w-6 text-foreground/50" />
-            </div>
+            {/* Premium Download Overlay */}
+            <button
+              onClick={handleDownload}
+              disabled={downloadState === 'loading'}
+              className="absolute top-4 right-4 flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-md border border-white/10 hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 opacity-0 group-hover:opacity-100"
+            >
+              <DownloadIcon className={`h-3.5 w-3.5 ${downloadState === 'loading' ? 'animate-spin' : ''}`} />
+              {downloadLabel === 'Baixar' ? 'Baixar' : downloadLabel === 'Baixado' ? 'Salvo' : 'Baixando…'}
+            </button>
+            <div className="absolute inset-0 rounded-xl bg-background/0 group-hover:bg-background/5 transition-colors duration-300 pointer-events-none" />
             {/* Text Overlay */}
             {hasTextOverlay && showOverlay && (
               <div

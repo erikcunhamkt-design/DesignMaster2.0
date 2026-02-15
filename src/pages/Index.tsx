@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { TopNav } from '@/components/layout/TopNav';
+import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
@@ -8,14 +8,12 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { buildGenerationRequest } from '@/core/prompt/PromptAgent';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import ExtractorPage from '@/pages/ExtractorPage';
 
 const Index = () => {
-  const [activePage, setActivePage] = useState<'explorar' | 'criar' | 'galeria' | 'extrator'>('criar');
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { apiKey, saveKey: setApiKey } = useGoogleApiKey();
+  const { apiKey } = useGoogleApiKey();
 
   const {
     projects,
@@ -76,29 +74,20 @@ const Index = () => {
     } finally {
       setIsGenerating(false);
     }
-  }, [activeProject]);
+  }, [activeProject, apiKey]);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <TopNav
-        activePage={activePage}
-        onNavigate={setActivePage}
-        onNewProject={addProject}
-        apiKey={apiKey}
-        onChangeApiKey={setApiKey}
+      <StudioTopbar title="Criador" />
+      <ProjectTabs
+        projects={projects}
+        activeId={activeProjectId}
+        onSelect={setActiveProjectId}
+        onClose={removeProject}
+        onAdd={addProject}
       />
-      {activePage === 'criar' && (
-        <ProjectTabs
-          projects={projects}
-          activeId={activeProjectId}
-          onSelect={setActiveProjectId}
-          onClose={removeProject}
-          onAdd={addProject}
-        />
-      )}
-
       <div className="flex flex-1 overflow-hidden relative">
-        {activePage === 'criar' && activeProject && (
+        {activeProject && (
           <>
             <PreviewPanel state={previewState} imageUrl={generatedImage} config={activeProject.config} />
             <ConfiguratorPanel
@@ -109,20 +98,6 @@ const Index = () => {
               apiKey={apiKey}
             />
           </>
-        )}
-
-        {activePage === 'extrator' && <ExtractorPage />}
-
-        {activePage === 'explorar' && (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">
-            <p className="text-sm">Explorar — Em breve</p>
-          </div>
-        )}
-
-        {activePage === 'galeria' && (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">
-            <p className="text-sm">Minha Galeria — Em breve</p>
-          </div>
         )}
       </div>
     </div>
