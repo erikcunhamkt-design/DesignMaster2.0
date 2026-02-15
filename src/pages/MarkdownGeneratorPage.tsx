@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, FileText, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { toast } from 'sonner';
 
 export default function MarkdownGeneratorPage() {
@@ -14,6 +15,7 @@ export default function MarkdownGeneratorPage() {
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { apiKey } = useGoogleApiKey();
 
   const handleGenerate = async () => {
     if (!topic) { toast.error('Informe o tema'); return; }
@@ -21,7 +23,7 @@ export default function MarkdownGeneratorPage() {
     setResult('');
     try {
       const { data, error } = await supabase.functions.invoke('prompt-ai', {
-        body: { mode: 'markdown', topic, variations, extra },
+        body: { mode: 'markdown', topic, variations, extra, googleApiKey: apiKey },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
@@ -43,7 +45,7 @@ export default function MarkdownGeneratorPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Gerador Markdown" showApiKey={false} />
+      <StudioTopbar title="Gerador Markdown" />
       <div className="flex flex-1 overflow-hidden">
         <div className="w-[400px] shrink-0 border-r border-border/15 bg-card/20 flex flex-col overflow-y-auto">
           <div className="p-6 space-y-5">
@@ -67,7 +69,7 @@ export default function MarkdownGeneratorPage() {
               <Textarea value={extra} onChange={e => setExtra(e.target.value)} placeholder="Detalhes opcionais..." className="min-h-[60px] bg-secondary/40 border-border/15 text-xs rounded-lg resize-none" />
             </div>
 
-            <Button onClick={handleGenerate} disabled={isLoading || !topic} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
+            <Button onClick={handleGenerate} disabled={isLoading || !topic || apiKey.length < 10} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
               {isLoading ? 'Gerando...' : 'Gerar Markdown'}
             </Button>
