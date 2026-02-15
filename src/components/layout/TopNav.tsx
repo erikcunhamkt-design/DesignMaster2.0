@@ -30,7 +30,7 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
           <Zap className="h-4 w-4" />
         </div>
         <span className="font-display text-base font-bold tracking-tight text-foreground hidden lg:block">
-          Spark<span className="text-gradient">Snap</span>
+          Design<span className="text-gradient">Master</span>
         </span>
       </div>
 
