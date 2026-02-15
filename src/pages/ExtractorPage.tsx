@@ -102,11 +102,11 @@ export default function ExtractorPage() {
   return (
     <div className="flex flex-1 overflow-hidden">
       {/* Left: Upload & Options */}
-      <div className="w-[400px] shrink-0 border-r border-border bg-card flex flex-col overflow-y-auto">
-        <div className="p-5 space-y-5">
+      <div className="w-[420px] shrink-0 border-r border-border/15 bg-card/30 flex flex-col overflow-y-auto">
+        <div className="p-6 space-y-6">
           <div>
-            <h2 className="text-sm font-semibold text-foreground mb-1">Extrator de Prompt</h2>
-            <p className="text-[11px] text-muted-foreground">
+            <h2 className="text-base font-bold text-foreground mb-1.5 font-display">Extrator de Prompt</h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Envie uma imagem e receba um prompt detalhado para recriá-la.
             </p>
           </div>
@@ -115,33 +115,33 @@ export default function ExtractorPage() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
 
           {imagePreview ? (
-            <div className="relative group">
-              <img src={imagePreview} alt="Preview" className="w-full rounded-lg border border-border object-cover max-h-[300px]" />
+            <div className="relative group rounded-xl overflow-hidden">
+              <img src={imagePreview} alt="Preview" className="w-full rounded-xl border border-border/15 object-cover max-h-[300px]" />
               <button
                 onClick={() => fileRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                className="absolute inset-0 flex items-center justify-center bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
               >
-                <span className="text-xs font-medium text-foreground">Trocar imagem</span>
+                <span className="text-xs font-semibold text-foreground bg-secondary/80 px-3 py-1.5 rounded-lg">Trocar imagem</span>
               </button>
             </div>
           ) : (
             <button
               onClick={() => fileRef.current?.click()}
-              className="flex h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+              className="flex h-52 w-full flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/30 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-300"
             >
               <Upload className="h-8 w-8" />
-              <span className="text-xs font-medium">Enviar Imagem</span>
+              <span className="text-xs font-semibold">Enviar Imagem</span>
             </button>
           )}
 
           {/* Replicate options */}
           <div>
-            <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-3">
               O que deseja replicar?
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {REPLICATE_OPTIONS.map(opt => (
-                <label key={opt.id} className="flex items-center gap-1.5 cursor-pointer text-xs">
+                <label key={opt.id} className="flex items-center gap-2 cursor-pointer text-xs text-foreground/70">
                   <Checkbox
                     checked={selectedOptions.includes(opt.id)}
                     onCheckedChange={() => toggleOption(opt.id)}
@@ -154,14 +154,14 @@ export default function ExtractorPage() {
 
           {/* Extra instruction */}
           <div>
-            <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
               Instrução extra (opcional)
             </p>
             <Input
               placeholder="Ex: trocar cenário para praia, mudar cor para azul..."
               value={extraInstruction}
               onChange={(e) => setExtraInstruction(e.target.value)}
-              className="h-8 bg-muted border-none text-xs"
+              className="h-9 bg-secondary/50 border-border/20 text-xs rounded-lg focus:border-primary/40"
             />
           </div>
 
@@ -169,7 +169,7 @@ export default function ExtractorPage() {
           <Button
             onClick={handleExtract}
             disabled={!imageBase64 || isExtracting}
-            className="w-full gap-2"
+            className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-glow-md transition-all duration-500"
           >
             {isExtracting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -182,24 +182,24 @@ export default function ExtractorPage() {
       </div>
 
       {/* Right: Results */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-8">
         {!result && !isExtracting && (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3">
-            <Wand2 className="h-12 w-12 opacity-30" />
-            <p className="text-sm font-medium">Resultado aparecerá aqui</p>
-            <p className="text-xs">Envie uma imagem e clique em "Extrair Prompt"</p>
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-4">
+            <Wand2 className="h-14 w-14 opacity-20" />
+            <p className="text-sm font-semibold text-foreground/50">Resultado aparecerá aqui</p>
+            <p className="text-xs text-muted-foreground/50">Envie uma imagem e clique em "Extrair Prompt"</p>
           </div>
         )}
 
         {isExtracting && (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="text-sm font-medium text-primary">Analisando imagem...</p>
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-sm font-semibold text-primary">Analisando imagem...</p>
           </div>
         )}
 
         {result && (
-          <div className="max-w-2xl mx-auto space-y-5">
+          <div className="max-w-2xl mx-auto space-y-6">
             {/* Prompt */}
             <FieldBlock
               label="Prompt"
@@ -218,20 +218,20 @@ export default function ExtractorPage() {
 
             {/* Settings */}
             <div>
-              <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-2">Configurações Sugeridas</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2.5">Configurações Sugeridas</p>
               <div className="flex gap-3 text-xs">
-                <span className="bg-muted px-2.5 py-1.5 rounded-lg">{result.suggested_settings.width} × {result.suggested_settings.height}</span>
-                <span className="bg-muted px-2.5 py-1.5 rounded-lg">Qualidade: {result.suggested_settings.quality}</span>
+                <span className="bg-secondary/60 px-3 py-2 rounded-lg border border-border/15 text-foreground/70">{result.suggested_settings.width} × {result.suggested_settings.height}</span>
+                <span className="bg-secondary/60 px-3 py-2 rounded-lg border border-border/15 text-foreground/70">Qualidade: {result.suggested_settings.quality}</span>
               </div>
             </div>
 
             {/* Style Tags */}
             {result.suggested_settings.style_tags?.length > 0 && (
               <div>
-                <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-2">Tags de Estilo</p>
-                <div className="flex flex-wrap gap-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2.5">Tags de Estilo</p>
+                <div className="flex flex-wrap gap-2">
                   {result.suggested_settings.style_tags.map((tag, i) => (
-                    <Badge key={i} variant="secondary" className="text-[10px]">{tag}</Badge>
+                    <Badge key={i} variant="secondary" className="text-[10px] rounded-md border-border/20">{tag}</Badge>
                   ))}
                 </div>
               </div>
@@ -240,10 +240,10 @@ export default function ExtractorPage() {
             {/* Notes */}
             {result.notes?.length > 0 && (
               <div>
-                <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-2">Observações</p>
-                <ul className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2.5">Observações</p>
+                <ul className="space-y-1.5">
                   {result.notes.map((note, i) => (
-                    <li key={i} className="text-xs text-muted-foreground">• {note}</li>
+                    <li key={i} className="text-xs text-muted-foreground leading-relaxed">• {note}</li>
                   ))}
                 </ul>
               </div>
@@ -258,14 +258,14 @@ export default function ExtractorPage() {
 function FieldBlock({ label, value, copied, onCopy }: { label: string; value: string; copied: boolean; onCopy: () => void }) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground">{label}</p>
-        <Button variant="ghost" size="sm" onClick={onCopy} className="h-6 gap-1 text-[10px]">
-          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">{label}</p>
+        <Button variant="ghost" size="sm" onClick={onCopy} className="h-7 gap-1.5 text-[10px] rounded-lg hover:bg-secondary/60">
+          {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
           {copied ? 'Copiado' : 'Copiar'}
         </Button>
       </div>
-      <div className="bg-muted rounded-lg p-3 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+      <div className="bg-secondary/40 border border-border/15 rounded-xl p-4 text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
         {value}
       </div>
     </div>
