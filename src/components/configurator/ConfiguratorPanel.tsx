@@ -20,14 +20,13 @@ interface ConfiguratorPanelProps {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
   onGenerate: () => void;
   isGenerating: boolean;
-  apiKey: string;
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating }: ConfiguratorPanelProps) {
   const { tipsEnabled, setTipsEnabled } = useTipsMode();
 
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
-    (!config.textEnabled || config.text01.length >= 3) && !isGenerating && apiKey.length >= 10;
+    (!config.textEnabled || config.text01.length >= 3) && !isGenerating;
 
   return (
     <div className="flex w-[360px] shrink-0 flex-col border-l border-border/20 bg-card/40 backdrop-blur-sm">
