@@ -24,6 +24,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+const isDev = import.meta.env.DEV;
+
 export default function PromptGalleryPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -33,6 +35,7 @@ export default function PromptGalleryPage() {
   // Form state
   const [newTitle, setNewTitle] = useState('');
   const [newPrompt, setNewPrompt] = useState('');
+  const [newNegativePrompt, setNewNegativePrompt] = useState('');
   const [newCategory, setNewCategory] = useState('editorial');
   const [newTags, setNewTags] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -43,7 +46,10 @@ export default function PromptGalleryPage() {
     : templates;
 
   const copyPrompt = (template: PromptTemplate) => {
-    navigator.clipboard.writeText(template.prompt);
+    const text = template.negativePrompt
+      ? `${template.prompt}\n\nNegative: ${template.negativePrompt}`
+      : template.prompt;
+    navigator.clipboard.writeText(text);
     setCopiedId(template.id);
     setTimeout(() => setCopiedId(null), 2000);
     toast.success('Prompt copiado!');
@@ -71,6 +77,7 @@ export default function PromptGalleryPage() {
       id: Date.now().toString(),
       title: newTitle.trim() || 'Sem título',
       prompt: newPrompt.trim(),
+      negativePrompt: newNegativePrompt.trim() || undefined,
       category: newCategory,
       tags: newTags.split(',').map(t => t.trim()).filter(Boolean),
       imageUrl: newImageUrl || undefined,
@@ -79,6 +86,7 @@ export default function PromptGalleryPage() {
     setTemplates(prev => [newTemplate, ...prev]);
     setNewTitle('');
     setNewPrompt('');
+    setNewNegativePrompt('');
     setNewCategory('editorial');
     setNewTags('');
     setNewImageUrl('');
@@ -101,97 +109,109 @@ export default function PromptGalleryPage() {
         <div className="px-8 pt-8 pb-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-2xl font-bold text-foreground font-display">💡 Galeria de Ideias</h2>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5 rounded-lg">
-                  <Plus className="h-4 w-4" />
-                  Adicionar Prompt
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Novo Prompt</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-2">
-                  {/* Image upload */}
-                  <div className="space-y-2">
-                    <Label className="text-xs">Imagem</Label>
-                    <div
-                      className={cn(
-                        'relative flex items-center justify-center rounded-xl border-2 border-dashed transition-colors cursor-pointer overflow-hidden',
-                        imagePreview ? 'border-primary/30 h-48' : 'border-border/30 hover:border-primary/30 h-32'
-                      )}
-                      onClick={() => document.getElementById('gallery-image-input')?.click()}
-                    >
-                      {imagePreview ? (
-                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="flex flex-col items-center gap-1.5 text-muted-foreground/50">
-                          <ImagePlus className="h-6 w-6" />
-                          <span className="text-[10px]">Clique para adicionar imagem</span>
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      id="gallery-image-input"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Título</Label>
-                    <Input
-                      placeholder="Nome do prompt"
-                      value={newTitle}
-                      onChange={e => setNewTitle(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Prompt *</Label>
-                    <Textarea
-                      placeholder="Descreva o prompt completo..."
-                      value={newPrompt}
-                      onChange={e => setNewPrompt(e.target.value)}
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Categoria</Label>
-                    <Select value={newCategory} onValueChange={setNewCategory}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {galleryCategories.map(c => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.emoji} {c.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Tags (separadas por vírgula)</Label>
-                    <Input
-                      placeholder="editorial, luxo, minimalista"
-                      value={newTags}
-                      onChange={e => setNewTags(e.target.value)}
-                    />
-                  </div>
-
-                  <Button onClick={handleAddTemplate} className="w-full gap-1.5">
+            {isDev && (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 rounded-lg">
                     <Plus className="h-4 w-4" />
-                    Adicionar
+                    Adicionar Prompt
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Novo Prompt</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
+                    {/* Image upload */}
+                    <div className="space-y-2">
+                      <Label className="text-xs">Imagem</Label>
+                      <div
+                        className={cn(
+                          'relative flex items-center justify-center rounded-xl border-2 border-dashed transition-colors cursor-pointer overflow-hidden',
+                          imagePreview ? 'border-primary/30 h-48' : 'border-border/30 hover:border-primary/30 h-32'
+                        )}
+                        onClick={() => document.getElementById('gallery-image-input')?.click()}
+                      >
+                        {imagePreview ? (
+                          <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-1.5 text-muted-foreground/50">
+                            <ImagePlus className="h-6 w-6" />
+                            <span className="text-[10px]">Clique para adicionar imagem</span>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        id="gallery-image-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Título</Label>
+                      <Input
+                        placeholder="Nome do prompt"
+                        value={newTitle}
+                        onChange={e => setNewTitle(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Prompt *</Label>
+                      <Textarea
+                        placeholder="Descreva o prompt completo..."
+                        value={newPrompt}
+                        onChange={e => setNewPrompt(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Negative Prompt</Label>
+                      <Textarea
+                        placeholder="O que evitar na geração..."
+                        value={newNegativePrompt}
+                        onChange={e => setNewNegativePrompt(e.target.value)}
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Categoria</Label>
+                      <Select value={newCategory} onValueChange={setNewCategory}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {galleryCategories.map(c => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.emoji} {c.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Tags (separadas por vírgula)</Label>
+                      <Input
+                        placeholder="editorial, luxo, minimalista"
+                        value={newTags}
+                        onChange={e => setNewTags(e.target.value)}
+                      />
+                    </div>
+
+                    <Button onClick={handleAddTemplate} className="w-full gap-1.5">
+                      <Plus className="h-4 w-4" />
+                      Adicionar
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           <p className="text-sm text-muted-foreground mb-6">Templates e coleções de prompts prontos para usar</p>
 
@@ -232,7 +252,7 @@ export default function PromptGalleryPage() {
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
               <Sparkles className="h-10 w-10 mb-3" />
               <p className="text-sm font-medium">Nenhum prompt ainda</p>
-              <p className="text-xs mt-1">Clique em "Adicionar Prompt" para começar</p>
+              {isDev && <p className="text-xs mt-1">Clique em "Adicionar Prompt" para começar</p>}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -270,14 +290,16 @@ export default function PromptGalleryPage() {
                             <Copy className="h-3 w-3" />
                           )}
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeTemplate(template.id)}
-                          className="h-7 w-7 rounded-lg text-muted-foreground/40 hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
+                        {isDev && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeTemplate(template.id)}
+                            className="h-7 w-7 rounded-lg text-muted-foreground/40 hover:text-destructive"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -291,9 +313,23 @@ export default function PromptGalleryPage() {
                       </div>
                     )}
 
-                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
-                      {template.prompt}
-                    </p>
+                    {/* Prompt */}
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 mb-1">Prompt</p>
+                      <p className="text-[11px] text-foreground/70 leading-relaxed line-clamp-4">
+                        {template.prompt}
+                      </p>
+                    </div>
+
+                    {/* Negative Prompt */}
+                    {template.negativePrompt && (
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-destructive/50 mb-1">Negative Prompt</p>
+                        <p className="text-[11px] text-muted-foreground/60 leading-relaxed line-clamp-2">
+                          {template.negativePrompt}
+                        </p>
+                      </div>
+                    )}
 
                     <Button
                       onClick={() => copyPrompt(template)}
