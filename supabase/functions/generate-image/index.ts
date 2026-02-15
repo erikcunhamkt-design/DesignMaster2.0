@@ -12,97 +12,82 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, negativePrompt, referenceImages, googleApiKey } = await req.json();
+    const { prompt, negativePrompt, referenceImages } = await req.json();
 
-    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "LOVABLE_API_KEY não configurada no servidor." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const fullPrompt = `Generate this image. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
-    // Build parts array
-    const parts: any[] = [{ text: fullPrompt }];
+    // Build message content array
+    const content: any[] = [{ type: "text", text: fullPrompt }];
 
-    // Add reference images as inline data
+    // Add reference images as image_url parts
     if (referenceImages && referenceImages.length > 0) {
       for (const refImg of referenceImages.slice(0, 3)) {
-        // refImg is a data URL like "data:image/png;base64,..."
-        const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
-        if (match) {
-          parts.push({
-            inlineData: {
-              mimeType: match[1],
-              data: match[2],
-            },
+        if (refImg && refImg.startsWith("data:")) {
+          content.push({
+            type: "image_url",
+            image_url: { url: refImg },
           });
         }
       }
     }
 
-    const model = "gemini-3-pro-image-preview";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+    console.log("Calling Nano Banana Pro via Lovable AI Gateway...");
 
-    console.log(`Calling Google Gemini ${model} directly...`);
-
-    const response = await fetch(url, {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"],
-        },
+        model: "google/gemini-3-pro-image-preview",
+        messages: [{ role: "user", content }],
+        modalities: ["image", "text"],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Google API error:", response.status, errorText);
+      console.error("Lovable AI Gateway error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido na API do Google. Aguarde e tente novamente." }),
+          JSON.stringify({ error: "Limite de requisições excedido. Aguarde e tente novamente." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 400) {
+      if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "Requisição inválida. Verifique o prompt e tente novamente." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 403) {
-        return new Response(
-          JSON.stringify({ error: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace Lovable." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
       return new Response(
-        JSON.stringify({ error: `Erro na API do Google: ${response.status}. Tente novamente.` }),
+        JSON.stringify({ error: `Erro na geração: ${response.status}. Tente novamente.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const data = await response.json();
 
-    // Extract image from Google's response format
+    // Extract image from Lovable AI Gateway response
     let imageUrl: string | null = null;
     let textResponse = "";
 
-    const candidates = data.candidates;
-    if (candidates && candidates.length > 0) {
-      const contentParts = candidates[0]?.content?.parts || [];
-      for (const part of contentParts) {
-        if (part.inlineData) {
-          imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-        }
-        if (part.text) {
-          textResponse += part.text;
-        }
+    const message = data.choices?.[0]?.message;
+    if (message) {
+      if (message.content) textResponse = message.content;
+      if (message.images && message.images.length > 0) {
+        imageUrl = message.images[0]?.image_url?.url || null;
       }
     }
 

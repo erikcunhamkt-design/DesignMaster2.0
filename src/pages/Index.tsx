@@ -4,7 +4,6 @@ import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
 import { useProjectStore } from '@/hooks/useProjectStore';
-import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { buildGenerationRequest } from '@/core/prompt/PromptAgent';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -15,7 +14,6 @@ const Index = () => {
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { apiKey, saveKey: setApiKey } = useGoogleApiKey();
 
   const {
     projects,
@@ -55,7 +53,6 @@ const Index = () => {
           prompt: genRequest.prompt,
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
-          googleApiKey: apiKey,
         },
       });
 
@@ -84,8 +81,6 @@ const Index = () => {
         activePage={activePage}
         onNavigate={setActivePage}
         onNewProject={addProject}
-        apiKey={apiKey}
-        onChangeApiKey={setApiKey}
       />
       {activePage === 'criar' && (
         <ProjectTabs
@@ -106,7 +101,6 @@ const Index = () => {
               onUpdate={updateConfig}
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
-              apiKey={apiKey}
             />
           </>
         )}
