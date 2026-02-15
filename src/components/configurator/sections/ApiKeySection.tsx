@@ -5,13 +5,37 @@ import { Eye, EyeOff, ExternalLink } from 'lucide-react';
 
 const STORAGE_KEY = 'google_gemini_api_key';
 
+/** Validates that a string looks like an API key (alphanumeric, no spaces/sentences) */
+function isValidApiKey(key: string): boolean {
+  if (!key) return true; // empty is allowed (clears key)
+  // API keys are typically alphanumeric with dashes/underscores, no spaces or long text
+  const trimmed = key.trim();
+  if (trimmed.length < 10 || trimmed.length > 256) return false;
+  if (/\s{2,}/.test(trimmed)) return false; // no multiple consecutive spaces
+  if (trimmed.split(' ').length > 5) return false; // not a sentence
+  return true;
+}
+
 export function useGoogleApiKey() {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEY) || '');
+  const [apiKey, setApiKey] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEY) || '';
+    // Sanitize on load: if stored value looks like prompt text, discard it
+    if (stored && !isValidApiKey(stored)) {
+      localStorage.removeItem(STORAGE_KEY);
+      return '';
+    }
+    return stored;
+  });
 
   const saveKey = (key: string) => {
-    setApiKey(key);
-    if (key) {
-      localStorage.setItem(STORAGE_KEY, key);
+    const trimmed = key.trim();
+    if (trimmed && !isValidApiKey(trimmed)) {
+      // Reject invalid values silently
+      return;
+    }
+    setApiKey(trimmed);
+    if (trimmed) {
+      localStorage.setItem(STORAGE_KEY, trimmed);
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }

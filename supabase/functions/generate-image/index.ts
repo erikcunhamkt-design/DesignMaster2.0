@@ -14,9 +14,9 @@ serve(async (req) => {
   try {
     const { prompt, negativePrompt, referenceImages, googleApiKey } = await req.json();
 
-    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
       return new Response(
-        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida. Verifique se você colou apenas a chave." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
