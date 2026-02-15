@@ -35,14 +35,13 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <div>
-        <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1.5">Nicho / Projeto</p>
         <VoiceTextField
-          placeholder="Ex: Trader de Elite"
+          placeholder="Nicho (Ex: Trader de Elite)"
           value={config.niche}
           onChange={(v) => onUpdate({ niche: v })}
-          className="h-8 bg-muted border-none text-xs mb-2"
+          className="h-7 bg-secondary/30 border-border/20 text-[10px] mb-2"
         />
         <div className="flex flex-wrap gap-1">
           {niches.map((n) => (
@@ -50,10 +49,10 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
               key={n}
               onClick={() => onUpdate({ niche: n })}
               className={cn(
-                'rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors',
+                'rounded-full px-2 py-0.5 text-[9px] font-medium transition-all duration-150 border',
                 config.niche === n
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/12 text-primary border-primary/25'
+                  : 'bg-secondary/30 text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary/50'
               )}
             >
               {n}
@@ -66,11 +65,11 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
         placeholder="Ambiente (Ex: Escritório Moderno)"
         value={config.environment}
         onChange={(v) => onUpdate({ environment: v })}
-        className="h-8 bg-muted border-none text-xs"
+        className="h-7 bg-secondary/30 border-border/20 text-[10px]"
       />
 
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-foreground">Usar fotos de cenário?</span>
+        <span className="text-[10px] font-medium text-foreground/70">Fotos de cenário</span>
         <Switch
           checked={config.sceneryPhotosEnabled}
           onCheckedChange={(v) => onUpdate({ sceneryPhotosEnabled: v })}
@@ -89,15 +88,15 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
           />
 
           {config.sceneryPhotos.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {config.sceneryPhotos.map((url, i) => (
-                <div key={i} className="relative h-16 w-16 rounded-lg overflow-hidden border border-border group">
+                <div key={i} className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group">
                   <img src={url} alt={`Cenário ${i + 1}`} className="h-full w-full object-cover" />
                   <button
                     onClick={() => removePhoto(i)}
-                    className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-2.5 w-2.5" />
+                    <X className="h-2 w-2" />
                   </button>
                 </div>
               ))}
@@ -106,10 +105,10 @@ export function ProjectScenarioSection({ config, onUpdate }: Props) {
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary transition-all duration-200"
           >
-            <Plus className="h-4 w-4" />
-            <span className="text-xs font-medium">UPLOAD CENÁRIO</span>
+            <Plus className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-medium tracking-wide uppercase">Upload Cenário</span>
           </button>
         </>
       )}

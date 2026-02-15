@@ -1,6 +1,5 @@
-import { Compass, PenTool, Image, Zap, Plus, Search, User, Activity, Wand2, KeyRound, ChevronDown } from 'lucide-react';
+import { Compass, PenTool, Image, Zap, Plus, User, Wand2, KeyRound, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection } from '@/components/configurator/sections/ApiKeySection';
@@ -24,11 +23,19 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
   const hasKey = apiKey.length >= 10;
 
   return (
-    <header className="relative z-30 flex h-14 items-center border-b border-border/50 glass px-5 gap-5">
+    <header className="relative z-30 flex h-12 items-center border-b border-border/40 bg-background/80 backdrop-blur-xl px-4 gap-3">
       {/* Logo */}
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/50 text-primary-foreground shadow-glow-sm shrink-0">
-        <Zap className="h-4.5 w-4.5" />
+      <div className="flex items-center gap-2.5 shrink-0 mr-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary/90 to-primary/40 text-primary-foreground shadow-glow-sm">
+          <Zap className="h-3.5 w-3.5" />
+        </div>
+        <span className="font-display text-sm font-bold tracking-tight text-foreground hidden lg:block">
+          Spark<span className="text-primary">Snap</span>
+        </span>
       </div>
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border/50" />
 
       {/* Nav items */}
       <nav className="flex items-center gap-0.5">
@@ -39,16 +46,16 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={cn(
-                'relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-[11px] font-semibold tracking-wide uppercase transition-all duration-200',
+                'relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium tracking-wide transition-all duration-200',
                 active
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'text-foreground bg-secondary/80'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40'
               )}
             >
               <item.icon className="h-3.5 w-3.5" />
-              {item.label}
+              <span className="hidden sm:inline">{item.label}</span>
               {active && (
-                <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary" />
+                <span className="absolute -bottom-[7px] left-2 right-2 h-[2px] rounded-full bg-primary shadow-glow-sm" />
               )}
             </button>
           );
@@ -58,60 +65,43 @@ export function TopNav({ activePage, onNavigate, onNewProject, apiKey = '', onCh
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Search */}
-      <div className="relative max-w-[220px]">
-        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Buscar..."
-          className="h-8 pl-9 bg-secondary/50 border-border/50 text-xs rounded-full w-full placeholder:text-muted-foreground/60 focus-visible:ring-1 focus-visible:ring-primary/30"
-        />
-      </div>
-
-      {/* API Key Pill */}
+      {/* API Key */}
       {onChangeApiKey && (
         <Popover>
           <PopoverTrigger asChild>
             <button
               className={cn(
-                'flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-bold tracking-wider uppercase transition-all duration-200 border',
+                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all duration-200 border',
                 hasKey
-                  ? 'bg-primary/8 text-primary border-primary/20 hover:bg-primary/12'
-                  : 'bg-destructive/8 text-destructive border-destructive/20 hover:bg-destructive/12'
+                  ? 'bg-primary/5 text-primary/80 border-primary/15 hover:bg-primary/10 hover:text-primary'
+                  : 'bg-destructive/5 text-destructive/70 border-destructive/15 hover:bg-destructive/10'
               )}
             >
+              <span className={cn('h-1.5 w-1.5 rounded-full', hasKey ? 'bg-primary' : 'bg-destructive')} />
               <KeyRound className="h-3 w-3" />
-              <span className="hidden sm:inline">API KEY</span>
-              <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+              <span className="hidden md:inline">API</span>
+              <ChevronDown className="h-2.5 w-2.5 opacity-40" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-4 glass glass-border shadow-elevation-3">
+          <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3">
             <ApiKeySection apiKey={apiKey} onChangeKey={onChangeApiKey} />
           </PopoverContent>
         </Popover>
       )}
 
-      {/* Status */}
-      <div className="flex items-center gap-2 rounded-full bg-primary/8 border border-primary/20 px-3.5 py-1.5 text-[10px] font-bold text-primary tracking-wider uppercase">
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-        </span>
-        ONLINE
-      </div>
-
-      {/* New */}
+      {/* New project */}
       <Button
         size="sm"
         onClick={onNewProject}
-        className="h-8 gap-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow-sm transition-all duration-200 hover:shadow-glow-md"
+        className="h-7 gap-1 text-[10px] font-semibold tracking-wide rounded-md bg-secondary hover:bg-secondary/80 text-foreground border border-border/50 shadow-none transition-all duration-200"
       >
-        <Plus className="h-3.5 w-3.5" />
-        Novo
+        <Plus className="h-3 w-3" />
+        <span className="hidden sm:inline">Novo</span>
       </Button>
 
-      {/* User */}
-      <button className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all duration-200 shrink-0">
-        <User className="h-3.5 w-3.5" />
+      {/* User avatar */}
+      <button className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary/60 border border-border/40 text-muted-foreground hover:text-foreground hover:border-primary/20 transition-all duration-200 shrink-0">
+        <User className="h-3 w-3" />
       </button>
     </header>
   );

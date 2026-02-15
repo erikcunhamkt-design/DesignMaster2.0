@@ -10,9 +10,9 @@ interface Props {
 
 export function TextSection({ config, onUpdate }: Props) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-foreground">Ativar Texto</span>
+        <span className="text-[10px] font-medium text-foreground/70">Ativar Texto</span>
         <Switch
           checked={config.textEnabled}
           onCheckedChange={(v) => onUpdate({ textEnabled: v })}
@@ -22,43 +22,41 @@ export function TextSection({ config, onUpdate }: Props) {
       {config.textEnabled && (
         <div className="space-y-2">
           <VoiceTextField
-            placeholder="Texto 01 (headline)"
+            placeholder="Headline"
             value={config.text01}
             onChange={(v) => onUpdate({ text01: v })}
-            className="h-8 bg-muted border-none text-xs"
+            className="h-7 bg-secondary/30 border-border/20 text-[10px]"
           />
           <VoiceTextField
-            placeholder="Texto 02 (subheadline)"
+            placeholder="Subheadline"
             value={config.text02}
             onChange={(v) => onUpdate({ text02: v })}
-            className="h-8 bg-muted border-none text-xs"
+            className="h-7 bg-secondary/30 border-border/20 text-[10px]"
           />
           <VoiceTextField
             placeholder="CTA"
             value={config.cta}
             onChange={(v) => onUpdate({ cta: v })}
-            className="h-8 bg-muted border-none text-xs"
+            className="h-7 bg-secondary/30 border-border/20 text-[10px]"
           />
 
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-1 pt-1">
             {(['camada', 'imagem'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => onUpdate({ textMode: mode })}
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-md px-3 py-2 text-[11px] transition-colors',
+                  'flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[10px] transition-all duration-150 border',
                   config.textMode === mode
-                    ? 'bg-primary/15 text-primary'
-                    : 'bg-muted text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary/10 text-primary border-primary/20'
+                    : 'bg-secondary/20 text-muted-foreground hover:text-foreground border-transparent'
                 )}
               >
                 <div className={cn(
-                  'h-3 w-3 rounded-full border-2',
-                  config.textMode === mode ? 'border-primary bg-primary' : 'border-muted-foreground'
+                  'h-2.5 w-2.5 rounded-full border-2',
+                  config.textMode === mode ? 'border-primary bg-primary' : 'border-muted-foreground/40'
                 )} />
-                {mode === 'camada'
-                  ? 'Texto como camada no app (recomendado)'
-                  : 'Texto dentro da imagem (IA)'}
+                {mode === 'camada' ? 'Camada (recomendado)' : 'Na imagem (IA)'}
               </button>
             ))}
           </div>
