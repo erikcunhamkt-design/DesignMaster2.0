@@ -1,6 +1,6 @@
 import { studios } from '@/data/studios';
 import { StudioCard } from '@/components/StudioCard';
-import { Zap } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 
 export default function StudiosPage() {
   return (
@@ -18,9 +18,7 @@ export default function StudiosPage() {
       {/* Header */}
       <header className="relative z-10 flex h-14 items-center px-6 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-            <Zap className="h-4 w-4" />
-          </div>
+          <img src={logoImg} alt="Design Master" className="h-8 w-8 rounded-lg shadow-glow-sm" />
           <span className="font-display text-base font-bold tracking-tight text-foreground">
             Design<span className="text-gradient">Master</span>
           </span>

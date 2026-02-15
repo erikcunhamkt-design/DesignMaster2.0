@@ -1,4 +1,5 @@
-import { ArrowLeft, Zap, KeyRound, ChevronDown } from 'lucide-react';
+import { ArrowLeft, KeyRound, ChevronDown } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
@@ -29,9 +30,7 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
 
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-primary to-accent text-primary-foreground">
-          <Zap className="h-3 w-3" />
-        </div>
+        <img src={logoImg} alt="Design Master" className="h-6 w-6 rounded-md" />
         <span className="font-display text-sm font-bold tracking-tight text-foreground">
           {title}
         </span>
