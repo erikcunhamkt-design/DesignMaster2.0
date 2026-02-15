@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 
 interface ExtractedResult {
   prompt: string;
@@ -28,6 +29,7 @@ const REPLICATE_OPTIONS = [
 ];
 
 export default function ExtractorPage() {
+  const { apiKey } = useGoogleApiKey();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -66,7 +68,10 @@ export default function ExtractorPage() {
 
   const handleExtract = async () => {
     if (!imageBase64) return;
-
+    if (!apiKey || apiKey.length < 10) {
+      toast.error('Configure sua API Key do Google primeiro (botão API no topo).');
+      return;
+    }
     setIsExtracting(true);
     setResult(null);
 
@@ -76,6 +81,7 @@ export default function ExtractorPage() {
           imageBase64,
           replicateOptions: selectedOptions,
           extraInstruction: extraInstruction || undefined,
+          googleApiKey: apiKey,
         },
       });
 

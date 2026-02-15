@@ -12,13 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, replicateOptions, extraInstruction } = await req.json();
+    const { imageBase64, replicateOptions, extraInstruction, googleApiKey } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
       return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -49,60 +48,66 @@ Style tags should be from: ultra realista, glow, glassmorphism, cartoon, gamer, 
 
 Respond ONLY with the JSON object, no markdown, no code blocks.`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+    // Extract base64 data from data URL
+    const match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+    const parts: any[] = [{ text: systemPrompt }];
+
+    if (match) {
+      parts.push({
+        inlineData: {
+          mimeType: match[1],
+          data: match[2],
         },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: "Analyze this image and extract a detailed recreation prompt." },
-                { type: "image_url", image_url: { url: imageBase64 } },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+      });
+    } else {
+      // If it's already raw base64 or a URL, send as text reference
+      parts.push({ text: `Analyze this image: ${imageBase64.substring(0, 100)}...` });
+    }
+
+    const model = "gemini-3-pro-preview";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+    console.log(`Calling Google Gemini ${model} for prompt extraction...`);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Google API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }),
+          JSON.stringify({ error: "Limite de requisições excedido na API do Google. Aguarde e tente novamente." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 403) {
         return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao seu workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
       return new Response(
-        JSON.stringify({ error: `Erro na extração: ${response.status}` }),
+        JSON.stringify({ error: `Erro na API do Google: ${response.status}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Parse the JSON from the AI response
     let extracted;
     try {
-      // Try to extract JSON from the response (handle potential markdown wrapping)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extracted = JSON.parse(jsonMatch[0]);
