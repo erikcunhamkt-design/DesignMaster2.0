@@ -38,57 +38,75 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const { messages, googleApiKey } = await req.json();
+
+    if (!googleApiKey || googleApiKey.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: "API Key do Google não fornecida. Configure sua chave no botão API." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
-        ],
-        stream: true,
-      }),
+    // Convert chat messages to Gemini format
+    const geminiContents = [];
+    
+    // Add system prompt as first user message context
+    geminiContents.push({
+      role: "user",
+      parts: [{ text: SYSTEM_PROMPT }]
+    });
+    geminiContents.push({
+      role: "model",
+      parts: [{ text: "Entendido! Sou o Design Master, pronto para ajudar com design, viralização e conteúdo magnético. Como posso ajudar?" }]
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde um momento." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "Erro na IA" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    for (const msg of messages) {
+      geminiContents.push({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }]
       });
     }
 
+    const model = "gemini-3-pro-preview";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${googleApiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: geminiContents }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Google API error:", response.status, errorText);
+
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit excedido. Aguarde um momento." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 403) {
+        return new Response(
+          JSON.stringify({ error: "API Key inválida ou sem permissão." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      return new Response(
+        JSON.stringify({ error: `Erro na API Google: ${response.status}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Stream the SSE response back to the client
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("chat-design-master error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 });
