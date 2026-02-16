@@ -83,4 +83,13 @@ export const studios: Studio[] = [
     route: '/studio/galeria',
     gradient: 'from-sky-500/15 to-indigo-500/10',
   },
+  {
+    id: 'chat',
+    name: 'Design Master',
+    tagline: 'Mentor criativo com IA',
+    description: 'Chat especialista em design, viralização, calendário de conteúdo e ideias magnéticas para Instagram.',
+    icon: '🧠',
+    route: '/studio/chat',
+    gradient: 'from-fuchsia-500/15 to-pink-500/10',
+  },
 ];
