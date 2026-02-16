@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import AuthPage from '@/pages/AuthPage';
 import PaywallPage from '@/pages/PaywallPage';
+import { ApiKeyDialog } from '@/components/ApiKeyDialog';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -23,5 +24,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!user) return <AuthPage />;
   if (!isActive()) return <PaywallPage />;
 
-  return <>{children}</>;
+  return (
+    <>
+      <ApiKeyDialog />
+      {children}
+    </>
+  );
 }
