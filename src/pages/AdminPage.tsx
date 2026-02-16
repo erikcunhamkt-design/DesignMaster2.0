@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ interface LicenseRow {
   status: string;
   expires_at: string | null;
   created_at: string;
+  access_key: string | null;
 }
 
 export default function AdminPage() {
@@ -114,6 +115,7 @@ export default function AdminPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Plano</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Chave</TableHead>
                     <TableHead>Expira em</TableHead>
                     <TableHead>Criado em</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
@@ -122,11 +124,11 @@ export default function AdminPage() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
                     </TableRow>
                   ) : filtered.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum resultado</TableCell>
+                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhum resultado</TableCell>
                     </TableRow>
                   ) : (
                     filtered.map(license => (
@@ -151,6 +153,9 @@ export default function AdminPage() {
                           >
                             {license.status === 'active' ? 'Ativo' : 'Inativo'}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs font-mono">
+                          {license.access_key || '—'}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {license.expires_at ? new Date(license.expires_at).toLocaleDateString('pt-BR') : '—'}
@@ -235,63 +240,97 @@ function ContentManager() {
 
 function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [plan, setPlan] = useState('monthly');
   const [status, setStatus] = useState('active');
   const [isTest, setIsTest] = useState(false);
   const [testMinutes, setTestMinutes] = useState('10');
   const [adding, setAdding] = useState(false);
   const [open, setOpen] = useState(false);
+  const [result, setResult] = useState<{ email: string; password: string; accessKey: string } | null>(null);
+
+  const generatePassword = () => {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
+    let pwd = '';
+    for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    setPassword(pwd);
+  };
 
   const handleAdd = async () => {
     if (!email.trim()) { toast.error('Informe o email'); return; }
+    if (!password.trim() || password.length < 6) { toast.error('Senha deve ter pelo menos 6 caracteres'); return; }
     setAdding(true);
 
-    const { data: existing } = await supabase
-      .from('licenses')
-      .select('id')
-      .eq('email', email.trim())
-      .maybeSingle();
+    const expiresAt = isTest
+      ? new Date(Date.now() + parseInt(testMinutes) * 60 * 1000).toISOString()
+      : undefined;
 
-    if (existing) {
-      toast.error('Já existe uma licença para este email');
-      setAdding(false);
-      return;
-    }
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
 
-    const insertData: any = {
-      user_id: crypto.randomUUID(),
-      email: email.trim(),
-      plan: isTest ? 'test' : plan,
-      status: 'active',
-    };
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-test-user`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password.trim(),
+          plan: isTest ? 'test' : plan,
+          expiresAt,
+        }),
+      }
+    );
 
-    if (isTest) {
-      const expiresAt = new Date(Date.now() + parseInt(testMinutes) * 60 * 1000);
-      insertData.expires_at = expiresAt.toISOString();
-    }
+    const data = await response.json();
 
-    const { error } = await supabase.from('licenses').insert(insertData);
-
-    if (error) { toast.error('Erro ao adicionar: ' + error.message); }
-    else {
-      toast.success(isTest ? `Licença teste de ${testMinutes}min criada` : 'Licença adicionada com sucesso');
-      setEmail('');
-      setPlan('monthly');
-      setStatus('active');
-      setIsTest(false);
-      setOpen(false);
+    if (!response.ok) {
+      toast.error('Erro: ' + (data.error || 'Falha ao criar'));
+    } else {
+      toast.success('Usuário criado com sucesso!');
+      setResult({ email: email.trim(), password: password.trim(), accessKey: data.accessKey });
       onAdded();
     }
     setAdding(false);
   };
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copiado!`);
+  };
+
+  if (result) {
+    return (
+      <div className="glass-card rounded-xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-5 w-5 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Usuário Criado com Sucesso</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <CredentialField label="Email" value={result.email} onCopy={() => copyToClipboard(result.email, 'Email')} />
+          <CredentialField label="Senha" value={result.password} onCopy={() => copyToClipboard(result.password, 'Senha')} secret />
+          <CredentialField label="Chave de Acesso" value={result.accessKey} onCopy={() => copyToClipboard(result.accessKey, 'Chave')} />
+        </div>
+        <p className="text-xs text-muted-foreground">Guarde essas credenciais — a senha não poderá ser recuperada.</p>
+        <Button size="sm" variant="outline" onClick={() => { setResult(null); setEmail(''); setPassword(''); setOpen(false); }}>
+          Fechar
+        </Button>
+      </div>
+    );
+  }
+
   if (!open) {
     return (
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => { setIsTest(false); setOpen(true); }} className="gap-1.5">
+        <Button size="sm" onClick={() => { setIsTest(false); setOpen(true); generatePassword(); }} className="gap-1.5">
           <Plus className="h-4 w-4" /> Adicionar Pessoa
         </Button>
-        <Button size="sm" variant="outline" onClick={() => { setIsTest(true); setOpen(true); }} className="gap-1.5">
+        <Button size="sm" variant="outline" onClick={() => { setIsTest(true); setOpen(true); generatePassword(); }} className="gap-1.5">
           <Timer className="h-4 w-4" /> Licença Teste
         </Button>
       </div>
@@ -307,12 +346,26 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex-1 min-w-[200px]">
           <label className="text-xs text-muted-foreground mb-1 block">Email</label>
-          <Input
-            placeholder="email@exemplo.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            type="email"
-          />
+          <Input placeholder="email@exemplo.com" value={email} onChange={e => setEmail(e.target.value)} type="email" />
+        </div>
+        <div className="w-48">
+          <label className="text-xs text-muted-foreground mb-1 block">Senha</label>
+          <div className="relative">
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="pr-16"
+            />
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
+              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              </Button>
+              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={generatePassword} title="Gerar senha">
+                <Key className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
         </div>
         {isTest ? (
           <div className="w-40">
@@ -355,9 +408,31 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
           </>
         )}
         <Button onClick={handleAdd} disabled={adding} className="gap-1.5">
-          <Plus className="h-4 w-4" /> {adding ? 'Adicionando...' : isTest ? 'Gerar Teste' : 'Adicionar'}
+          <Plus className="h-4 w-4" /> {adding ? 'Criando...' : isTest ? 'Gerar Teste' : 'Adicionar'}
         </Button>
         <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
+      </div>
+    </div>
+  );
+}
+
+function CredentialField({ label, value, onCopy, secret }: { label: string; value: string; onCopy: () => void; secret?: boolean }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="rounded-lg border border-border/40 bg-secondary/30 p-3">
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <div className="flex items-center gap-2">
+        <code className="text-sm font-mono text-foreground flex-1 truncate">
+          {secret && !show ? '••••••••' : value}
+        </code>
+        {secret && (
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShow(!show)}>
+            {show ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+          </Button>
+        )}
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onCopy}>
+          <Copy className="h-3 w-3" />
+        </Button>
       </div>
     </div>
   );

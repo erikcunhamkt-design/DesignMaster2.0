@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       licenses: {
         Row: {
+          access_key: string | null
           created_at: string
           email: string | null
           expires_at: string | null
@@ -28,6 +29,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_key?: string | null
           created_at?: string
           email?: string | null
           expires_at?: string | null
@@ -40,6 +42,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_key?: string | null
           created_at?: string
           email?: string | null
           expires_at?: string | null
