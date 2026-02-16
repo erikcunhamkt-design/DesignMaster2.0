@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ export default function DesignMasterChatPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { apiKey } = useGoogleApiKey();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,6 +38,11 @@ export default function DesignMasterChatPage() {
   const send = async (text?: string) => {
     const msg = (text || input).trim();
     if (!msg || isLoading) return;
+
+    if (!apiKey || apiKey.length < 10) {
+      toast.error('Configure sua API Key do Google no botão API no topo.');
+      return;
+    }
 
     const userMsg: Msg = { role: 'user', content: msg };
     setMessages(prev => [...prev, userMsg]);
@@ -52,7 +59,7 @@ export default function DesignMasterChatPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: allMessages }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
       });
 
       if (!resp.ok) {
@@ -97,7 +104,8 @@ export default function DesignMasterChatPage() {
 
           try {
             const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            // Gemini SSE format: candidates[].content.parts[].text
+            const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined;
             if (content) upsertAssistant(content);
           } catch {
             textBuffer = line + '\n' + textBuffer;
@@ -117,7 +125,7 @@ export default function DesignMasterChatPage() {
           if (jsonStr === '[DONE]') continue;
           try {
             const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined;
             if (content) upsertAssistant(content);
           } catch { /* ignore */ }
         }
@@ -148,7 +156,7 @@ export default function DesignMasterChatPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Design Master Chat" showApiKey={false} />
+      <StudioTopbar title="Design Master Chat" showApiKey={true} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Messages */}
