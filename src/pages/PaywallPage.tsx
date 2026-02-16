@@ -56,7 +56,11 @@ const PaywallPage = () => {
       });
 
       if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error === 'invalid_key' ? 'Chave inválida' : data.error);
+      if (data?.error) {
+        if (data.error === 'invalid_key') throw new Error('Chave inválida');
+        if (data.error === 'key_expired') throw new Error('Esta chave expirou');
+        throw new Error(data.error);
+      }
 
       toast.success('Acesso ativado com sucesso!');
       window.location.reload();
