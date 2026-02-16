@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Crown, Zap, Star, Key } from 'lucide-react';
+import { Crown, Zap, Star, Key, MessageCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
@@ -41,6 +41,13 @@ const PaywallPage = () => {
   const [accessKey, setAccessKey] = useState('');
   const [validating, setValidating] = useState(false);
 
+  const isExpired = license?.status === 'active' && license?.expires_at && new Date(license.expires_at) < new Date();
+
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(`Olá! Minha licença do Design Master expirou. Email: ${user?.email}`);
+    window.open(`https://wa.me/5551996377086?text=${msg}`, '_blank');
+  };
+
   const handleSelect = (baseUrl: string) => {
     const url = `${baseUrl}?email=${encodeURIComponent(user?.email || '')}`;
     window.open(url, '_blank');
@@ -70,6 +77,36 @@ const PaywallPage = () => {
       setValidating(false);
     }
   };
+
+  if (isExpired) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
+        <div className="max-w-md w-full text-center space-y-6">
+          <img src={logoImg} alt="Design Master" className="h-10 w-auto mx-auto" />
+          <div className="glass-card rounded-2xl p-8 space-y-5">
+            <div className="flex items-center justify-center">
+              <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">
+              Sua licença expirou
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Seu período de acesso chegou ao fim. Entre em contato com o suporte para renovar ou adquirir um novo plano.
+            </p>
+            <Button onClick={handleWhatsApp} className="w-full gap-2" size="lg">
+              <MessageCircle className="h-5 w-5" /> Falar com Suporte via WhatsApp
+            </Button>
+          </div>
+          <div className="flex items-center justify-center gap-4 pt-2">
+            <p className="text-xs text-muted-foreground">Logado como {user?.email}</p>
+            <Button variant="ghost" size="sm" onClick={signOut} className="text-xs text-muted-foreground">Sair</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
