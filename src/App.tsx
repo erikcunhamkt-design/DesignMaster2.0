@@ -5,7 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import StudiosPage from "./pages/StudiosPage";
+import AdminPage from "./pages/AdminPage";
 import Index from "./pages/Index";
 import ExtractorPage from "./pages/ExtractorPage";
 import PromptBuilderPage from "./pages/PromptBuilderPage";
@@ -41,6 +43,7 @@ const App = () => {
             <Route path="/studio/capas" element={<ProtectedRoute><MagneticCoversPage /></ProtectedRoute>} />
             <Route path="/studio/galeria" element={<ProtectedRoute><PromptGalleryPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

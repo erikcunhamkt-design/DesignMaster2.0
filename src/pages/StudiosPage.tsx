@@ -2,8 +2,14 @@ import { studios } from '@/data/studios';
 import { StudioCard } from '@/components/StudioCard';
 import logoImg from '@/assets/logo.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
+import { useAdmin } from '@/hooks/useAdmin';
+import { useNavigate } from 'react-router-dom';
+import { Shield } from 'lucide-react';
 
 export default function StudiosPage() {
+  const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
+
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
       {/* Cinematic background */}
@@ -25,6 +31,16 @@ export default function StudiosPage() {
           </span>
           <SubscriptionBadge />
         </div>
+        <div className="flex-1" />
+        {isAdmin && (
+          <button
+            onClick={() => navigate('/admin')}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Shield className="h-3.5 w-3.5" />
+            Admin
+          </button>
+        )}
       </header>
 
       {/* Content */}
