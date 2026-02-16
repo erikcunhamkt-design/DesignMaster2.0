@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -237,6 +237,8 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
   const [email, setEmail] = useState('');
   const [plan, setPlan] = useState('monthly');
   const [status, setStatus] = useState('active');
+  const [isTest, setIsTest] = useState(false);
+  const [testMinutes, setTestMinutes] = useState('10');
   const [adding, setAdding] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -244,7 +246,6 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
     if (!email.trim()) { toast.error('Informe o email'); return; }
     setAdding(true);
 
-    // Check if a license already exists for this email
     const { data: existing } = await supabase
       .from('licenses')
       .select('id')
@@ -257,20 +258,27 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
       return;
     }
 
-    // Create license with a placeholder user_id (admin-created)
-    const { error } = await supabase.from('licenses').insert({
+    const insertData: any = {
       user_id: crypto.randomUUID(),
       email: email.trim(),
-      plan,
-      status,
-    });
+      plan: isTest ? 'test' : plan,
+      status: 'active',
+    };
+
+    if (isTest) {
+      const expiresAt = new Date(Date.now() + parseInt(testMinutes) * 60 * 1000);
+      insertData.expires_at = expiresAt.toISOString();
+    }
+
+    const { error } = await supabase.from('licenses').insert(insertData);
 
     if (error) { toast.error('Erro ao adicionar: ' + error.message); }
     else {
-      toast.success('Licença adicionada com sucesso');
+      toast.success(isTest ? `Licença teste de ${testMinutes}min criada` : 'Licença adicionada com sucesso');
       setEmail('');
       setPlan('monthly');
       setStatus('active');
+      setIsTest(false);
       setOpen(false);
       onAdded();
     }
@@ -279,48 +287,78 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
 
   if (!open) {
     return (
-      <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
-        <Plus className="h-4 w-4" /> Adicionar Pessoa
-      </Button>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={() => { setIsTest(false); setOpen(true); }} className="gap-1.5">
+          <Plus className="h-4 w-4" /> Adicionar Pessoa
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => { setIsTest(true); setOpen(true); }} className="gap-1.5">
+          <Timer className="h-4 w-4" /> Licença Teste
+        </Button>
+      </div>
     );
   }
 
   return (
-    <div className="glass-card rounded-xl p-4 flex flex-wrap items-end gap-3">
-      <div className="flex-1 min-w-[200px]">
-        <label className="text-xs text-muted-foreground mb-1 block">Email</label>
-        <Input
-          placeholder="email@exemplo.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          type="email"
-        />
+    <div className="glass-card rounded-xl p-4 space-y-3">
+      <div className="flex items-center gap-2 mb-1">
+        {isTest && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Licença Teste</Badge>}
+        <span className="text-sm font-medium text-foreground">{isTest ? 'Nova Licença Teste' : 'Adicionar Pessoa'}</span>
       </div>
-      <div className="w-32">
-        <label className="text-xs text-muted-foreground mb-1 block">Plano</label>
-        <Select value={plan} onValueChange={setPlan}>
-          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="monthly">Mensal</SelectItem>
-            <SelectItem value="yearly">Anual</SelectItem>
-            <SelectItem value="lifetime">Vitalício</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-xs text-muted-foreground mb-1 block">Email</label>
+          <Input
+            placeholder="email@exemplo.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            type="email"
+          />
+        </div>
+        {isTest ? (
+          <div className="w-40">
+            <label className="text-xs text-muted-foreground mb-1 block">Duração</label>
+            <Select value={testMinutes} onValueChange={setTestMinutes}>
+              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10 minutos</SelectItem>
+                <SelectItem value="20">20 minutos</SelectItem>
+                <SelectItem value="30">30 minutos</SelectItem>
+                <SelectItem value="60">1 hora</SelectItem>
+                <SelectItem value="120">2 horas</SelectItem>
+                <SelectItem value="1440">24 horas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        ) : (
+          <>
+            <div className="w-32">
+              <label className="text-xs text-muted-foreground mb-1 block">Plano</label>
+              <Select value={plan} onValueChange={setPlan}>
+                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">Mensal</SelectItem>
+                  <SelectItem value="yearly">Anual</SelectItem>
+                  <SelectItem value="lifetime">Vitalício</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-32">
+              <label className="text-xs text-muted-foreground mb-1 block">Status</label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativo</SelectItem>
+                  <SelectItem value="inactive">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
+        <Button onClick={handleAdd} disabled={adding} className="gap-1.5">
+          <Plus className="h-4 w-4" /> {adding ? 'Adicionando...' : isTest ? 'Gerar Teste' : 'Adicionar'}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
       </div>
-      <div className="w-32">
-        <label className="text-xs text-muted-foreground mb-1 block">Status</label>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">Ativo</SelectItem>
-            <SelectItem value="inactive">Inativo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <Button onClick={handleAdd} disabled={adding} className="gap-1.5">
-        <Plus className="h-4 w-4" /> {adding ? 'Adicionando...' : 'Adicionar'}
-      </Button>
-      <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
     </div>
   );
 }
