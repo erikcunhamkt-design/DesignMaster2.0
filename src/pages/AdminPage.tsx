@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -93,6 +93,7 @@ export default function AdminPage() {
 
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-4 mt-4">
+            <AddLicenseForm onAdded={fetchLicenses} />
             <div className="flex items-center gap-3">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -228,6 +229,98 @@ function ContentManager() {
       <p className="text-xs text-muted-foreground">
         Para adicionar ou remover studios, edite o arquivo de configuração de studios no código.
       </p>
+    </div>
+  );
+}
+
+function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
+  const [email, setEmail] = useState('');
+  const [plan, setPlan] = useState('monthly');
+  const [status, setStatus] = useState('active');
+  const [adding, setAdding] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleAdd = async () => {
+    if (!email.trim()) { toast.error('Informe o email'); return; }
+    setAdding(true);
+
+    // Check if a license already exists for this email
+    const { data: existing } = await supabase
+      .from('licenses')
+      .select('id')
+      .eq('email', email.trim())
+      .maybeSingle();
+
+    if (existing) {
+      toast.error('Já existe uma licença para este email');
+      setAdding(false);
+      return;
+    }
+
+    // Create license with a placeholder user_id (admin-created)
+    const { error } = await supabase.from('licenses').insert({
+      user_id: crypto.randomUUID(),
+      email: email.trim(),
+      plan,
+      status,
+    });
+
+    if (error) { toast.error('Erro ao adicionar: ' + error.message); }
+    else {
+      toast.success('Licença adicionada com sucesso');
+      setEmail('');
+      setPlan('monthly');
+      setStatus('active');
+      setOpen(false);
+      onAdded();
+    }
+    setAdding(false);
+  };
+
+  if (!open) {
+    return (
+      <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
+        <Plus className="h-4 w-4" /> Adicionar Pessoa
+      </Button>
+    );
+  }
+
+  return (
+    <div className="glass-card rounded-xl p-4 flex flex-wrap items-end gap-3">
+      <div className="flex-1 min-w-[200px]">
+        <label className="text-xs text-muted-foreground mb-1 block">Email</label>
+        <Input
+          placeholder="email@exemplo.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          type="email"
+        />
+      </div>
+      <div className="w-32">
+        <label className="text-xs text-muted-foreground mb-1 block">Plano</label>
+        <Select value={plan} onValueChange={setPlan}>
+          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="monthly">Mensal</SelectItem>
+            <SelectItem value="yearly">Anual</SelectItem>
+            <SelectItem value="lifetime">Vitalício</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="w-32">
+        <label className="text-xs text-muted-foreground mb-1 block">Status</label>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Ativo</SelectItem>
+            <SelectItem value="inactive">Inativo</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <Button onClick={handleAdd} disabled={adding} className="gap-1.5">
+        <Plus className="h-4 w-4" /> {adding ? 'Adicionando...' : 'Adicionar'}
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
     </div>
   );
 }
