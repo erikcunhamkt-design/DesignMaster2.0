@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
 
     if (!key || !userId) {
       return new Response(JSON.stringify({ error: "missing_params" }), {
-        status: 400,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -30,21 +30,26 @@ Deno.serve(async (req) => {
     // 1. Check if it's the master access key
     const masterKey = (Deno.env.get("MASTER_ACCESS_KEY") || "").trim();
     if (masterKey && trimmedKey === masterKey) {
-      const { error } = await supabase.from("licenses").upsert(
-        {
-          user_id: userId,
+      // Ensure user has a license row, then activate
+      const { data: existing } = await supabase
+        .from("licenses")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase.from("licenses").update({
           plan: "lifetime",
           status: "active",
           expires_at: null,
           updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
-
-      if (error) {
-        return new Response(JSON.stringify({ error: "db_error", details: error }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }).eq("user_id", userId);
+      } else {
+        await supabase.from("licenses").insert({
+          user_id: userId,
+          plan: "lifetime",
+          status: "active",
+          expires_at: null,
         });
       }
 
@@ -63,7 +68,7 @@ Deno.serve(async (req) => {
 
     if (lookupError || !keyLicense) {
       return new Response(JSON.stringify({ error: "invalid_key" }), {
-        status: 401,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -71,52 +76,52 @@ Deno.serve(async (req) => {
     // Check if expired
     if (keyLicense.expires_at && new Date(keyLicense.expires_at) < new Date()) {
       return new Response(JSON.stringify({ error: "key_expired" }), {
-        status: 401,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Activate the current user's license with the key's plan/expiry
+    // Ensure current user has a license row
+    const { data: userLicense } = await supabase
+      .from("licenses")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
     if (keyLicense.user_id === userId) {
-      // Key belongs to same user — just activate their license
-      const { error: updateError } = await supabase
-        .from("licenses")
-        .update({
-          status: "active",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId);
+      // Key belongs to same user — just activate
+      await supabase.from("licenses").update({
+        status: "active",
+        updated_at: new Date().toISOString(),
+      }).eq("user_id", userId);
+    } else if (userLicense) {
+      // Current user has a license — update it with key's plan/expiry
+      await supabase.from("licenses").update({
+        plan: keyLicense.plan,
+        status: "active",
+        expires_at: keyLicense.expires_at,
+        updated_at: new Date().toISOString(),
+      }).eq("user_id", userId);
 
-      if (updateError) {
-        return new Response(JSON.stringify({ error: "db_error", details: updateError }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      // Invalidate the key
+      await supabase.from("licenses").update({
+        access_key: null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", keyLicense.id);
     } else {
-      // Key belongs to a different user — copy plan/expiry to the current user's license
-      const { error: updateError } = await supabase
-        .from("licenses")
-        .update({
-          plan: keyLicense.plan,
-          status: "active",
-          expires_at: keyLicense.expires_at,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId);
+      // Current user has no license row — create one
+      await supabase.from("licenses").insert({
+        user_id: userId,
+        plan: keyLicense.plan,
+        status: "active",
+        expires_at: keyLicense.expires_at,
+      });
 
-      if (updateError) {
-        return new Response(JSON.stringify({ error: "db_error", details: updateError }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Invalidate the key so it can't be reused
-      await supabase
-        .from("licenses")
-        .update({ access_key: null, updated_at: new Date().toISOString() })
-        .eq("id", keyLicense.id);
+      // Invalidate the key
+      await supabase.from("licenses").update({
+        access_key: null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", keyLicense.id);
     }
 
     return new Response(JSON.stringify({ ok: true }), {
@@ -126,7 +131,7 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
