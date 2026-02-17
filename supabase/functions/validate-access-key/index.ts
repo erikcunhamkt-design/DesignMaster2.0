@@ -1,6 +1,6 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -55,13 +55,13 @@ Deno.serve(async (req) => {
     }
 
     // 2. Check if it's a generated access key from licenses table
-    const { data: license, error: lookupError } = await supabase
+    const { data: keyLicense, error: lookupError } = await supabase
       .from("licenses")
       .select("*")
       .eq("access_key", trimmedKey)
       .maybeSingle();
 
-    if (lookupError || !license) {
+    if (lookupError || !keyLicense) {
       return new Response(JSON.stringify({ error: "invalid_key" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -69,28 +69,54 @@ Deno.serve(async (req) => {
     }
 
     // Check if expired
-    if (license.expires_at && new Date(license.expires_at) < new Date()) {
+    if (keyLicense.expires_at && new Date(keyLicense.expires_at) < new Date()) {
       return new Response(JSON.stringify({ error: "key_expired" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Transfer the license to the current user
-    const { error: updateError } = await supabase
-      .from("licenses")
-      .update({
-        user_id: userId,
-        status: "active",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", license.id);
+    // Activate the current user's license with the key's plan/expiry
+    if (keyLicense.user_id === userId) {
+      // Key belongs to same user — just activate their license
+      const { error: updateError } = await supabase
+        .from("licenses")
+        .update({
+          status: "active",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId);
 
-    if (updateError) {
-      return new Response(JSON.stringify({ error: "db_error", details: updateError }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (updateError) {
+        return new Response(JSON.stringify({ error: "db_error", details: updateError }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      // Key belongs to a different user — copy plan/expiry to the current user's license
+      const { error: updateError } = await supabase
+        .from("licenses")
+        .update({
+          plan: keyLicense.plan,
+          status: "active",
+          expires_at: keyLicense.expires_at,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId);
+
+      if (updateError) {
+        return new Response(JSON.stringify({ error: "db_error", details: updateError }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Invalidate the key so it can't be reused
+      await supabase
+        .from("licenses")
+        .update({ access_key: null, updated_at: new Date().toISOString() })
+        .eq("id", keyLicense.id);
     }
 
     return new Response(JSON.stringify({ ok: true }), {
