@@ -60,7 +60,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create user with admin API (auto-confirms email)
+    let userId: string;
+    let isExisting = false;
+
+    // Try to create user; if already exists, find them instead
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -68,31 +71,73 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
-      return new Response(JSON.stringify({ error: createError.message }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+      // Check if the error is "user already exists"
+      if (createError.message?.toLowerCase().includes('already') || createError.status === 422) {
+        // Find existing user by email
+        const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+        if (listError) {
+          return new Response(JSON.stringify({ error: 'Failed to find existing user' }), {
+            status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        const existingUser = users.find((u: any) => u.email === email);
+        if (!existingUser) {
+          return new Response(JSON.stringify({ error: 'User exists but could not be found' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        userId = existingUser.id;
+        isExisting = true;
 
-    const userId = newUser.user.id;
+        // Update password for existing user
+        await supabaseAdmin.auth.admin.updateUserById(userId, { password });
+      } else {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    } else {
+      userId = newUser.user.id;
+    }
 
     // Generate access key
     const accessKey = generateAccessKey();
 
-    // Update the license that was auto-created by the trigger
-    const { error: updateError } = await supabaseAdmin
-      .from('licenses')
-      .update({
-        plan: plan || 'test',
-        status: 'active',
-        expires_at: expiresAt || null,
-        access_key: accessKey,
-      })
-      .eq('user_id', userId);
+    if (isExisting) {
+      // Update existing license
+      const { error: updateError } = await supabaseAdmin
+        .from('licenses')
+        .update({
+          plan: plan || 'test',
+          status: 'active',
+          expires_at: expiresAt || null,
+          access_key: accessKey,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', userId);
 
-    if (updateError) {
-      return new Response(JSON.stringify({ error: 'User created but license update failed: ' + updateError.message }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      if (updateError) {
+        return new Response(JSON.stringify({ error: 'License update failed: ' + updateError.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    } else {
+      // Update the license that was auto-created by the trigger
+      const { error: updateError } = await supabaseAdmin
+        .from('licenses')
+        .update({
+          plan: plan || 'test',
+          status: 'active',
+          expires_at: expiresAt || null,
+          access_key: accessKey,
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        return new Response(JSON.stringify({ error: 'User created but license update failed: ' + updateError.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
     }
 
     return new Response(JSON.stringify({
@@ -100,6 +145,7 @@ Deno.serve(async (req) => {
       userId,
       accessKey,
       email,
+      renewed: isExisting,
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
