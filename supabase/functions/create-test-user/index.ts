@@ -103,8 +103,14 @@ Deno.serve(async (req) => {
     // Generate access key
     const accessKey = generateAccessKey();
 
-    if (isExisting) {
-      // Update existing license
+    // Upsert the license (handles both existing and new users, even if trigger didn't fire)
+    const { data: existingLicense } = await supabaseAdmin
+      .from('licenses')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingLicense) {
       const { error: updateError } = await supabaseAdmin
         .from('licenses')
         .update({
@@ -122,19 +128,20 @@ Deno.serve(async (req) => {
         });
       }
     } else {
-      // Update the license that was auto-created by the trigger
-      const { error: updateError } = await supabaseAdmin
+      // No license row exists — create one
+      const { error: insertError } = await supabaseAdmin
         .from('licenses')
-        .update({
+        .insert({
+          user_id: userId,
+          email,
           plan: plan || 'test',
           status: 'active',
           expires_at: expiresAt || null,
           access_key: accessKey,
-        })
-        .eq('user_id', userId);
+        });
 
-      if (updateError) {
-        return new Response(JSON.stringify({ error: 'User created but license update failed: ' + updateError.message }), {
+      if (insertError) {
+        return new Response(JSON.stringify({ error: 'License creation failed: ' + insertError.message }), {
           status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
