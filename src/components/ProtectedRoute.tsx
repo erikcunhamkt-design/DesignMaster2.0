@@ -4,6 +4,7 @@ import { useLicense } from '@/hooks/useLicense';
 import AuthPage from '@/pages/AuthPage';
 import PaywallPage from '@/pages/PaywallPage';
 import { ApiKeyDialog } from '@/components/ApiKeyDialog';
+import { LicenseCountdown } from '@/components/LicenseCountdown';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -27,6 +28,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   return (
     <>
       <ApiKeyDialog />
+      <LicenseCountdown />
       {children}
     </>
   );

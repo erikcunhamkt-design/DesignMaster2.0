@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -157,8 +157,8 @@ export default function AdminPage() {
                         <TableCell className="text-muted-foreground text-xs font-mono">
                           {license.access_key || '—'}
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {license.expires_at ? new Date(license.expires_at).toLocaleDateString('pt-BR') : '—'}
+                        <TableCell className="text-xs">
+                          {license.expires_at ? <CountdownCell expiresAt={license.expires_at} /> : '—'}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {new Date(license.created_at).toLocaleDateString('pt-BR')}
@@ -292,7 +292,7 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
     if (!response.ok) {
       toast.error('Erro: ' + (data.error || 'Falha ao criar'));
     } else {
-      toast.success('Usuário criado com sucesso!');
+      toast.success(data.renewed ? 'Licença renovada com sucesso!' : 'Usuário criado com sucesso!');
       setResult({ email: email.trim(), password: password.trim(), accessKey: data.accessKey });
       onAdded();
     }
@@ -436,4 +436,32 @@ function CredentialField({ label, value, onCopy, secret }: { label: string; valu
       </div>
     </div>
   );
+}
+
+function CountdownCell({ expiresAt }: { expiresAt: string }) {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const diff = new Date(expiresAt).getTime() - now;
+
+  if (diff <= 0) {
+    return <span className="text-destructive font-medium">Expirado</span>;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  if (days > 0) {
+    return <span className="text-muted-foreground">{days}d {hours}h {minutes}m</span>;
+  }
+  if (hours > 0) {
+    return <span className="text-amber-400">{hours}h {minutes}m {seconds}s</span>;
+  }
+  return <span className="text-destructive">{minutes}m {seconds}s</span>;
 }
