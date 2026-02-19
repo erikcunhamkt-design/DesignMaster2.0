@@ -1,6 +1,6 @@
-import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Maximize2, Check, Loader2 } from 'lucide-react';
+import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Check, Loader2, Droplets, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { ProjectConfig } from '@/types/project';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
@@ -14,22 +14,9 @@ interface PreviewPanelProps {
 export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
   const [zoom, setZoom] = useState(100);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
-
-  const handleDownload = useCallback(() => {
-    if (!imageUrl) return;
-    setDownloadState('loading');
-    
-    // Simulate brief loading for UX
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = `design-master-${Date.now()}.png`;
-      link.click();
-      setDownloadState('done');
-      setTimeout(() => setDownloadState('idle'), 2000);
-    }, 600);
-  }, [imageUrl]);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const hasTextOverlay = config?.textEnabled && config.textMode === 'camada' && (config.text01 || config.text02 || config.cta);
 
@@ -42,7 +29,98 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
   const overlayPos = getOverlayPosition();
 
-  const downloadLabel = downloadState === 'loading' ? 'Preparando…' : downloadState === 'done' ? 'Baixado' : 'Baixar';
+  // Draw watermark on canvas and return data URL
+  const applyWatermarkToImage = useCallback((src: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(src); return; }
+
+        // Draw original image
+        ctx.drawImage(img, 0, 0);
+
+        const w = canvas.width;
+        const h = canvas.height;
+        const fontSize = Math.round(Math.min(w, h) * 0.045);
+        const spacing = Math.round(Math.min(w, h) * 0.28);
+
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Tiled diagonal watermark
+        ctx.translate(w / 2, h / 2);
+        ctx.rotate(-Math.PI / 5);
+
+        const cols = Math.ceil(Math.sqrt(w * w + h * h) / spacing) + 2;
+        const rows = Math.ceil(Math.sqrt(w * w + h * h) / spacing) + 2;
+        const startX = -cols * spacing;
+        const startY = -rows * spacing;
+
+        for (let row = 0; row < rows * 2; row++) {
+          for (let col = 0; col < cols * 2; col++) {
+            const x = startX + col * spacing;
+            const y = startY + row * spacing;
+            ctx.fillText('PRÉVIA', x, y);
+          }
+        }
+        ctx.restore();
+
+        // Bottom bar with lock icon text
+        const barH = Math.round(h * 0.055);
+        ctx.save();
+        ctx.globalAlpha = 0.75;
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, h - barH, w, barH);
+        ctx.restore();
+
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `600 ${Math.round(barH * 0.42)}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔒  Imagem protegida — apenas para aprovação do cliente', w / 2, h - barH / 2);
+        ctx.restore();
+
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve(src);
+      img.src = src;
+    });
+  }, []);
+
+  const handleDownload = useCallback(async (withWatermark = false) => {
+    if (!imageUrl) return;
+    setDownloadState('loading');
+
+    try {
+      let finalUrl = imageUrl;
+      if (withWatermark) {
+        finalUrl = await applyWatermarkToImage(imageUrl);
+      }
+      const link = document.createElement('a');
+      link.href = finalUrl;
+      link.download = withWatermark
+        ? `preview-cliente-${Date.now()}.png`
+        : `design-master-${Date.now()}.png`;
+      link.click();
+      setDownloadState('done');
+      setTimeout(() => setDownloadState('idle'), 2000);
+    } catch {
+      setDownloadState('idle');
+    }
+  }, [imageUrl, applyWatermarkToImage]);
+
+  const downloadLabel = downloadState === 'loading' ? 'Preparando…' : downloadState === 'done' ? 'Salvo' : 'Baixar';
   const DownloadIcon = downloadState === 'loading' ? Loader2 : downloadState === 'done' ? Check : Download;
 
   return (
@@ -69,7 +147,19 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
               <ZoomIn className="h-3.5 w-3.5" />
             </Button>
           </div>
+
           <div className="flex items-center gap-2">
+            {/* Watermark toggle */}
+            <Button
+              size="sm"
+              variant={watermarkEnabled ? 'default' : 'outline'}
+              onClick={() => setWatermarkEnabled(!watermarkEnabled)}
+              className={`h-7 gap-1.5 text-[10px] rounded-lg font-medium transition-all ${watermarkEnabled ? 'bg-amber-500/90 hover:bg-amber-500 border-amber-500/50 text-white shadow-sm' : 'border-border/30 text-muted-foreground hover:text-foreground'}`}
+            >
+              <Droplets className="h-3 w-3" />
+              Marca d'água
+            </Button>
+
             {hasTextOverlay && (
               <Button
                 size="sm"
@@ -81,7 +171,6 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
                 Texto
               </Button>
             )}
-
           </div>
         </div>
       )}
@@ -90,7 +179,6 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
       <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-12">
         {state === 'aguardando' && (
           <div className="flex flex-col items-center gap-10 animate-fade-up">
-            {/* Premium empty state */}
             <div className="relative">
               <div className="flex h-28 w-28 items-center justify-center rounded-3xl border border-border/10 bg-card/30 animate-float">
                 <ImageIcon className="h-12 w-12 text-muted-foreground/15" />
@@ -129,27 +217,107 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
         {state === 'concluido' && imageUrl && (
           <div className="relative inline-block group" style={{ maxWidth: `${zoom}%`, maxHeight: `${zoom}%` }}>
             <img
+              ref={imgRef}
               src={imageUrl}
               alt="Imagem gerada"
               className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.03]"
             />
-            {/* Premium Download Overlay */}
-            <button
-              onClick={handleDownload}
-              disabled={downloadState === 'loading'}
-              className="absolute top-4 right-4 flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-md border border-white/10 hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 opacity-0 group-hover:opacity-100"
-            >
-              <DownloadIcon className={`h-3.5 w-3.5 ${downloadState === 'loading' ? 'animate-spin' : ''}`} />
-              {downloadLabel === 'Baixar' ? 'Baixar' : downloadLabel === 'Baixado' ? 'Salvo' : 'Baixando…'}
-            </button>
-            <div className="absolute inset-0 rounded-xl bg-background/0 group-hover:bg-background/5 transition-colors duration-300 pointer-events-none" />
+
+            {/* Watermark overlay (visual only, CSS-based) */}
+            {watermarkEnabled && (
+              <>
+                {/* Tiled PRÉVIA text */}
+                <div
+                  className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none select-none"
+                  style={{ zIndex: 2 }}
+                >
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(
+                        -30deg,
+                        transparent,
+                        transparent 70px,
+                        rgba(255,255,255,0.04) 70px,
+                        rgba(255,255,255,0.04) 71px
+                      )`,
+                    }}
+                  />
+                  {/* Diagonal text pattern */}
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-full text-center font-bold tracking-[0.3em] uppercase"
+                      style={{
+                        top: `${(i * 100) / 12 - 5}%`,
+                        left: '-10%',
+                        width: '120%',
+                        transform: 'rotate(-18deg)',
+                        fontSize: 'clamp(10px, 2vw, 18px)',
+                        color: 'rgba(255,255,255,0.18)',
+                        letterSpacing: '0.4em',
+                        userSelect: 'none',
+                        pointerEvents: 'none',
+                        lineHeight: 1,
+                      }}
+                    >
+                      PRÉVIA &nbsp;&nbsp;&nbsp; PRÉVIA &nbsp;&nbsp;&nbsp; PRÉVIA
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom protection bar */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-1.5 rounded-b-xl pointer-events-none select-none"
+                  style={{
+                    background: 'rgba(0,0,0,0.72)',
+                    padding: '6px 10px',
+                    zIndex: 3,
+                  }}
+                >
+                  <Lock className="h-2.5 w-2.5 text-amber-400 shrink-0" />
+                  <span
+                    className="text-white/80 font-medium text-center leading-tight"
+                    style={{ fontSize: 'clamp(8px, 1.2vw, 11px)' }}
+                  >
+                    Imagem protegida — apenas para aprovação do cliente
+                  </span>
+                </div>
+              </>
+            )}
+
+            {/* Download button(s) */}
+            <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ zIndex: 10 }}>
+              {/* Download without watermark */}
+              <button
+                onClick={() => handleDownload(false)}
+                disabled={downloadState === 'loading'}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-md border border-white/10 hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 whitespace-nowrap"
+              >
+                <DownloadIcon className={`h-3.5 w-3.5 ${downloadState === 'loading' ? 'animate-spin' : ''}`} />
+                {downloadState === 'done' ? 'Salvo!' : 'Baixar original'}
+              </button>
+
+              {/* Download with watermark */}
+              <button
+                onClick={() => handleDownload(true)}
+                disabled={downloadState === 'loading'}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold bg-amber-500/90 text-white shadow-md border border-amber-400/30 hover:bg-amber-500 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 whitespace-nowrap"
+              >
+                <Droplets className="h-3.5 w-3.5" />
+                Enviar ao cliente
+              </button>
+            </div>
+
+            <div className="absolute inset-0 rounded-xl bg-background/0 group-hover:bg-background/5 transition-colors duration-300 pointer-events-none" style={{ zIndex: 1 }} />
+
             {/* Text Overlay */}
             {hasTextOverlay && showOverlay && (
               <div
                 className={`absolute left-0 right-0 flex flex-col items-center gap-2 px-6 ${
                   overlayPos === 'top' ? 'top-[8%]' : 'bottom-[8%]'
                 }`}
-                style={{ pointerEvents: 'none' }}
+                style={{ pointerEvents: 'none', zIndex: watermarkEnabled ? 1 : 4 }}
               >
                 {config.text01 && (
                   <p
