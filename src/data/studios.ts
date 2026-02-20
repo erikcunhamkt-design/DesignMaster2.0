@@ -112,6 +112,15 @@ export const studios: Studio[] = [
     gradient: 'from-red-500/15 to-orange-500/10',
   },
   {
+    id: 'hero-studio',
+    name: 'Hero Studio',
+    tagline: 'Landing pages de alta conversão',
+    description: 'Crie hero sections premium para landing pages e sites SaaS — sem escrever prompt, resultado comparável às melhores marcas do mundo.',
+    icon: '🖥️',
+    route: '/studio/hero-studio',
+    gradient: 'from-blue-500/15 to-indigo-500/10',
+  },
+  {
     id: 'mockup-studio',
     name: 'Mockup Studio',
     tagline: 'Mockups profissionais com IA',

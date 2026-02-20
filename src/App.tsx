@@ -21,6 +21,7 @@ import FootballArtsPage from "./pages/FootballArtsPage";
 import FootballCreatorPage from "./pages/FootballCreatorPage";
 import AutoCreatorPage from "./pages/AutoCreatorPage";
 import MockupStudioPage from "./pages/MockupStudioPage";
+import HeroStudioPage from "./pages/HeroStudioPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
@@ -52,6 +53,7 @@ const App = () => {
             <Route path="/studio/football-creator" element={<ProtectedRoute><FootballCreatorPage /></ProtectedRoute>} />
             <Route path="/studio/auto-creator" element={<ProtectedRoute><AutoCreatorPage /></ProtectedRoute>} />
             <Route path="/studio/mockup-studio" element={<ProtectedRoute><MockupStudioPage /></ProtectedRoute>} />
+            <Route path="/studio/hero-studio" element={<ProtectedRoute><HeroStudioPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
