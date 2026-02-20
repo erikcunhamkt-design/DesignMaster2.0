@@ -1,7 +1,6 @@
 import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
-import criadorHero from '@/assets/criador-hero.png';
 import extratorHero from '@/assets/extrator-hero.png';
 import promptBuilderHero from '@/assets/prompt-builder-hero.png';
 import upscaleHero from '@/assets/upscale-hero.png';
@@ -115,7 +114,7 @@ export default function StudiosPage() {
             {/* Floating glow orb */}
             <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-64 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/18 transition-all duration-700" />
 
-            {/* Content — LEFT side */}
+            {/* Content — full width */}
             <div className="relative flex flex-1 items-center justify-between px-10 py-6 min-w-0">
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
@@ -130,20 +129,11 @@ export default function StudiosPage() {
                 </h2>
                 <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{featured.description}</p>
               </div>
-              <div className="flex items-center justify-center w-11 h-11 rounded-full border border-primary/25 bg-primary/10 group-hover:border-primary/50 group-hover:bg-primary/20 group-hover:shadow-[0_0_16px_hsl(var(--primary)/0.4)] transition-all duration-300 shrink-0">
+
+              {/* Arrow — pinned to the right end of the card */}
+              <div className="flex items-center justify-center w-11 h-11 rounded-full border border-primary/25 bg-primary/10 group-hover:border-primary/50 group-hover:bg-primary/20 group-hover:shadow-[0_0_16px_hsl(var(--primary)/0.4)] transition-all duration-300 shrink-0 ml-8">
                 <ArrowRight className="h-4 w-4 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
               </div>
-            </div>
-
-            {/* Image — RIGHT side */}
-            <div className="relative shrink-0 h-full flex items-center overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[hsl(var(--card)/0.5)] pointer-events-none z-10" />
-              <img
-                src={criadorHero}
-                alt="Criador"
-                className="h-full w-auto object-contain max-h-full transition-transform duration-500 group-hover:scale-105"
-                style={{ opacity: 0.92 }}
-              />
             </div>
           </button>
         </div>
