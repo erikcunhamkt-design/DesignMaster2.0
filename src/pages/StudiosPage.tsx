@@ -74,15 +74,15 @@ export default function StudiosPage() {
           {/* Background gradient */}
           <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
 
-          {/* Hero image — left side, fades right before the text */}
-          <div className="absolute inset-y-0 left-0 w-[280px] pointer-events-none overflow-hidden">
+          {/* Hero image — left side, fades to the right smoothly */}
+          <div className="absolute inset-y-0 left-0 w-[320px] pointer-events-none overflow-hidden">
             <img
               src={criadorHero}
               alt=""
-              className="h-full w-full object-cover object-center opacity-80 group-hover:opacity-95 transition-opacity duration-500"
+              className="h-full w-full object-cover object-center opacity-90 group-hover:opacity-100 transition-opacity duration-500"
             />
-            {/* Fade gradient from right edge of image toward left, protecting text */}
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background)/0.6) 30%, transparent 70%)' }} />
+            {/* Fade: transparent on left → background on right */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 0%, transparent 40%, hsl(220 20% 4% / 0.85) 70%, hsl(220 20% 4%) 100%)' }} />
           </div>
 
           <div className="relative flex items-center justify-between px-10 py-9">
