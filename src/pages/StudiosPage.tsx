@@ -79,8 +79,12 @@ export default function StudiosPage() {
             <img
               src={criadorHero}
               alt=""
-              className="h-full w-full object-cover object-center"
-              style={{ transform: 'scaleX(-1)' }}
+              className="absolute inset-0 h-full w-full"
+              style={{
+                transform: 'scaleX(-1) scale(1.8)',
+                objectFit: 'cover',
+                objectPosition: '45% 20%',
+              }}
             />
             {/* Gradient: fully invisible on left → fully visible on right */}
             <div
