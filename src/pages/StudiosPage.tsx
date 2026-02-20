@@ -1,6 +1,7 @@
 import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
+import criadorHero from '@/assets/criador-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -72,6 +73,17 @@ export default function StudiosPage() {
         >
           {/* Background gradient */}
           <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
+
+          {/* Hero image — right side, fades out toward the text */}
+          <div className="absolute inset-0 flex justify-end pointer-events-none">
+            <img
+              src={criadorHero}
+              alt=""
+              className="h-full w-auto max-w-[45%] object-cover object-left opacity-30 group-hover:opacity-40 transition-opacity duration-500"
+              style={{ maskImage: 'linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 75%)', WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 75%)' }}
+            />
+          </div>
+
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/80" />
 
           <div className="relative flex items-center justify-between px-10 py-9">
