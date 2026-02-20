@@ -57,6 +57,19 @@ import margeAngleLowAngle   from '@/assets/angles/marge-low-angle.png';
 import margeAngleHighAngle  from '@/assets/angles/marge-high-angle.png';
 import margeAngleDutchAngle from '@/assets/angles/marge-dutch-angle.png';
 
+// Lens-specific images — each shows the visual effect of each focal length
+import homerLens24mm  from '@/assets/lenses/homer-24mm.png';
+import homerLens35mm  from '@/assets/lenses/homer-35mm.png';
+import homerLens50mm  from '@/assets/lenses/homer-50mm.png';
+import homerLens85mm  from '@/assets/lenses/homer-85mm.png';
+import homerLens135mm from '@/assets/lenses/homer-135mm.png';
+
+import margeLens24mm  from '@/assets/lenses/marge-24mm.png';
+import margeLens35mm  from '@/assets/lenses/marge-35mm.png';
+import margeLens50mm  from '@/assets/lenses/marge-50mm.png';
+import margeLens85mm  from '@/assets/lenses/marge-85mm.png';
+import margeLens135mm from '@/assets/lenses/marge-135mm.png';
+
 // ─── Avatar map: each chip → unique image per gender ─────────────────────────
 const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   // EXPRESSÃO — uses new expression-specific images (all unique)
@@ -76,12 +89,12 @@ const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   'High angle':  { homer: homerAngleHighAngle,   marge: margeAngleHighAngle   },
   'Dutch angle': { homer: homerAngleDutchAngle,  marge: margeAngleDutchAngle  },
 
-  // LENTE — 5 unique poses, none repeated
-  '24mm':        { homer: homerAndando,         marge: margeAndando         },
-  '35mm':        { homer: homerApoiado,         marge: margeApoiado         },
-  '50mm':        { homer: homerMaosBolso,       marge: margeMaosBolso       },
-  '85mm':        { homer: homerBracosCruzados,  marge: margeBracosCruzados  },
-  '135mm':       { homer: homerPoseHeroica,     marge: margePoseHeroica     },
+  // LENTE — imagens específicas para cada distância focal
+  '24mm':        { homer: homerLens24mm,  marge: margeLens24mm  },
+  '35mm':        { homer: homerLens35mm,  marge: margeLens35mm  },
+  '50mm':        { homer: homerLens50mm,  marge: margeLens50mm  },
+  '85mm':        { homer: homerLens85mm,  marge: margeLens85mm  },
+  '135mm':       { homer: homerLens135mm, marge: margeLens135mm },
 
   // OLHAR — 6 unique poses, none repeated
   'Para câmera': { homer: homerApontando,       marge: margeApontando       },
