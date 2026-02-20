@@ -136,7 +136,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 1 — Sujeito */}
         <CollapsibleBlock
-          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
+          icon={User}
           title="Sujeito"
           subtitle={config.gender === 'masculino' ? 'Masculino' : 'Feminino'}
           defaultOpen
