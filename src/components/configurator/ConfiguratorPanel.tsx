@@ -107,8 +107,14 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen 
 export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
   const { tipsEnabled } = useTipsMode();
 
-  const canGenerate = config.dimension !== null && config.niche.length > 0 &&
-    (!config.textEnabled || config.text01.length >= 3) && !isGenerating && apiKey.length >= 10;
+  const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
+  const canGenerate = !isGenerating && apiKey.length >= 10 && (
+    hasFreePrompt || (
+      config.dimension !== null &&
+      config.niche.length > 0 &&
+      (!config.textEnabled || config.text01.length >= 3)
+    )
+  );
 
   const applyPreset = (preset: typeof creativePresets[number]) => {
     onUpdate(preset.values);
@@ -230,12 +236,12 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
       {/* Footer */}
       <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
-        {!canGenerate && config.dimension === null && (
+        {!canGenerate && !hasFreePrompt && config.dimension === null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
           </p>
         )}
-        {!canGenerate && config.niche.length === 0 && config.dimension !== null && (
+        {!canGenerate && !hasFreePrompt && config.niche.length === 0 && config.dimension !== null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Informe o <span className="text-foreground/50 font-semibold">Nicho</span> em Avançado
           </p>
