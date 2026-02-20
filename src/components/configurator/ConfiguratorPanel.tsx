@@ -12,7 +12,7 @@ import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
 import {
   Sparkles, Copy, Loader2, ChevronDown,
-  User, Smartphone, Palette, Type, Settings2, SlidersHorizontal
+  User, Smartphone, Palette, Type, Settings2, SlidersHorizontal, Clapperboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { creativePresets } from '@/data/creativePresets';
@@ -156,7 +156,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 3 — Direção do Personagem */}
         <CollapsibleBlock
-          avatarSrc={config.gender === 'masculino' ? homerNeutro : margeNeutro}
+          icon={Clapperboard}
           title="Direção do Personagem"
           subtitle="Expressão · Ângulo · Lente · Olhar"
         >
