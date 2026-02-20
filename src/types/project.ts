@@ -37,6 +37,7 @@ export interface ProjectConfig {
   floatingElements: boolean;
   floatingElementsText: string;
   verticalPosition: 'cima' | 'centralizado' | 'baixo';
+  customComposition?: string;
 
   // Referências
   styleReferences: string[];
