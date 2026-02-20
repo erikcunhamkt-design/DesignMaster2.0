@@ -71,31 +71,6 @@ export default function StudiosPage() {
           className="group relative w-full rounded-2xl border border-border/15 bg-card/50 overflow-hidden mb-4 text-left transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-glow-md active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 animate-fade-up"
           style={{ animationDelay: '80ms' }}
         >
-          {/* Background gradient */}
-          <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-20 group-hover:opacity-35 transition-opacity duration-500')} />
-
-          {/* Hero image — RIGHT side, fades left toward the text */}
-          <div className="absolute inset-y-0 right-0 w-[420px] pointer-events-none overflow-hidden">
-            <img
-              src={criadorHero}
-              alt=""
-              className="absolute inset-0 h-full w-full"
-              style={{
-                objectFit: 'cover',
-                objectPosition: '35% 15%',
-                transform: 'scale(1.15)',
-                mixBlendMode: 'luminosity',
-              }}
-            />
-            {/* Gradient: fully invisible on left → fully visible on right */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to left, transparent 0%, transparent 30%, rgba(11,15,20,0.5) 55%, rgba(11,15,20,0.85) 72%, rgba(11,15,20,1) 88%)',
-              }}
-            />
-          </div>
-
           {/* Content — pinned to the LEFT */}
           <div className="relative flex items-center justify-between px-10 py-9">
             <div>
@@ -114,8 +89,6 @@ export default function StudiosPage() {
             </div>
           </div>
 
-          {/* Bottom accent */}
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </button>
 
         {/* Grid of remaining studios */}
