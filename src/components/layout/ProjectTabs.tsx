@@ -12,7 +12,7 @@ interface ProjectTabsProps {
 
 export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: ProjectTabsProps) {
   return (
-    <div className="flex items-center bg-background/80 backdrop-blur-sm px-4 gap-1 h-9 overflow-x-auto border-b border-border/20">
+    <div className="flex items-center bg-background/90 backdrop-blur-sm px-4 gap-1 h-9 overflow-x-auto border-b border-border/10 shrink-0">
       {projects.map((p) => {
         const active = p.id === activeId;
         return (
@@ -20,32 +20,32 @@ export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: Pr
             key={p.id}
             onClick={() => onSelect(p.id)}
             className={cn(
-              'group flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium transition-all duration-300 shrink-0 rounded-md border',
+              'group flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium transition-all duration-200 shrink-0 rounded-md',
               active
-                ? 'bg-secondary text-foreground border-border/40'
-                : 'text-muted-foreground hover:text-foreground border-transparent hover:bg-secondary/40'
+                ? 'bg-secondary/60 text-foreground border border-border/25'
+                : 'text-muted-foreground/50 hover:text-foreground/70 border border-transparent hover:bg-secondary/20'
             )}
           >
-            <Folder className={cn('h-3 w-3', active && 'text-primary')} />
-            {p.name}
+            <Folder className={cn('h-2.5 w-2.5 shrink-0', active ? 'text-primary' : 'text-muted-foreground/30')} />
+            <span>{p.name}</span>
             <span
               role="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose(p.id);
               }}
-              className="ml-0.5 rounded-sm p-0.5 hover:bg-border/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              className="rounded p-0.5 hover:bg-border/40 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-150"
             >
-              <X className="h-2.5 w-2.5" />
+              <X className="h-2 w-2" />
             </span>
           </button>
         );
       })}
       <button
         onClick={onAdd}
-        className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-all duration-200 shrink-0 ml-1"
+        className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground/30 hover:bg-secondary/40 hover:text-muted-foreground transition-all duration-200 shrink-0 ml-1"
       >
-        <Plus className="h-3 w-3" />
+        <Plus className="h-2.5 w-2.5" />
       </button>
     </div>
   );

@@ -125,19 +125,15 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background relative">
-      {/* Cinematic ambient */}
+      {/* Cinematic ambient — subtle */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="ambient-glow w-[600px] h-[600px] bg-primary -top-48 -left-48" />
-        <div className="ambient-glow w-[400px] h-[400px] bg-accent -bottom-40 -right-40" />
-        <div className="absolute inset-0 opacity-[0.01]" style={{
-          backgroundImage: 'radial-gradient(circle, hsl(220 12% 25%) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }} />
+        <div className="ambient-glow w-[500px] h-[500px] bg-primary -top-60 left-1/4" style={{ opacity: 0.04 }} />
+        <div className="ambient-glow w-[300px] h-[300px] bg-accent -bottom-32 right-1/4" style={{ opacity: 0.03 }} />
       </div>
 
       {/* Toolbar */}
       {state === 'concluido' && imageUrl && (
-        <div className="relative z-10 flex items-center justify-between border-b border-border/10 px-5 py-2.5 bg-background/50 backdrop-blur-md shrink-0">
+        <div className="relative z-10 flex items-center justify-between border-b border-border/8 px-5 py-2 bg-background/60 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground" onClick={() => setZoom(Math.max(25, zoom - 25))}>
               <ZoomOut className="h-3.5 w-3.5" />
@@ -176,40 +172,41 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
       )}
 
       {/* Canvas area */}
-      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-12">
+      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-10">
         {state === 'aguardando' && (
-          <div className="flex flex-col items-center gap-10 animate-fade-up">
+          <div className="flex flex-col items-center gap-8 animate-fade-up max-w-[220px] text-center">
             <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-3xl border border-border/10 bg-card/30 animate-float">
-                <ImageIcon className="h-12 w-12 text-muted-foreground/15" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-border/10 bg-card/20">
+                <ImageIcon className="h-8 w-8 text-muted-foreground/12" />
               </div>
-              <div className="absolute -inset-8 rounded-[2rem] bg-gradient-to-br from-primary/3 to-accent/3 -z-10 animate-breathe" />
+              <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-primary/4 to-accent/3 -z-10 animate-breathe" />
             </div>
-            <div className="text-center space-y-3 max-w-xs">
-              <p className="font-display text-xl font-bold tracking-tight text-foreground/70">
-                Seu Studio está pronto
+            <div className="space-y-2">
+              <p className="font-display text-base font-semibold tracking-tight text-foreground/50">
+                Pronto para criar
               </p>
-              <p className="text-xs text-muted-foreground/40 leading-relaxed">
-                Configure no <span className="text-foreground/60 font-medium">Creative Dock</span> e clique em <span className="text-primary font-semibold">Gerar</span>
+              <p className="text-[11px] text-muted-foreground/30 leading-relaxed">
+                Configure os controles à direita e clique em{' '}
+                <span className="text-primary/60 font-semibold">Gerar Imagem</span>
               </p>
             </div>
           </div>
         )}
 
         {state === 'gerando' && (
-          <div className="flex flex-col items-center gap-10 animate-fade-up">
-            <div className="relative h-28 w-28">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/12 to-accent/8 animate-breathe" />
-              <div className="absolute inset-[3px] rounded-[1.4rem] bg-background/70 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="h-10 w-10 text-primary animate-pulse-glow" />
+          <div className="flex flex-col items-center gap-8 animate-fade-up">
+            <div className="relative h-20 w-20">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 animate-breathe" />
+              <div className="absolute inset-[3px] rounded-[14px] bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
               </div>
             </div>
-            <div className="text-center space-y-2.5">
-              <p className="font-display text-xl font-bold tracking-tight text-foreground/70">Criando...</p>
-              <p className="text-xs text-muted-foreground/40">IA processando seu criativo</p>
+            <div className="text-center space-y-2">
+              <p className="font-display text-base font-semibold tracking-tight text-foreground/60">Gerando imagem…</p>
+              <p className="text-[11px] text-muted-foreground/35">IA processando seu criativo</p>
             </div>
-            <div className="w-56 h-[2px] rounded-full overflow-hidden bg-border/15">
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/50 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+            <div className="w-48 h-[1.5px] rounded-full overflow-hidden bg-border/15">
+              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
             </div>
           </div>
         )}
