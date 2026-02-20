@@ -68,11 +68,11 @@ export default function StudiosPage() {
         {/* Featured card */}
         <button
           onClick={() => navigate(featured.route)}
-          className="group relative w-full rounded-2xl border border-border/15 bg-card/50 overflow-hidden mb-4 text-left transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-glow-md active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 animate-fade-up"
+          className="group relative w-full rounded-2xl border border-border/15 bg-card/50 overflow-hidden mb-4 text-left transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-glow-md active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 animate-fade-up flex items-stretch"
           style={{ animationDelay: '80ms' }}
         >
-          {/* Content — pinned to the LEFT */}
-          <div className="relative flex items-center justify-between px-10 py-9">
+          {/* Content — LEFT side */}
+          <div className="relative flex flex-1 items-center justify-between px-10 py-9">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
@@ -89,7 +89,17 @@ export default function StudiosPage() {
             </div>
           </div>
 
+          {/* Image — RIGHT side, full height without crop */}
+          <div className="relative shrink-0 flex items-stretch">
+            <img
+              src={criadorHero}
+              alt="Criador"
+              className="h-full w-auto object-contain"
+              style={{ mixBlendMode: 'luminosity', opacity: 0.85 }}
+            />
+          </div>
         </button>
+
 
         {/* Grid of remaining studios */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
