@@ -152,17 +152,11 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
 
           <div className="flex items-center gap-2">
             {/* Refinar Imagem — Em breve */}
-            <div className="relative group/refine">
-              <Button
-                size="sm"
-                disabled
-                className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold bg-secondary/40 text-muted-foreground/40 border border-border/15 cursor-not-allowed opacity-60"
-              >
-                <Wand2 className="h-3 w-3" />
-                Refinar
-              </Button>
-              <span className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary/90 text-primary-foreground text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 opacity-0 group-hover/refine:opacity-100 transition-opacity duration-200 pointer-events-none">
-                Em breve
+            <div className="flex items-center gap-1.5 rounded-lg border border-border/15 bg-secondary/30 px-3 h-7 cursor-not-allowed opacity-50">
+              <Wand2 className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+              <span className="text-[10px] font-semibold text-muted-foreground/50">Refinar</span>
+              <span className="rounded-full bg-primary/20 text-primary px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wider leading-none ml-0.5">
+                em breve
               </span>
             </div>
 
