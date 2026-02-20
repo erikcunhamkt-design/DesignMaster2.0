@@ -1,7 +1,8 @@
-import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Check, Loader2, Droplets, Lock } from 'lucide-react';
+import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Check, Loader2, Droplets, Lock, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useCallback, useRef } from 'react';
 import { ProjectConfig } from '@/types/project';
+import { RefinementChat } from './RefinementChat';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 
@@ -11,13 +12,16 @@ interface PreviewPanelProps {
   config?: ProjectConfig;
   elapsedSeconds?: number;
   estimatedSeconds?: number;
+  onRefine?: (prompt: string, currentImage: string) => Promise<void>;
+  isRefining?: boolean;
 }
 
-export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, estimatedSeconds = 35 }: PreviewPanelProps) {
+export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, estimatedSeconds = 35, onRefine, isRefining = false }: PreviewPanelProps) {
   const [zoom, setZoom] = useState(100);
   const [showOverlay, setShowOverlay] = useState(true);
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [refinementOpen, setRefinementOpen] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   const hasTextOverlay = config?.textEnabled && config.textMode === 'camada' && (config.text01 || config.text02 || config.cta);
@@ -147,6 +151,19 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Refinar Imagem */}
+            {onRefine && (
+              <Button
+                size="sm"
+                onClick={() => setRefinementOpen(true)}
+                disabled={isRefining}
+                className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold bg-gradient-to-r from-primary/80 to-accent/80 hover:from-primary hover:to-accent text-primary-foreground border-0 shadow-glow-sm hover:shadow-glow-md transition-all duration-200 disabled:opacity-50"
+              >
+                <Wand2 className="h-3 w-3" />
+                {isRefining ? 'Refinando…' : 'Refinar'}
+              </Button>
+            )}
+
             {/* Watermark toggle */}
             <Button
               size="sm"
@@ -389,6 +406,17 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
           </div>
         )}
       </div>
+
+      {/* Refinement Chat — slides up from bottom */}
+      {onRefine && imageUrl && (
+        <RefinementChat
+          open={refinementOpen}
+          onClose={() => setRefinementOpen(false)}
+          imageUrl={imageUrl}
+          onRefine={onRefine}
+          isRefining={isRefining}
+        />
+      )}
     </div>
   );
 }

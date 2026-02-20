@@ -20,6 +20,7 @@ const Index = () => {
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { apiKey } = useGoogleApiKey();
@@ -98,6 +99,42 @@ const Index = () => {
     }
   }, [activeProject, apiKey]);
 
+  const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
+    setIsRefining(true);
+    try {
+      const resp = await fetch(currentImageUrl);
+      const blob = await resp.blob();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const refinePromptText = `Refine this existing image with the following changes: ${refinementPrompt}. Keep the same overall composition, subject, and style. Only apply the requested modifications. The image MUST fill the entire canvas edge to edge.`;
+
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: refinePromptText,
+          negativePrompt: 'low quality, blurry, artifacts, watermark',
+          referenceImages: [base64],
+          googleApiKey: apiKey,
+        },
+      });
+
+      if (error) throw new Error(error.message || 'Erro no refinamento');
+      if (data?.error) throw new Error(data.error);
+      if (data?.imageUrl) {
+        setGeneratedImage(data.imageUrl);
+        toast.success('Imagem refinada!');
+      } else {
+        throw new Error('Nenhuma imagem retornada');
+      }
+    } finally {
+      setIsRefining(false);
+    }
+  }, [apiKey]);
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Criador" />
@@ -161,6 +198,8 @@ const Index = () => {
                 config={activeProject.config}
                 elapsedSeconds={elapsedSeconds}
                 estimatedSeconds={ESTIMATED_SECONDS}
+                onRefine={handleRefine}
+                isRefining={isRefining}
               />
               <ConfiguratorPanel
                 config={activeProject.config}
