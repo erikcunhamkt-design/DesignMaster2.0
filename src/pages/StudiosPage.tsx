@@ -74,22 +74,21 @@ export default function StudiosPage() {
           {/* Background gradient */}
           <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
 
-          {/* Hero image — right side, fades out toward the text */}
-          <div className="absolute inset-y-0 right-0 w-[45%] pointer-events-none overflow-hidden">
+          {/* Hero image — left side, fades right before the text */}
+          <div className="absolute inset-y-0 left-0 w-[280px] pointer-events-none overflow-hidden">
             <img
               src={criadorHero}
               alt=""
-              className="h-full w-full object-cover object-center opacity-60 group-hover:opacity-75 transition-opacity duration-500"
+              className="h-full w-full object-cover object-center opacity-80 group-hover:opacity-95 transition-opacity duration-500"
             />
-            {/* Fade gradient over the image toward the left */}
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, hsl(var(--background)) 0%, transparent 40%)' }} />
+            {/* Fade gradient from right edge of image toward left, protecting text */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background)/0.6) 30%, transparent 70%)' }} />
           </div>
-
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/80" />
 
           <div className="relative flex items-center justify-between px-10 py-9">
             <div className="flex items-center gap-8">
-              <span className="text-6xl transition-transform duration-300 group-hover:scale-110">{featured.icon}</span>
+              {/* Spacer where the image sits — replaces the emoji icon */}
+              <div className="w-[120px] shrink-0" />
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
