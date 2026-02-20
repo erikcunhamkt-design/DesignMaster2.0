@@ -111,4 +111,13 @@ export const studios: Studio[] = [
     route: '/studio/auto-creator',
     gradient: 'from-red-500/15 to-orange-500/10',
   },
+  {
+    id: 'mockup-studio',
+    name: 'Mockup Studio',
+    tagline: 'Mockups profissionais com IA',
+    description: 'Gere mockups realistas de produtos, embalagens, dispositivos e branding sem escrever uma linha de prompt.',
+    icon: '📦',
+    route: '/studio/mockup-studio',
+    gradient: 'from-violet-500/15 to-purple-500/10',
+  },
 ];
