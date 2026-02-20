@@ -179,20 +179,22 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Direction groups as card carousels */}
-      {directionGroups.map((group) => (
-        <ChipCardCarousel
-          key={group.key}
-          group={group}
-          chipValue={getChipValue(group.key)}
-          customValue={getCustomValue(group.key)}
-          customEnabled={!!customEnabled[group.key]}
-          isMasculino={isMasculino}
-          onSelect={(val) => setChipValue(group.key, val)}
-          onCustomChange={(val) => setCustomValue(group.key, val)}
-          onToggleCustom={() => toggleCustom(group.key)}
-        />
-      ))}
+      {/* Direction groups — card carousel */}
+      <div className="space-y-5">
+        {directionGroups.map((group) => (
+          <ChipCardCarousel
+            key={group.key}
+            group={group}
+            chipValue={getChipValue(group.key)}
+            customValue={getCustomValue(group.key)}
+            customEnabled={!!customEnabled[group.key]}
+            isMasculino={isMasculino}
+            onSelect={(val) => setChipValue(group.key, val)}
+            onCustomChange={(val) => setCustomValue(group.key, val)}
+            onToggleCustom={() => toggleCustom(group.key)}
+          />
+        ))}
+      </div>
 
       {/* Summary */}
       {hasAnySelection && (
