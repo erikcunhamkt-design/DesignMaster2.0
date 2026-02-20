@@ -21,19 +21,16 @@ serve(async (req) => {
       );
     }
 
-    // Choose model: if reference images are provided, use gemini-2.0-flash for image editing
-    // otherwise use gemini-3-pro-image-preview for pure generation
+    const model = "gemini-3-pro-image-preview";
     const hasReferenceImages = referenceImages && referenceImages.length > 0;
-    const model = hasReferenceImages ? "gemini-2.0-flash-exp" : "gemini-3-pro-image-preview";
 
     const fullPrompt = hasReferenceImages
       ? `${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`
       : `Generate this image. The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
-    // Build parts array
+    // Build parts: images FIRST (if any), then text — required for image editing
     const parts: any[] = [];
 
-    // For image editing: add images FIRST, then text prompt
     if (hasReferenceImages) {
       for (const refImg of referenceImages.slice(0, 3)) {
         const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
