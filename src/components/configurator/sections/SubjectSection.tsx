@@ -67,21 +67,23 @@ export function SubjectSection({ config, onUpdate }: Props) {
     onUpdate({ subjectPhotos: updated });
   };
 
-  const togglePose = (poseLabel: string) => {
+  const selectPose = (poseLabel: string) => {
+    // Single selection: if already selected, deselect; otherwise replace
     const current = config.poseDescription || '';
-    const poses = current.split(',').map(p => p.trim()).filter(Boolean);
-    const idx = poses.indexOf(poseLabel);
-    if (idx >= 0) {
-      poses.splice(idx, 1);
-    } else {
-      poses.push(poseLabel);
-    }
-    onUpdate({ poseDescription: poses.join(', ') });
+    // Keep any custom text (non-preset parts)
+    const customParts = current
+      .split(',')
+      .map(p => p.trim())
+      .filter(p => p && !POSES.map(po => po.label).includes(p));
+    const alreadySelected = current.split(',').map(p => p.trim()).includes(poseLabel);
+    const newPoses = alreadySelected
+      ? [...customParts]
+      : [poseLabel, ...customParts];
+    onUpdate({ poseDescription: newPoses.join(', ') });
   };
 
   const isSelected = (poseLabel: string) => {
-    const poses = (config.poseDescription || '').split(',').map(p => p.trim());
-    return poses.includes(poseLabel);
+    return (config.poseDescription || '').split(',').map(p => p.trim()).includes(poseLabel);
   };
 
   const isMasculino = config.gender === 'masculino';
@@ -170,7 +172,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
             return (
               <button
                 key={pose.id}
-                onClick={() => togglePose(pose.label)}
+                onClick={() => selectPose(pose.label)}
                 className={cn(
                   'relative shrink-0 snap-start rounded-xl overflow-hidden border transition-all duration-200 w-[88px]',
                   selected
