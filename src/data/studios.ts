@@ -102,4 +102,13 @@ export const studios: Studio[] = [
     route: '/studio/football-creator',
     gradient: 'from-emerald-500/15 to-green-600/10',
   },
+  {
+    id: 'auto-creator',
+    name: 'Auto Creator',
+    tagline: 'Motorsport & Performance',
+    description: 'Crie artes automotivas profissionais com IA — race day, drift, trackday, supercar e muito mais.',
+    icon: '🏎️',
+    route: '/studio/auto-creator',
+    gradient: 'from-red-500/15 to-orange-500/10',
+  },
 ];
