@@ -6,6 +6,7 @@ export interface Studio {
   tagline: string;
   description: string;
   icon: string;
+  image?: string;
   route: string;
   gradient: string;
 }
