@@ -75,13 +75,14 @@ export default function StudiosPage() {
           <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
 
           {/* Hero image — right side, fades out toward the text */}
-          <div className="absolute inset-0 flex justify-end pointer-events-none">
+          <div className="absolute inset-y-0 right-0 w-[45%] pointer-events-none overflow-hidden">
             <img
               src={criadorHero}
               alt=""
-              className="h-full w-auto max-w-[45%] object-cover object-left opacity-30 group-hover:opacity-40 transition-opacity duration-500"
-              style={{ maskImage: 'linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 75%)', WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 75%)' }}
+              className="h-full w-full object-cover object-center opacity-60 group-hover:opacity-75 transition-opacity duration-500"
             />
+            {/* Fade gradient over the image toward the left */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, hsl(var(--background)) 0%, transparent 40%)' }} />
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/80" />
