@@ -80,6 +80,7 @@ export default function StudiosPage() {
               src={criadorHero}
               alt=""
               className="h-full w-full object-cover object-center"
+              style={{ transform: 'scaleX(-1)' }}
             />
             {/* Gradient: fully invisible on left → fully visible on right */}
             <div
