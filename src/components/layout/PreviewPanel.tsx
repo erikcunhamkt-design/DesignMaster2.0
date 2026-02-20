@@ -151,18 +151,20 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Refinar Imagem */}
-            {onRefine && (
+            {/* Refinar Imagem — Em breve */}
+            <div className="relative group/refine">
               <Button
                 size="sm"
-                onClick={() => setRefinementOpen(true)}
-                disabled={isRefining}
-                className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold bg-gradient-to-r from-primary/80 to-accent/80 hover:from-primary hover:to-accent text-primary-foreground border-0 shadow-glow-sm hover:shadow-glow-md transition-all duration-200 disabled:opacity-50"
+                disabled
+                className="h-7 gap-1.5 text-[10px] rounded-lg font-semibold bg-secondary/40 text-muted-foreground/40 border border-border/15 cursor-not-allowed opacity-60"
               >
                 <Wand2 className="h-3 w-3" />
-                {isRefining ? 'Refinando…' : 'Refinar'}
+                Refinar
               </Button>
-            )}
+              <span className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary/90 text-primary-foreground text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 opacity-0 group-hover/refine:opacity-100 transition-opacity duration-200 pointer-events-none">
+                Em breve
+              </span>
+            </div>
 
             {/* Watermark toggle */}
             <Button
