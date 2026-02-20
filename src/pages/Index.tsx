@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
@@ -12,11 +12,16 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SlidersHorizontal, Wand2 } from 'lucide-react';
 
+// Estimated generation time in seconds
+const ESTIMATED_SECONDS = 35;
+
 const Index = () => {
   const [mode, setMode] = useState<'avancado' | 'guiado'>('avancado');
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { apiKey } = useGoogleApiKey();
 
   const {
@@ -29,12 +34,25 @@ const Index = () => {
     updateConfig,
   } = useProjectStore();
 
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   const handleGenerate = useCallback(async () => {
     if (!activeProject) return;
 
     setIsGenerating(true);
     setPreviewState('gerando');
     setGeneratedImage(undefined);
+    setElapsedSeconds(0);
+
+    // Start elapsed timer
+    timerRef.current = setInterval(() => {
+      setElapsedSeconds(prev => prev + 1);
+    }, 1000);
 
     try {
       const genRequest = buildGenerationRequest(activeProject.config);
@@ -75,6 +93,7 @@ const Index = () => {
       toast.error(err.message || 'Erro ao gerar imagem');
       setPreviewState('aguardando');
     } finally {
+      stopTimer();
       setIsGenerating(false);
     }
   }, [activeProject, apiKey]);
@@ -136,7 +155,13 @@ const Index = () => {
         ) : (
           activeProject && (
             <>
-              <PreviewPanel state={previewState} imageUrl={generatedImage} config={activeProject.config} />
+              <PreviewPanel
+                state={previewState}
+                imageUrl={generatedImage}
+                config={activeProject.config}
+                elapsedSeconds={elapsedSeconds}
+                estimatedSeconds={ESTIMATED_SECONDS}
+              />
               <ConfiguratorPanel
                 config={activeProject.config}
                 onUpdate={updateConfig}
