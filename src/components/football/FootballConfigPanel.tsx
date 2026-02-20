@@ -261,24 +261,16 @@ function VisualStyleSection({ config, onUpdate }: { config: FootballConfig; onUp
         ))}
       </div>
 
-      {/* Additional prompt */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-medium text-foreground/70">Prompt Extra</span>
-          <Switch
-            checked={config.additionalPromptEnabled}
-            onCheckedChange={(v) => onUpdate({ additionalPromptEnabled: v })}
-          />
-        </div>
-        {config.additionalPromptEnabled && (
-          <VoiceTextField
-            textarea
-            placeholder="Instruções adicionais esportivas..."
-            value={config.additionalPrompt}
-            onChange={(v) => onUpdate({ additionalPrompt: v })}
-            className="min-h-[48px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-          />
-        )}
+      {/* Additional prompt — always visible */}
+      <div className="space-y-1.5">
+        <Label>Prompt Extra</Label>
+        <VoiceTextField
+          textarea
+          placeholder="Instruções adicionais esportivas..."
+          value={config.additionalPrompt}
+          onChange={(v) => onUpdate({ additionalPrompt: v, additionalPromptEnabled: true })}
+          className="min-h-[56px] resize-none bg-secondary/30 border-border/20 text-[10px]"
+        />
       </div>
     </div>
   );
