@@ -81,9 +81,10 @@ export default function StudiosPage() {
               alt=""
               className="absolute inset-0 h-full w-full"
               style={{
-                transform: 'scaleX(-1) scale(1.8)',
                 objectFit: 'cover',
-                objectPosition: '45% 20%',
+                objectPosition: '35% 15%',
+                transform: 'scale(1.15)',
+                mixBlendMode: 'luminosity',
               }}
             />
             {/* Gradient: fully invisible on left → fully visible on right */}
