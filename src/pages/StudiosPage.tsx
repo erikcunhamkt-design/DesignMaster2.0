@@ -9,6 +9,7 @@ import markdownHero from '@/assets/markdown-hero.png';
 import produtosHero from '@/assets/produtos-hero.png';
 import capasHero from '@/assets/capas-hero.png';
 import galeriaHero from '@/assets/galeria-hero.png';
+import chatHero from '@/assets/chat-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ const studioImages: Record<string, string> = {
   produtos: produtosHero,
   capas: capasHero,
   galeria: galeriaHero,
+  chat: chatHero,
 };
 
 const FEATURED_STUDIO_ID = 'criador';
