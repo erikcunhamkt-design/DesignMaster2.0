@@ -102,14 +102,14 @@ const Index = () => {
   const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
     setIsRefining(true);
     try {
-      // currentImageUrl may already be a data URL (base64) — no need to fetch it
-      let base64: string;
+      // Ensure we have a data URL (generated images are already base64)
+      let imageDataUrl: string;
       if (currentImageUrl.startsWith('data:')) {
-        base64 = currentImageUrl;
+        imageDataUrl = currentImageUrl;
       } else {
         const resp = await fetch(currentImageUrl);
         const blob = await resp.blob();
-        base64 = await blobToBase64(blob);
+        imageDataUrl = await blobToBase64(blob);
       }
 
       const refinePromptText = `Refine this existing image with the following changes: ${refinementPrompt}. Keep the same overall composition, subject, and style. Only apply the requested modifications. The image MUST fill the entire canvas edge to edge.`;
