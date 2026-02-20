@@ -93,39 +93,60 @@ export default function StudiosPage() {
         </div>
 
         {/* Featured card */}
-        <button
-          onClick={() => navigate(featured.route)}
-          className="group relative w-full rounded-2xl border border-border/15 bg-card/50 overflow-hidden mb-4 text-left transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-glow-md active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 animate-fade-up flex items-stretch h-[140px]"
-          style={{ animationDelay: '80ms' }}
-        >
-          {/* Content — LEFT side */}
-          <div className="relative flex flex-1 items-center justify-between px-10 py-6 min-w-0">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/20">
-                  <Sparkles className="h-2.5 w-2.5" />
-                  Principal
-                </span>
-              </div>
-              <h2 className="text-2xl font-extrabold text-foreground font-display tracking-tight">{featured.name}</h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-md leading-relaxed">{featured.description}</p>
-            </div>
-            <div className="flex items-center justify-center w-11 h-11 rounded-full border border-border/20 bg-card/60 group-hover:border-primary/30 group-hover:bg-primary/10 transition-all duration-300 shrink-0">
-              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-          </div>
+        <div className="relative mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
+          {/* Outer glow pulse ring */}
+          <div className="absolute -inset-[2px] rounded-[18px] bg-gradient-to-r from-primary/60 via-primary/90 to-primary/60 opacity-70 blur-[2px] animate-pulse pointer-events-none" />
+          {/* Secondary shimmer ring */}
+          <div className="absolute -inset-[1px] rounded-[17px] bg-gradient-to-r from-transparent via-primary/40 to-transparent pointer-events-none" />
 
-          {/* Image — RIGHT side, contained within card height */}
-          <div className="relative shrink-0 h-full flex items-center overflow-hidden">
-            <img
-              src={criadorHero}
-              alt="Criador"
-              className="h-full w-auto object-contain max-h-full"
-              style={{ mixBlendMode: 'luminosity', opacity: 0.85 }}
-            />
-          </div>
-        </button>
+          <button
+            onClick={() => navigate(featured.route)}
+            className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 flex items-stretch h-[150px] bg-card/70 backdrop-blur-sm"
+          >
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-transparent pointer-events-none" />
+
+            {/* Top shimmer line */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/80 to-transparent" />
+            {/* Bottom accent line */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+            {/* Floating glow orb */}
+            <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-64 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/18 transition-all duration-700" />
+
+            {/* Content — LEFT side */}
+            <div className="relative flex flex-1 items-center justify-between px-10 py-6 min-w-0">
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">{featured.tagline}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary border border-primary/30 shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    Principal
+                  </span>
+                </div>
+                <h2 className="text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
+                  {featured.name}
+                </h2>
+                <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{featured.description}</p>
+              </div>
+              <div className="flex items-center justify-center w-11 h-11 rounded-full border border-primary/25 bg-primary/10 group-hover:border-primary/50 group-hover:bg-primary/20 group-hover:shadow-[0_0_16px_hsl(var(--primary)/0.4)] transition-all duration-300 shrink-0">
+                <ArrowRight className="h-4 w-4 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
+              </div>
+            </div>
+
+            {/* Image — RIGHT side */}
+            <div className="relative shrink-0 h-full flex items-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[hsl(var(--card)/0.5)] pointer-events-none z-10" />
+              <img
+                src={criadorHero}
+                alt="Criador"
+                className="h-full w-auto object-contain max-h-full transition-transform duration-500 group-hover:scale-105"
+                style={{ opacity: 0.92 }}
+              />
+            </div>
+          </button>
+        </div>
 
 
         {/* Grid of remaining studios */}
