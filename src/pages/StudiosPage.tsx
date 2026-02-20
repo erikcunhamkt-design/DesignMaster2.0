@@ -7,6 +7,7 @@ import promptBuilderHero from '@/assets/prompt-builder-hero.png';
 import upscaleHero from '@/assets/upscale-hero.png';
 import markdownHero from '@/assets/markdown-hero.png';
 import produtosHero from '@/assets/produtos-hero.png';
+import capasHero from '@/assets/capas-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +20,7 @@ const studioImages: Record<string, string> = {
   upscale: upscaleHero,
   markdown: markdownHero,
   produtos: produtosHero,
+  capas: capasHero,
 };
 
 const FEATURED_STUDIO_ID = 'criador';
