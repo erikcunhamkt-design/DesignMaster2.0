@@ -154,9 +154,9 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 3 — Direção do Personagem */}
         <CollapsibleBlock
-          icon={User}
+          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
           title="Direção do Personagem"
-          subtitle="Pose · Expressão · Enquadramento"
+          subtitle="Expressão · Ângulo · Lente · Olhar"
         >
           <CharacterDirectionSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
