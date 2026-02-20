@@ -61,19 +61,37 @@ const STYLE_VFX: Record<string, string> = {
 };
 
 // ── BASE STYLE (always injected) ──
-const BASE_STYLE = 'cinematic commercial advertising look, premium high-end finish, cinematic lighting, subtle VFX, dramatic rim light combined with soft fill light, realistic depth of field, clean composition, hero subject placement, polished post-production, high clarity, sharp focus on subject, gentle filmic contrast, high-end advertising quality';
+const BASE_STYLE = [
+  'cinematic commercial advertising photography, premium high-end production quality',
+  'cinematic directional lighting with well-defined key light, rim light and subtle fill light',
+  'realistic depth of field with natural lens focus, no plastic or artificial look',
+  'hero subject clearly visible and intentionally placed, no unwanted crops on head, hands or feet',
+  'clean editorial composition with breathing space for text overlay',
+  'subtle controlled VFX: light flare, particles, smoke or glow only when contextually appropriate, never exaggerated',
+  'polished post-production grade, filmic contrast, high clarity, sharp focus on subject',
+  'suitable for premium advertising campaigns, landing pages, product launches and high-impact covers',
+].join(', ');
 
 // ── DEFAULT NEGATIVE ──
-const BASE_NEGATIVE = 'low-res, blurry, noise, watermark, text artifacts, logo artifacts, bad anatomy, deformed hands, extra fingers, duplicated face, plastic skin, overprocessed HDR, ugly noise, compression artifacts, cropped, out of frame';
+const BASE_NEGATIVE = 'low-res, blurry, noise, watermark, text artifacts, logo artifacts, bad anatomy, deformed hands, extra fingers, duplicated face, plastic skin, overprocessed HDR, ugly noise, compression artifacts, cropped head, out of frame, letterboxing, blur borders, empty padding, illustration style, cartoon look, CGI cheap look, artificial, overly processed, plastic skin, waxy skin';
 
 const TEXT_NEGATIVE = 'garbled text, misspelled words, distorted typography, unreadable text, broken letters, overlapping characters';
 
-// ── ULTRA REALISM (human subjects) ──
-const HUMAN_REALISM_BOOST = 'ultra photorealistic, extreme realism, cinematic lighting, skin pores detailed, natural pores, natural facial texture, no plastic skin, highly detailed lips and mouth anatomy, well-defined facial expressions, sharp eyes with natural catchlight, realistic hair strands strand-by-strand, realistic beard and mustache detail strand-by-strand, high micro-texture detail, ultra sharp focus, 8k, ultra HD, premium quality, masterpiece';
+// ── ULTRA REALISM (human subjects — ABSOLUTE RULE) ──
+const HUMAN_REALISM_BOOST = [
+  'ultra photorealistic extreme realism, professional camera photography, shot on high-end DSLR or mirrorless',
+  'highly detailed skin texture with visible pores, natural micro imperfections, realistic natural skin tone variation',
+  'natural healthy lip texture, correct lip anatomy with natural fissures, organic volume, no artificial look',
+  'eyes extremely striking with natural reflections, real depth, controlled natural catchlight, sharp iris detail',
+  'hair rendered strand by strand with thickness variation, natural light and shadow',
+  'realistic beard and mustache with individual visible strands, natural density and volume',
+  'cinematic studio lighting: key light, rim light and fill light correctly applied to face and body volumes',
+  '8K ultra HD, ultra sharp, masterpiece quality, absolutely no plastic or AI-smooth skin look',
+].join(', ');
 
-const HUMAN_NEGATIVE_BOOST = 'cracked lips, overly dry lips, deformed mouth, weird teeth, extra teeth, asymmetrical eyes, uncanny face, plastic skin, waxy skin, over-smoothed skin, blurry eyes, low detail skin, mushy hair, artifacts, low quality';
+const HUMAN_NEGATIVE_BOOST = 'cracked lips, overly dry lips, deformed mouth, weird teeth, extra teeth, asymmetrical eyes, uncanny face, plastic skin, waxy skin, over-smoothed skin, blurry eyes, low detail skin, mushy hair, artifacts, low quality, illustration, CGI, cartoon face';
 
-const HUMAN_LIPS_BOOST = 'natural healthy lip texture, correct lip contour and anatomy, no artificial appearance';
+const HUMAN_LIPS_BOOST = 'natural healthy lip texture, correct lip contour and anatomy, no artificial appearance, organic fissures, realistic softness';
 
 // Styles that should NOT receive the ultra-realism boost
 const NON_REALIST_STYLES = new Set([
