@@ -355,12 +355,12 @@ function ChipCardCarousel({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.15 }}
             >
-              {/* Character image */}
-              <div className="h-[140px] w-full overflow-hidden">
+              {/* Character image — fills the full card */}
+              <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
                 <img
                   src={avatarSrc}
                   alt={currentChip}
-                  className="h-full w-full object-cover object-top"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
                 />
               </div>
 
