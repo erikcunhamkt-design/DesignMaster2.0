@@ -6,52 +6,75 @@ import { ChevronLeft, ChevronRight, Shuffle, X, Zap, ChevronDown, ChevronUp } fr
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import genderMale from '@/assets/gender-male.png';
-import genderFemale from '@/assets/gender-female.png';
+// Expression images — unique per expression, per gender
+import homerExprSorrindo    from '@/assets/expressions/homer-sorrindo.png';
+import homerExprSerio       from '@/assets/expressions/homer-serio.png';
+import homerExprNeutro      from '@/assets/expressions/homer-neutro.png';
+import homerExprConfiante   from '@/assets/expressions/homer-confiante.png';
+import homerExprBravo       from '@/assets/expressions/homer-bravo.png';
+import homerExprPensativo   from '@/assets/expressions/homer-pensativo.png';
+import homerExprDeterminado from '@/assets/expressions/homer-determinado.png';
 
+import margeExprSorrindo    from '@/assets/expressions/marge-sorrindo.png';
+import margeExprSerio       from '@/assets/expressions/marge-serio.png';
+import margeExprNeutro      from '@/assets/expressions/marge-neutro.png';
+import margeExprConfiante   from '@/assets/expressions/marge-confiante.png';
+import margeExprBravo       from '@/assets/expressions/marge-bravo.png';
+import margeExprPensativo   from '@/assets/expressions/marge-pensativo.png';
+import margeExprDeterminado from '@/assets/expressions/marge-determinado.png';
+
+// Pose images for angle / lens / gaze groups (unique per group, no repeats within)
 import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
-import homerMaosBolso from '@/assets/poses/homer-maos-bolso.png';
-import homerPoseHeroica from '@/assets/poses/homer-pose-heroica.png';
-import homerSentado from '@/assets/poses/homer-sentado.png';
-import homerAndando from '@/assets/poses/homer-andando.png';
-import homerApoiado from '@/assets/poses/homer-apoiado.png';
-import homerApontando from '@/assets/poses/homer-apontando.png';
-import homerDeCostas from '@/assets/poses/homer-de-costas.png';
+import homerMaosBolso      from '@/assets/poses/homer-maos-bolso.png';
+import homerPoseHeroica    from '@/assets/poses/homer-pose-heroica.png';
+import homerSentado        from '@/assets/poses/homer-sentado.png';
+import homerAndando        from '@/assets/poses/homer-andando.png';
+import homerApoiado        from '@/assets/poses/homer-apoiado.png';
+import homerApontando      from '@/assets/poses/homer-apontando.png';
+import homerDeCostas       from '@/assets/poses/homer-de-costas.png';
 
 import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
-import margeMaosBolso from '@/assets/poses/marge-maos-bolso.png';
-import margePoseHeroica from '@/assets/poses/marge-pose-heroica.png';
-import margeSentado from '@/assets/poses/marge-sentado.png';
-import margeAndando from '@/assets/poses/marge-andando.png';
-import margeApoiado from '@/assets/poses/marge-apoiado.png';
-import margeApontando from '@/assets/poses/marge-apontando.png';
-import margeDeCostas from '@/assets/poses/marge-de-costas.png';
+import margeMaosBolso      from '@/assets/poses/marge-maos-bolso.png';
+import margePoseHeroica    from '@/assets/poses/marge-pose-heroica.png';
+import margeSentado        from '@/assets/poses/marge-sentado.png';
+import margeAndando        from '@/assets/poses/marge-andando.png';
+import margeApoiado        from '@/assets/poses/marge-apoiado.png';
+import margeApontando      from '@/assets/poses/marge-apontando.png';
+import margeDeCostas       from '@/assets/poses/marge-de-costas.png';
 
+// ─── Avatar map: each chip → unique image per gender ─────────────────────────
 const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
-  'Sorrindo':    { homer: homerApontando,     marge: margeApontando },
-  'Sério':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
-  'Neutro':      { homer: homerMaosBolso,      marge: margeMaosBolso },
-  'Confiante':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
-  'Bravo':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
-  'Pensativo':   { homer: homerSentado,        marge: margeSentado },
-  'Determinado': { homer: homerPoseHeroica,    marge: margePoseHeroica },
-  'Frontal':     { homer: homerApontando,      marge: margeApontando },
-  '3/4':         { homer: homerApoiado,        marge: margeApoiado },
-  'Perfil':      { homer: homerAndando,        marge: margeAndando },
-  'Low angle':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
-  'High angle':  { homer: homerSentado,        marge: margeSentado },
-  'Dutch angle': { homer: homerAndando,        marge: margeAndando },
-  '24mm':        { homer: homerAndando,        marge: margeAndando },
-  '35mm':        { homer: homerApoiado,        marge: margeApoiado },
-  '50mm':        { homer: homerMaosBolso,      marge: margeMaosBolso },
-  '85mm':        { homer: homerApontando,      marge: margeApontando },
-  '135mm':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
-  'Para câmera': { homer: homerApontando,      marge: margeApontando },
-  'Esquerda':    { homer: homerAndando,        marge: margeAndando },
-  'Direita':     { homer: homerApoiado,        marge: margeApoiado },
-  'Para cima':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
-  'Para baixo':  { homer: homerSentado,        marge: margeSentado },
-  'Distante':    { homer: homerDeCostas,       marge: margeDeCostas },
+  // EXPRESSÃO — uses new expression-specific images (all unique)
+  'Sorrindo':    { homer: homerExprSorrindo,    marge: margeExprSorrindo    },
+  'Sério':       { homer: homerExprSerio,       marge: margeExprSerio       },
+  'Neutro':      { homer: homerExprNeutro,      marge: margeExprNeutro      },
+  'Confiante':   { homer: homerExprConfiante,   marge: margeExprConfiante   },
+  'Bravo':       { homer: homerExprBravo,       marge: margeExprBravo       },
+  'Pensativo':   { homer: homerExprPensativo,   marge: margeExprPensativo   },
+  'Determinado': { homer: homerExprDeterminado, marge: margeExprDeterminado },
+
+  // ÂNGULO — 6 unique poses, none repeated
+  'Frontal':     { homer: homerApontando,       marge: margeApontando       },
+  '3/4':         { homer: homerApoiado,         marge: margeApoiado         },
+  'Perfil':      { homer: homerAndando,         marge: margeAndando         },
+  'Low angle':   { homer: homerPoseHeroica,     marge: margePoseHeroica     },
+  'High angle':  { homer: homerSentado,         marge: margeSentado         },
+  'Dutch angle': { homer: homerDeCostas,        marge: margeDeCostas        },
+
+  // LENTE — 5 unique poses, none repeated
+  '24mm':        { homer: homerAndando,         marge: margeAndando         },
+  '35mm':        { homer: homerApoiado,         marge: margeApoiado         },
+  '50mm':        { homer: homerMaosBolso,       marge: margeMaosBolso       },
+  '85mm':        { homer: homerBracosCruzados,  marge: margeBracosCruzados  },
+  '135mm':       { homer: homerPoseHeroica,     marge: margePoseHeroica     },
+
+  // OLHAR — 6 unique poses, none repeated
+  'Para câmera': { homer: homerApontando,       marge: margeApontando       },
+  'Esquerda':    { homer: homerDeCostas,        marge: margeDeCostas        },
+  'Direita':     { homer: homerApoiado,         marge: margeApoiado         },
+  'Para cima':   { homer: homerPoseHeroica,     marge: margePoseHeroica     },
+  'Para baixo':  { homer: homerSentado,         marge: margeSentado         },
+  'Distante':    { homer: homerAndando,         marge: margeAndando         },
 };
 
 interface Props {
@@ -254,7 +277,7 @@ function ChipCardCarousel({
   const avatarEntry = chipAvatarMap[currentChip];
   const avatarSrc = avatarEntry
     ? (isMasculino ? avatarEntry.homer : avatarEntry.marge)
-    : (isMasculino ? genderMale : genderFemale);
+    : (isMasculino ? homerExprNeutro : margeExprNeutro);
 
   const isSelected = chipValue === currentChip;
 
