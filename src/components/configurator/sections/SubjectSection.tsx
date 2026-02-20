@@ -161,7 +161,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
       {/* Pose carousel */}
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-2 tracking-wide">
-          Pose — como {isMasculino ? 'o Homer' : 'a Marge'} vai aparecer
+          Pose — como sua imagem vai aparecer
         </p>
 
         {/* Horizontal scrollable cards */}
