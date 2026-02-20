@@ -112,11 +112,15 @@ const Index = () => {
         imageDataUrl = await blobToBase64(blob);
       }
 
-      // Use dedicated refine-image function (Nano banana pro via Lovable AI gateway)
-      const { data, error } = await supabase.functions.invoke('refine-image', {
+      // Use generate-image with the current image as a reference (Google API key)
+      const refinePromptText = `Edit this image: ${refinementPrompt}. Preserve the overall composition, subject, pose, lighting style, and visual quality. Only apply the requested change. The final image MUST fill the entire canvas edge to edge with no blank space.`;
+
+      const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
-          refinementPrompt,
-          imageDataUrl,
+          prompt: refinePromptText,
+          negativePrompt: 'low quality, blurry, artifacts, blank space, empty borders',
+          referenceImages: [imageDataUrl],
+          googleApiKey: apiKey,
         },
       });
 
@@ -134,7 +138,7 @@ const Index = () => {
     } finally {
       setIsRefining(false);
     }
-  }, []);
+  }, [apiKey]);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
