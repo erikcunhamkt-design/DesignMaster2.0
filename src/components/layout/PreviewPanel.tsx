@@ -9,9 +9,11 @@ interface PreviewPanelProps {
   state: PreviewState;
   imageUrl?: string;
   config?: ProjectConfig;
+  elapsedSeconds?: number;
+  estimatedSeconds?: number;
 }
 
-export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
+export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, estimatedSeconds = 35 }: PreviewPanelProps) {
   const [zoom, setZoom] = useState(100);
   const [showOverlay, setShowOverlay] = useState(true);
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
@@ -195,18 +197,47 @@ export function PreviewPanel({ state, imageUrl, config }: PreviewPanelProps) {
 
         {state === 'gerando' && (
           <div className="flex flex-col items-center gap-8 animate-fade-up">
+            {/* Icon */}
             <div className="relative h-20 w-20">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 animate-breathe" />
               <div className="absolute inset-[3px] rounded-[14px] bg-background/80 backdrop-blur-sm flex items-center justify-center">
                 <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
               </div>
             </div>
-            <div className="text-center space-y-2">
+
+            {/* Text + timer */}
+            <div className="text-center space-y-1.5">
               <p className="font-display text-base font-semibold tracking-tight text-foreground/60">Gerando imagem…</p>
               <p className="text-[11px] text-muted-foreground/35">IA processando seu criativo</p>
+              {/* Elapsed + countdown */}
+              <div className="flex items-center justify-center gap-2 pt-1">
+                <span className="tabular-nums text-[11px] font-mono text-muted-foreground/40">
+                  {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:{String(elapsedSeconds % 60).padStart(2, '0')}
+                </span>
+                {elapsedSeconds < estimatedSeconds && (
+                  <>
+                    <span className="text-muted-foreground/20 text-[10px]">/</span>
+                    <span className="tabular-nums text-[11px] font-mono text-primary/50 font-semibold">
+                      ~{estimatedSeconds - elapsedSeconds}s
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="w-48 h-[1.5px] rounded-full overflow-hidden bg-border/15">
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+
+            {/* Progress bar */}
+            <div className="w-56 space-y-1.5">
+              <div className="w-full h-1.5 rounded-full overflow-hidden bg-border/15">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary/70 to-accent/80 transition-all duration-1000 ease-linear"
+                  style={{
+                    width: `${Math.min(100, (elapsedSeconds / estimatedSeconds) * 100)}%`,
+                  }}
+                />
+              </div>
+              <p className="text-center text-[9px] text-muted-foreground/25 tabular-nums">
+                {Math.min(100, Math.round((elapsedSeconds / estimatedSeconds) * 100))}%
+              </p>
             </div>
           </div>
         )}
