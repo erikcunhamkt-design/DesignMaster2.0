@@ -85,20 +85,14 @@ export function VisualStyleSection({ config, onUpdate }: Props) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-medium text-foreground/70">Prompt Extra</span>
-          <Switch
-            checked={config.additionalPromptEnabled}
-            onCheckedChange={(v) => onUpdate({ additionalPromptEnabled: v })}
-          />
         </div>
-        {config.additionalPromptEnabled && (
-          <VoiceTextField
-            textarea
-            placeholder="Instruções adicionais..."
-            value={config.additionalPrompt}
-            onChange={(v) => onUpdate({ additionalPrompt: v })}
-            className="min-h-[48px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-          />
-        )}
+        <VoiceTextField
+          textarea
+          placeholder="Instruções adicionais ao prompt (opcional)..."
+          value={config.additionalPrompt}
+          onChange={(v) => onUpdate({ additionalPrompt: v, additionalPromptEnabled: v.length > 0 })}
+          className="min-h-[48px] resize-none bg-secondary/30 border-border/20 text-[10px]"
+        />
       </div>
     </div>
   );
