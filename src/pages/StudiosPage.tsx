@@ -3,6 +3,7 @@ import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
 import criadorHero from '@/assets/criador-hero.png';
 import extratorHero from '@/assets/extrator-hero.png';
+import promptBuilderHero from '@/assets/prompt-builder-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
+  'prompt-builder': promptBuilderHero,
 };
 
 const FEATURED_STUDIO_ID = 'criador';
