@@ -73,18 +73,10 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   if (dirGaze) parts.push(`gaze direction: ${dirGaze}`);
 
   // Subject position
-  const posMapComposer: Record<string, string> = {
-    'esquerda':      'subject on the left side of the frame',
-    'direita':       'subject on the right side of the frame',
-    'topo-esquerda': 'subject in the top-left corner',
-    'topo-centro':   'subject at the top center',
-    'topo-direita':  'subject in the top-right corner',
-    'base-esquerda': 'subject at the bottom-left corner',
-    'base-centro':   'subject at the bottom center',
-    'base-direita':  'subject at the bottom-right corner',
-  };
-  if (config.subjectPosition && posMapComposer[config.subjectPosition]) {
-    parts.push(posMapComposer[config.subjectPosition]);
+  if (config.subjectPosition === 'esquerda') {
+    parts.push('subject positioned on the left side of the frame');
+  } else if (config.subjectPosition === 'direita') {
+    parts.push('subject positioned on the right side of the frame');
   } else {
     parts.push('subject centered in frame');
   }

@@ -143,19 +143,11 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   if (dirLens) parts.push(`shot with ${dirLens} lens`);
   if (dirGaze) parts.push(`gaze direction: ${dirGaze}`);
 
-  // Subject position
-  const posMap: Record<string, string> = {
-    'esquerda':      'subject anchored to the left side of the frame, rule of thirds',
-    'direita':       'subject anchored to the right side of the frame, rule of thirds',
-    'topo-esquerda': 'subject positioned in the top-left corner of the frame',
-    'topo-centro':   'subject positioned at the top center of the frame',
-    'topo-direita':  'subject positioned in the top-right corner of the frame',
-    'base-esquerda': 'subject anchored to the bottom-left corner of the frame',
-    'base-centro':   'subject anchored to the bottom center of the frame',
-    'base-direita':  'subject anchored to the bottom-right corner of the frame',
-  };
-  if (config.subjectPosition && posMap[config.subjectPosition]) {
-    parts.push(posMap[config.subjectPosition]);
+  // Subject horizontal position
+  if (config.subjectPosition === 'esquerda') {
+    parts.push('subject positioned on the left third of frame, following rule of thirds');
+  } else if (config.subjectPosition === 'direita') {
+    parts.push('subject positioned on the right third of frame, following rule of thirds');
   } else {
     parts.push('subject centered in frame, symmetrical composition');
   }

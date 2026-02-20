@@ -1,5 +1,5 @@
-import { Plus, X, Check } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Plus, X, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react';
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
@@ -44,7 +44,11 @@ const POSES = [
 
 export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [poseCustomEnabled, setPoseCustomEnabled] = useState(false);
+  const positions = [
+    { id: 'esquerda' as const, label: 'Esq', icon: AlignLeft },
+    { id: 'centro' as const, label: 'Centro', icon: AlignCenter },
+    { id: 'direita' as const, label: 'Dir', icon: AlignRight },
+  ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -211,150 +215,51 @@ export function SubjectSection({ config, onUpdate }: Props) {
 
         {/* Custom pose text */}
         <div className="mt-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground/60">
-              Pose avançada
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                const next = !poseCustomEnabled;
-                setPoseCustomEnabled(next);
-                if (!next) {
-                  // clear custom text when disabled
-                  const presetPoses = (config.poseDescription || '')
-                    .split(',').map(p => p.trim())
-                    .filter(p => POSES.map(po => po.label).includes(p));
-                  onUpdate({ poseDescription: presetPoses.join(', ') });
-                }
-              }}
-              className={cn(
-                'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-200',
-                poseCustomEnabled
-                  ? 'bg-primary border-primary/60'
-                  : 'bg-secondary/60 border-border/30'
-              )}
-            >
-              <span className={cn(
-                'inline-block h-3 w-3 rounded-full bg-white shadow-sm transition-transform duration-200',
-                poseCustomEnabled ? 'translate-x-3.5' : 'translate-x-0.5'
-              )} />
-            </button>
-          </div>
-          {poseCustomEnabled && (
-            <VoiceTextField
-              textarea
-              placeholder="Pose personalizada ou detalhes de roupa..."
-              value={
-                (config.poseDescription || '')
-                  .split(',')
-                  .map(p => p.trim())
-                  .filter(p => !POSES.map(po => po.label).includes(p))
-                  .join(', ')
-              }
-              onChange={(v) => {
-                const presetPoses = (config.poseDescription || '')
-                  .split(',')
-                  .map(p => p.trim())
-                  .filter(p => POSES.map(po => po.label).includes(p));
-                const customParts = v.split(',').map(p => p.trim()).filter(Boolean);
-                const allPoses = [...presetPoses, ...customParts].filter(Boolean);
-                onUpdate({ poseDescription: allPoses.join(', ') });
-              }}
-              className="min-h-[40px] resize-none bg-secondary/30 border-border/20 text-[11px]"
-            />
-          )}
+          <VoiceTextField
+            textarea
+            placeholder="Pose personalizada ou detalhes de roupa..."
+            value={
+              (config.poseDescription || '')
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => !POSES.map(po => po.label).includes(p))
+                .join(', ')
+            }
+            onChange={(v) => {
+              const presetPoses = (config.poseDescription || '')
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => POSES.map(po => po.label).includes(p));
+              const customParts = v.split(',').map(p => p.trim()).filter(Boolean);
+              const allPoses = [...presetPoses, ...customParts].filter(Boolean);
+              onUpdate({ poseDescription: allPoses.join(', ') });
+            }}
+            className="min-h-[40px] resize-none bg-secondary/30 border-border/20 text-[11px]"
+          />
         </div>
       </div>
 
       {/* Position */}
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Posição</p>
-        <PositionPicker
-          value={config.subjectPosition}
-          isMasculino={isMasculino}
-          onChange={(pos) => onUpdate({ subjectPosition: pos as ProjectConfig['subjectPosition'] })}
-        />
+        <div className="grid grid-cols-3 gap-1">
+          {positions.map((pos) => (
+            <button
+              key={pos.id}
+              onClick={() => onUpdate({ subjectPosition: pos.id })}
+              className={cn(
+                'flex flex-col items-center gap-0.5 rounded-md py-2 text-[9px] font-medium transition-all duration-150 border',
+                config.subjectPosition === pos.id
+                  ? 'bg-primary/10 text-primary border-primary/25'
+                  : 'bg-secondary/30 text-muted-foreground hover:text-foreground border-transparent'
+              )}
+            >
+              <pos.icon className="h-3 w-3" />
+              {pos.label}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
-}
-
-// ── PositionPicker ──────────────────────────────────────────────
-type SubjectPosition = 'esquerda' | 'centro' | 'direita' | 'topo-esquerda' | 'topo-centro' | 'topo-direita' | 'base-esquerda' | 'base-centro' | 'base-direita';
-
-interface PositionPickerProps {
-  value: string;
-  isMasculino: boolean;
-  onChange: (pos: SubjectPosition) => void;
-}
-
-const POSITION_OPTIONS = [
-  { id: 'topo-esquerda',  label: 'Canto sup. esq', col: 'left',   row: 'top' },
-  { id: 'topo-centro',    label: 'Topo centro',     col: 'center', row: 'top' },
-  { id: 'topo-direita',   label: 'Canto sup. dir',  col: 'right',  row: 'top' },
-  { id: 'esquerda',       label: 'Esquerda',        col: 'left',   row: 'middle' },
-  { id: 'centro',         label: 'Centro',          col: 'center', row: 'middle' },
-  { id: 'direita',        label: 'Direita',         col: 'right',  row: 'middle' },
-  { id: 'base-esquerda',  label: 'Base esq',        col: 'left',   row: 'bottom' },
-  { id: 'base-centro',    label: 'Base centro',     col: 'center', row: 'bottom' },
-  { id: 'base-direita',   label: 'Base dir',        col: 'right',  row: 'bottom' },
-] as const;
-
-function MiniCanvas({ col, row, isMasculino }: { col: string; row: string; isMasculino: boolean }) {
-  const charSrc = isMasculino ? homerPoseHeroica : margePoseHeroica;
-
-  const colClass = col === 'left' ? 'items-start' : col === 'right' ? 'items-end' : 'items-center';
-  const rowClass = row === 'top' ? 'justify-start' : row === 'bottom' ? 'justify-end' : 'justify-center';
-
-  return (
-    <div className={cn('flex w-full h-full', rowClass, colClass)}>
-      <img
-        src={charSrc}
-        alt="personagem"
-        className="h-[28px] w-auto object-contain object-bottom"
-        style={{ imageRendering: 'auto' }}
-      />
-    </div>
-  );
-}
-
-function PositionPicker({ value, isMasculino, onChange }: PositionPickerProps) {
-  return (
-    <div className="grid grid-cols-3 gap-1.5">
-      {POSITION_OPTIONS.map((pos) => {
-        const selected = value === pos.id;
-        return (
-          <button
-            key={pos.id}
-            onClick={() => onChange(pos.id as SubjectPosition)}
-            title={pos.label}
-            className={cn(
-              'relative rounded-lg overflow-hidden border transition-all duration-200',
-              'h-[52px] w-full',
-              selected
-                ? 'border-primary/50 shadow-[0_0_8px_hsl(var(--primary)/0.2)] bg-primary/10'
-                : 'border-border/15 bg-secondary/30 hover:border-border/35 hover:bg-secondary/50'
-            )}
-          >
-            {/* Canvas frame lines */}
-            <div className="absolute inset-[3px] rounded border border-dashed border-border/20 pointer-events-none" />
-
-            {/* Character positioned */}
-            <div className="absolute inset-[6px]">
-              <MiniCanvas col={pos.col} row={pos.row} isMasculino={isMasculino} />
-            </div>
-
-            {/* Label tooltip on bottom */}
-            <div className={cn(
-              'absolute bottom-0 left-0 right-0 py-0.5 text-center text-[7px] font-semibold tracking-wide truncate px-1 transition-colors',
-              selected ? 'text-primary bg-primary/15' : 'text-muted-foreground/50 bg-transparent'
-            )}>
-              {selected ? pos.label : ''}
-            </div>
-          </button>
-        );
-      })}
     </div>
   );
 }
