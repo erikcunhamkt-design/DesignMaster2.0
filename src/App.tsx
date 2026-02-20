@@ -17,6 +17,7 @@ import ProductsStudioPage from "./pages/ProductsStudioPage";
 import MagneticCoversPage from "./pages/MagneticCoversPage";
 import PromptGalleryPage from "./pages/PromptGalleryPage";
 import DesignMasterChatPage from "./pages/DesignMasterChatPage";
+import FootballArtsPage from "./pages/FootballArtsPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
@@ -44,6 +45,7 @@ const App = () => {
             <Route path="/studio/capas" element={<ProtectedRoute><MagneticCoversPage /></ProtectedRoute>} />
             <Route path="/studio/galeria" element={<ProtectedRoute><PromptGalleryPage /></ProtectedRoute>} />
             <Route path="/studio/chat" element={<ProtectedRoute><DesignMasterChatPage /></ProtectedRoute>} />
+            <Route path="/studio/football-arts" element={<ProtectedRoute><FootballArtsPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
