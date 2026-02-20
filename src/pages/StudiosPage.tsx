@@ -1,5 +1,6 @@
 import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
+import heroBg from '@/assets/hero-bg.jpg';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -17,10 +18,16 @@ export default function StudiosPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Ambient glow */}
+      {/* Hero background image */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-primary/5 rounded-full blur-[160px]" />
-        <div className="absolute bottom-[-5%] right-1/3 w-[500px] h-[400px] bg-accent/4 rounded-full blur-[130px]" />
+        <img
+          src={heroBg}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-20"
+        />
+        {/* Dark overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/60" />
       </div>
 
       {/* Topbar */}
