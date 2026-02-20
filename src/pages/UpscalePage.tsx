@@ -141,12 +141,46 @@ export default function UpscalePage() {
     }
   };
 
-  const handleUpscale = async () => {
+  const buildUpscalePrompt = (diag: ImageAnalysis | null) => {
+    let prompt = UPSCALE_PROMPT_BASE.replace('{RESOLUTION}', resolution);
+
+    if (diag) {
+      const corrections: string[] = [];
+
+      if (diag.details.sharpness && diag.details.sharpness !== 'boa' && diag.details.sharpness !== 'alta') {
+        corrections.push('pay special attention to recovering sharpness and fine micro-detail');
+      }
+      if (diag.details.noise_level && diag.details.noise_level !== 'baixo' && diag.details.noise_level !== 'mínimo') {
+        corrections.push('apply intelligent noise reduction preserving texture and detail');
+      }
+      if (diag.details.compression && diag.details.compression !== 'mínima' && diag.details.compression !== 'baixa') {
+        corrections.push('reconstruct areas affected by compression artifacts and blocking');
+      }
+      if (diag.details.lighting && (diag.details.lighting.includes('baixa') || diag.details.lighting.includes('flat'))) {
+        corrections.push('enhance contrast and depth while preserving the original lighting mood');
+      }
+      if (diag.details.colors && (diag.details.colors.includes('desbotad') || diag.details.colors.includes('baixa'))) {
+        corrections.push('restore natural color saturation and white balance without oversaturation');
+      }
+
+      if (corrections.length > 0) {
+        prompt += `\n\nDIAGNOSTIC-GUIDED CORRECTIONS (based on AI analysis of this specific image):\n${corrections.map((c, i) => `${i + 1}. ${c}`).join('\n')}`;
+      }
+
+      if (diag.suggestions.length > 0) {
+        prompt += `\n\nADDITIONAL GUIDANCE:\n${diag.suggestions.join('. ')}`;
+      }
+    }
+
+    return prompt;
+  };
+
+  const handleUpscale = async (useDiagnostic = false) => {
     if (!imageBase64 || !apiKey) return;
     setIsProcessing(true);
     setResultImage(null);
     try {
-      const prompt = UPSCALE_PROMPT_BASE.replace('{RESOLUTION}', resolution);
+      const prompt = buildUpscalePrompt(useDiagnostic ? analysis : null);
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
           prompt,
@@ -159,7 +193,7 @@ export default function UpscalePage() {
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
         setResultImage(data.imageUrl);
-        toast.success(`Upscale ${resolution} concluído!`);
+        toast.success(`Upscale ${resolution}${useDiagnostic ? ' com diagnóstico' : ''} concluído!`);
       }
     } catch (err: any) {
       toast.error(err.message || 'Erro no upscale');
@@ -286,14 +320,27 @@ export default function UpscalePage() {
               </div>
             </div>
 
-            {/* Upscale button */}
+            {/* Upscale com diagnóstico — aparece logo após análise */}
+            {analysis && (
+              <Button
+                onClick={() => handleUpscale(true)}
+                disabled={!imageBase64 || isProcessing || apiKey.length < 10}
+                className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-[0_0_32px_-8px_hsl(var(--primary)/0.3)]"
+              >
+                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {isProcessing ? 'Processando...' : `Upscale com Diagnóstico ${resolution}`}
+              </Button>
+            )}
+
+            {/* Upscale padrão */}
             <Button
-              onClick={handleUpscale}
+              onClick={() => handleUpscale(false)}
               disabled={!imageBase64 || isProcessing || apiKey.length < 10}
-              className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-[0_0_32px_-8px_hsl(var(--primary)/0.3)]"
+              variant="outline"
+              className="w-full h-10 gap-2 rounded-xl font-bold tracking-wider text-xs uppercase border-border/30 hover:border-primary/40"
             >
-              {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpCircle className="h-4 w-4" />}
-              {isProcessing ? 'Processando...' : `Upscale ${resolution}`}
+              {isProcessing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowUpCircle className="h-3.5 w-3.5" />}
+              {isProcessing ? 'Processando...' : `Upscale padrão ${resolution}`}
             </Button>
 
             {apiKey.length < 10 && (
