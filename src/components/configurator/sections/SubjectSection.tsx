@@ -1,5 +1,5 @@
 import { Plus, X, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
@@ -44,6 +44,7 @@ const POSES = [
 
 export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [poseCustomEnabled, setPoseCustomEnabled] = useState(false);
   const positions = [
     { id: 'esquerda' as const, label: 'Esq', icon: AlignLeft },
     { id: 'centro' as const, label: 'Centro', icon: AlignCenter },
@@ -215,27 +216,59 @@ export function SubjectSection({ config, onUpdate }: Props) {
 
         {/* Custom pose text */}
         <div className="mt-2">
-          <VoiceTextField
-            textarea
-            placeholder="Pose personalizada ou detalhes de roupa..."
-            value={
-              (config.poseDescription || '')
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => !POSES.map(po => po.label).includes(p))
-                .join(', ')
-            }
-            onChange={(v) => {
-              const presetPoses = (config.poseDescription || '')
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => POSES.map(po => po.label).includes(p));
-              const customParts = v.split(',').map(p => p.trim()).filter(Boolean);
-              const allPoses = [...presetPoses, ...customParts].filter(Boolean);
-              onUpdate({ poseDescription: allPoses.join(', ') });
-            }}
-            className="min-h-[40px] resize-none bg-secondary/30 border-border/20 text-[11px]"
-          />
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground/60">
+              Pose avançada
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !poseCustomEnabled;
+                setPoseCustomEnabled(next);
+                if (!next) {
+                  // clear custom text when disabled
+                  const presetPoses = (config.poseDescription || '')
+                    .split(',').map(p => p.trim())
+                    .filter(p => POSES.map(po => po.label).includes(p));
+                  onUpdate({ poseDescription: presetPoses.join(', ') });
+                }
+              }}
+              className={cn(
+                'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-200',
+                poseCustomEnabled
+                  ? 'bg-primary border-primary/60'
+                  : 'bg-secondary/60 border-border/30'
+              )}
+            >
+              <span className={cn(
+                'inline-block h-3 w-3 rounded-full bg-white shadow-sm transition-transform duration-200',
+                poseCustomEnabled ? 'translate-x-3.5' : 'translate-x-0.5'
+              )} />
+            </button>
+          </div>
+          {poseCustomEnabled && (
+            <VoiceTextField
+              textarea
+              placeholder="Pose personalizada ou detalhes de roupa..."
+              value={
+                (config.poseDescription || '')
+                  .split(',')
+                  .map(p => p.trim())
+                  .filter(p => !POSES.map(po => po.label).includes(p))
+                  .join(', ')
+              }
+              onChange={(v) => {
+                const presetPoses = (config.poseDescription || '')
+                  .split(',')
+                  .map(p => p.trim())
+                  .filter(p => POSES.map(po => po.label).includes(p));
+                const customParts = v.split(',').map(p => p.trim()).filter(Boolean);
+                const allPoses = [...presetPoses, ...customParts].filter(Boolean);
+                onUpdate({ poseDescription: allPoses.join(', ') });
+              }}
+              className="min-h-[40px] resize-none bg-secondary/30 border-border/20 text-[11px]"
+            />
+          )}
         </div>
       </div>
 
