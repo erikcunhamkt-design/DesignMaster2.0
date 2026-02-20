@@ -15,13 +15,6 @@ export const directionGroups: DirectionGroup[] = [
     tooltip: 'Define a emoção do personagem na imagem.',
   },
   {
-    key: 'pose',
-    label: 'Pose',
-    chips: ['Braços cruzados', 'Mãos no bolso', 'Sentado', 'Andando', 'Pose heroica', 'Apoiado', 'De costas'],
-    placeholder: 'Ex: segurando um produto, apontando...',
-    tooltip: 'A linguagem corporal influencia a mensagem visual.',
-  },
-  {
     key: 'cameraAngle',
     label: 'Ângulo',
     chips: ['Frontal', '3/4', 'Perfil', 'Low angle', 'High angle', 'Dutch angle'],
@@ -54,22 +47,22 @@ export const directionPresets: DirectionPreset[] = [
   {
     name: 'Retrato Premium',
     description: '85mm + 3/4 + olhar câmera + neutro',
-    values: { expression: 'Neutro', pose: '', cameraAngle: '3/4', lens: '85mm', gazeDirection: 'Para câmera' },
+    values: { expression: 'Neutro', cameraAngle: '3/4', lens: '85mm', gazeDirection: 'Para câmera' },
   },
   {
     name: 'Capa de Filme',
-    description: '35mm + low angle + sério + heroico',
-    values: { expression: 'Sério', pose: 'Pose heroica', cameraAngle: 'Low angle', lens: '35mm', gazeDirection: 'Distante' },
+    description: '35mm + low angle + sério',
+    values: { expression: 'Sério', cameraAngle: 'Low angle', lens: '35mm', gazeDirection: 'Distante' },
   },
   {
     name: 'Foto Corporativa',
-    description: '50mm + frontal + sorriso + confiante',
-    values: { expression: 'Sorrindo', pose: 'Braços cruzados', cameraAngle: 'Frontal', lens: '50mm', gazeDirection: 'Para câmera' },
+    description: '50mm + frontal + sorriso',
+    values: { expression: 'Sorrindo', cameraAngle: 'Frontal', lens: '50mm', gazeDirection: 'Para câmera' },
   },
   {
     name: 'Lifestyle Dinâmico',
-    description: '35mm + andando + confiante + 3/4',
-    values: { expression: 'Confiante', pose: 'Andando', cameraAngle: '3/4', lens: '35mm', gazeDirection: 'Esquerda' },
+    description: '35mm + confiante + 3/4',
+    values: { expression: 'Confiante', cameraAngle: '3/4', lens: '35mm', gazeDirection: 'Esquerda' },
   },
 ];
 

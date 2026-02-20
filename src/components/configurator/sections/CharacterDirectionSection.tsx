@@ -14,7 +14,6 @@ interface Props {
 
 const fieldMap: Record<string, { chip: keyof ProjectConfig; custom: keyof ProjectConfig }> = {
   expression: { chip: 'expression', custom: 'expressionCustom' },
-  pose: { chip: 'pose', custom: 'poseCustom' },
   cameraAngle: { chip: 'cameraAngle', custom: 'cameraAngleCustom' },
   lens: { chip: 'lens', custom: 'lensCustom' },
   gazeDirection: { chip: 'gazeDirection', custom: 'gazeDirectionCustom' },
