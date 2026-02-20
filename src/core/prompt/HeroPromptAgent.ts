@@ -58,6 +58,10 @@ interface HeroRequest {
 }
 
 export function buildHeroRequest(config: HeroConfig): HeroRequest {
+  // Prompt Livre — ignorar o resto
+  if (config.ignoreRest && config.freePrompt?.trim()) {
+    return { prompt: config.freePrompt.trim(), negative_prompt: '' };
+  }
   const parts: string[] = [];
 
   // Base quality

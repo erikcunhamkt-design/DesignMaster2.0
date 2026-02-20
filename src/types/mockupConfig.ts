@@ -81,6 +81,10 @@ export interface MockupConfig {
 
   // Advanced
   additionalPrompt: string;
+
+  // Prompt Livre
+  freePrompt: string;
+  ignoreRest: boolean;
 }
 
 export const defaultMockupConfig: MockupConfig = {
@@ -101,4 +105,6 @@ export const defaultMockupConfig: MockupConfig = {
   verticalPosition: 'baixo',
   dimension: null,
   additionalPrompt: '',
+  freePrompt: '',
+  ignoreRest: false,
 };

@@ -45,6 +45,10 @@ export interface FootballConfig {
   additionalPromptEnabled: boolean;
   additionalPrompt: string;
 
+  // Prompt Livre
+  freePrompt: string;
+  ignoreRest: boolean;
+
   // Referências
   styleReferences: string[];
 }
@@ -78,5 +82,7 @@ export const defaultFootballConfig: FootballConfig = {
   environment: '',
   additionalPromptEnabled: false,
   additionalPrompt: '',
+  freePrompt: '',
+  ignoreRest: false,
   styleReferences: [],
 };

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
+import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, Monitor, Type,
   Settings2, Layers, Plus, X, Zap, Sun, Image,
@@ -463,6 +464,14 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
 
       {/* Blocks */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-none">
+        {/* Prompt Livre */}
+        <FreePromptBlock
+          freePrompt={config.freePrompt}
+          ignoreRest={config.ignoreRest}
+          onUpdate={onUpdate}
+          placeholder="Ex: Hero premium para SaaS fintech, mulher executiva, fundo tech gradiente azul-índigo..."
+        />
+
         <CollapsibleBlock icon={Image} title="Tipo & Elemento" subtitle="Defina o hero e o sujeito principal" defaultOpen accent>
           <HeroTypeSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>

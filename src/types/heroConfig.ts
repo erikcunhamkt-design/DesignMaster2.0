@@ -78,6 +78,10 @@ export interface HeroConfig {
 
   // Additional
   additionalPrompt: string;
+
+  // Prompt Livre
+  freePrompt: string;
+  ignoreRest: boolean;
 }
 
 export const defaultHeroConfig: HeroConfig = {
@@ -99,4 +103,6 @@ export const defaultHeroConfig: HeroConfig = {
   useGrain: false,
   contrast: 50,
   additionalPrompt: '',
+  freePrompt: '',
+  ignoreRest: false,
 };

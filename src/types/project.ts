@@ -65,6 +65,10 @@ export interface ProjectConfig {
   useSideGradient: boolean;
   additionalPromptEnabled: boolean;
   additionalPrompt: string;
+
+  // Prompt Livre
+  freePrompt: string;
+  ignoreRest: boolean;
 }
 
 export interface Project {
@@ -122,4 +126,6 @@ export const defaultConfig: ProjectConfig = {
   useSideGradient: false,
   additionalPromptEnabled: false,
   additionalPrompt: '',
+  freePrompt: '',
+  ignoreRest: false,
 };

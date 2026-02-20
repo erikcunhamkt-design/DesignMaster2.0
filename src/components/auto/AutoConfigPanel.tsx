@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
+import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, Car, Smartphone,
   Palette, Type, Settings2, Wind, Plus, X,
@@ -498,6 +499,14 @@ export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
   return (
     <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
+        {/* Prompt Livre */}
+        <FreePromptBlock
+          freePrompt={config.freePrompt}
+          ignoreRest={config.ignoreRest}
+          onUpdate={onUpdate}
+          placeholder="Ex: Ferrari vermelha em pista molhada, fumaça de pneus, lighting dramático..."
+        />
+
         <CollapsibleBlock icon={Car} title="Sujeito" subtitle={subjectSubtitle} defaultOpen accent>
           <SubjectSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
