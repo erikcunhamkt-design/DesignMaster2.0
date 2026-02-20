@@ -88,6 +88,15 @@ const NEGATIVE_PROMPT = [
 
 // ── Build prompt ───────────────────────────────────────────────────────────
 export function buildMockupRequest(config: MockupConfig): MockupGenerationRequest {
+  // Prompt Livre — ignorar o resto
+  if (config.ignoreRest && config.freePrompt?.trim()) {
+    const dimMap: Record<string, { w: number; h: number }> = {
+      stories: { w: 1080, h: 1920 }, horizontal: { w: 1920, h: 1080 },
+      'feed-quadrado': { w: 1080, h: 1080 }, 'feed-retrato': { w: 1080, h: 1350 }, apresentacao: { w: 1920, h: 1200 },
+    };
+    const { w, h } = dimMap[config.dimension ?? 'feed-quadrado'] ?? { w: 1080, h: 1080 };
+    return { prompt: config.freePrompt.trim(), negative_prompt: NEGATIVE_PROMPT, width: w, height: h };
+  }
   const parts: string[] = [];
 
   // Core quality

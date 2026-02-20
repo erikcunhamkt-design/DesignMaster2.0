@@ -79,6 +79,10 @@ export interface AutoConfig {
   // Advanced
   additionalPrompt: string;
   environment: string;
+
+  // Prompt Livre
+  freePrompt: string;
+  ignoreRest: boolean;
 }
 
 export const defaultAutoConfig: AutoConfig = {
@@ -104,4 +108,6 @@ export const defaultAutoConfig: AutoConfig = {
   verticalPosition: 'baixo',
   additionalPrompt: '',
   environment: '',
+  freePrompt: '',
+  ignoreRest: false,
 };

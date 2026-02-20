@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
+import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, Package, Smartphone,
   Palette, Type, Settings2, Layers, Plus, X, Sun,
@@ -428,6 +429,14 @@ export function MockupConfigPanel({ config, onUpdate, onGenerate, isGenerating, 
   return (
     <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
+        {/* Prompt Livre */}
+        <FreePromptBlock
+          freePrompt={config.freePrompt}
+          ignoreRest={config.ignoreRest}
+          onUpdate={onUpdate}
+          placeholder="Ex: Caixa de perfume luxo em superfície de mármore, luz lateral dramática, reflexo sutil..."
+        />
+
         <CollapsibleBlock icon={Package} title="Produto" subtitle={`${config.mockupType.replace(/_/g, ' ')} · ${objectLabel[config.mockupObject]}`} defaultOpen accent>
           <ProductSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
