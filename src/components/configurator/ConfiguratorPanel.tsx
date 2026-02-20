@@ -19,6 +19,9 @@ import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
 import { tipsConfig } from '@/data/tipsConfig';
 import { SectionLabel } from './SectionLabel';
+import genderMale from '@/assets/gender-male.png';
+import genderFemale from '@/assets/gender-female.png';
+
 
 interface ConfiguratorPanelProps {
   config: ProjectConfig;
@@ -29,7 +32,8 @@ interface ConfiguratorPanelProps {
 }
 
 interface CollapsibleBlockProps {
-  icon: React.ElementType;
+  icon?: React.ElementType;
+  avatarSrc?: string;
   title: string;
   subtitle?: string;
   defaultOpen?: boolean;
@@ -37,7 +41,7 @@ interface CollapsibleBlockProps {
   accent?: boolean;
 }
 
-function CollapsibleBlock({ icon: Icon, title, subtitle, defaultOpen = false, children, accent }: CollapsibleBlockProps) {
+function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen = false, children, accent }: CollapsibleBlockProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -51,14 +55,23 @@ function CollapsibleBlock({ icon: Icon, title, subtitle, defaultOpen = false, ch
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
       >
-        <div className={cn(
-          'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-300',
-          open
-            ? accent ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground/70'
-            : 'bg-secondary/50 text-muted-foreground/50'
-        )}>
-          <Icon className="h-3.5 w-3.5" />
-        </div>
+        {avatarSrc ? (
+          <div className={cn(
+            'h-7 w-7 shrink-0 rounded-full overflow-hidden border-2 transition-all duration-300',
+            open ? 'border-primary/40' : 'border-border/20'
+          )}>
+            <img src={avatarSrc} alt="avatar" className="h-full w-full object-cover object-top" />
+          </div>
+        ) : Icon ? (
+          <div className={cn(
+            'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-300',
+            open
+              ? accent ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground/70'
+              : 'bg-secondary/50 text-muted-foreground/50'
+          )}>
+            <Icon className="h-3.5 w-3.5" />
+          </div>
+        ) : null}
 
         <div className="flex-1 min-w-0">
           <p className={cn(
@@ -136,9 +149,9 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 1 — Sujeito */}
         <CollapsibleBlock
-          icon={User}
+          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
           title="Sujeito"
-          subtitle={subjectSubtitle}
+          subtitle={config.gender === 'masculino' ? 'Masculino' : 'Feminino'}
           defaultOpen
           accent
         >
