@@ -2,11 +2,16 @@ import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
 import criadorHero from '@/assets/criador-hero.png';
+import extratorHero from '@/assets/extrator-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Shield, ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const studioImages: Record<string, string> = {
+  extrator: extratorHero,
+};
 
 const FEATURED_STUDIO_ID = 'criador';
 
@@ -113,8 +118,18 @@ export default function StudiosPage() {
               {/* Hover gradient */}
               <div className={cn('absolute inset-0 bg-gradient-to-br', studio.gradient, 'opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl')} />
 
-              {/* Icon */}
-              <span className="relative text-3xl transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
+              {/* Icon or image */}
+              {studioImages[studio.id] ? (
+                <div className="relative w-full overflow-hidden rounded-xl flex-1 -mx-6 -mt-6 mb-0" style={{ maxHeight: '120px' }}>
+                  <img
+                    src={studioImages[studio.id]}
+                    alt={studio.name}
+                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+              ) : (
+                <span className="relative text-3xl transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
+              )}
 
               {/* Text */}
               <div className="relative space-y-1.5 flex-1">
