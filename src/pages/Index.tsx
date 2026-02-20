@@ -3,13 +3,17 @@ import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
+import { GuidedWizard } from '@/components/guided/GuidedWizard';
 import { useProjectStore } from '@/hooks/useProjectStore';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { buildGenerationRequest } from '@/core/prompt/PromptAgent';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { SlidersHorizontal, Wand2 } from 'lucide-react';
 
 const Index = () => {
+  const [mode, setMode] = useState<'avancado' | 'guiado'>('avancado');
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -35,7 +39,6 @@ const Index = () => {
     try {
       const genRequest = buildGenerationRequest(activeProject.config);
 
-      // Convert reference URLs to base64
       const referenceImages: string[] = [];
       for (const ref of genRequest.references.slice(0, 5)) {
         try {
@@ -79,25 +82,70 @@ const Index = () => {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Criador" />
-      <ProjectTabs
-        projects={projects}
-        activeId={activeProjectId}
-        onSelect={setActiveProjectId}
-        onClose={removeProject}
-        onAdd={addProject}
-      />
-      <div className="flex flex-1 overflow-hidden relative">
-        {activeProject && (
-          <>
-            <PreviewPanel state={previewState} imageUrl={generatedImage} config={activeProject.config} />
-            <ConfiguratorPanel
-              config={activeProject.config}
-              onUpdate={updateConfig}
-              onGenerate={handleGenerate}
-              isGenerating={isGenerating}
-              apiKey={apiKey}
+
+      {/* Mode switcher + project tabs row */}
+      <div className="flex items-center border-b border-border/10 bg-background/90 backdrop-blur-sm shrink-0 h-9">
+        {/* Mode tabs */}
+        <div className="flex items-center gap-0.5 px-3 h-full border-r border-border/10 shrink-0">
+          <button
+            onClick={() => setMode('avancado')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1 text-[10px] font-semibold rounded-md transition-all duration-200',
+              mode === 'avancado'
+                ? 'bg-secondary/60 text-foreground border border-border/25'
+                : 'text-muted-foreground/50 hover:text-foreground/70 hover:bg-secondary/20'
+            )}
+          >
+            <SlidersHorizontal className="h-2.5 w-2.5" />
+            Avançado
+          </button>
+          <button
+            onClick={() => setMode('guiado')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1 text-[10px] font-semibold rounded-md transition-all duration-200',
+              mode === 'guiado'
+                ? 'bg-secondary/60 text-foreground border border-border/25'
+                : 'text-muted-foreground/50 hover:text-foreground/70 hover:bg-secondary/20'
+            )}
+          >
+            <Wand2 className="h-2.5 w-2.5" />
+            Guiado
+            <span className="rounded-full bg-primary/20 text-primary px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wider leading-none">
+              novo
+            </span>
+          </button>
+        </div>
+
+        {/* Project tabs — only in avançado mode */}
+        {mode === 'avancado' && (
+          <div className="flex-1 min-w-0 h-full">
+            <ProjectTabs
+              projects={projects}
+              activeId={activeProjectId}
+              onSelect={setActiveProjectId}
+              onClose={removeProject}
+              onAdd={addProject}
             />
-          </>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 overflow-hidden relative">
+        {mode === 'guiado' ? (
+          <GuidedWizard />
+        ) : (
+          activeProject && (
+            <>
+              <PreviewPanel state={previewState} imageUrl={generatedImage} config={activeProject.config} />
+              <ConfiguratorPanel
+                config={activeProject.config}
+                onUpdate={updateConfig}
+                onGenerate={handleGenerate}
+                isGenerating={isGenerating}
+                apiKey={apiKey}
+              />
+            </>
+          )
         )}
       </div>
     </div>
