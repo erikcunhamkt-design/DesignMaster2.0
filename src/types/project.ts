@@ -4,7 +4,7 @@ export interface ProjectConfig {
   quantity: number;
   gender: 'masculino' | 'feminino';
   poseDescription: string;
-  subjectPosition: 'esquerda' | 'centro' | 'direita' | 'topo-esquerda' | 'topo-centro' | 'topo-direita' | 'base-esquerda' | 'base-centro' | 'base-direita';
+  subjectPosition: 'esquerda' | 'centro' | 'direita';
 
   // Dimensões
   dimension: 'stories' | 'horizontal' | 'feed-quadrado' | 'feed-retrato' | null;
