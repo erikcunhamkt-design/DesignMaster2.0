@@ -1,4 +1,4 @@
-import { Plus, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Plus, X, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react';
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
@@ -6,20 +6,40 @@ import { ProjectConfig } from '@/types/project';
 import genderFemale from '@/assets/gender-female.png';
 import genderMale from '@/assets/gender-male.png';
 
+// Homer poses
+import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
+import homerMaosBolso from '@/assets/poses/homer-maos-bolso.png';
+import homerPoseHeroica from '@/assets/poses/homer-pose-heroica.png';
+import homerSentado from '@/assets/poses/homer-sentado.png';
+import homerAndando from '@/assets/poses/homer-andando.png';
+import homerApoiado from '@/assets/poses/homer-apoiado.png';
+import homerApontando from '@/assets/poses/homer-apontando.png';
+import homerDeCostas from '@/assets/poses/homer-de-costas.png';
+
+// Marge poses
+import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
+import margeMaosBolso from '@/assets/poses/marge-maos-bolso.png';
+import margePoseHeroica from '@/assets/poses/marge-pose-heroica.png';
+import margeSentado from '@/assets/poses/marge-sentado.png';
+import margeAndando from '@/assets/poses/marge-andando.png';
+import margeApoiado from '@/assets/poses/marge-apoiado.png';
+import margeApontando from '@/assets/poses/marge-apontando.png';
+import margeDeCostas from '@/assets/poses/marge-de-costas.png';
+
 interface Props {
   config: ProjectConfig;
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
 const POSES = [
-  { id: 'bracos_cruzados', label: 'Braços cruzados', emoji: '🤞' },
-  { id: 'maos_bolso', label: 'Mãos no bolso', emoji: '🧍' },
-  { id: 'pose_heroica', label: 'Pose heroica', emoji: '🦸' },
-  { id: 'sentado', label: 'Sentado', emoji: '🪑' },
-  { id: 'andando', label: 'Andando', emoji: '🚶' },
-  { id: 'apoiado', label: 'Apoiado', emoji: '🧱' },
-  { id: 'apontando', label: 'Apontando', emoji: '👉' },
-  { id: 'de_costas', label: 'De costas', emoji: '🔄' },
+  { id: 'bracos_cruzados', label: 'Braços cruzados', homer: homerBracosCruzados, marge: margeBracosCruzados },
+  { id: 'maos_bolso',      label: 'Mãos no bolso',   homer: homerMaosBolso,      marge: margeMaosBolso },
+  { id: 'pose_heroica',    label: 'Pose heroica',     homer: homerPoseHeroica,    marge: margePoseHeroica },
+  { id: 'sentado',         label: 'Sentado',          homer: homerSentado,        marge: margeSentado },
+  { id: 'andando',         label: 'Andando',          homer: homerAndando,        marge: margeAndando },
+  { id: 'apoiado',         label: 'Apoiado',          homer: homerApoiado,        marge: margeApoiado },
+  { id: 'apontando',       label: 'Apontando',        homer: homerApontando,      marge: margeApontando },
+  { id: 'de_costas',       label: 'De costas',        homer: homerDeCostas,       marge: margeDeCostas },
 ];
 
 export function SubjectSection({ config, onUpdate }: Props) {
@@ -47,12 +67,8 @@ export function SubjectSection({ config, onUpdate }: Props) {
     onUpdate({ subjectPhotos: updated });
   };
 
-  const selectedGenderAvatar = config.gender === 'masculino' ? genderMale : genderFemale;
-  const selectedGenderName = config.gender === 'masculino' ? 'Homer' : 'Marge';
-
   const togglePose = (poseLabel: string) => {
     const current = config.poseDescription || '';
-    // Check if already selected (exact match in comma-separated list)
     const poses = current.split(',').map(p => p.trim()).filter(Boolean);
     const idx = poses.indexOf(poseLabel);
     if (idx >= 0) {
@@ -67,6 +83,8 @@ export function SubjectSection({ config, onUpdate }: Props) {
     const poses = (config.poseDescription || '').split(',').map(p => p.trim());
     return poses.includes(poseLabel);
   };
+
+  const isMasculino = config.gender === 'masculino';
 
   return (
     <div className="space-y-3">
@@ -106,7 +124,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </button>
       </div>
 
-      {/* Gender row — full width */}
+      {/* Gender row */}
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
         <div className="grid grid-cols-2 gap-1.5">
@@ -125,11 +143,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
               )}
             >
               <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-border/20">
-                <img
-                  src={img}
-                  alt={label}
-                  className="h-full w-full object-cover object-top"
-                />
+                <img src={img} alt={label} className="h-full w-full object-cover object-top" />
               </div>
               <span className={cn(
                 'text-[9px] font-semibold tracking-wide uppercase',
@@ -142,46 +156,67 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      {/* Pose selector */}
+      {/* Pose carousel */}
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 tracking-wide flex-1">
-            Pose — como o {selectedGenderName} vai aparecer
-          </p>
-          <div className="h-6 w-6 rounded-full overflow-hidden border border-border/20 shrink-0">
-            <img
-              src={selectedGenderAvatar}
-              alt={selectedGenderName}
-              className="h-full w-full object-cover object-top"
-            />
-          </div>
-        </div>
+        <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-2 tracking-wide">
+          Pose — como {isMasculino ? 'o Homer' : 'a Marge'} vai aparecer
+        </p>
 
-        <div className="grid grid-cols-2 gap-1">
-          {POSES.map((pose) => (
-            <button
-              key={pose.id}
-              onClick={() => togglePose(pose.label)}
-              className={cn(
-                'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[9px] font-medium transition-all duration-150 border text-left',
-                isSelected(pose.label)
-                  ? 'bg-primary/15 border-primary/30 text-primary'
-                  : 'bg-secondary/20 border-border/10 text-muted-foreground hover:bg-secondary/40 hover:border-border/25 hover:text-foreground'
-              )}
-            >
-              <span className="text-[11px] shrink-0">{pose.emoji}</span>
-              <span className="leading-tight">{pose.label}</span>
-            </button>
-          ))}
+        {/* Horizontal scrollable cards */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory">
+          {POSES.map((pose) => {
+            const selected = isSelected(pose.label);
+            const img = isMasculino ? pose.homer : pose.marge;
+            return (
+              <button
+                key={pose.id}
+                onClick={() => togglePose(pose.label)}
+                className={cn(
+                  'relative shrink-0 snap-start rounded-xl overflow-hidden border transition-all duration-200 w-[88px]',
+                  selected
+                    ? 'border-primary/50 shadow-[0_0_12px_hsl(var(--primary)/0.25)]'
+                    : 'border-border/15 hover:border-border/35'
+                )}
+              >
+                {/* Character image */}
+                <div className="h-[112px] w-full bg-black overflow-hidden">
+                  <img
+                    src={img}
+                    alt={pose.label}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
+
+                {/* Label */}
+                <div className={cn(
+                  'px-1.5 py-1.5 transition-colors duration-200',
+                  selected ? 'bg-primary/20' : 'bg-secondary/40'
+                )}>
+                  <p className={cn(
+                    'text-[8px] font-semibold leading-tight text-center',
+                    selected ? 'text-primary' : 'text-muted-foreground/70'
+                  )}>
+                    {pose.label}
+                  </p>
+                </div>
+
+                {/* Selected checkmark */}
+                {selected && (
+                  <div className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
+                    <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Custom pose text */}
-        <div className="mt-1.5">
+        <div className="mt-2">
           <VoiceTextField
             textarea
             placeholder="Pose personalizada ou detalhes de roupa..."
             value={
-              // Show only non-preset parts in the text field
               (config.poseDescription || '')
                 .split(',')
                 .map(p => p.trim())
