@@ -1,14 +1,16 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, Loader2, Download, Check, ShoppingBag, Sparkles } from 'lucide-react';
+import { Upload, Loader2, ShoppingBag, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
+import { DownloadButtons } from '@/components/DownloadButtons';
 
 const LIGHTING_OPTIONS = ['Estúdio Softbox', 'Rim Light Dramático', 'Luz Natural Janela', 'Hard Light Produto', 'Backlight Silhueta'];
 const BG_OPTIONS = ['Fundo Infinito Branco', 'Fundo Infinito Preto', 'Fundo Gradiente', 'Lifestyle Contextual', 'Superfície Reflexiva'];
@@ -23,9 +25,9 @@ export default function ProductsStudioPage() {
   const [productImage, setProductImage] = useState<string | null>(null);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
   const fileRef = useRef<HTMLInputElement>(null);
   const { apiKey } = useGoogleApiKey();
+  const { downloadState, download } = useWatermarkDownload(resultImage, 'packshot');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,18 +65,6 @@ export default function ProductsStudioPage() {
     }
   };
 
-  const handleDownload = useCallback(() => {
-    if (!resultImage) return;
-    setDownloadState('loading');
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = resultImage;
-      link.download = `product-${Date.now()}.png`;
-      link.click();
-      setDownloadState('done');
-      setTimeout(() => setDownloadState('idle'), 2000);
-    }, 500);
-  }, [resultImage]);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
@@ -164,10 +154,7 @@ export default function ProductsStudioPage() {
           {resultImage && (
             <div className="relative inline-block">
               <img src={resultImage} alt="Product shot" className="max-w-full max-h-[80vh] rounded-xl shadow-cinematic ring-1 ring-white/[0.03]" />
-              <button onClick={handleDownload} disabled={downloadState === 'loading'} className="absolute top-4 right-4 flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-md border border-white/10 hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-200">
-                {downloadState === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : downloadState === 'done' ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
-                {downloadState === 'loading' ? 'Baixando…' : downloadState === 'done' ? 'Salvo' : 'Baixar'}
-              </button>
+              <DownloadButtons downloadState={downloadState} onDownload={download} />
             </div>
           )}
         </div>
