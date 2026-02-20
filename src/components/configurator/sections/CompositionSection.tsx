@@ -123,26 +123,47 @@ export function CompositionSection({ config, onUpdate }: Props) {
 
       {/* Vertical position */}
       <div>
-        <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">
-          Posição Vertical
-        </p>
-        <div className="grid grid-cols-3 gap-1">
-          {verticalPositions.map((vp) => (
-            <button
-              key={vp.id}
-              onClick={() => onUpdate({ verticalPosition: vp.id })}
-              className={cn(
-                'flex flex-col items-center gap-0.5 rounded-md py-1.5 text-[9px] font-medium transition-all duration-150 border',
-                config.verticalPosition === vp.id
-                  ? 'bg-primary/10 text-primary border-primary/25'
-                  : 'bg-secondary/30 text-muted-foreground hover:text-foreground border-transparent'
-              )}
-            >
-              <vp.icon className="h-3 w-3" />
-              {vp.label}
-            </button>
-          ))}
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 tracking-wide">
+            Posição Vertical
+          </p>
+          <div className="flex items-center gap-1.5">
+            <span className={cn('text-[9px] font-medium transition-colors', config.autoVerticalPosition ? 'text-primary' : 'text-muted-foreground/50')}>
+              Auto IA
+            </span>
+            <Switch
+              checked={!config.autoVerticalPosition}
+              onCheckedChange={(v) => onUpdate({ autoVerticalPosition: !v })}
+            />
+            <span className={cn('text-[9px] font-medium transition-colors', !config.autoVerticalPosition ? 'text-primary' : 'text-muted-foreground/50')}>
+              Manual
+            </span>
+          </div>
         </div>
+        {!config.autoVerticalPosition && (
+          <div className="grid grid-cols-3 gap-1">
+            {verticalPositions.map((vp) => (
+              <button
+                key={vp.id}
+                onClick={() => onUpdate({ verticalPosition: vp.id })}
+                className={cn(
+                  'flex flex-col items-center gap-0.5 rounded-md py-1.5 text-[9px] font-medium transition-all duration-150 border',
+                  config.verticalPosition === vp.id
+                    ? 'bg-primary/10 text-primary border-primary/25'
+                    : 'bg-secondary/30 text-muted-foreground hover:text-foreground border-transparent'
+                )}
+              >
+                <vp.icon className="h-3 w-3" />
+                {vp.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {config.autoVerticalPosition && (
+          <p className="text-[9px] text-muted-foreground/50 italic text-center py-1">
+            A IA vai decidir a melhor posição automaticamente
+          </p>
+        )}
       </div>
     </div>
   );

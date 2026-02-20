@@ -37,6 +37,7 @@ export interface ProjectConfig {
   floatingElements: boolean;
   floatingElementsText: string;
   verticalPosition: 'cima' | 'centralizado' | 'baixo';
+  autoVerticalPosition: boolean;
   customComposition?: string;
 
   // Referências
@@ -100,6 +101,7 @@ export const defaultConfig: ProjectConfig = {
   floatingElements: false,
   floatingElementsText: '',
   verticalPosition: 'centralizado',
+  autoVerticalPosition: true,
   styleReferences: [],
   referenceAttributes: {},
   referenceNotes: {},
