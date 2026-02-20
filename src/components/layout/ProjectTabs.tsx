@@ -12,7 +12,7 @@ interface ProjectTabsProps {
 
 export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: ProjectTabsProps) {
   return (
-    <div className="flex items-center bg-background/90 backdrop-blur-sm px-4 gap-1 h-9 overflow-x-auto border-b border-border/10 shrink-0">
+    <div className="flex items-center px-4 gap-1 h-full overflow-x-auto">
       {projects.map((p) => {
         const active = p.id === activeId;
         return (
