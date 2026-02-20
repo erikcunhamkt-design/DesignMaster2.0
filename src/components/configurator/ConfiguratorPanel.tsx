@@ -21,6 +21,8 @@ import { tipsConfig } from '@/data/tipsConfig';
 import { SectionLabel } from './SectionLabel';
 import genderMale from '@/assets/gender-male.png';
 import genderFemale from '@/assets/gender-female.png';
+import homerNeutro from '@/assets/expressions/homer-neutro.png';
+import margeNeutro from '@/assets/expressions/marge-neutro.png';
 
 
 interface ConfiguratorPanelProps {
@@ -154,7 +156,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 3 — Direção do Personagem */}
         <CollapsibleBlock
-          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
+          avatarSrc={config.gender === 'masculino' ? homerNeutro : margeNeutro}
           title="Direção do Personagem"
           subtitle="Expressão · Ângulo · Lente · Olhar"
         >
