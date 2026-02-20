@@ -112,14 +112,11 @@ const Index = () => {
         imageDataUrl = await blobToBase64(blob);
       }
 
-      const refinePromptText = `Refine this existing image with the following changes: ${refinementPrompt}. Keep the same overall composition, subject, and style. Only apply the requested modifications. The image MUST fill the entire canvas edge to edge.`;
-
-      const { data, error } = await supabase.functions.invoke('generate-image', {
+      // Use dedicated refine-image function (Nano banana pro via Lovable AI gateway)
+      const { data, error } = await supabase.functions.invoke('refine-image', {
         body: {
-          prompt: refinePromptText,
-          negativePrompt: 'low quality, blurry, artifacts, watermark',
-          referenceImages: [base64],
-          googleApiKey: apiKey,
+          refinementPrompt,
+          imageDataUrl,
         },
       });
 
@@ -129,12 +126,15 @@ const Index = () => {
         setGeneratedImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
-        throw new Error('Nenhuma imagem retornada');
+        throw new Error('Nenhuma imagem retornada no refinamento');
       }
+    } catch (err: any) {
+      console.error('Refine error:', err);
+      toast.error(err.message || 'Erro ao refinar imagem');
     } finally {
       setIsRefining(false);
     }
-  }, [apiKey]);
+  }, []);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
