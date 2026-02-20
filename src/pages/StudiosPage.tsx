@@ -11,6 +11,7 @@ import capasHero from '@/assets/capas-hero.png';
 import galeriaHero from '@/assets/galeria-hero.png';
 import chatHero from '@/assets/chat-hero.png';
 import footballCreatorHero from '@/assets/football-creator-hero.png';
+import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +28,7 @@ const studioImages: Record<string, string> = {
   galeria: galeriaHero,
   chat: chatHero,
   'football-creator': footballCreatorHero,
+  'auto-creator': autoCreatorHero,
 };
 
 const FEATURED_STUDIO_ID = 'criador';
