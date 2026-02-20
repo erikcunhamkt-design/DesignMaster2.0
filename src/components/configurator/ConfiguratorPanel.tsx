@@ -129,21 +129,6 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
   return (
     <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
-      {/* Presets strip */}
-      <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border/8 overflow-x-auto shrink-0">
-        <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/30 shrink-0 mr-1">Presets</span>
-        {creativePresets.map((preset) => (
-          <button
-            key={preset.id}
-            onClick={() => applyPreset(preset)}
-            className="flex items-center gap-1.5 shrink-0 rounded-lg border border-border/15 bg-secondary/20 px-2.5 py-1.5 text-[9px] font-medium text-foreground/50 hover:bg-secondary/40 hover:text-foreground hover:border-primary/20 transition-all duration-200"
-          >
-            <span className="text-[11px]">{preset.emoji}</span>
-            <span className="whitespace-nowrap">{preset.name}</span>
-          </button>
-        ))}
-      </div>
-
       {/* Blocks */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
 
