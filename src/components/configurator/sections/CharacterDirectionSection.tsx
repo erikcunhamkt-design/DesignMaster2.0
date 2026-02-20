@@ -356,11 +356,11 @@ function ChipCardCarousel({
               transition={{ duration: 0.15 }}
             >
               {/* Character image */}
-              <div className="h-[130px] w-full bg-black overflow-hidden">
+              <div className="h-[140px] w-full overflow-hidden">
                 <img
                   src={avatarSrc}
                   alt={currentChip}
-                  className="h-full w-full object-contain object-bottom"
+                  className="h-full w-full object-cover object-top"
                 />
               </div>
 
