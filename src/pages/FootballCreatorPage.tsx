@@ -8,9 +8,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Download, ZoomIn, ZoomOut,
-  Check, Loader2, Droplets, Lock, SlidersHorizontal
+  Check, Loader2, Droplets, Lock, SlidersHorizontal, ListChecks
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FootballGuidedWizard } from '@/components/football/FootballGuidedWizard';
 
 // ── Football Preview Panel ─────────────────────────────────────────────────
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
@@ -232,6 +233,7 @@ export default function FootballCreatorPage() {
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState<'avancado' | 'guiado'>('avancado');
   const { apiKey } = useGoogleApiKey();
 
   const updateConfig = useCallback((patch: Partial<FootballConfig>) => {
@@ -296,12 +298,34 @@ export default function FootballCreatorPage() {
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Football Creator" />
 
-      {/* Mode bar */}
+      {/* Mode bar with tabs */}
       <div className="flex items-center border-b border-border/10 bg-background/90 backdrop-blur-sm shrink-0 h-9 px-3 gap-2">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 border border-border/25">
-          <SlidersHorizontal className="h-2.5 w-2.5 text-foreground" />
-          <span className="text-[10px] font-semibold text-foreground">Avançado</span>
+        {/* Tab buttons */}
+        <div className="flex items-center gap-0.5 bg-secondary/40 rounded-lg p-0.5">
+          <button
+            onClick={() => setActiveTab('avancado')}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150 ${
+              activeTab === 'avancado'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <SlidersHorizontal className="h-2.5 w-2.5" />
+            Avançado
+          </button>
+          <button
+            onClick={() => setActiveTab('guiado')}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all duration-150 ${
+              activeTab === 'guiado'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <ListChecks className="h-2.5 w-2.5" />
+            Guiado
+          </button>
         </div>
+
         <div className="h-4 w-px bg-border/20" />
         <span className="text-[9px] text-muted-foreground/40 uppercase tracking-widest font-semibold">Football Creator</span>
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
@@ -311,18 +335,24 @@ export default function FootballCreatorPage() {
 
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative">
-        <FootballPreviewPanel
-          state={previewState}
-          imageUrl={generatedImage}
-          config={config}
-        />
-        <FootballConfigPanel
-          config={config}
-          onUpdate={updateConfig}
-          onGenerate={handleGenerate}
-          isGenerating={isGenerating}
-          apiKey={apiKey}
-        />
+        {activeTab === 'avancado' ? (
+          <>
+            <FootballPreviewPanel
+              state={previewState}
+              imageUrl={generatedImage}
+              config={config}
+            />
+            <FootballConfigPanel
+              config={config}
+              onUpdate={updateConfig}
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+              apiKey={apiKey}
+            />
+          </>
+        ) : (
+          <FootballGuidedWizard apiKey={apiKey} />
+        )}
       </div>
     </div>
   );
