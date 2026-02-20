@@ -139,6 +139,18 @@ function SubjectSection({ config, onUpdate }: { config: FootballConfig; onUpdate
         </div>
       </div>
 
+      {/* Prompt Extra — logo abaixo do tipo de sujeito */}
+      <div className="space-y-1.5">
+        <Label>Prompt Extra</Label>
+        <VoiceTextField
+          textarea
+          placeholder="Instruções adicionais esportivas..."
+          value={config.additionalPrompt}
+          onChange={(v) => onUpdate({ additionalPrompt: v, additionalPromptEnabled: true })}
+          className="min-h-[56px] resize-none bg-secondary/30 border-border/20 text-[10px]"
+        />
+      </div>
+
       {/* Upload */}
       {config.subjectType !== 'sem_pessoas' && (
         <div>
@@ -261,20 +273,10 @@ function VisualStyleSection({ config, onUpdate }: { config: FootballConfig; onUp
         ))}
       </div>
 
-      {/* Additional prompt — always visible */}
-      <div className="space-y-1.5">
-        <Label>Prompt Extra</Label>
-        <VoiceTextField
-          textarea
-          placeholder="Instruções adicionais esportivas..."
-          value={config.additionalPrompt}
-          onChange={(v) => onUpdate({ additionalPrompt: v, additionalPromptEnabled: true })}
-          className="min-h-[56px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-        />
-      </div>
     </div>
   );
 }
+
 
 function MoodSection({ config, onUpdate }: { config: FootballConfig; onUpdate: (p: Partial<FootballConfig>) => void }) {
   const moods: { id: FootballConfig['matchMood']; label: string; desc: string; emoji: string }[] = [
