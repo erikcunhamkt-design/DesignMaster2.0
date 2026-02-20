@@ -23,7 +23,7 @@ import margeExprBravo       from '@/assets/expressions/marge-bravo.png';
 import margeExprPensativo   from '@/assets/expressions/marge-pensativo.png';
 import margeExprDeterminado from '@/assets/expressions/marge-determinado.png';
 
-// Pose images for angle / lens / gaze groups (unique per group, no repeats within)
+// Pose images for lens / gaze groups
 import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
 import homerMaosBolso      from '@/assets/poses/homer-maos-bolso.png';
 import homerPoseHeroica    from '@/assets/poses/homer-pose-heroica.png';
@@ -42,6 +42,21 @@ import margeApoiado        from '@/assets/poses/marge-apoiado.png';
 import margeApontando      from '@/assets/poses/marge-apontando.png';
 import margeDeCostas       from '@/assets/poses/marge-de-costas.png';
 
+// Angle-specific images — each matches the actual camera angle concept
+import homerAngleFrontal    from '@/assets/angles/homer-frontal.png';
+import homerAngleTresQuartos from '@/assets/angles/homer-tres-quartos.png';
+import homerAnglePerfil     from '@/assets/angles/homer-perfil.png';
+import homerAngleLowAngle   from '@/assets/angles/homer-low-angle.png';
+import homerAngleHighAngle  from '@/assets/angles/homer-high-angle.png';
+import homerAngleDutchAngle from '@/assets/angles/homer-dutch-angle.png';
+
+import margeAngleFrontal    from '@/assets/angles/marge-frontal.png';
+import margeAngleTresQuartos from '@/assets/angles/marge-tres-quartos.png';
+import margeAnglePerfil     from '@/assets/angles/marge-perfil.png';
+import margeAngleLowAngle   from '@/assets/angles/marge-low-angle.png';
+import margeAngleHighAngle  from '@/assets/angles/marge-high-angle.png';
+import margeAngleDutchAngle from '@/assets/angles/marge-dutch-angle.png';
+
 // ─── Avatar map: each chip → unique image per gender ─────────────────────────
 const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   // EXPRESSÃO — uses new expression-specific images (all unique)
@@ -53,13 +68,13 @@ const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   'Pensativo':   { homer: homerExprPensativo,   marge: margeExprPensativo   },
   'Determinado': { homer: homerExprDeterminado, marge: margeExprDeterminado },
 
-  // ÂNGULO — 6 unique poses, none repeated
-  'Frontal':     { homer: homerApontando,       marge: margeApontando       },
-  '3/4':         { homer: homerApoiado,         marge: margeApoiado         },
-  'Perfil':      { homer: homerAndando,         marge: margeAndando         },
-  'Low angle':   { homer: homerPoseHeroica,     marge: margePoseHeroica     },
-  'High angle':  { homer: homerSentado,         marge: margeSentado         },
-  'Dutch angle': { homer: homerDeCostas,        marge: margeDeCostas        },
+  // ÂNGULO — imagens específicas para cada ângulo de câmera
+  'Frontal':     { homer: homerAngleFrontal,     marge: margeAngleFrontal     },
+  '3/4':         { homer: homerAngleTresQuartos, marge: margeAngleTresQuartos },
+  'Perfil':      { homer: homerAnglePerfil,      marge: margeAnglePerfil      },
+  'Low angle':   { homer: homerAngleLowAngle,    marge: margeAngleLowAngle    },
+  'High angle':  { homer: homerAngleHighAngle,   marge: margeAngleHighAngle   },
+  'Dutch angle': { homer: homerAngleDutchAngle,  marge: margeAngleDutchAngle  },
 
   // LENTE — 5 unique poses, none repeated
   '24mm':        { homer: homerAndando,         marge: margeAndando         },
