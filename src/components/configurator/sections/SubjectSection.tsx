@@ -3,6 +3,8 @@ import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
+import genderFemale from '@/assets/gender-female.png';
+import genderMale from '@/assets/gender-male.png';
 
 interface Props {
   config: ProjectConfig;
@@ -76,18 +78,33 @@ export function SubjectSection({ config, onUpdate }: Props) {
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
         <div className="grid grid-cols-2 gap-1.5">
-          {(['masculino', 'feminino'] as const).map((g) => (
+          {([
+            { id: 'masculino', label: 'Masculino', img: genderMale },
+            { id: 'feminino',  label: 'Feminino',  img: genderFemale },
+          ] as const).map(({ id, label, img }) => (
             <button
-              key={g}
-              onClick={() => onUpdate({ gender: g })}
+              key={id}
+              onClick={() => onUpdate({ gender: id })}
               className={cn(
-                'rounded-md py-2 text-[10px] font-semibold tracking-wide uppercase transition-all duration-150 border',
-                config.gender === g
-                  ? 'bg-primary/15 text-primary border-primary/30'
-                  : 'bg-secondary/50 text-muted-foreground hover:text-foreground border-transparent'
+                'relative flex flex-col items-center gap-1.5 rounded-xl py-2 px-1 transition-all duration-150 border overflow-hidden',
+                config.gender === id
+                  ? 'bg-primary/15 border-primary/40 shadow-[0_0_10px_hsl(var(--primary)/0.15)]'
+                  : 'bg-secondary/30 border-transparent hover:border-border/30 hover:bg-secondary/50'
               )}
             >
-              {g === 'masculino' ? 'Masculino' : 'Feminino'}
+              <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-border/20">
+                <img
+                  src={img}
+                  alt={label}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <span className={cn(
+                'text-[9px] font-semibold tracking-wide uppercase',
+                config.gender === id ? 'text-primary' : 'text-muted-foreground'
+              )}>
+                {label}
+              </span>
             </button>
           ))}
         </div>
