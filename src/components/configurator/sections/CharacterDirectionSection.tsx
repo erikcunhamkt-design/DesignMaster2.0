@@ -70,6 +70,21 @@ import margeLens50mm  from '@/assets/lenses/marge-50mm.png';
 import margeLens85mm  from '@/assets/lenses/marge-85mm.png';
 import margeLens135mm from '@/assets/lenses/marge-135mm.png';
 
+// Gaze-specific images — each shows the character's eye direction
+import homerGazeParaCamera from '@/assets/gaze/homer-para-camera.png';
+import homerGazeEsquerda   from '@/assets/gaze/homer-esquerda.png';
+import homerGazeDireita    from '@/assets/gaze/homer-direita.png';
+import homerGazeParaCima   from '@/assets/gaze/homer-para-cima.png';
+import homerGazeParaBaixo  from '@/assets/gaze/homer-para-baixo.png';
+import homerGazeDistante   from '@/assets/gaze/homer-distante.png';
+
+import margeGazeParaCamera from '@/assets/gaze/marge-para-camera.png';
+import margeGazeEsquerda   from '@/assets/gaze/marge-esquerda.png';
+import margeGazeDireita    from '@/assets/gaze/marge-direita.png';
+import margeGazeParaCima   from '@/assets/gaze/marge-para-cima.png';
+import margeGazeParaBaixo  from '@/assets/gaze/marge-para-baixo.png';
+import margeGazeDistante   from '@/assets/gaze/marge-distante.png';
+
 // ─── Avatar map: each chip → unique image per gender ─────────────────────────
 const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   // EXPRESSÃO — uses new expression-specific images (all unique)
@@ -96,13 +111,13 @@ const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
   '85mm':        { homer: homerLens85mm,  marge: margeLens85mm  },
   '135mm':       { homer: homerLens135mm, marge: margeLens135mm },
 
-  // OLHAR — 6 unique poses, none repeated
-  'Para câmera': { homer: homerApontando,       marge: margeApontando       },
-  'Esquerda':    { homer: homerDeCostas,        marge: margeDeCostas        },
-  'Direita':     { homer: homerApoiado,         marge: margeApoiado         },
-  'Para cima':   { homer: homerPoseHeroica,     marge: margePoseHeroica     },
-  'Para baixo':  { homer: homerSentado,         marge: margeSentado         },
-  'Distante':    { homer: homerAndando,         marge: margeAndando         },
+  // OLHAR — imagens específicas para cada direção do olhar
+  'Para câmera': { homer: homerGazeParaCamera, marge: margeGazeParaCamera },
+  'Esquerda':    { homer: homerGazeEsquerda,   marge: margeGazeEsquerda   },
+  'Direita':     { homer: homerGazeDireita,    marge: margeGazeDireita    },
+  'Para cima':   { homer: homerGazeParaCima,   marge: margeGazeParaCima   },
+  'Para baixo':  { homer: homerGazeParaBaixo,  marge: margeGazeParaBaixo  },
+  'Distante':    { homer: homerGazeDistante,   marge: margeGazeDistante   },
 };
 
 interface Props {
