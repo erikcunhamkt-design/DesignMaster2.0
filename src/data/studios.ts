@@ -94,15 +94,6 @@ export const studios: Studio[] = [
     gradient: 'from-fuchsia-500/15 to-pink-500/10',
   },
   {
-    id: 'football-arts',
-    name: 'Football Arts',
-    tagline: 'Artes esportivas premium',
-    description: 'Studio especializado em artes profissionais de futebol: matchday, jogador destaque, flyers esportivos e muito mais.',
-    icon: '⚽',
-    route: '/studio/football-arts',
-    gradient: 'from-green-500/15 to-emerald-500/10',
-  },
-  {
     id: 'football-creator',
     name: 'Football Creator',
     tagline: 'Criador esportivo profissional',
