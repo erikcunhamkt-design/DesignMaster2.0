@@ -313,11 +313,11 @@ function PoseCardCarousel({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.15 }}
             >
-              <div className="h-[148px] w-full bg-black overflow-hidden">
+              <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
                 <img
                   src={img}
                   alt={currentPose.label}
-                  className="h-full w-full object-contain object-bottom"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
                 />
               </div>
               <div className={cn(
