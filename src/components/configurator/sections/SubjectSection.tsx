@@ -11,7 +11,6 @@ interface Props {
 
 export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const quantities = [1, 2, 3, 4, 5];
   const positions = [
     { id: 'esquerda' as const, label: 'Esq', icon: AlignLeft },
     { id: 'centro' as const, label: 'Centro', icon: AlignCenter },
@@ -73,45 +72,24 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </button>
       </div>
 
-      {/* Quantity + Gender row */}
-      <div className="flex gap-3">
-        <div className="flex-1">
-          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Qtd</p>
-          <div className="flex gap-1">
-            {quantities.map((q) => (
-              <button
-                key={q}
-                onClick={() => onUpdate({ quantity: q })}
-                className={cn(
-                  'flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-all duration-150',
-                  config.quantity === q
-                    ? 'bg-primary/15 text-primary border border-primary/30'
-                    : 'bg-secondary/50 text-muted-foreground hover:text-foreground border border-transparent'
-                )}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
-          <div className="flex gap-1">
-            {(['masculino', 'feminino'] as const).map((g) => (
-              <button
-                key={g}
-                onClick={() => onUpdate({ gender: g })}
-                className={cn(
-                  'rounded-md px-3 py-1.5 text-[10px] font-medium capitalize transition-all duration-150 border',
-                  config.gender === g
-                    ? 'bg-primary/15 text-primary border-primary/30'
-                    : 'bg-secondary/50 text-muted-foreground hover:text-foreground border-transparent'
-                )}
-              >
-                {g === 'masculino' ? 'M' : 'F'}
-              </button>
-            ))}
-          </div>
+      {/* Gender row — full width */}
+      <div>
+        <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {(['masculino', 'feminino'] as const).map((g) => (
+            <button
+              key={g}
+              onClick={() => onUpdate({ gender: g })}
+              className={cn(
+                'rounded-md py-2 text-[10px] font-semibold tracking-wide uppercase transition-all duration-150 border',
+                config.gender === g
+                  ? 'bg-primary/15 text-primary border-primary/30'
+                  : 'bg-secondary/50 text-muted-foreground hover:text-foreground border-transparent'
+              )}
+            >
+              {g === 'masculino' ? 'Masculino' : 'Feminino'}
+            </button>
+          ))}
         </div>
       </div>
 
