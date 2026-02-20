@@ -1,6 +1,7 @@
 import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
+import criadorHero from '@/assets/criador-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -72,11 +73,36 @@ export default function StudiosPage() {
         >
           {/* Background gradient */}
           <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/80" />
+
+          {/* Hero image — left side, strong multi-stop fade to the right */}
+          <div className="absolute inset-y-0 left-0 w-[340px] pointer-events-none overflow-hidden">
+            <img
+              src={criadorHero}
+              alt=""
+              className="h-full w-full object-cover object-center"
+            />
+            {/* Multi-stop gradient: image fully visible → fully invisible */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: [
+                  'linear-gradient(to right,',
+                  '  transparent 0%,',
+                  '  transparent 30%,',
+                  '  rgba(11,15,20,0.4) 50%,',
+                  '  rgba(11,15,20,0.75) 65%,',
+                  '  rgba(11,15,20,0.93) 80%,',
+                  '  rgba(11,15,20,1) 100%',
+                  ')',
+                ].join(' '),
+              }}
+            />
+          </div>
 
           <div className="relative flex items-center justify-between px-10 py-9">
             <div className="flex items-center gap-8">
-              <span className="text-6xl transition-transform duration-300 group-hover:scale-110">{featured.icon}</span>
+              {/* Spacer where the image sits — replaces the emoji icon */}
+              <div className="w-[120px] shrink-0" />
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
