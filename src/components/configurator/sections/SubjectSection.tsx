@@ -11,6 +11,17 @@ interface Props {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
+const POSES = [
+  { id: 'bracos_cruzados', label: 'Braços cruzados', emoji: '🤞' },
+  { id: 'maos_bolso', label: 'Mãos no bolso', emoji: '🧍' },
+  { id: 'pose_heroica', label: 'Pose heroica', emoji: '🦸' },
+  { id: 'sentado', label: 'Sentado', emoji: '🪑' },
+  { id: 'andando', label: 'Andando', emoji: '🚶' },
+  { id: 'apoiado', label: 'Apoiado', emoji: '🧱' },
+  { id: 'apontando', label: 'Apontando', emoji: '👉' },
+  { id: 'de_costas', label: 'De costas', emoji: '🔄' },
+];
+
 export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const positions = [
@@ -34,6 +45,27 @@ export function SubjectSection({ config, onUpdate }: Props) {
   const removePhoto = (index: number) => {
     const updated = config.subjectPhotos.filter((_, i) => i !== index);
     onUpdate({ subjectPhotos: updated });
+  };
+
+  const selectedGenderAvatar = config.gender === 'masculino' ? genderMale : genderFemale;
+  const selectedGenderName = config.gender === 'masculino' ? 'Homer' : 'Marge';
+
+  const togglePose = (poseLabel: string) => {
+    const current = config.poseDescription || '';
+    // Check if already selected (exact match in comma-separated list)
+    const poses = current.split(',').map(p => p.trim()).filter(Boolean);
+    const idx = poses.indexOf(poseLabel);
+    if (idx >= 0) {
+      poses.splice(idx, 1);
+    } else {
+      poses.push(poseLabel);
+    }
+    onUpdate({ poseDescription: poses.join(', ') });
+  };
+
+  const isSelected = (poseLabel: string) => {
+    const poses = (config.poseDescription || '').split(',').map(p => p.trim());
+    return poses.includes(poseLabel);
   };
 
   return (
@@ -110,13 +142,65 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      <VoiceTextField
-        textarea
-        placeholder="Descrição da pose ou roupa..."
-        value={config.poseDescription}
-        onChange={(v) => onUpdate({ poseDescription: v })}
-        className="min-h-[52px] resize-none bg-secondary/30 border-border/20 text-[11px]"
-      />
+      {/* Pose selector */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 tracking-wide flex-1">
+            Pose — como o {selectedGenderName} vai aparecer
+          </p>
+          <div className="h-6 w-6 rounded-full overflow-hidden border border-border/20 shrink-0">
+            <img
+              src={selectedGenderAvatar}
+              alt={selectedGenderName}
+              className="h-full w-full object-cover object-top"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1">
+          {POSES.map((pose) => (
+            <button
+              key={pose.id}
+              onClick={() => togglePose(pose.label)}
+              className={cn(
+                'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[9px] font-medium transition-all duration-150 border text-left',
+                isSelected(pose.label)
+                  ? 'bg-primary/15 border-primary/30 text-primary'
+                  : 'bg-secondary/20 border-border/10 text-muted-foreground hover:bg-secondary/40 hover:border-border/25 hover:text-foreground'
+              )}
+            >
+              <span className="text-[11px] shrink-0">{pose.emoji}</span>
+              <span className="leading-tight">{pose.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Custom pose text */}
+        <div className="mt-1.5">
+          <VoiceTextField
+            textarea
+            placeholder="Pose personalizada ou detalhes de roupa..."
+            value={
+              // Show only non-preset parts in the text field
+              (config.poseDescription || '')
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => !POSES.map(po => po.label).includes(p))
+                .join(', ')
+            }
+            onChange={(v) => {
+              const presetPoses = (config.poseDescription || '')
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => POSES.map(po => po.label).includes(p));
+              const customParts = v.split(',').map(p => p.trim()).filter(Boolean);
+              const allPoses = [...presetPoses, ...customParts].filter(Boolean);
+              onUpdate({ poseDescription: allPoses.join(', ') });
+            }}
+            className="min-h-[40px] resize-none bg-secondary/30 border-border/20 text-[11px]"
+          />
+        </div>
+      </div>
 
       {/* Position */}
       <div>
