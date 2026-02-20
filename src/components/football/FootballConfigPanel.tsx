@@ -553,7 +553,8 @@ function AdvancedSection({ config, onUpdate }: { config: FootballConfig; onUpdat
 
 // ── Main Panel ─────────────────────────────────────────────────────────────
 export function FootballConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
-  const canGenerate = config.dimension !== null && !isGenerating && apiKey.length >= 10;
+  const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
+  const canGenerate = !isGenerating && apiKey.length >= 10 && (hasFreePrompt || config.dimension !== null);
 
   const subjectSubtitle = `${config.subjectType.replace('_', ' ')} · ${config.subjectPosition.replace('_', ' ')}`;
   const styleSubtitle = config.visualStyle ? config.visualStyle.replace('_', ' ') : 'Selecionar estilo';
@@ -611,7 +612,7 @@ export function FootballConfigPanel({ config, onUpdate, onGenerate, isGenerating
 
       {/* Footer */}
       <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
-        {!canGenerate && config.dimension === null && (
+        {!canGenerate && !hasFreePrompt && config.dimension === null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
           </p>
