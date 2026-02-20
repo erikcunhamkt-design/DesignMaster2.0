@@ -21,15 +21,21 @@ serve(async (req) => {
       );
     }
 
-    const fullPrompt = `Generate this image. The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
+    // Choose model: if reference images are provided, use gemini-2.0-flash for image editing
+    // otherwise use gemini-3-pro-image-preview for pure generation
+    const hasReferenceImages = referenceImages && referenceImages.length > 0;
+    const model = hasReferenceImages ? "gemini-2.0-flash-exp" : "gemini-3-pro-image-preview";
+
+    const fullPrompt = hasReferenceImages
+      ? `${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`
+      : `Generate this image. The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
     // Build parts array
-    const parts: any[] = [{ text: fullPrompt }];
+    const parts: any[] = [];
 
-    // Add reference images as inline data
-    if (referenceImages && referenceImages.length > 0) {
+    // For image editing: add images FIRST, then text prompt
+    if (hasReferenceImages) {
       for (const refImg of referenceImages.slice(0, 3)) {
-        // refImg is a data URL like "data:image/png;base64,..."
         const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
           parts.push({
@@ -42,7 +48,8 @@ serve(async (req) => {
       }
     }
 
-    const model = "gemini-3-pro-image-preview";
+    parts.push({ text: fullPrompt });
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     console.log(`Calling Google Gemini ${model} directly...`);
