@@ -78,6 +78,11 @@ function SubjectSection({ config, onUpdate }: { config: AutoConfig; onUpdate: (p
     { id: 'dois_carros',        label: 'Duelo',             icon: '🏎️' },
     { id: 'carro_piloto',       label: 'Carro + Piloto',    icon: '👤' },
     { id: 'so_o_carro',         label: 'Só o carro',        icon: '🚙' },
+    { id: 'moto_unica',         label: 'Moto',              icon: '🏍️' },
+    { id: 'moto_piloto',        label: 'Moto + Piloto',     icon: '🤿' },
+    { id: 'caminhao',           label: 'Caminhão',          icon: '🚛' },
+    { id: 'pickup_offroad',     label: 'Pickup / Off-road', icon: '🚙' },
+    { id: 'van_utilitario',     label: 'Van / Utilitário',  icon: '🚐' },
     { id: 'detalhe_automotivo', label: 'Detalhe técnico',   icon: '🔩' },
   ];
 

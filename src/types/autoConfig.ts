@@ -3,7 +3,12 @@ export type AutoSubjectType =
   | 'dois_carros'
   | 'carro_piloto'
   | 'so_o_carro'
-  | 'detalhe_automotivo';
+  | 'detalhe_automotivo'
+  | 'moto_unica'
+  | 'moto_piloto'
+  | 'caminhao'
+  | 'pickup_offroad'
+  | 'van_utilitario';
 
 export type AutoAngle =
   | 'frente_agressiva'

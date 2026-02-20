@@ -14,6 +14,11 @@ const SUBJECT_DESC: Record<AutoConfig['subjectType'], string> = {
   carro_piloto:       'racing driver and car unified composition, driver and machine as one',
   so_o_carro:         'vehicle only, no driver, pure automotive form and design',
   detalhe_automotivo: 'extreme close-up automotive detail — wheel, headlight, intake, cockpit, or carbon fiber',
+  moto_unica:         'single motorcycle as the hero subject, full bike featured prominently, aggressive stance',
+  moto_piloto:        'motorcycle rider and bike as one unified composition, rider in full gear, dynamic pose',
+  caminhao:           'powerful truck as the hero subject, imposing presence, massive and dominant vehicle',
+  pickup_offroad:     'pickup truck or off-road 4x4 vehicle, rugged terrain, adventure and power',
+  van_utilitario:     'van or utility vehicle, professional and versatile, clean commercial aesthetic',
 };
 
 // ── Angle descriptors ──────────────────────────────────────────────────────
