@@ -102,4 +102,13 @@ export const studios: Studio[] = [
     route: '/studio/football-arts',
     gradient: 'from-green-500/15 to-emerald-500/10',
   },
+  {
+    id: 'football-creator',
+    name: 'Football Creator',
+    tagline: 'Criador esportivo profissional',
+    description: 'Versão especializada do Criador para futebol — controles avançados de composição esportiva, clima de partida e prompt automático.',
+    icon: '🏟️',
+    route: '/studio/football-creator',
+    gradient: 'from-emerald-500/15 to-green-600/10',
+  },
 ];
