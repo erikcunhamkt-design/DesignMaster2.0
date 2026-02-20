@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
-import { directionGroups, directionPresets, smartTips, DirectionGroup } from '@/data/characterDirectionData';
-import { Info, Shuffle, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { directionGroups, directionPresets, DirectionGroup } from '@/data/characterDirectionData';
+import { ChevronLeft, ChevronRight, Shuffle, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-// Homer avatars (reuse existing pose images as character reference)
 import genderMale from '@/assets/gender-male.png';
 import genderFemale from '@/assets/gender-female.png';
 
-// Homer poses (used as character illustrations per chip)
 import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
 import homerMaosBolso from '@/assets/poses/homer-maos-bolso.png';
 import homerPoseHeroica from '@/assets/poses/homer-pose-heroica.png';
@@ -19,8 +16,8 @@ import homerSentado from '@/assets/poses/homer-sentado.png';
 import homerAndando from '@/assets/poses/homer-andando.png';
 import homerApoiado from '@/assets/poses/homer-apoiado.png';
 import homerApontando from '@/assets/poses/homer-apontando.png';
+import homerDeCostas from '@/assets/poses/homer-de-costas.png';
 
-// Marge poses
 import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
 import margeMaosBolso from '@/assets/poses/marge-maos-bolso.png';
 import margePoseHeroica from '@/assets/poses/marge-pose-heroica.png';
@@ -28,43 +25,34 @@ import margeSentado from '@/assets/poses/marge-sentado.png';
 import margeAndando from '@/assets/poses/marge-andando.png';
 import margeApoiado from '@/assets/poses/marge-apoiado.png';
 import margeApontando from '@/assets/poses/marge-apontando.png';
-
-// Character illustrations for each group option
-// We map chip labels to avatar expressions using existing pose assets as proxies
-const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
-  // Expression chips — use different poses to suggest mood
-  'Sorrindo':      { homer: homerApontando,      marge: margeApontando },
-  'Sério':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
-  'Neutro':        { homer: homerMaosBolso,        marge: margeMaosBolso },
-  'Confiante':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
-  'Bravo':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
-  'Pensativo':     { homer: homerSentado,          marge: margeSentado },
-  'Determinado':   { homer: homerPoseHeroica,      marge: margePoseHeroica },
-  // Camera angle chips
-  'Frontal':       { homer: homerApontando,        marge: margeApontando },
-  '3/4':           { homer: homerApoiado,          marge: margeApoiado },
-  'Perfil':        { homer: homerAndando,          marge: margeAndando },
-  'Low angle':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
-  'High angle':    { homer: homerSentado,          marge: margeSentado },
-  'Dutch angle':   { homer: homerAndando,          marge: margeAndando },
-  // Lens chips — use neutral poses
-  '24mm':          { homer: homerAndando,          marge: margeAndando },
-  '35mm':          { homer: homerApoiado,          marge: margeApoiado },
-  '50mm':          { homer: homerMaosBolso,        marge: margeMaosBolso },
-  '85mm':          { homer: homerApontando,        marge: margeApontando },
-  '135mm':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
-  // Gaze chips
-  'Para câmera':   { homer: homerApontando,        marge: margeApontando },
-  'Esquerda':      { homer: homerAndando,          marge: margeAndando },
-  'Direita':       { homer: homerApoiado,          marge: margeApoiado },
-  'Para cima':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
-  'Para baixo':    { homer: homerSentado,          marge: margeSentado },
-  'Distante':      { homer: homerDeCostas,         marge: margeDeCostas },
-};
-
-// need to import de-costas separately
-import homerDeCostas from '@/assets/poses/homer-de-costas.png';
 import margeDeCostas from '@/assets/poses/marge-de-costas.png';
+
+const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
+  'Sorrindo':    { homer: homerApontando,     marge: margeApontando },
+  'Sério':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
+  'Neutro':      { homer: homerMaosBolso,      marge: margeMaosBolso },
+  'Confiante':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
+  'Bravo':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
+  'Pensativo':   { homer: homerSentado,        marge: margeSentado },
+  'Determinado': { homer: homerPoseHeroica,    marge: margePoseHeroica },
+  'Frontal':     { homer: homerApontando,      marge: margeApontando },
+  '3/4':         { homer: homerApoiado,        marge: margeApoiado },
+  'Perfil':      { homer: homerAndando,        marge: margeAndando },
+  'Low angle':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
+  'High angle':  { homer: homerSentado,        marge: margeSentado },
+  'Dutch angle': { homer: homerAndando,        marge: margeAndando },
+  '24mm':        { homer: homerAndando,        marge: margeAndando },
+  '35mm':        { homer: homerApoiado,        marge: margeApoiado },
+  '50mm':        { homer: homerMaosBolso,      marge: margeMaosBolso },
+  '85mm':        { homer: homerApontando,      marge: margeApontando },
+  '135mm':       { homer: homerBracosCruzados, marge: margeBracosCruzados },
+  'Para câmera': { homer: homerApontando,      marge: margeApontando },
+  'Esquerda':    { homer: homerAndando,        marge: margeAndando },
+  'Direita':     { homer: homerApoiado,        marge: margeApoiado },
+  'Para cima':   { homer: homerPoseHeroica,    marge: margePoseHeroica },
+  'Para baixo':  { homer: homerSentado,        marge: margeSentado },
+  'Distante':    { homer: homerDeCostas,       marge: margeDeCostas },
+};
 
 interface Props {
   config: ProjectConfig;
@@ -72,24 +60,22 @@ interface Props {
 }
 
 const fieldMap: Record<string, { chip: keyof ProjectConfig; custom: keyof ProjectConfig }> = {
-  expression: { chip: 'expression', custom: 'expressionCustom' },
-  cameraAngle: { chip: 'cameraAngle', custom: 'cameraAngleCustom' },
-  lens: { chip: 'lens', custom: 'lensCustom' },
-  gazeDirection: { chip: 'gazeDirection', custom: 'gazeDirectionCustom' },
+  expression:   { chip: 'expression',   custom: 'expressionCustom' },
+  cameraAngle:  { chip: 'cameraAngle',  custom: 'cameraAngleCustom' },
+  lens:         { chip: 'lens',         custom: 'lensCustom' },
+  gazeDirection:{ chip: 'gazeDirection',custom: 'gazeDirectionCustom' },
 };
 
 export function CharacterDirectionSection({ config, onUpdate }: Props) {
   const [presetsOpen, setPresetsOpen] = useState(false);
   const [customEnabled, setCustomEnabled] = useState<Record<string, boolean>>({});
-
   const isMasculino = config.gender === 'masculino';
 
   const getChipValue = (key: string) => config[fieldMap[key].chip] as string;
   const getCustomValue = (key: string) => config[fieldMap[key].custom] as string;
 
   const setChipValue = (key: string, val: string) => {
-    const current = getChipValue(key);
-    onUpdate({ [fieldMap[key].chip]: current === val ? '' : val });
+    onUpdate({ [fieldMap[key].chip]: val });
   };
 
   const setCustomValue = (key: string, val: string) => {
@@ -99,10 +85,7 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
   const toggleCustom = (key: string) => {
     const next = !customEnabled[key];
     setCustomEnabled(prev => ({ ...prev, [key]: next }));
-    if (!next) {
-      // clear custom text when toggling off
-      onUpdate({ [fieldMap[key].custom]: '' });
-    }
+    if (!next) onUpdate({ [fieldMap[key].custom]: '' });
   };
 
   const applyPreset = (preset: typeof directionPresets[0]) => {
@@ -136,27 +119,14 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
     onUpdate(patch);
   };
 
-  const hasAnySelection = directionGroups.some(
-    (g) => getChipValue(g.key) || getCustomValue(g.key)
-  );
-
-  // Selected chip avatar for the header
-  const selectedChips = directionGroups
-    .map(g => getChipValue(g.key))
-    .filter(Boolean);
-
-  const headerAvatarChip = selectedChips[0];
-  const headerAvatar = headerAvatarChip && chipAvatarMap[headerAvatarChip]
-    ? (isMasculino ? chipAvatarMap[headerAvatarChip].homer : chipAvatarMap[headerAvatarChip].marge)
-    : (isMasculino ? genderMale : genderFemale);
+  const hasAnySelection = directionGroups.some(g => getChipValue(g.key) || getCustomValue(g.key));
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Actions bar */}
       <div className="flex items-center gap-1">
         <Button
-          variant="ghost"
-          size="sm"
+          variant="ghost" size="sm"
           onClick={() => setPresetsOpen(!presetsOpen)}
           className="h-6 gap-1 text-[9px] font-semibold text-muted-foreground/60 hover:text-foreground px-2"
         >
@@ -165,8 +135,7 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
           {presetsOpen ? <ChevronUp className="h-2.5 w-2.5" /> : <ChevronDown className="h-2.5 w-2.5" />}
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant="ghost" size="sm"
           onClick={shuffleRandom}
           className="h-6 gap-1 text-[9px] font-semibold text-muted-foreground/60 hover:text-foreground px-2"
         >
@@ -175,8 +144,7 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
         </Button>
         {hasAnySelection && (
           <Button
-            variant="ghost"
-            size="sm"
+            variant="ghost" size="sm"
             onClick={clearAll}
             className="h-6 gap-1 text-[9px] font-semibold text-destructive/50 hover:text-destructive px-2 ml-auto"
           >
@@ -211,16 +179,16 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Direction groups */}
+      {/* Direction groups as card carousels */}
       {directionGroups.map((group) => (
-        <DirectionGroupUI
+        <ChipCardCarousel
           key={group.key}
           group={group}
           chipValue={getChipValue(group.key)}
           customValue={getCustomValue(group.key)}
           customEnabled={!!customEnabled[group.key]}
           isMasculino={isMasculino}
-          onChipSelect={(val) => setChipValue(group.key, val)}
+          onSelect={(val) => setChipValue(group.key, val)}
           onCustomChange={(val) => setCustomValue(group.key, val)}
           onToggleCustom={() => toggleCustom(group.key)}
         />
@@ -241,9 +209,7 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
                 >
                   <span className="text-primary/40">{g.label}:</span> {val}
                   <button
-                    onClick={() => {
-                      onUpdate({ [fieldMap[g.key].chip]: '', [fieldMap[g.key].custom]: '' });
-                    }}
+                    onClick={() => onUpdate({ [fieldMap[g.key].chip]: '', [fieldMap[g.key].custom]: '' })}
                     className="ml-0.5 hover:text-destructive transition-colors"
                   >
                     <X className="h-2 w-2" />
@@ -258,13 +224,13 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
   );
 }
 
-function DirectionGroupUI({
+function ChipCardCarousel({
   group,
   chipValue,
   customValue,
   customEnabled,
   isMasculino,
-  onChipSelect,
+  onSelect,
   onCustomChange,
   onToggleCustom,
 }: {
@@ -273,64 +239,59 @@ function DirectionGroupUI({
   customValue: string;
   customEnabled: boolean;
   isMasculino: boolean;
-  onChipSelect: (val: string) => void;
+  onSelect: (val: string) => void;
   onCustomChange: (val: string) => void;
   onToggleCustom: () => void;
 }) {
-  // Determine avatar to show: selected chip avatar, or neutral gender avatar
-  const avatarEntry = chipValue && chipAvatarMap[chipValue] ? chipAvatarMap[chipValue] : null;
+  // Local index for navigation; sync to chipValue when defined
+  const chips = group.chips;
+  const selectedIdx = chips.indexOf(chipValue);
+  const [navIdx, setNavIdx] = useState(selectedIdx >= 0 ? selectedIdx : 0);
+
+  const currentChip = chips[navIdx];
+  const avatarEntry = chipAvatarMap[currentChip];
   const avatarSrc = avatarEntry
     ? (isMasculino ? avatarEntry.homer : avatarEntry.marge)
     : (isMasculino ? genderMale : genderFemale);
 
+  const isSelected = chipValue === currentChip;
+
+  const goNext = () => {
+    const next = (navIdx + 1) % chips.length;
+    setNavIdx(next);
+    onSelect(chips[next]);
+  };
+
+  const goPrev = () => {
+    const prev = (navIdx - 1 + chips.length) % chips.length;
+    setNavIdx(prev);
+    onSelect(chips[prev]);
+  };
+
+  const handleCardClick = () => {
+    if (isSelected) {
+      onSelect('');
+    } else {
+      onSelect(currentChip);
+    }
+  };
+
   return (
     <div className="space-y-1.5">
-      {/* Group header with avatar preview */}
-      <div className="flex items-center gap-2">
-        {/* Mini avatar */}
-        <div className={cn(
-          'shrink-0 h-7 w-7 rounded-full overflow-hidden border transition-all duration-300',
-          chipValue
-            ? 'border-primary/40 shadow-[0_0_6px_hsl(var(--primary)/0.2)]'
-            : 'border-border/20'
-        )}>
-          <img
-            src={avatarSrc}
-            alt="personagem"
-            className="h-full w-full object-cover object-top"
-          />
-        </div>
-
-        <div className="flex items-center gap-1 flex-1 min-w-0">
-          <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/50">{group.label}</span>
-          {chipValue && (
-            <span className="text-[9px] text-primary/70 font-medium truncate">— {chipValue}</span>
-          )}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="text-muted-foreground/30 hover:text-muted-foreground transition-colors ml-0.5">
-                  <Info className="h-2.5 w-2.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="text-[9px] max-w-[180px]">
-                {group.tooltip}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-
-        {/* Custom text toggle */}
-        <div className="flex items-center gap-1 shrink-0">
+      {/* Label row */}
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/50">
+          {group.label}
+        </span>
+        {/* Custom toggle */}
+        <div className="flex items-center gap-1.5">
           <span className="text-[8px] text-muted-foreground/40">livre</span>
           <button
             type="button"
             onClick={onToggleCustom}
             className={cn(
               'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-200',
-              customEnabled
-                ? 'bg-primary border-primary/60'
-                : 'bg-secondary/60 border-border/30'
+              customEnabled ? 'bg-primary border-primary/60' : 'bg-secondary/60 border-border/30'
             )}
           >
             <span className={cn(
@@ -341,25 +302,95 @@ function DirectionGroupUI({
         </div>
       </div>
 
-      {/* Chips */}
-      <div className="flex flex-wrap gap-1">
-        {group.chips.map((chip) => (
+      {/* Card carousel */}
+      <div className="relative flex items-center gap-2">
+        {/* Prev arrow */}
+        <button
+          onClick={goPrev}
+          className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
+        >
+          <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        {/* Card */}
+        <button
+          onClick={handleCardClick}
+          className={cn(
+            'flex-1 relative rounded-xl overflow-hidden border transition-all duration-200',
+            isSelected
+              ? 'border-primary/50 shadow-[0_0_16px_hsl(var(--primary)/0.25)]'
+              : 'border-border/20 hover:border-border/40'
+          )}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={navIdx}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.15 }}
+            >
+              {/* Character image */}
+              <div className="h-[130px] w-full bg-black overflow-hidden">
+                <img
+                  src={avatarSrc}
+                  alt={currentChip}
+                  className="h-full w-full object-contain object-bottom"
+                />
+              </div>
+
+              {/* Label overlay */}
+              <div className={cn(
+                'px-2 py-2 flex items-center justify-between transition-colors duration-200',
+                isSelected ? 'bg-primary/20' : 'bg-secondary/40'
+              )}>
+                <p className={cn(
+                  'text-[10px] font-semibold',
+                  isSelected ? 'text-primary' : 'text-muted-foreground/70'
+                )}>
+                  {currentChip}
+                </p>
+                <span className="text-[8px] text-muted-foreground/40">
+                  {navIdx + 1}/{chips.length}
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Selected indicator */}
+          {isSelected && (
+            <div className="absolute top-2 right-2 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-[8px] text-primary-foreground font-bold">✓</span>
+            </div>
+          )}
+        </button>
+
+        {/* Next arrow */}
+        <button
+          onClick={goNext}
+          className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
+        >
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-1">
+        {chips.map((_, i) => (
           <button
-            key={chip}
-            onClick={() => onChipSelect(chip)}
+            key={i}
+            onClick={() => { setNavIdx(i); onSelect(chips[i]); }}
             className={cn(
-              'rounded-full px-2 py-0.5 text-[9px] font-medium transition-all duration-150 border',
-              chipValue === chip
-                ? 'bg-primary/12 text-primary border-primary/25 shadow-[0_0_6px_hsl(var(--primary)/0.1)]'
-                : 'bg-secondary/30 text-muted-foreground border-transparent hover:bg-secondary/50 hover:text-foreground'
+              'rounded-full transition-all duration-200',
+              i === navIdx
+                ? 'w-3 h-1.5 bg-primary'
+                : 'w-1.5 h-1.5 bg-border/40 hover:bg-border/70'
             )}
-          >
-            {chip}
-          </button>
+          />
         ))}
       </div>
 
-      {/* Custom text field (toggle-controlled) */}
+      {/* Custom text field */}
       <AnimatePresence>
         {customEnabled && (
           <motion.div
@@ -373,7 +404,7 @@ function DirectionGroupUI({
               value={customValue}
               onChange={(e) => onCustomChange(e.target.value)}
               placeholder={group.placeholder}
-              className="w-full h-7 rounded-md border border-primary/20 bg-primary/5 px-2 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+              className="w-full h-7 rounded-md border border-primary/20 bg-primary/5 px-2 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all mt-1"
             />
           </motion.div>
         )}

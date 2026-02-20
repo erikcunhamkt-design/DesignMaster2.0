@@ -1,5 +1,6 @@
-import { Plus, X, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react';
+import { Plus, X, AlignLeft, AlignCenter, AlignRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
@@ -159,60 +160,18 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      {/* Pose carousel */}
+      {/* Pose carousel — card único com setas */}
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-2 tracking-wide">
           Pose — como sua imagem vai aparecer
         </p>
 
-        {/* Horizontal scrollable cards */}
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory">
-          {POSES.map((pose) => {
-            const selected = isSelected(pose.label);
-            const img = isMasculino ? pose.homer : pose.marge;
-            return (
-              <button
-                key={pose.id}
-                onClick={() => selectPose(pose.label)}
-                className={cn(
-                  'relative shrink-0 snap-start rounded-xl overflow-hidden border transition-all duration-200 w-[88px]',
-                  selected
-                    ? 'border-primary/50 shadow-[0_0_12px_hsl(var(--primary)/0.25)]'
-                    : 'border-border/15 hover:border-border/35'
-                )}
-              >
-                {/* Character image */}
-                <div className="h-[112px] w-full bg-black overflow-hidden">
-                  <img
-                    src={img}
-                    alt={pose.label}
-                    className="h-full w-full object-cover object-top"
-                  />
-                </div>
-
-                {/* Label */}
-                <div className={cn(
-                  'px-1.5 py-1.5 transition-colors duration-200',
-                  selected ? 'bg-primary/20' : 'bg-secondary/40'
-                )}>
-                  <p className={cn(
-                    'text-[8px] font-semibold leading-tight text-center',
-                    selected ? 'text-primary' : 'text-muted-foreground/70'
-                  )}>
-                    {pose.label}
-                  </p>
-                </div>
-
-                {/* Selected checkmark */}
-                {selected && (
-                  <div className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
-                    <Check className="h-2.5 w-2.5 text-primary-foreground" />
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        <PoseCardCarousel
+          poses={POSES}
+          isMasculino={isMasculino}
+          selectedLabel={(config.poseDescription || '').split(',')[0]?.trim() || ''}
+          onSelect={selectPose}
+        />
 
         {/* Custom pose text */}
         <div className="mt-2">
@@ -226,7 +185,6 @@ export function SubjectSection({ config, onUpdate }: Props) {
                 const next = !poseCustomEnabled;
                 setPoseCustomEnabled(next);
                 if (!next) {
-                  // clear custom text when disabled
                   const presetPoses = (config.poseDescription || '')
                     .split(',').map(p => p.trim())
                     .filter(p => POSES.map(po => po.label).includes(p));
@@ -235,9 +193,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
               }}
               className={cn(
                 'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-200',
-                poseCustomEnabled
-                  ? 'bg-primary border-primary/60'
-                  : 'bg-secondary/60 border-border/30'
+                poseCustomEnabled ? 'bg-primary border-primary/60' : 'bg-secondary/60 border-border/30'
               )}
             >
               <span className={cn(
@@ -292,6 +248,122 @@ export function SubjectSection({ config, onUpdate }: Props) {
             </button>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pose Card Carousel ────────────────────────────────────────────────────
+
+function PoseCardCarousel({
+  poses,
+  isMasculino,
+  selectedLabel,
+  onSelect,
+}: {
+  poses: typeof POSES;
+  isMasculino: boolean;
+  selectedLabel: string;
+  onSelect: (label: string) => void;
+}) {
+  const initIdx = Math.max(0, poses.findIndex(p => p.label === selectedLabel));
+  const [navIdx, setNavIdx] = useState(initIdx);
+  const currentPose = poses[navIdx];
+  const img = isMasculino ? currentPose.homer : currentPose.marge;
+  const isSelected = selectedLabel === currentPose.label;
+
+  const goPrev = () => {
+    const prev = (navIdx - 1 + poses.length) % poses.length;
+    setNavIdx(prev);
+    onSelect(poses[prev].label);
+  };
+
+  const goNext = () => {
+    const next = (navIdx + 1) % poses.length;
+    setNavIdx(next);
+    onSelect(poses[next].label);
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="relative flex items-center gap-2">
+        {/* Prev */}
+        <button
+          onClick={goPrev}
+          className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
+        >
+          <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        {/* Card */}
+        <button
+          onClick={() => isSelected ? onSelect('') : onSelect(currentPose.label)}
+          className={cn(
+            'flex-1 relative rounded-xl overflow-hidden border transition-all duration-200',
+            isSelected
+              ? 'border-primary/50 shadow-[0_0_16px_hsl(var(--primary)/0.25)]'
+              : 'border-border/20 hover:border-border/40'
+          )}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={navIdx}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.15 }}
+            >
+              <div className="h-[148px] w-full bg-black overflow-hidden">
+                <img
+                  src={img}
+                  alt={currentPose.label}
+                  className="h-full w-full object-contain object-bottom"
+                />
+              </div>
+              <div className={cn(
+                'px-2 py-2 flex items-center justify-between transition-colors',
+                isSelected ? 'bg-primary/20' : 'bg-secondary/40'
+              )}>
+                <p className={cn(
+                  'text-[10px] font-semibold',
+                  isSelected ? 'text-primary' : 'text-muted-foreground/70'
+                )}>
+                  {currentPose.label}
+                </p>
+                <span className="text-[8px] text-muted-foreground/40">
+                  {navIdx + 1}/{poses.length}
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          {isSelected && (
+            <div className="absolute top-2 right-2 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-[8px] text-primary-foreground font-bold">✓</span>
+            </div>
+          )}
+        </button>
+
+        {/* Next */}
+        <button
+          onClick={goNext}
+          className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
+        >
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-1">
+        {poses.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setNavIdx(i); onSelect(poses[i].label); }}
+            className={cn(
+              'rounded-full transition-all duration-200',
+              i === navIdx ? 'w-3 h-1.5 bg-primary' : 'w-1.5 h-1.5 bg-border/40 hover:bg-border/70'
+            )}
+          />
+        ))}
       </div>
     </div>
   );
