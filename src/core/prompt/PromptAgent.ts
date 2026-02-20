@@ -97,7 +97,16 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   // Prompt Livre — ignorar o resto
   if (config.ignoreRest && config.freePrompt?.trim()) {
     const dim = DIMENSIONS[config.dimension ?? 'stories'];
-    return { prompt: config.freePrompt.trim(), negative_prompt: BASE_NEGATIVE, width: dim.width, height: dim.height } as GenerationRequest;
+    return {
+      prompt: config.freePrompt.trim(),
+      negative_prompt: BASE_NEGATIVE,
+      width: dim.width,
+      height: dim.height,
+      references: [],
+      quality: 'high',
+      reserved_text_area: null,
+      layout_plan: '',
+    };
   }
   const parts: string[] = [];
   const negativeParts: string[] = [BASE_NEGATIVE];
