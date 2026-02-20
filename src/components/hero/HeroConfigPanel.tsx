@@ -417,17 +417,24 @@ function AdvancedSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (
           <span className="text-[8px] text-muted-foreground/50 w-10 text-right">Alto</span>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div>
-        <Label>Prompt Extra</Label>
-        <VoiceTextField
-          textarea
-          placeholder="Instruções adicionais para o hero..."
-          value={config.additionalPrompt}
-          onChange={(v) => onUpdate({ additionalPrompt: v })}
-          className="min-h-[52px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-        />
-      </div>
+// ── Custom Prompt Section ──────────────────────────────────────────────────
+function CustomPromptSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
+  return (
+    <div className="space-y-2">
+      <VoiceTextField
+        textarea
+        placeholder="Digite qualquer instrução adicional ao prompt gerado automaticamente... (opcional)"
+        value={config.additionalPrompt}
+        onChange={(v) => onUpdate({ additionalPrompt: v })}
+        className="min-h-[72px] resize-none bg-secondary/30 border-border/20 text-[10px]"
+      />
+      <p className="text-[9px] text-muted-foreground/35 leading-relaxed">
+        Sua instrução será adicionada ao prompt gerado pela IA. Deixe em branco para usar apenas o modo automático.
+      </p>
     </div>
   );
 }
@@ -474,6 +481,10 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
 
         <CollapsibleBlock icon={Monitor} title="Formato" subtitle="Dimensão e responsividade">
           <FormatSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
+
+        <CollapsibleBlock icon={Type} title="Prompt Personalizado" subtitle={config.additionalPrompt ? 'Ativo' : 'Opcional'}>
+          <CustomPromptSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
 
         <CollapsibleBlock icon={Settings2} title="Avançado" subtitle="Profundidade, glow, nitidez e grão">
