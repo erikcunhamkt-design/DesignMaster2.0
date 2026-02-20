@@ -12,7 +12,7 @@ import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
 import {
   Sparkles, Copy, Loader2, ChevronDown,
-  User, Smartphone, Palette, Type, Settings2, SlidersHorizontal, Clapperboard
+  User, Smartphone, Palette, Type, Settings2, SlidersHorizontal
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { creativePresets } from '@/data/creativePresets';
@@ -21,8 +21,6 @@ import { tipsConfig } from '@/data/tipsConfig';
 import { SectionLabel } from './SectionLabel';
 import genderMale from '@/assets/gender-male.png';
 import genderFemale from '@/assets/gender-female.png';
-import homerNeutro from '@/assets/expressions/homer-neutro.png';
-import margeNeutro from '@/assets/expressions/marge-neutro.png';
 
 
 interface ConfiguratorPanelProps {
@@ -136,7 +134,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 1 — Sujeito */}
         <CollapsibleBlock
-          icon={User}
+          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
           title="Sujeito"
           subtitle={config.gender === 'masculino' ? 'Masculino' : 'Feminino'}
           defaultOpen
@@ -156,7 +154,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
         {/* Bloco 3 — Direção do Personagem */}
         <CollapsibleBlock
-          icon={Clapperboard}
+          avatarSrc={config.gender === 'masculino' ? genderMale : genderFemale}
           title="Direção do Personagem"
           subtitle="Expressão · Ângulo · Lente · Olhar"
         >

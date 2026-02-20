@@ -1,7 +1,6 @@
 import { studios } from '@/data/studios';
 import logoImg from '@/assets/logo.png';
 import heroBg from '@/assets/hero-bg.jpg';
-import criadorHero from '@/assets/criador-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -72,44 +71,25 @@ export default function StudiosPage() {
           style={{ animationDelay: '80ms' }}
         >
           {/* Background gradient */}
-          <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-20 group-hover:opacity-35 transition-opacity duration-500')} />
+          <div className={cn('absolute inset-0 bg-gradient-to-br', featured.gradient, 'opacity-30 group-hover:opacity-50 transition-opacity duration-500')} />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/80" />
 
-          {/* Hero image — RIGHT side, fades left toward the text */}
-          <div className="absolute inset-y-0 right-0 w-[420px] pointer-events-none overflow-hidden">
-            <img
-              src={criadorHero}
-              alt=""
-              className="absolute inset-0 h-full w-full"
-              style={{
-                objectFit: 'cover',
-                objectPosition: '35% 15%',
-                transform: 'scale(1.15)',
-                mixBlendMode: 'luminosity',
-              }}
-            />
-            {/* Gradient: fully invisible on left → fully visible on right */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to left, transparent 0%, transparent 30%, rgba(11,15,20,0.5) 55%, rgba(11,15,20,0.85) 72%, rgba(11,15,20,1) 88%)',
-              }}
-            />
-          </div>
-
-          {/* Content — pinned to the LEFT */}
           <div className="relative flex items-center justify-between px-10 py-9">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/20">
-                  <Sparkles className="h-2.5 w-2.5" />
-                  Principal
-                </span>
+            <div className="flex items-center gap-8">
+              <span className="text-6xl transition-transform duration-300 group-hover:scale-110">{featured.icon}</span>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">{featured.tagline}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/20">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    Principal
+                  </span>
+                </div>
+                <h2 className="text-2xl font-extrabold text-foreground font-display tracking-tight">{featured.name}</h2>
+                <p className="text-sm text-muted-foreground mt-1 max-w-lg leading-relaxed">{featured.description}</p>
               </div>
-              <h2 className="text-2xl font-extrabold text-foreground font-display tracking-tight">{featured.name}</h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-md leading-relaxed">{featured.description}</p>
             </div>
-            <div className="flex items-center justify-center w-11 h-11 rounded-full border border-border/20 bg-card/60 group-hover:border-primary/30 group-hover:bg-primary/10 transition-all duration-300 shrink-0">
+            <div className="flex items-center justify-center w-11 h-11 rounded-full border border-border/20 bg-card/60 group-hover:border-primary/30 group-hover:bg-primary/10 transition-all duration-300">
               <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
           </div>
