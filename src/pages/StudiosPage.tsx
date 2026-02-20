@@ -117,19 +117,25 @@ export default function StudiosPage() {
               className="group relative flex flex-col gap-4 rounded-2xl border border-border/12 bg-card/30 p-6 text-left transition-all duration-200 hover:border-primary/20 hover:bg-card/60 hover:shadow-glow-sm hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 overflow-hidden animate-fade-up"
               style={{ animationDelay: `${(i + 2) * 55}ms` }}
             >
-              {/* Hover gradient */}
-              <div className={cn('absolute inset-0 bg-gradient-to-br', studio.gradient, 'opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl')} />
-
-              {/* Icon or image */}
-              {studioImages[studio.id] ? (
-                <div className="relative w-full overflow-hidden rounded-xl flex-1 -mx-6 -mt-6 mb-0" style={{ maxHeight: '120px' }}>
+              {/* Background image — full card, semi-transparent */}
+              {studioImages[studio.id] && (
+                <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                   <img
                     src={studioImages[studio.id]}
-                    alt={studio.name}
-                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                    alt=""
+                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                    style={{ opacity: 0.18 }}
                   />
+                  {/* dark overlay to ensure text readability */}
+                  <div className="absolute inset-0 bg-background/40" />
                 </div>
-              ) : (
+              )}
+
+              {/* Hover gradient */}
+              <div className={cn('absolute inset-0 bg-gradient-to-br', studio.gradient, 'opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-2xl')} />
+
+              {/* Icon (only when no image) */}
+              {!studioImages[studio.id] && (
                 <span className="relative text-3xl transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
               )}
 
