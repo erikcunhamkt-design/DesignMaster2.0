@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ProjectConfig } from '@/types/project';
-import { SectionLabel } from './SectionLabel';
 import { SubjectSection } from './sections/SubjectSection';
 import { DimensionsSection } from './sections/DimensionsSection';
 import { TextSection } from './sections/TextSection';
@@ -11,11 +10,15 @@ import { CharacterDirectionSection } from './sections/CharacterDirectionSection'
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Copy, Loader2, Eye, Move, Aperture, Palette, Type, Settings2 } from 'lucide-react';
+import {
+  Sparkles, Copy, Loader2, ChevronDown,
+  User, Smartphone, Palette, Type, Settings2, SlidersHorizontal
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
 import { tipsConfig } from '@/data/tipsConfig';
+import { SectionLabel } from './SectionLabel';
 
 interface ConfiguratorPanelProps {
   config: ProjectConfig;
@@ -25,19 +28,67 @@ interface ConfiguratorPanelProps {
   apiKey: string;
 }
 
-const dockTabs = [
-  { id: 'look', label: 'Look', icon: Eye },
-  { id: 'pose', label: 'Pose', icon: Move },
-  { id: 'lens', label: 'Lens', icon: Aperture },
-  { id: 'color', label: 'Color', icon: Palette },
-  { id: 'text', label: 'Text', icon: Type },
-  { id: 'pro', label: 'Pro', icon: Settings2 },
-] as const;
+interface CollapsibleBlockProps {
+  icon: React.ElementType;
+  title: string;
+  subtitle?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+  accent?: boolean;
+}
 
-type DockTab = typeof dockTabs[number]['id'];
+function CollapsibleBlock({ icon: Icon, title, subtitle, defaultOpen = false, children, accent }: CollapsibleBlockProps) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className={cn(
+      'rounded-xl border transition-all duration-300',
+      open
+        ? 'border-border/20 bg-card/30'
+        : 'border-border/10 bg-card/10 hover:border-border/20 hover:bg-card/20'
+    )}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
+      >
+        <div className={cn(
+          'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-300',
+          open
+            ? accent ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground/70'
+            : 'bg-secondary/50 text-muted-foreground/50'
+        )}>
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className={cn(
+            'text-[11px] font-semibold tracking-wide transition-colors duration-200',
+            open ? 'text-foreground' : 'text-foreground/60'
+          )}>
+            {title}
+          </p>
+          {subtitle && (
+            <p className="text-[9px] text-muted-foreground/40 mt-0.5 truncate">{subtitle}</p>
+          )}
+        </div>
+
+        <ChevronDown className={cn(
+          'h-3.5 w-3.5 text-muted-foreground/30 transition-transform duration-300 shrink-0',
+          open && 'rotate-180 text-muted-foreground/60'
+        )} />
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 pt-0">
+          <div className="h-px w-full bg-border/10 mb-3.5" />
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
-  const [activeTab, setActiveTab] = useState<DockTab>('look');
   const { tipsEnabled } = useTipsMode();
 
   const canGenerate = config.dimension !== null && config.niche.length > 0 &&
@@ -47,109 +98,139 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
     onUpdate(preset.values);
   };
 
-  return (
-    <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-card/20">
-      {/* Dock Tab Bar */}
-      <div className="flex items-center border-b border-border/10 px-2 py-1.5 gap-0.5 shrink-0">
-        {dockTabs.map((tab) => {
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'flex flex-1 flex-col items-center gap-0.5 py-1.5 rounded-lg text-[9px] font-semibold tracking-wide transition-all duration-300',
-                active
-                  ? 'text-primary bg-primary/8'
-                  : 'text-muted-foreground/50 hover:text-foreground/70 hover:bg-secondary/30'
-              )}
-            >
-              <tab.icon className={cn('h-3.5 w-3.5', active && 'text-primary')} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+  // Derive subtitles from current config
+  const subjectSubtitle = [
+    config.quantity > 1 ? `${config.quantity} pessoas` : null,
+    config.gender === 'masculino' ? 'Masculino' : 'Feminino',
+    config.poseDescription ? config.poseDescription.slice(0, 20) + (config.poseDescription.length > 20 ? '…' : '') : null,
+  ].filter(Boolean).join(' · ');
 
-      {/* Presets Row */}
-      <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-border/8 overflow-x-auto shrink-0">
+  const dimensionSubtitle = config.dimension
+    ? { stories: 'Stories 9:16', horizontal: 'Horizontal 16:9', 'feed-quadrado': 'Feed 1:1', 'feed-retrato': 'Feed 4:5' }[config.dimension]
+    : 'Selecionar formato';
+
+  const colorSubtitle = config.colorMode === 'auto' ? 'Automático pela IA' : 'Personalizado';
+  const styleSubtitle = config.visualStyleEnabled && config.visualStyle ? config.visualStyle : 'Sobriedade · Blur · Degradê';
+  const textSubtitle = config.textEnabled ? (config.text01 || 'Texto habilitado') : 'Desabilitado';
+  const scenarioSubtitle = config.niche ? config.niche : 'Nicho não definido';
+
+  return (
+    <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
+      {/* Presets strip */}
+      <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border/8 overflow-x-auto shrink-0">
+        <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/30 shrink-0 mr-1">Presets</span>
         {creativePresets.map((preset) => (
           <button
             key={preset.id}
             onClick={() => applyPreset(preset)}
-            className="flex items-center gap-1.5 shrink-0 rounded-lg border border-border/15 bg-secondary/20 px-2.5 py-1.5 text-[9px] font-medium text-foreground/60 hover:bg-secondary/40 hover:text-foreground hover:border-primary/20 transition-all duration-300"
+            className="flex items-center gap-1.5 shrink-0 rounded-lg border border-border/15 bg-secondary/20 px-2.5 py-1.5 text-[9px] font-medium text-foreground/50 hover:bg-secondary/40 hover:text-foreground hover:border-primary/20 transition-all duration-200"
           >
-            <span className="text-xs">{preset.emoji}</span>
+            <span className="text-[11px]">{preset.emoji}</span>
             <span className="whitespace-nowrap">{preset.name}</span>
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
-        {activeTab === 'look' && (
-          <>
-            <section>
-              <SectionLabel tip={tipsConfig['sujeito']} tipsEnabled={tipsEnabled}>Sujeito</SectionLabel>
-              <SubjectSection config={config} onUpdate={onUpdate} />
-            </section>
-            <section>
-              <SectionLabel tip={tipsConfig['estilo-visual']} tipsEnabled={tipsEnabled}>Estilo Visual</SectionLabel>
-              <VisualStyleSection config={config} onUpdate={onUpdate} />
-            </section>
-          </>
-        )}
+      {/* Blocks */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
 
-        {activeTab === 'pose' && (
-          <section>
-            <SectionLabel tip={tipsConfig['direcao']} tipsEnabled={tipsEnabled}>Direção do Personagem</SectionLabel>
-            <CharacterDirectionSection config={config} onUpdate={onUpdate} />
-          </section>
-        )}
+        {/* Bloco 1 — Sujeito */}
+        <CollapsibleBlock
+          icon={User}
+          title="Sujeito"
+          subtitle={subjectSubtitle}
+          defaultOpen
+          accent
+        >
+          <SubjectSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
 
-        {activeTab === 'lens' && (
-          <>
-            <section>
+        {/* Bloco 2 — Estilo Visual */}
+        <CollapsibleBlock
+          icon={SlidersHorizontal}
+          title="Estilo Visual"
+          subtitle={styleSubtitle}
+        >
+          <VisualStyleSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
+
+        {/* Bloco 3 — Direção do Personagem */}
+        <CollapsibleBlock
+          icon={User}
+          title="Direção do Personagem"
+          subtitle="Pose · Expressão · Enquadramento"
+        >
+          <CharacterDirectionSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
+
+        {/* Bloco 4 — Formato & Composição */}
+        <CollapsibleBlock
+          icon={Smartphone}
+          title="Formato & Composição"
+          subtitle={dimensionSubtitle}
+        >
+          <div className="space-y-5">
+            <div>
               <SectionLabel tip={tipsConfig['dimensoes']} tipsEnabled={tipsEnabled}>Dimensões</SectionLabel>
               <DimensionsSection config={config} onUpdate={onUpdate} />
-            </section>
-            <section>
+            </div>
+            <div>
               <SectionLabel tip={tipsConfig['composicao']} tipsEnabled={tipsEnabled}>Composição</SectionLabel>
               <CompositionSection config={config} onUpdate={onUpdate} />
-            </section>
-          </>
-        )}
+            </div>
+          </div>
+        </CollapsibleBlock>
 
-        {activeTab === 'color' && (
-          <section>
-            <SectionLabel tip={tipsConfig['cores']} tipsEnabled={tipsEnabled}>Cores & Iluminação</SectionLabel>
-            <ColorsSection config={config} onUpdate={onUpdate} />
-          </section>
-        )}
+        {/* Bloco 5 — Cores & Iluminação */}
+        <CollapsibleBlock
+          icon={Palette}
+          title="Cores & Iluminação"
+          subtitle={colorSubtitle}
+        >
+          <ColorsSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
 
-        {activeTab === 'text' && (
-          <section>
-            <SectionLabel tip={tipsConfig['texto']} tipsEnabled={tipsEnabled}>Texto</SectionLabel>
-            <TextSection config={config} onUpdate={onUpdate} />
-          </section>
-        )}
+        {/* Bloco 6 — Texto */}
+        <CollapsibleBlock
+          icon={Type}
+          title="Texto na Imagem"
+          subtitle={textSubtitle}
+        >
+          <TextSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
 
-        {activeTab === 'pro' && (
-          <>
-            <section>
+        {/* Bloco 7 — Avançado */}
+        <CollapsibleBlock
+          icon={Settings2}
+          title="Avançado"
+          subtitle={`${scenarioSubtitle} · Referências`}
+        >
+          <div className="space-y-5">
+            <div>
               <SectionLabel tip={tipsConfig['projeto-cenario']} tipsEnabled={tipsEnabled}>Projeto & Cenário</SectionLabel>
               <ProjectScenarioSection config={config} onUpdate={onUpdate} />
-            </section>
-            <section>
+            </div>
+            <div>
               <SectionLabel tip={tipsConfig['referencias']} tipsEnabled={tipsEnabled}>Referências</SectionLabel>
               <ReferencesSection config={config} onUpdate={onUpdate} />
-            </section>
-          </>
-        )}
+            </div>
+          </div>
+        </CollapsibleBlock>
+
       </div>
 
-      {/* Footer actions */}
-      <div className="border-t border-border/10 p-4 space-y-2">
+      {/* Footer */}
+      <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
+        {!canGenerate && config.dimension === null && (
+          <p className="text-[9px] text-muted-foreground/40 text-center">
+            Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
+          </p>
+        )}
+        {!canGenerate && config.niche.length === 0 && config.dimension !== null && (
+          <p className="text-[9px] text-muted-foreground/40 text-center">
+            Informe o <span className="text-foreground/50 font-semibold">Nicho</span> em Avançado
+          </p>
+        )}
         <Button
           disabled={!canGenerate}
           onClick={onGenerate}
