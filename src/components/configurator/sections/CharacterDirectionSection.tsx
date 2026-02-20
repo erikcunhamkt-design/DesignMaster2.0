@@ -2,10 +2,69 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
 import { directionGroups, directionPresets, smartTips, DirectionGroup } from '@/data/characterDirectionData';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, Shuffle, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// Homer avatars (reuse existing pose images as character reference)
+import genderMale from '@/assets/gender-male.png';
+import genderFemale from '@/assets/gender-female.png';
+
+// Homer poses (used as character illustrations per chip)
+import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
+import homerMaosBolso from '@/assets/poses/homer-maos-bolso.png';
+import homerPoseHeroica from '@/assets/poses/homer-pose-heroica.png';
+import homerSentado from '@/assets/poses/homer-sentado.png';
+import homerAndando from '@/assets/poses/homer-andando.png';
+import homerApoiado from '@/assets/poses/homer-apoiado.png';
+import homerApontando from '@/assets/poses/homer-apontando.png';
+
+// Marge poses
+import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
+import margeMaosBolso from '@/assets/poses/marge-maos-bolso.png';
+import margePoseHeroica from '@/assets/poses/marge-pose-heroica.png';
+import margeSentado from '@/assets/poses/marge-sentado.png';
+import margeAndando from '@/assets/poses/marge-andando.png';
+import margeApoiado from '@/assets/poses/marge-apoiado.png';
+import margeApontando from '@/assets/poses/marge-apontando.png';
+
+// Character illustrations for each group option
+// We map chip labels to avatar expressions using existing pose assets as proxies
+const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
+  // Expression chips — use different poses to suggest mood
+  'Sorrindo':      { homer: homerApontando,      marge: margeApontando },
+  'Sério':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
+  'Neutro':        { homer: homerMaosBolso,        marge: margeMaosBolso },
+  'Confiante':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
+  'Bravo':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
+  'Pensativo':     { homer: homerSentado,          marge: margeSentado },
+  'Determinado':   { homer: homerPoseHeroica,      marge: margePoseHeroica },
+  // Camera angle chips
+  'Frontal':       { homer: homerApontando,        marge: margeApontando },
+  '3/4':           { homer: homerApoiado,          marge: margeApoiado },
+  'Perfil':        { homer: homerAndando,          marge: margeAndando },
+  'Low angle':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
+  'High angle':    { homer: homerSentado,          marge: margeSentado },
+  'Dutch angle':   { homer: homerAndando,          marge: margeAndando },
+  // Lens chips — use neutral poses
+  '24mm':          { homer: homerAndando,          marge: margeAndando },
+  '35mm':          { homer: homerApoiado,          marge: margeApoiado },
+  '50mm':          { homer: homerMaosBolso,        marge: margeMaosBolso },
+  '85mm':          { homer: homerApontando,        marge: margeApontando },
+  '135mm':         { homer: homerBracosCruzados,  marge: margeBracosCruzados },
+  // Gaze chips
+  'Para câmera':   { homer: homerApontando,        marge: margeApontando },
+  'Esquerda':      { homer: homerAndando,          marge: margeAndando },
+  'Direita':       { homer: homerApoiado,          marge: margeApoiado },
+  'Para cima':     { homer: homerPoseHeroica,      marge: margePoseHeroica },
+  'Para baixo':    { homer: homerSentado,          marge: margeSentado },
+  'Distante':      { homer: homerDeCostas,         marge: margeDeCostas },
+};
+
+// need to import de-costas separately
+import homerDeCostas from '@/assets/poses/homer-de-costas.png';
+import margeDeCostas from '@/assets/poses/marge-de-costas.png';
 
 interface Props {
   config: ProjectConfig;
@@ -21,7 +80,9 @@ const fieldMap: Record<string, { chip: keyof ProjectConfig; custom: keyof Projec
 
 export function CharacterDirectionSection({ config, onUpdate }: Props) {
   const [presetsOpen, setPresetsOpen] = useState(false);
-  const [expandedTip, setExpandedTip] = useState<string | null>(null);
+  const [customEnabled, setCustomEnabled] = useState<Record<string, boolean>>({});
+
+  const isMasculino = config.gender === 'masculino';
 
   const getChipValue = (key: string) => config[fieldMap[key].chip] as string;
   const getCustomValue = (key: string) => config[fieldMap[key].custom] as string;
@@ -33,6 +94,15 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
 
   const setCustomValue = (key: string, val: string) => {
     onUpdate({ [fieldMap[key].custom]: val });
+  };
+
+  const toggleCustom = (key: string) => {
+    const next = !customEnabled[key];
+    setCustomEnabled(prev => ({ ...prev, [key]: next }));
+    if (!next) {
+      // clear custom text when toggling off
+      onUpdate({ [fieldMap[key].custom]: '' });
+    }
   };
 
   const applyPreset = (preset: typeof directionPresets[0]) => {
@@ -53,6 +123,7 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
       (patch as any)[fieldMap[key].custom] = '';
     }
     onUpdate(patch);
+    setCustomEnabled({});
   };
 
   const shuffleRandom = () => {
@@ -68,6 +139,16 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
   const hasAnySelection = directionGroups.some(
     (g) => getChipValue(g.key) || getCustomValue(g.key)
   );
+
+  // Selected chip avatar for the header
+  const selectedChips = directionGroups
+    .map(g => getChipValue(g.key))
+    .filter(Boolean);
+
+  const headerAvatarChip = selectedChips[0];
+  const headerAvatar = headerAvatarChip && chipAvatarMap[headerAvatarChip]
+    ? (isMasculino ? chipAvatarMap[headerAvatarChip].homer : chipAvatarMap[headerAvatarChip].marge)
+    : (isMasculino ? genderMale : genderFemale);
 
   return (
     <div className="space-y-3">
@@ -137,10 +218,11 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
           group={group}
           chipValue={getChipValue(group.key)}
           customValue={getCustomValue(group.key)}
+          customEnabled={!!customEnabled[group.key]}
+          isMasculino={isMasculino}
           onChipSelect={(val) => setChipValue(group.key, val)}
           onCustomChange={(val) => setCustomValue(group.key, val)}
-          tipExpanded={expandedTip === group.key}
-          onToggleTip={() => setExpandedTip(expandedTip === group.key ? null : group.key)}
+          onToggleCustom={() => toggleCustom(group.key)}
         />
       ))}
 
@@ -180,50 +262,86 @@ function DirectionGroupUI({
   group,
   chipValue,
   customValue,
+  customEnabled,
+  isMasculino,
   onChipSelect,
   onCustomChange,
-  tipExpanded,
-  onToggleTip,
+  onToggleCustom,
 }: {
   group: DirectionGroup;
   chipValue: string;
   customValue: string;
+  customEnabled: boolean;
+  isMasculino: boolean;
   onChipSelect: (val: string) => void;
   onCustomChange: (val: string) => void;
-  tipExpanded: boolean;
-  onToggleTip: () => void;
+  onToggleCustom: () => void;
 }) {
+  // Determine avatar to show: selected chip avatar, or neutral gender avatar
+  const avatarEntry = chipValue && chipAvatarMap[chipValue] ? chipAvatarMap[chipValue] : null;
+  const avatarSrc = avatarEntry
+    ? (isMasculino ? avatarEntry.homer : avatarEntry.marge)
+    : (isMasculino ? genderMale : genderFemale);
+
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1">
-        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/50">{group.label}</span>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button onClick={onToggleTip} className="text-muted-foreground/30 hover:text-muted-foreground transition-colors">
-                <Info className="h-2.5 w-2.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-[9px] max-w-[180px]">
-              {group.tooltip}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <div className="space-y-1.5">
+      {/* Group header with avatar preview */}
+      <div className="flex items-center gap-2">
+        {/* Mini avatar */}
+        <div className={cn(
+          'shrink-0 h-7 w-7 rounded-full overflow-hidden border transition-all duration-300',
+          chipValue
+            ? 'border-primary/40 shadow-[0_0_6px_hsl(var(--primary)/0.2)]'
+            : 'border-border/20'
+        )}>
+          <img
+            src={avatarSrc}
+            alt="personagem"
+            className="h-full w-full object-cover object-top"
+          />
+        </div>
+
+        <div className="flex items-center gap-1 flex-1 min-w-0">
+          <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/50">{group.label}</span>
+          {chipValue && (
+            <span className="text-[9px] text-primary/70 font-medium truncate">— {chipValue}</span>
+          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-muted-foreground/30 hover:text-muted-foreground transition-colors ml-0.5">
+                  <Info className="h-2.5 w-2.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="text-[9px] max-w-[180px]">
+                {group.tooltip}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        {/* Custom text toggle */}
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[8px] text-muted-foreground/40">livre</span>
+          <button
+            type="button"
+            onClick={onToggleCustom}
+            className={cn(
+              'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors duration-200',
+              customEnabled
+                ? 'bg-primary border-primary/60'
+                : 'bg-secondary/60 border-border/30'
+            )}
+          >
+            <span className={cn(
+              'inline-block h-3 w-3 rounded-full bg-white shadow-sm transition-transform duration-200',
+              customEnabled ? 'translate-x-3.5' : 'translate-x-0.5'
+            )} />
+          </button>
+        </div>
       </div>
 
-      <AnimatePresence>
-        {tipExpanded && smartTips[group.key] && (
-          <motion.p
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="text-[8px] text-primary/50 bg-primary/3 rounded-md px-2 py-1 border border-primary/8"
-          >
-            💡 {smartTips[group.key]}
-          </motion.p>
-        )}
-      </AnimatePresence>
-
+      {/* Chips */}
       <div className="flex flex-wrap gap-1">
         {group.chips.map((chip) => (
           <button
@@ -241,13 +359,25 @@ function DirectionGroupUI({
         ))}
       </div>
 
-      <input
-        type="text"
-        value={customValue}
-        onChange={(e) => onCustomChange(e.target.value)}
-        placeholder={group.placeholder}
-        className="w-full h-6 rounded-md border border-border/15 bg-secondary/20 px-2 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/20 transition-all"
-      />
+      {/* Custom text field (toggle-controlled) */}
+      <AnimatePresence>
+        {customEnabled && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <input
+              type="text"
+              value={customValue}
+              onChange={(e) => onCustomChange(e.target.value)}
+              placeholder={group.placeholder}
+              className="w-full h-7 rounded-md border border-primary/20 bg-primary/5 px-2 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
