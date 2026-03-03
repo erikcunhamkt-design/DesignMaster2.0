@@ -39,25 +39,21 @@ type Plan = "monthly" | "yearly" | "lifetime";
 
 function planFromProductNameOrUrl(payload: any): Plan | null {
   const name =
-    (payload?.product?.name ||
+    (payload?.Product?.product_name ||
+      payload?.product?.name ||
       payload?.product_name ||
       payload?.product?.title ||
       payload?.offer?.name ||
       "") as string;
 
-  const slug =
-    (payload?.product?.slug ||
-      payload?.product_slug ||
-      payload?.checkout_url ||
-      "") as string;
-
-  const text = `${name} ${slug}`.toLowerCase();
+  const text = name.toLowerCase();
 
   if (text.includes("vital") || text.includes("lifetime")) return "lifetime";
   if (text.includes("anual") || text.includes("year")) return "yearly";
-  if (text.includes("mensal") || text.includes("month")) return "monthly";
+  // Default to monthly for subscription products
+  if (text.includes("mensal") || text.includes("month") || text.includes("assinatura")) return "monthly";
 
-  return null;
+  return "monthly"; // fallback to monthly
 }
 
 function planFromProductId(payload: any): Plan | null {
