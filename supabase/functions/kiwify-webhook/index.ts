@@ -23,9 +23,9 @@ function nowISO() {
   return new Date().toISOString();
 }
 
-function addMonthsISO(months: number) {
+function add30DaysISO() {
   const d = new Date();
-  d.setMonth(d.getMonth() + months);
+  d.setDate(d.getDate() + 30);
   return d.toISOString();
 }
 
@@ -76,7 +76,8 @@ function planFromProductId(payload: any): Plan | null {
 
 function computeExpiresAt(plan: Plan): string | null {
   if (plan === "lifetime") return null;
-  if (plan === "monthly") return addMonthsISO(1);
+  // Monthly = 30 days, yearly = 365 days
+  if (plan === "monthly") return add30DaysISO();
   return addYearsISO(1);
 }
 
