@@ -9,43 +9,35 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const UPSCALE_PROMPT_BASE = `Analyze the provided image and perform a high-quality restoration and upscale process, increasing the resolution to true {RESOLUTION} while strictly preserving the original composition, proportions, framing, identity, and visual intent.
+const UPSCALE_PROMPT_BASE = `CRITICAL INSTRUCTION: This is an IMAGE RESTORATION task, NOT an image generation task. You MUST return the EXACT SAME image with improved resolution and quality. DO NOT reimagine, recreate, reinterpret, or generate a new version of this image. The output must be pixel-faithful to the input — same person, same face, same pose, same clothes, same background, same everything. Only the technical quality should improve.
 
-Enhance overall sharpness and clarity without introducing artifacts, halos, oversharpening, or artificial edges. Restore fine details naturally, improving micro-textures and surface definition.
+Perform a high-quality restoration and upscale to true {RESOLUTION}:
 
-Apply realistic texture reconstruction:
-– Skin: natural skin texture with visible pores, subtle imperfections, realistic softness and depth (no plastic or AI-smoothed look)
-– Materials: accurate surface textures such as fabric weave, leather grain, metal micro-scratches, paint reflections, glass clarity, hair strands, and natural edges
-– Objects and environments: refined details while maintaining realism and scale
+ABSOLUTE PRESERVATION RULES (violations are unacceptable):
+– The subject's FACE must remain IDENTICAL — same features, same proportions, same age, same ethnicity, same skin tone
+– The subject's BODY must remain IDENTICAL — same pose, same posture, same anatomy, same clothing, same accessories
+– The BACKGROUND must remain IDENTICAL — same setting, same objects, same colors, same layout
+– The COMPOSITION must remain IDENTICAL — same framing, same camera angle, same crop, same aspect ratio
+– The LIGHTING must remain IDENTICAL — same direction, same intensity, same shadows, same highlights
+– The COLOR PALETTE must remain IDENTICAL — same hues, same saturation, same tone, same mood
 
-Correct colors, contrast, and exposure only if necessary:
-– Balance white levels naturally
-– Improve dynamic range without crushing shadows or blowing highlights
-– Preserve original color palette and mood
-– Avoid color shifting, oversaturation, or stylistic reinterpretation
+ALLOWED improvements (quality only):
+– Increase sharpness and clarity naturally
+– Restore fine details: skin pores, fabric weave, hair strands, material textures
+– Remove compression artifacts, noise, and blur
+– Improve dynamic range subtly without changing the mood
+– Enhance micro-textures and surface definition
 
-Noise reduction should be intelligent and selective:
-– Remove digital noise and compression artifacts
-– Preserve fine detail and texture
-– Maintain cinematic depth and realism
+STRICTLY FORBIDDEN:
+– DO NOT change the person's identity, face shape, features, or appearance in ANY way
+– DO NOT change clothing, accessories, or any visible objects
+– DO NOT add or remove ANY elements from the scene
+– DO NOT change the art style or aesthetic
+– DO NOT relight, recolor, or restyle the image
+– DO NOT dramatize, beautify, or stylize
+– DO NOT generate a "similar" image — return the SAME image enhanced
 
-Lighting must remain physically consistent with the original image:
-– No new light sources
-– No relighting or dramatic changes
-– Subtle enhancement of depth and separation only if needed
-
-Final output must look like a professionally shot, high-resolution photograph, not AI-generated:
-– Ultra-clean
-– Natural
-– Photorealistic
-– True-to-source
-
-RULES:
-– Do not change pose, expression, anatomy, or geometry
-– Do not add or remove elements
-– Do not stylize, dramatize, or reinterpret
-– Do not alter identity
-– Focus exclusively on quality restoration and resolution enhancement`;
+The output must be indistinguishable from the input except for higher resolution and cleaner details.`;
 
 type Resolution = '2K' | '4K';
 
