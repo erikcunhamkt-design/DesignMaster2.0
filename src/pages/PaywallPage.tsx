@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Crown, Zap, Star, Key, MessageCircle, AlertTriangle } from 'lucide-react';
+import { Zap, Star, Key, MessageCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
@@ -24,14 +24,6 @@ const plans = [
     url: 'https://pay.kiwify.com.br/xHOsxEt',
     icon: Star,
     highlight: true,
-  },
-  {
-    id: 'lifetime',
-    name: 'Vitalício',
-    price: 'R$ XX',
-    url: 'https://pay.kiwify.com.br/I0DNmTF',
-    icon: Crown,
-    highlight: false,
   },
 ];
 
@@ -121,7 +113,7 @@ const PaywallPage = () => {
             : 'Escolha o plano ideal para você e comece a usar o Design Master.'}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
           {plans.map((plan) => {
             const Icon = plan.icon;
             return (
