@@ -23,9 +23,9 @@ function nowISO() {
   return new Date().toISOString();
 }
 
-function addMonthsISO(months: number) {
+function add30DaysISO() {
   const d = new Date();
-  d.setMonth(d.getMonth() + months);
+  d.setDate(d.getDate() + 30);
   return d.toISOString();
 }
 
