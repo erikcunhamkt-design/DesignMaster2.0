@@ -99,7 +99,7 @@ const PaywallPage = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
         <div className="max-w-md w-full text-center space-y-6">
-          <img src={logoImg} alt="Design Master" className="h-10 w-auto mx-auto" />
+          <img src={logoImg} alt="Design Master" className="h-10 w-10 rounded-full object-cover mx-auto" />
           <div className="glass-card rounded-2xl p-8 space-y-5">
             <div className="flex items-center justify-center">
               <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
