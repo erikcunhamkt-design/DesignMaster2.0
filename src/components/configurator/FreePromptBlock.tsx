@@ -45,14 +45,17 @@ export function FreePromptBlock({
       </div>
 
       {/* Textarea */}
-      <div className="px-4 pb-3">
+      <div className="px-4 pb-1">
         <VoiceTextField
           textarea
           placeholder={placeholder}
           value={freePrompt}
-          onChange={(v) => onUpdate({ freePrompt: v })}
+          onChange={(v) => onUpdate({ freePrompt: v.slice(0, 9000) })}
           className="min-h-[64px] resize-none bg-secondary/30 border-border/20 text-[10px]"
         />
+        <p className="text-[8px] text-muted-foreground/40 text-right mt-1">
+          {freePrompt.length.toLocaleString()}/9.000
+        </p>
       </div>
 
       {/* Toggle ignorar o resto */}
