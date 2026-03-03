@@ -115,6 +115,9 @@ const PaywallPage = () => {
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
             
             <div className="relative z-10 space-y-4">
+              <div className="inline-block px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold tracking-wide animate-pulse">
+                🚀 Promoção de Lançamento
+              </div>
               <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
                 <Zap className="h-7 w-7 text-primary" />
               </div>
@@ -122,7 +125,7 @@ const PaywallPage = () => {
               <p className="text-3xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
               <p className="text-xs text-muted-foreground">Acesso completo a todas as ferramentas</p>
               <div className="pt-2">
-                <span className="inline-block w-full py-3 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
+                <span className="inline-block py-3 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
                   Assinar Agora ✨
                 </span>
               </div>
