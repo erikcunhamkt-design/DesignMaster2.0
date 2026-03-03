@@ -113,7 +113,7 @@ const PaywallPage = () => {
             : 'Escolha o plano ideal para você e comece a usar o Design Master.'}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
           {plans.map((plan) => {
             const Icon = plan.icon;
             return (
