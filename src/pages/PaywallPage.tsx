@@ -114,9 +114,16 @@ const PaywallPage = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
             
+            {/* Badge canto superior direito */}
+            <div className="absolute -top-1 -right-1 z-20 rotate-[20deg] animate-pulse">
+              <div className="bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg shadow-red-500/40 ring-2 ring-red-400/50">
+                🔥 Oferta de Lançamento
+              </div>
+            </div>
+            
             <div className="relative z-10 space-y-4">
-              <div className="inline-block px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold tracking-wide animate-pulse">
-                🚀 Promoção de Lançamento
+              <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
+                <Zap className="h-7 w-7 text-primary" />
               </div>
               <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
                 <Zap className="h-7 w-7 text-primary" />
