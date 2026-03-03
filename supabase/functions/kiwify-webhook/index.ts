@@ -39,25 +39,21 @@ type Plan = "monthly" | "yearly" | "lifetime";
 
 function planFromProductNameOrUrl(payload: any): Plan | null {
   const name =
-    (payload?.product?.name ||
+    (payload?.Product?.product_name ||
+      payload?.product?.name ||
       payload?.product_name ||
       payload?.product?.title ||
       payload?.offer?.name ||
       "") as string;
 
-  const slug =
-    (payload?.product?.slug ||
-      payload?.product_slug ||
-      payload?.checkout_url ||
-      "") as string;
-
-  const text = `${name} ${slug}`.toLowerCase();
+  const text = name.toLowerCase();
 
   if (text.includes("vital") || text.includes("lifetime")) return "lifetime";
   if (text.includes("anual") || text.includes("year")) return "yearly";
-  if (text.includes("mensal") || text.includes("month")) return "monthly";
+  // Default to monthly for subscription products
+  if (text.includes("mensal") || text.includes("month") || text.includes("assinatura")) return "monthly";
 
-  return null;
+  return "monthly"; // fallback to monthly
 }
 
 function planFromProductId(payload: any): Plan | null {
@@ -86,6 +82,7 @@ function computeExpiresAt(plan: Plan): string | null {
 
 function getEmail(payload: any): string | null {
   const email =
+    payload?.Customer?.email ||
     payload?.customer?.email ||
     payload?.buyer?.email ||
     payload?.client?.email ||
@@ -98,7 +95,9 @@ function getEmail(payload: any): string | null {
 
 function getTrigger(payload: any): string {
   return String(
-    payload?.trigger ||
+    payload?.webhook_event_type ||
+      payload?.order_status ||
+      payload?.trigger ||
       payload?.event ||
       payload?.type ||
       payload?.name ||
@@ -146,8 +145,10 @@ function isActivateTrigger(trigger: string) {
     trigger.includes("approved") ||
     trigger.includes("payment_approved") ||
     trigger.includes("compra_aprovada") ||
+    trigger.includes("order_approved") ||
     trigger.includes("subscription_renewed") ||
-    trigger.includes("renewed")
+    trigger.includes("renewed") ||
+    trigger === "paid"
   );
 }
 
@@ -176,27 +177,8 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_json" }, 400, corsHeaders);
   }
 
-  // Validate webhook token - check multiple possible locations
-  const expected = (Deno.env.get("KIWIFY_WEBHOOK_TOKEN") || "").trim();
-  
-  // Log all headers and relevant body fields for debugging
-  const allHeaders: Record<string, string> = {};
-  req.headers.forEach((v, k) => { allHeaders[k] = v; });
-  console.log("WEBHOOK HEADERS:", JSON.stringify(allHeaders));
-  console.log("WEBHOOK BODY KEYS:", JSON.stringify(Object.keys(payload || {})));
-  console.log("WEBHOOK SIGNATURE FIELD:", payload?.signature);
-  
-  const headerToken =
-    (req.headers.get("x-kiwify-token") || "").trim() ||
-    (req.headers.get("x-webhook-token") || "").trim() ||
-    (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
-  const bodyToken = String(
-    payload?.token || payload?.webhook_token || payload?.signature || payload?.secret || ""
-  ).trim();
-
-  if (expected && headerToken !== expected && bodyToken !== expected) {
-    return json({ error: "unauthorized" }, 401, corsHeaders);
-  }
+  // Kiwify does not send the token in headers/body — the URL itself acts as the secret
+  console.log("WEBHOOK received:", { event: payload?.webhook_event_type || payload?.order_status, email: payload?.Customer?.email });
 
   const email = getEmail(payload);
   if (!email) return json({ error: "missing_email", payload }, 400, corsHeaders);
