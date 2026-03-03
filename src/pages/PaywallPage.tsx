@@ -132,7 +132,7 @@ const PaywallPage = () => {
               <p className="text-3xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
               <p className="text-xs text-muted-foreground">Acesso completo a todas as ferramentas</p>
               <div className="pt-2">
-                <span className="inline-block py-3 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
+                <span className="inline-block py-3 px-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
                   Assinar Agora ✨
                 </span>
               </div>
