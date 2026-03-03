@@ -105,23 +105,29 @@ const PaywallPage = () => {
             : 'Escolha o plano ideal para você e comece a usar o Design Master.'}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-          {plans.map((plan) => {
-            const Icon = plan.icon;
-            return (
-              <button
-                key={plan.id}
-                onClick={() => handleSelect(plan.url)}
-                className={`glass-card rounded-xl p-6 text-left space-y-3 transition-all hover:scale-[1.02] hover:glow-sm ${
-                  plan.highlight ? 'ring-1 ring-primary/50' : ''
-                }`}
-              >
-                <Icon className="h-6 w-6 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground">{plan.price}</p>
-              </button>
-            );
-          })}
+        <div className="flex justify-center">
+          <button
+            onClick={() => handleSelect(plans[0].url)}
+            className="relative group glass-card rounded-2xl p-8 text-center space-y-4 transition-all hover:scale-[1.03] max-w-xs w-full ring-1 ring-primary/40 overflow-hidden"
+          >
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
+            
+            <div className="relative z-10 space-y-4">
+              <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
+                <Zap className="h-7 w-7 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground font-['Space_Grotesk']">Assinatura Mensal</h3>
+              <p className="text-3xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
+              <p className="text-xs text-muted-foreground">Acesso completo a todas as ferramentas</p>
+              <div className="pt-2">
+                <span className="inline-block w-full py-3 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
+                  Assinar Agora ✨
+                </span>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Access Key Section */}
