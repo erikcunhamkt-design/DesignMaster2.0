@@ -95,7 +95,9 @@ function getEmail(payload: any): string | null {
 
 function getTrigger(payload: any): string {
   return String(
-    payload?.trigger ||
+    payload?.webhook_event_type ||
+      payload?.order_status ||
+      payload?.trigger ||
       payload?.event ||
       payload?.type ||
       payload?.name ||
