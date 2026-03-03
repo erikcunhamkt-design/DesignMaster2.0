@@ -128,7 +128,7 @@ const PaywallPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
       <div className="max-w-2xl w-full text-center space-y-8">
-        <img src={logoImg} alt="Design Master" className="h-10 w-auto mx-auto" />
+        <img src={logoImg} alt="Design Master" className="h-10 w-10 rounded-full object-cover mx-auto" />
         <h1 className="text-3xl font-bold text-foreground font-['Space_Grotesk']">
           Ative seu acesso
         </h1>
