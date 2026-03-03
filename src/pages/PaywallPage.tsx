@@ -25,14 +25,6 @@ const plans = [
     icon: Star,
     highlight: true,
   },
-  {
-    id: 'lifetime',
-    name: 'Vitalício',
-    price: 'R$ XX',
-    url: 'https://pay.kiwify.com.br/I0DNmTF',
-    icon: Crown,
-    highlight: false,
-  },
 ];
 
 const PaywallPage = () => {
