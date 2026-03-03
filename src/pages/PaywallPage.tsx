@@ -18,6 +18,40 @@ const plans = [
   },
 ];
 
+const FakeCountdown = () => {
+  const [time, setTime] = useState({ h: 23, m: 59, s: 59 });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime((prev) => {
+        let { h, m, s } = prev;
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 23; m = 59; s = 59; }
+        return { h, m, s };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return (
+    <div className="flex items-center justify-center gap-2 pt-1">
+      <Clock className="h-3.5 w-3.5 text-destructive animate-pulse" />
+      <div className="flex items-center gap-1 font-mono text-sm font-bold text-destructive">
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.h)}</span>
+        <span>:</span>
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.m)}</span>
+        <span>:</span>
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.s)}</span>
+      </div>
+      <span className="text-[10px] text-muted-foreground">restantes</span>
+    </div>
+  );
+};
+
 const PaywallPage = () => {
   const { user, signOut } = useAuth();
   const { license } = useLicense();
