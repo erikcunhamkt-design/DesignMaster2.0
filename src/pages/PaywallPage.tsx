@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Zap, Star, Key, MessageCircle, AlertTriangle } from 'lucide-react';
+import { Zap, Key, MessageCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
@@ -15,14 +15,6 @@ const plans = [
     price: 'R$ XX/mês',
     url: 'https://pay.kiwify.com.br/Y7ScUkk',
     icon: Zap,
-    highlight: false,
-  },
-  {
-    id: 'yearly',
-    name: 'Anual',
-    price: 'R$ XX/ano',
-    url: 'https://pay.kiwify.com.br/xHOsxEt',
-    icon: Star,
     highlight: true,
   },
 ];
