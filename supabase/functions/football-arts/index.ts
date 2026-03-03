@@ -106,7 +106,7 @@ serve(async (req) => {
     const prompt = buildPrompt(payload);
     console.log("Football Arts prompt built, calling Gemini...");
 
-    const model = "gemini-3-pro-image-preview";
+    const model = "gemini-2.5-flash-image-generation";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     const response = await fetch(url, {
