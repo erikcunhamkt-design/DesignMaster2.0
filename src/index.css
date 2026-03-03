@@ -185,3 +185,70 @@
     display: none;
   }
 }
+
+/* ── Accessibility: Large Text Mode ── */
+.accessible-large-text {
+  font-size: 118% !important;
+}
+.accessible-large-text button,
+.accessible-large-text input,
+.accessible-large-text textarea,
+.accessible-large-text select,
+.accessible-large-text label,
+.accessible-large-text span,
+.accessible-large-text p,
+.accessible-large-text h1,
+.accessible-large-text h2,
+.accessible-large-text h3,
+.accessible-large-text h4 {
+  letter-spacing: 0.01em;
+}
+
+/* ── Accessibility: Light / High-Contrast Mode ── */
+.accessible-light-mode {
+  --background: 0 0% 97%;
+  --foreground: 220 15% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 12%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 15% 12%;
+
+  --primary: 160 65% 35%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 10% 92%;
+  --secondary-foreground: 220 12% 35%;
+
+  --muted: 220 10% 93%;
+  --muted-foreground: 220 8% 40%;
+
+  --accent: 160 45% 28%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 46%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 10% 82%;
+  --input: 220 10% 88%;
+  --ring: 160 65% 35%;
+
+  --surface: 220 8% 95%;
+  --surface-foreground: 220 10% 35%;
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 220 8% 35%;
+  --sidebar-primary: 160 65% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 10% 92%;
+  --sidebar-accent-foreground: 220 15% 12%;
+  --sidebar-border: 220 10% 85%;
+}
+
+.accessible-light-mode ::-webkit-scrollbar-thumb {
+  background: hsl(220 10% 78%);
+}
+.accessible-light-mode ::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 10% 65%);
+}

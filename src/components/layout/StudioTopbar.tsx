@@ -1,10 +1,12 @@
-import { ArrowLeft, KeyRound, ChevronDown } from 'lucide-react';
+import { ArrowLeft, KeyRound, ChevronDown, Glasses, Sun } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { cn } from '@/lib/utils';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 interface StudioTopbarProps {
   title: string;
@@ -15,6 +17,7 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
   const navigate = useNavigate();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
+  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
 
   return (
     <header className="relative z-30 flex h-12 items-center border-b border-border/20 bg-background/95 backdrop-blur-xl px-4 gap-3 shrink-0">
@@ -44,6 +47,47 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
       <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         <span className={cn('h-1.5 w-1.5 rounded-full', hasKey ? 'bg-primary animate-pulse' : 'bg-destructive')} />
         <span className="hidden md:inline">{hasKey ? 'Online' : 'Offline'}</span>
+      </div>
+
+      {/* Accessibility toggles */}
+      <div className="flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={toggleLargeText}
+              className={cn(
+                'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
+                largeText
+                  ? 'bg-primary/15 text-primary border border-primary/30'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              )}
+            >
+              <Glasses className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={toggleLightMode}
+              className={cn(
+                'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
+                lightMode
+                  ? 'bg-primary/15 text-primary border border-primary/30'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              )}
+            >
+              <Sun className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            {lightMode ? 'Desativar modo claro' : 'Ativar modo claro'}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {/* API Key */}

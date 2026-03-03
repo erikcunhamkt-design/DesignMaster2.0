@@ -16,8 +16,10 @@ import mockupStudioHero from '@/assets/mockup-studio-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Sparkles } from 'lucide-react';
+import { Shield, ArrowRight, Sparkles, Glasses, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
@@ -39,6 +41,7 @@ const FEATURED_STUDIO_ID = 'criador';
 export default function StudiosPage() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
+  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
 
   const featured = studios.find(s => s.id === FEATURED_STUDIO_ID)!;
   const rest = studios.filter(s => s.id !== FEATURED_STUDIO_ID);
@@ -66,15 +69,58 @@ export default function StudiosPage() {
           </span>
           <SubscriptionBadge />
         </div>
-        {isAdmin && (
-          <button
-            onClick={() => navigate('/admin')}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-          >
-            <Shield className="h-3.5 w-3.5" />
-            Admin
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Accessibility toggles */}
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleLargeText}
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
+                    largeText
+                      ? 'bg-primary/15 text-primary border border-primary/30'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  )}
+                >
+                  <Glasses className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleLightMode}
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
+                    lightMode
+                      ? 'bg-primary/15 text-primary border border-primary/30'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  )}
+                >
+                  <Sun className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                {lightMode ? 'Desativar modo claro' : 'Ativar modo claro'}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Shield className="h-3.5 w-3.5" />
+              Admin
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Main content */}
