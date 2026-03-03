@@ -108,30 +108,20 @@ const PaywallPage = () => {
         <div className="flex justify-center">
           <button
             onClick={() => handleSelect(plans[0].url)}
-            className="relative group glass-card rounded-2xl p-8 text-center space-y-4 transition-all hover:scale-[1.03] max-w-xs w-full ring-1 ring-primary/40 overflow-hidden"
+            className="relative group glass-card rounded-2xl p-8 text-center transition-all hover:scale-[1.02] max-w-sm w-full ring-1 ring-primary/30 overflow-hidden"
           >
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
+            {/* Glow background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/5 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
             
-            {/* Badge canto superior direito */}
-            <div className="absolute -top-1 -right-1 z-20 rotate-[20deg] animate-pulse">
-              <div className="bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg shadow-red-500/40 ring-2 ring-red-400/50">
+            <div className="relative z-10 space-y-3">
+              <h3 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">Assinatura Mensal</h3>
+              <p className="text-4xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
+              <div className="inline-block px-3 py-1 rounded-full bg-destructive/15 text-destructive text-xs font-semibold animate-pulse">
                 🔥 Oferta de Lançamento
               </div>
-            </div>
-            
-            <div className="relative z-10 space-y-4">
-              <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
-                <Zap className="h-7 w-7 text-primary" />
-              </div>
-              <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto ring-2 ring-primary/30">
-                <Zap className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground font-['Space_Grotesk']">Assinatura Mensal</h3>
-              <p className="text-3xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
-              <p className="text-xs text-muted-foreground">Acesso completo a todas as ferramentas</p>
-              <div className="pt-2">
+              <p className="text-xs text-muted-foreground pt-1">Acesso completo a todas as ferramentas</p>
+              <div className="pt-3">
                 <span className="inline-block py-3 px-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
                   Assinar Agora ✨
                 </span>
