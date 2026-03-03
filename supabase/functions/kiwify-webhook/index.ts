@@ -82,6 +82,7 @@ function computeExpiresAt(plan: Plan): string | null {
 
 function getEmail(payload: any): string | null {
   const email =
+    payload?.Customer?.email ||
     payload?.customer?.email ||
     payload?.buyer?.email ||
     payload?.client?.email ||
