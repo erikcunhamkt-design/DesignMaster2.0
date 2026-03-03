@@ -82,6 +82,10 @@ export interface HeroConfig {
   // Prompt Livre
   freePrompt: string;
   ignoreRest: boolean;
+
+  // Prompt Negativo
+  negativePrompt: string;
+  negativePromptEnabled: boolean;
 }
 
 export const defaultHeroConfig: HeroConfig = {
@@ -105,4 +109,6 @@ export const defaultHeroConfig: HeroConfig = {
   additionalPrompt: '',
   freePrompt: '',
   ignoreRest: false,
+  negativePrompt: '',
+  negativePromptEnabled: false,
 };

@@ -69,6 +69,10 @@ export interface ProjectConfig {
   // Prompt Livre
   freePrompt: string;
   ignoreRest: boolean;
+
+  // Prompt Negativo
+  negativePrompt: string;
+  negativePromptEnabled: boolean;
 }
 
 export interface Project {
@@ -128,4 +132,6 @@ export const defaultConfig: ProjectConfig = {
   additionalPrompt: '',
   freePrompt: '',
   ignoreRest: false,
+  negativePrompt: '',
+  negativePromptEnabled: false,
 };

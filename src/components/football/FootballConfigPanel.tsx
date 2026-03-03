@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
+import { NegativePromptBlock } from '@/components/configurator/NegativePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, User, Smartphone,
   Palette, Type, Settings2, Wind, Plus, X,
@@ -572,6 +573,13 @@ export function FootballConfigPanel({ config, onUpdate, onGenerate, isGenerating
           ignoreRest={config.ignoreRest}
           onUpdate={onUpdate}
           placeholder="Ex: Jogador de futebol em campo molhado, iluminação dramática noturna..."
+        />
+
+        {/* Prompt Negativo */}
+        <NegativePromptBlock
+          negativePrompt={config.negativePrompt}
+          negativePromptEnabled={config.negativePromptEnabled}
+          onUpdate={onUpdate}
         />
 
         {/* Block 1 — Sujeito */}

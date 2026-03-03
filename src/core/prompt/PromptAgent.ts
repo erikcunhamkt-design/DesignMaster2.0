@@ -260,6 +260,11 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     negativeParts.push(HUMAN_NEGATIVE_BOOST);
   }
 
+  // ─── USER NEGATIVE PROMPT ───
+  if (config.negativePromptEnabled && config.negativePrompt?.trim()) {
+    negativeParts.push(config.negativePrompt.trim());
+  }
+
   // ─── ALWAYS INJECT BASE STYLE ───
   parts.push(BASE_STYLE);
 

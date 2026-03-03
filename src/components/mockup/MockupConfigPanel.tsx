@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
+import { NegativePromptBlock } from '@/components/configurator/NegativePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, Package, Smartphone,
   Palette, Type, Settings2, Layers, Plus, X, Sun,
@@ -436,6 +437,13 @@ export function MockupConfigPanel({ config, onUpdate, onGenerate, isGenerating, 
           ignoreRest={config.ignoreRest}
           onUpdate={onUpdate}
           placeholder="Ex: Caixa de perfume luxo em superfície de mármore, luz lateral dramática, reflexo sutil..."
+        />
+
+        {/* Prompt Negativo */}
+        <NegativePromptBlock
+          negativePrompt={config.negativePrompt}
+          negativePromptEnabled={config.negativePromptEnabled}
+          onUpdate={onUpdate}
         />
 
         <CollapsibleBlock icon={Package} title="Produto" subtitle={`${config.mockupType.replace(/_/g, ' ')} · ${objectLabel[config.mockupObject]}`} defaultOpen accent>

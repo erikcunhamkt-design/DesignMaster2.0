@@ -85,6 +85,10 @@ export interface MockupConfig {
   // Prompt Livre
   freePrompt: string;
   ignoreRest: boolean;
+
+  // Prompt Negativo
+  negativePrompt: string;
+  negativePromptEnabled: boolean;
 }
 
 export const defaultMockupConfig: MockupConfig = {
@@ -107,4 +111,6 @@ export const defaultMockupConfig: MockupConfig = {
   additionalPrompt: '',
   freePrompt: '',
   ignoreRest: false,
+  negativePrompt: '',
+  negativePromptEnabled: false,
 };
