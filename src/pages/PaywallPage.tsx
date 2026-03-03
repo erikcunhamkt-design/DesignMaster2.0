@@ -157,8 +157,8 @@ const PaywallPage = () => {
               <FakeCountdown />
               <p className="text-xs text-muted-foreground pt-1">Acesso completo a todas as ferramentas</p>
               <div className="pt-3">
-                <span className="inline-block py-3 px-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
-                  Assinar Agora ✨
+                <span className="inline-block py-3 px-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300 animate-pulse">
+                  Assinar Agora
                 </span>
               </div>
             </div>
