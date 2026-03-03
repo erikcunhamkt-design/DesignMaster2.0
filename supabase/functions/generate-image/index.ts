@@ -24,9 +24,11 @@ serve(async (req) => {
     const model = "gemini-3-pro-image-preview";
     const hasReferenceImages = referenceImages && referenceImages.length > 0;
 
+    const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image. If the image has a background scene, it must continue all the way to every border. Never crop the image short or leave any portion unfilled.";
+
     const fullPrompt = hasReferenceImages
-      ? `${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`
-      : `Generate this image. The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding. ${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
+      ? `${edgeFillInstruction}\n\n${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`
+      : `${edgeFillInstruction}\n\n${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
     // Build parts: images FIRST (if any), then text — required for image editing
     const parts: any[] = [];
