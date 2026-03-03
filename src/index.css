@@ -252,3 +252,9 @@
 .accessible-light-mode ::-webkit-scrollbar-thumb:hover {
   background: hsl(220 10% 65%);
 }
+
+@keyframes bounce-once {
+  0%, 10% { transform: scale(1); }
+  5% { transform: scale(1.08); }
+  12%, 100% { transform: scale(1); }
+}
