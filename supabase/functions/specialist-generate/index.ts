@@ -83,7 +83,7 @@ serve(async (req) => {
       }
     }
 
-    const model = "gemini-2.5-flash-image-generation";
+    const model = "gemini-3-pro-image-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     const response = await fetch(url, {
