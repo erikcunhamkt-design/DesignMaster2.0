@@ -21,7 +21,7 @@ serve(async (req) => {
       );
     }
 
-    const model = "gemini-3-pro-image-preview";
+    const model = "gemini-2.5-flash-image-generation";
     const hasReferenceImages = referenceImages && referenceImages.length > 0;
 
     const fullPrompt = hasReferenceImages
