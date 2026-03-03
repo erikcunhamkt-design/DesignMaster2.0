@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Key, MessageCircle, AlertTriangle } from 'lucide-react';
+import { Key, MessageCircle, AlertTriangle, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
@@ -17,6 +17,40 @@ const plans = [
     highlight: true,
   },
 ];
+
+const FakeCountdown = () => {
+  const [time, setTime] = useState({ h: 23, m: 59, s: 59 });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime((prev) => {
+        let { h, m, s } = prev;
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 23; m = 59; s = 59; }
+        return { h, m, s };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return (
+    <div className="flex items-center justify-center gap-2 pt-1">
+      <Clock className="h-3.5 w-3.5 text-destructive animate-pulse" />
+      <div className="flex items-center gap-1 font-mono text-sm font-bold text-destructive">
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.h)}</span>
+        <span>:</span>
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.m)}</span>
+        <span>:</span>
+        <span className="bg-destructive/10 px-1.5 py-0.5 rounded">{pad(time.s)}</span>
+      </div>
+      <span className="text-[10px] text-muted-foreground">restantes</span>
+    </div>
+  );
+};
 
 const PaywallPage = () => {
   const { user, signOut } = useAuth();
@@ -119,6 +153,7 @@ const PaywallPage = () => {
               <div className="inline-block px-3 py-1 rounded-full bg-destructive/15 text-destructive text-xs font-semibold animate-pulse">
                 🔥 Oferta de Lançamento
               </div>
+              <FakeCountdown />
               <p className="text-xs text-muted-foreground pt-1">Acesso completo a todas as ferramentas</p>
               <div className="pt-3">
                 <span className="inline-block py-3 px-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow duration-300">
