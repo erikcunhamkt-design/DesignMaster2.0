@@ -83,6 +83,10 @@ export interface AutoConfig {
   // Prompt Livre
   freePrompt: string;
   ignoreRest: boolean;
+
+  // Prompt Negativo
+  negativePrompt: string;
+  negativePromptEnabled: boolean;
 }
 
 export const defaultAutoConfig: AutoConfig = {
@@ -110,4 +114,6 @@ export const defaultAutoConfig: AutoConfig = {
   environment: '',
   freePrompt: '',
   ignoreRest: false,
+  negativePrompt: '',
+  negativePromptEnabled: false,
 };

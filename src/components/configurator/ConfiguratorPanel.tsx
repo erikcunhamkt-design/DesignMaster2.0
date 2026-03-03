@@ -10,6 +10,7 @@ import { CharacterDirectionSection } from './sections/CharacterDirectionSection'
 import { ReferencesSection } from './sections/ReferencesSection';
 import { VisualStyleSection } from './sections/VisualStyleSection';
 import { FreePromptBlock } from './FreePromptBlock';
+import { NegativePromptBlock } from './NegativePromptBlock';
 import { Button } from '@/components/ui/button';
 import {
   Sparkles, Copy, Loader2, ChevronDown,
@@ -147,6 +148,13 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           ignoreRest={config.ignoreRest}
           onUpdate={onUpdate}
           placeholder="Ex: Mulher executiva confiante, fundo urbano noturno, lighting dramático..."
+        />
+
+        {/* Prompt Negativo */}
+        <NegativePromptBlock
+          negativePrompt={config.negativePrompt}
+          negativePromptEnabled={config.negativePromptEnabled}
+          onUpdate={onUpdate}
         />
 
         {/* Bloco 1 — Sujeito */}

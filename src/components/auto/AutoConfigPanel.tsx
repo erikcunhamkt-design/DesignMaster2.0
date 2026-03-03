@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { FreePromptBlock } from '@/components/configurator/FreePromptBlock';
+import { NegativePromptBlock } from '@/components/configurator/NegativePromptBlock';
 import {
   Sparkles, Loader2, ChevronDown, Car, Smartphone,
   Palette, Type, Settings2, Wind, Plus, X,
@@ -506,6 +507,13 @@ export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
           ignoreRest={config.ignoreRest}
           onUpdate={onUpdate}
           placeholder="Ex: Ferrari vermelha em pista molhada, fumaça de pneus, lighting dramático..."
+        />
+
+        {/* Prompt Negativo */}
+        <NegativePromptBlock
+          negativePrompt={config.negativePrompt}
+          negativePromptEnabled={config.negativePromptEnabled}
+          onUpdate={onUpdate}
         />
 
         <CollapsibleBlock icon={Car} title="Sujeito" subtitle={subjectSubtitle} defaultOpen accent>

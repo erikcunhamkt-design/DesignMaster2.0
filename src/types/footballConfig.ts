@@ -49,6 +49,10 @@ export interface FootballConfig {
   freePrompt: string;
   ignoreRest: boolean;
 
+  // Prompt Negativo
+  negativePrompt: string;
+  negativePromptEnabled: boolean;
+
   // Referências
   styleReferences: string[];
 }
@@ -84,5 +88,7 @@ export const defaultFootballConfig: FootballConfig = {
   additionalPrompt: '',
   freePrompt: '',
   ignoreRest: false,
+  negativePrompt: '',
+  negativePromptEnabled: false,
   styleReferences: [],
 };
