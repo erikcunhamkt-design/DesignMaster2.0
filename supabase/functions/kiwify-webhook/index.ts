@@ -145,8 +145,10 @@ function isActivateTrigger(trigger: string) {
     trigger.includes("approved") ||
     trigger.includes("payment_approved") ||
     trigger.includes("compra_aprovada") ||
+    trigger.includes("order_approved") ||
     trigger.includes("subscription_renewed") ||
-    trigger.includes("renewed")
+    trigger.includes("renewed") ||
+    trigger === "paid"
   );
 }
 
