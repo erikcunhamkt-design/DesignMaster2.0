@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLicense } from '@/hooks/useLicense';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Zap, Key, MessageCircle, AlertTriangle } from 'lucide-react';
+import { Key, MessageCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoImg from '@/assets/logo.png';
