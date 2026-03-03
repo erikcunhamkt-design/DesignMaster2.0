@@ -176,12 +176,23 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_json" }, 400, corsHeaders);
   }
 
-  // Validate webhook token
+  // Validate webhook token - check multiple possible locations
   const expected = (Deno.env.get("KIWIFY_WEBHOOK_TOKEN") || "").trim();
+  
+  // Log all headers and relevant body fields for debugging
+  const allHeaders: Record<string, string> = {};
+  req.headers.forEach((v, k) => { allHeaders[k] = v; });
+  console.log("WEBHOOK HEADERS:", JSON.stringify(allHeaders));
+  console.log("WEBHOOK BODY KEYS:", JSON.stringify(Object.keys(payload || {})));
+  console.log("WEBHOOK SIGNATURE FIELD:", payload?.signature);
+  
   const headerToken =
     (req.headers.get("x-kiwify-token") || "").trim() ||
+    (req.headers.get("x-webhook-token") || "").trim() ||
     (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
-  const bodyToken = String(payload?.token || payload?.webhook_token || "").trim();
+  const bodyToken = String(
+    payload?.token || payload?.webhook_token || payload?.signature || payload?.secret || ""
+  ).trim();
 
   if (expected && headerToken !== expected && bodyToken !== expected) {
     return json({ error: "unauthorized" }, 401, corsHeaders);
