@@ -41,7 +41,7 @@ const AuthPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-4">
-          <img src={logoImg} alt="Design Master" className="h-12 w-auto" />
+          <img src={logoImg} alt="Design Master" className="h-12 w-12 rounded-full object-cover" />
           <h1 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">
             {isLogin ? 'Entrar' : 'Criar Conta'}
           </h1>
