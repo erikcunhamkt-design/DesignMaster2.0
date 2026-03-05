@@ -88,8 +88,8 @@ serve(async (req) => {
       );
     }
 
-    // Model selection: pro = gemini-3-pro-image-preview, flash = gemini-3.1-flash-image-preview (Nano Banana 2)
-    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
+    // Model selection: pro = gemini-3.1-pro-preview, flash = gemini-3.1-flash-image-preview (Nano Banana 2)
+    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3.1-pro-preview";
 
     let systemPrompt = "";
     let userInstructions = "";
