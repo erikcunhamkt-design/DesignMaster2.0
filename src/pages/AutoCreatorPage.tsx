@@ -233,6 +233,7 @@ export default function AutoCreatorPage() {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<AutoConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
