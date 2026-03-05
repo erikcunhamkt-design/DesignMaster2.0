@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SlidersHorizontal, Wand2 } from 'lucide-react';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 
 // Estimated generation time in seconds
 const ESTIMATED_SECONDS = 35;
