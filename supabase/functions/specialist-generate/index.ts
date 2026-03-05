@@ -79,14 +79,20 @@ serve(async (req) => {
       );
     }
 
-    // Build parts
-    const parts: any[] = [{ text: prompt }];
+    // Build parts — reference images FIRST so the model sees them before the prompt
+    const parts: any[] = [];
 
     for (const refImg of referenceImages.slice(0, 3)) {
       const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
       if (match) {
         parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
       }
+    }
+
+    if (parts.length > 0) {
+      parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following these instructions:\n\n" + prompt });
+    } else {
+      parts.push({ text: prompt });
     }
 
     const model = "gemini-3-pro-image-preview";
