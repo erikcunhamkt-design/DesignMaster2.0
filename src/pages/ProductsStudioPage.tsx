@@ -134,7 +134,12 @@ export default function ProductsStudioPage() {
               <Textarea value={extra} onChange={e => setExtra(e.target.value)} placeholder="Instruções adicionais..." className="min-h-[60px] bg-secondary/40 border-border/15 text-xs rounded-lg resize-none" />
             </div>
 
-            <Button onClick={handleGenerate} disabled={isGenerating || !productName || apiKey.length < 10} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">Modelo de IA</p>
+              <ModelSelector value={aiModel} onChange={setAiModel} />
+            </div>
+
+            <Button onClick={handleGenerate} disabled={isGenerating || !productName || (aiModel === 'pro' && apiKey.length < 10)} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
               {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               {isGenerating ? 'Gerando...' : 'Gerar Packshot'}
             </Button>
