@@ -1,4 +1,4 @@
-import { ArrowLeft, KeyRound, ChevronDown, Glasses, Sun } from 'lucide-react';
+import { ArrowLeft, KeyRound, ChevronDown, Glasses, Sun, LogOut } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -7,6 +7,9 @@ import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { cn } from '@/lib/utils';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
 
 interface StudioTopbarProps {
   title: string;
