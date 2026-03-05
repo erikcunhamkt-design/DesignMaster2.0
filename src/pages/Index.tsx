@@ -215,6 +215,8 @@ const Index = () => {
                 onGenerate={handleGenerate}
                 isGenerating={isGenerating}
                 apiKey={apiKey}
+                aiModel={aiModel}
+                onModelChange={setAiModel}
               />
             </>
           )
