@@ -19,6 +19,8 @@ interface Props {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
+  aiModel?: AiModel;
+  onModelChange?: (model: AiModel) => void;
 }
 
 // ── CollapsibleBlock ──────────────────────────────────────────────────────
