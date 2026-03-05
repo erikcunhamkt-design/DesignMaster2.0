@@ -58,28 +58,33 @@ serve(async (req) => {
       );
     }
 
-    let prompt = "";
+    let systemPrompt = "";
+    let userInstructions = "";
 
     if (studioType === "products") {
       const { productName, productType, lighting, background, extra } = body;
-      prompt = `${PRODUCT_SYSTEM}\n\nProduct: ${productName}`;
-      if (productType) prompt += `\nProduct type: ${productType}`;
-      if (lighting) prompt += `\nLighting: ${lighting}`;
-      if (background) prompt += `\nBackground: ${background}`;
-      if (extra) prompt += `\nAdditional: ${extra}`;
+      systemPrompt = PRODUCT_SYSTEM;
+      userInstructions = `Product name: ${productName}`;
+      if (productType) userInstructions += `\nProduct type: ${productType}`;
+      if (lighting) userInstructions += `\nLighting style: ${lighting}`;
+      if (background) userInstructions += `\nBackground: ${background}`;
+      if (extra) userInstructions += `\n\n⚠️ MANDATORY USER INSTRUCTIONS (YOU MUST FOLLOW THESE EXACTLY):\n${extra}`;
     } else if (studioType === "covers") {
       const { theme, character, style, elements, extra } = body;
-      prompt = `${COVERS_SYSTEM}\n\nTheme/Concept: ${theme}`;
-      if (character) prompt += `\nCharacter/Animal: ${character}`;
-      if (style) prompt += `\nVisual style: ${style}`;
-      if (elements) prompt += `\nGraphic elements: ${elements}`;
-      if (extra) prompt += `\nAdditional: ${extra}`;
+      systemPrompt = COVERS_SYSTEM;
+      userInstructions = `Theme/Concept: ${theme}`;
+      if (character) userInstructions += `\nCharacter/Animal: ${character}`;
+      if (style) userInstructions += `\nVisual style: ${style}`;
+      if (elements) userInstructions += `\nGraphic elements: ${elements}`;
+      if (extra) userInstructions += `\n\n⚠️ MANDATORY USER INSTRUCTIONS (YOU MUST FOLLOW THESE EXACTLY):\n${extra}`;
     } else {
       return new Response(
         JSON.stringify({ error: "studioType inválido" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const fullPrompt = `${systemPrompt}\n\n--- USER SPECIFICATIONS (HIGHEST PRIORITY) ---\n${userInstructions}\n\n--- END OF SPECIFICATIONS ---\nRemember: The user's specific instructions above are the HIGHEST PRIORITY. Follow them exactly.`;
 
     // Build parts — reference images FIRST so the model sees them before the prompt
     const parts: any[] = [];
@@ -92,9 +97,9 @@ serve(async (req) => {
     }
 
     if (parts.length > 0) {
-      parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following these instructions:\n\n" + prompt });
+      parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following ALL instructions below (especially any MANDATORY USER INSTRUCTIONS):\n\n" + fullPrompt });
     } else {
-      parts.push({ text: prompt });
+      parts.push({ text: fullPrompt });
     }
 
     const model = "gemini-3-pro-image-preview";
