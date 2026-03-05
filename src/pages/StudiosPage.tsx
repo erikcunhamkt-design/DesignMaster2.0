@@ -16,10 +16,15 @@ import mockupStudioHero from '@/assets/mockup-studio-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Sparkles, Glasses, Sun } from 'lucide-react';
+import { Shield, ArrowRight, Sparkles, Glasses, Sun, LogOut, KeyRound, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { useAuth } from '@/hooks/useAuth';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
@@ -42,6 +47,11 @@ export default function StudiosPage() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { user, signOut } = useAuth();
+  const { apiKey, saveKey } = useGoogleApiKey();
+  const hasKey = apiKey.length >= 10;
+  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   const featured = studios.find(s => s.id === FEATURED_STUDIO_ID)!;
   const rest = studios.filter(s => s.id !== FEATURED_STUDIO_ID);
@@ -111,6 +121,27 @@ export default function StudiosPage() {
             </Tooltip>
           </div>
 
+          {/* API Key */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className={cn(
+                  'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-semibold tracking-wider uppercase transition-all duration-200 border',
+                  hasKey
+                    ? 'bg-primary/8 text-primary/80 border-primary/20 hover:bg-primary/12'
+                    : 'bg-destructive/8 text-destructive/70 border-destructive/20 hover:bg-destructive/12'
+                )}
+              >
+                <KeyRound className="h-2.5 w-2.5" />
+                <span className="hidden sm:inline">API</span>
+                <ChevronDown className="h-2 w-2 opacity-50" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3 rounded-xl">
+              <ApiKeySection apiKey={apiKey} onChangeKey={saveKey} />
+            </PopoverContent>
+          </Popover>
+
           {isAdmin && (
             <button
               onClick={() => navigate('/admin')}
@@ -120,6 +151,31 @@ export default function StudiosPage() {
               Admin
             </button>
           )}
+
+          {/* User avatar + logout */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex h-8 w-8 items-center justify-center rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
+                <Avatar className="h-8 w-8">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
+                  <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {user?.email && (
+                <div className="px-2 py-1.5 text-[10px] text-muted-foreground truncate border-b border-border mb-1">
+                  {user.email}
+                </div>
+              )}
+              <DropdownMenuItem onClick={signOut} className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer">
+                <LogOut className="h-3.5 w-3.5" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
