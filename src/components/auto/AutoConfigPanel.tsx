@@ -11,6 +11,7 @@ import {
   Palette, Type, Settings2, Wind, Plus, X,
   AlignLeft, AlignCenter, AlignRight, ZoomIn,
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { cn } from '@/lib/utils';
 
 interface Props {
