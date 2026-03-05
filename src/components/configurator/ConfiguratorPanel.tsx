@@ -34,6 +34,8 @@ interface ConfiguratorPanelProps {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
+  aiModel?: AiModel;
+  onModelChange?: (model: AiModel) => void;
 }
 
 interface CollapsibleBlockProps {
