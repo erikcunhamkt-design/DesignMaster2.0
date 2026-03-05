@@ -250,6 +250,12 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
       {/* Footer */}
       <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
+        {onModelChange && (
+          <div className="mb-2">
+            <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Modelo de IA</p>
+            <ModelSelector value={aiModel} onChange={onModelChange} />
+          </div>
+        )}
         {!canGenerate && !hasFreePrompt && config.dimension === null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
