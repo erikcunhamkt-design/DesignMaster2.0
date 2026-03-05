@@ -47,6 +47,11 @@ export default function StudiosPage() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { user, signOut } = useAuth();
+  const { apiKey, saveKey } = useGoogleApiKey();
+  const hasKey = apiKey.length >= 10;
+  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   const featured = studios.find(s => s.id === FEATURED_STUDIO_ID)!;
   const rest = studios.filter(s => s.id !== FEATURED_STUDIO_ID);
