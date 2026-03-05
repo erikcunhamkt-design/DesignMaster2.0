@@ -271,6 +271,7 @@ export default function AutoCreatorPage() {
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
+          aiModel,
         },
       });
 
