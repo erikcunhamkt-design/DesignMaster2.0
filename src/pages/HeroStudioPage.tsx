@@ -268,6 +268,7 @@ export default function HeroStudioPage() {
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
+          aiModel,
         },
       });
 
