@@ -112,7 +112,10 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (
+    !needsApiKey || apiKey.length >= 10
+  ) && (
     hasFreePrompt || (
       config.dimension !== null &&
       config.niche.length > 0 &&
