@@ -215,6 +215,7 @@ export default function MockupStudioPage() {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<MockupConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
