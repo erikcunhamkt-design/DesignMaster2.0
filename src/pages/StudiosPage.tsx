@@ -16,10 +16,15 @@ import mockupStudioHero from '@/assets/mockup-studio-hero.png';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Sparkles, Glasses, Sun } from 'lucide-react';
+import { Shield, ArrowRight, Sparkles, Glasses, Sun, LogOut, KeyRound, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { useAuth } from '@/hooks/useAuth';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
