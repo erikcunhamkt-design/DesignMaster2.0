@@ -19,7 +19,6 @@ interface FootballArtsPayload {
 function buildPrompt(payload: FootballArtsPayload): string {
   const { artType, mood, visualElements, withText, format } = payload;
 
-  // Art type context
   const artTypeMap: Record<string, string> = {
     matchday: "matchday football art, game day announcement, intense pre-match atmosphere",
     jogador_destaque: "player spotlight football art, hero athlete portrait, dramatic player feature",
@@ -28,7 +27,6 @@ function buildPrompt(payload: FootballArtsPayload): string {
     anuncio_partida: "match announcement football art, fixture announcement, club vs club graphic",
   };
 
-  // Mood/emotion
   const moodMap: Record<string, string> = {
     epico: "epic cinematic mood, god-rays lighting, monumental scale, heroic atmosphere, awe-inspiring grandeur",
     explosivo: "explosive energy, dynamic motion blur, high-impact composition, electric atmosphere, raw power",
@@ -37,7 +35,6 @@ function buildPrompt(payload: FootballArtsPayload): string {
     clean_profissional: "clean professional design, minimal elegant layout, premium editorial aesthetic, sharp refined composition",
   };
 
-  // Visual elements
   const visualElementsMap: Record<string, string> = {
     jogador_unico: "single football player as main subject, full body or dynamic action pose, athlete in kit, precise cutout with dramatic lighting",
     dois_jogadores: "two football players in powerful composition, duel or face-off framing, contrasting athletes, rival energy",
@@ -45,7 +42,6 @@ function buildPrompt(payload: FootballArtsPayload): string {
     sem_pessoas: "no people, football symbols and elements: club crest, football textures, stadium silhouette, athletic patterns, abstract sports geometry",
   };
 
-  // Format aspect ratio
   const formatMap: Record<string, string> = {
     feed: "square 1:1 format, Instagram feed optimized composition, centered layout",
     story: "vertical 9:16 format, full-screen story composition, tall vertical layout with top-to-bottom visual flow",
@@ -53,7 +49,6 @@ function buildPrompt(payload: FootballArtsPayload): string {
     square: "perfect square format, balanced centered composition",
   };
 
-  // Text instruction
   const textInstruction = withText
     ? "Include bold professional sports typography integrated into the design: match details, team names, or date/time. Use athletic display fonts, strong hierarchy — headline dominant, supporting text secondary. Text must be part of the visual design, not overlaid generically."
     : "No text whatsoever. Pure visual art only. Every element is graphical.";
@@ -86,9 +81,9 @@ OUTPUT REQUIREMENT: A single, complete, ready-to-publish professional football s
 `.trim();
 }
 
-async function generateWithGoogleDirect(prompt: string, googleApiKey: string) {
-  const model = "gemini-3.1-pro-image-preview";
+async function generateWithGoogle(prompt: string, googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+  console.log(`Calling Google Gemini ${model} directly...`);
 
   const response = await fetch(url, {
     method: "POST",
@@ -120,37 +115,6 @@ async function generateWithGoogleDirect(prompt: string, googleApiKey: string) {
   return imageUrl;
 }
 
-async function generateWithLovableGateway(prompt: string) {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) throw { status: 500, message: "LOVABLE_API_KEY não configurado." };
-
-  console.log("Calling Lovable AI Gateway with gemini-2.5-flash-image...");
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image",
-      messages: [{ role: "user", content: prompt }],
-      modalities: ["image", "text"],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Lovable AI gateway error:", response.status, errorText);
-    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido. Aguarde." };
-    if (response.status === 402) throw { status: 402, message: "Créditos insuficientes." };
-    throw { status: 500, message: `Erro no gateway: ${response.status}` };
-  }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.images?.[0]?.image_url?.url ?? null;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -159,25 +123,21 @@ serve(async (req) => {
   try {
     const payload: FootballArtsPayload = await req.json();
     const { googleApiKey, aiModel } = payload;
-    const useFlash = aiModel === "flash";
 
-    if (!useFlash && (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10)) {
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
       return new Response(
         JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    // Model selection: pro = gemini-3-pro-image-preview, flash = gemini-3.1-flash-image-preview (Nano Banana 2)
+    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
+
     const prompt = buildPrompt(payload);
     console.log("Football Arts prompt built, calling AI...");
 
-    let imageUrl: string | null = null;
-
-    if (useFlash) {
-      imageUrl = await generateWithLovableGateway(prompt);
-    } else {
-      imageUrl = await generateWithGoogleDirect(prompt, googleApiKey);
-    }
+    const imageUrl = await generateWithGoogle(prompt, googleApiKey, model);
 
     if (!imageUrl) {
       return new Response(

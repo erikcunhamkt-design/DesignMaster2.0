@@ -6,10 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function generateWithGoogleDirect(prompt: string, parts: any[], googleApiKey: string) {
-  const model = "gemini-3.1-pro-image-preview";
+async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
-
   console.log(`Calling Google Gemini ${model} directly...`);
 
   const response = await fetch(url, {
@@ -43,48 +41,6 @@ async function generateWithGoogleDirect(prompt: string, parts: any[], googleApiK
   return { imageUrl, textResponse };
 }
 
-async function generateWithLovableGateway(prompt: string, referenceImages: string[]) {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) throw { status: 500, message: "LOVABLE_API_KEY não configurado." };
-
-  console.log("Calling Lovable AI Gateway with gemini-2.5-flash-image...");
-
-  const content: any[] = [];
-  // Add reference images first
-  for (const refImg of (referenceImages || []).slice(0, 3)) {
-    if (refImg.startsWith("data:")) {
-      content.push({ type: "image_url", image_url: { url: refImg } });
-    }
-  }
-  content.push({ type: "text", text: prompt });
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image",
-      messages: [{ role: "user", content }],
-      modalities: ["image", "text"],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Lovable AI gateway error:", response.status, errorText);
-    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido. Aguarde e tente novamente." };
-    if (response.status === 402) throw { status: 402, message: "Créditos insuficientes. Adicione créditos ao workspace." };
-    throw { status: 500, message: `Erro no gateway de IA: ${response.status}. Tente novamente.` };
-  }
-
-  const data = await response.json();
-  const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url ?? null;
-  const textResponse = data.choices?.[0]?.message?.content || "";
-  return { imageUrl, textResponse };
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -92,40 +48,34 @@ serve(async (req) => {
 
   try {
     const { prompt, negativePrompt, referenceImages, googleApiKey, aiModel } = await req.json();
-    const useFlash = aiModel === "flash";
 
-    // For pro model, require Google API key
-    if (!useFlash) {
-      if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
-        return new Response(
-          JSON.stringify({ error: "API Key do Google não fornecida ou inválida. Verifique se você colou apenas a chave." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
+      return new Response(
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida. Verifique se você colou apenas a chave." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+
+    // Model selection: pro = gemini-3-pro-image-preview, flash = gemini-3.1-flash-image-preview (Nano Banana 2)
+    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image.";
 
     const fullPrompt = `${edgeFillInstruction}\n\n${prompt}${negativePrompt ? `\n\nAvoid: ${negativePrompt}` : ""}`;
 
-    let result: { imageUrl: string | null; textResponse: string };
-
-    if (useFlash) {
-      result = await generateWithLovableGateway(fullPrompt, referenceImages || []);
-    } else {
-      // Build parts for Google direct API
-      const parts: any[] = [];
-      if (referenceImages && referenceImages.length > 0) {
-        for (const refImg of referenceImages.slice(0, 3)) {
-          const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
-          if (match) {
-            parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-          }
+    // Build parts for Google direct API
+    const parts: any[] = [];
+    if (referenceImages && referenceImages.length > 0) {
+      for (const refImg of referenceImages.slice(0, 3)) {
+        const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
         }
       }
-      parts.push({ text: fullPrompt });
-      result = await generateWithGoogleDirect(fullPrompt, parts, googleApiKey);
     }
+    parts.push({ text: fullPrompt });
+
+    const result = await generateWithGoogle(parts, googleApiKey, model);
 
     if (!result.imageUrl) {
       return new Response(

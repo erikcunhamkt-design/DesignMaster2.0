@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { refinementPrompt, imageDataUrl } = await req.json();
+    const { refinementPrompt, imageDataUrl, googleApiKey } = await req.json();
 
     if (!refinementPrompt || typeof refinementPrompt !== "string") {
       return new Response(
@@ -28,63 +28,54 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY não configurado.");
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const systemInstruction = `You are an expert image editor. Apply the requested changes to the provided image while preserving the overall composition, subject, style, and quality. The image MUST fill the entire canvas edge to edge — no blank space, no letterboxing. Only apply the described modifications and nothing else.`;
 
     const fullPrompt = `${systemInstruction}\n\nChanges to apply: ${refinementPrompt}`;
 
-    console.log("Calling Lovable AI gateway for image refinement...");
+    // Extract base64 from data URL
+    const match = imageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    const parts: any[] = [];
+    if (match) {
+      parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+    }
+    parts.push({ text: fullPrompt });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const model = "gemini-3-pro-image-preview";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+    console.log(`Calling Google Gemini ${model} for image refinement...`);
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3.1-pro-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: fullPrompt,
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: imageDataUrl,
-                },
-              },
-            ],
-          },
-        ],
-        modalities: ["image", "text"],
+        contents: [{ parts }],
+        generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI gateway error:", response.status, errorText);
-
+      console.error("Google API error:", response.status, errorText);
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de requisições excedido. Aguarde e tente novamente." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 403) {
         return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "API Key sem permissão." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
       return new Response(
         JSON.stringify({ error: `Erro ao refinar imagem: ${response.status}. Tente novamente.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -92,20 +83,14 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log("Lovable AI response received.");
-
-    // Extract image from response
     let imageUrl: string | null = null;
     let textResponse = "";
 
-    const images = data.choices?.[0]?.message?.images;
-    if (images && images.length > 0) {
-      imageUrl = images[0]?.image_url?.url ?? null;
-    }
-
-    const textContent = data.choices?.[0]?.message?.content;
-    if (textContent) {
-      textResponse = textContent;
+    if (data.candidates?.[0]?.content?.parts) {
+      for (const part of data.candidates[0].content.parts) {
+        if (part.inlineData) imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        if (part.text) textResponse += part.text;
+      }
     }
 
     if (!imageUrl) {
