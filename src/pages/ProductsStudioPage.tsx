@@ -7,6 +7,7 @@ import { Upload, Loader2, ShoppingBag, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
