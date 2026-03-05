@@ -28,6 +28,7 @@ export default function ProductsStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
   const { downloadState, download } = useWatermarkDownload(resultImage, 'packshot');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
