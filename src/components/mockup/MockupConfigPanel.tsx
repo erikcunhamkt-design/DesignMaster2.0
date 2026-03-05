@@ -10,6 +10,7 @@ import {
   Sparkles, Loader2, ChevronDown, Package, Smartphone,
   Palette, Type, Settings2, Layers, Plus, X, Sun,
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { cn } from '@/lib/utils';
 
 interface Props {
