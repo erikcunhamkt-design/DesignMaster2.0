@@ -21,7 +21,7 @@ serve(async (req) => {
       );
     }
 
-    const model = "gemini-3-pro-image-preview";
+    const model = "gemini-3.1-pro-image-preview";
     const hasReferenceImages = referenceImages && referenceImages.length > 0;
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image. If the image has a background scene, it must continue all the way to every border. Never crop the image short or leave any portion unfilled.";

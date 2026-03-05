@@ -102,7 +102,7 @@ serve(async (req) => {
       parts.push({ text: fullPrompt });
     }
 
-    const model = "gemini-3-pro-image-preview";
+    const model = "gemini-3.1-pro-image-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     const response = await fetch(url, {
