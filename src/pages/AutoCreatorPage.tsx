@@ -324,6 +324,8 @@ export default function AutoCreatorPage() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           apiKey={apiKey}
+          aiModel={aiModel}
+          onModelChange={setAiModel}
         />
       </div>
     </div>

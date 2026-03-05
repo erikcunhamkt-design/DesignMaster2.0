@@ -306,6 +306,8 @@ export default function MockupStudioPage() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           apiKey={apiKey}
+          aiModel={aiModel}
+          onModelChange={setAiModel}
         />
       </div>
     </div>

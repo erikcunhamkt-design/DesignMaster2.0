@@ -55,6 +55,7 @@ export default function ProductsStudioPage() {
           extra: (extra + getFormatPromptSuffix(format)).trim(),
           referenceImages: productImage ? [productImage] : [],
           googleApiKey: apiKey,
+          aiModel,
         },
       });
       if (error) throw new Error(error.message);
