@@ -10,7 +10,7 @@ interface ModelSelectorProps {
 
 const models: { id: AiModel; label: string; desc: string; icon: React.ElementType; badge?: string }[] = [
   { id: 'pro', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Mais lento', icon: Crown, badge: 'PRO' },
-  { id: 'flash', label: 'Nano Banana 2', desc: 'Rápido · Sem API Key', icon: Zap, badge: 'FAST' },
+  { id: 'flash', label: 'Nano Banana 2', desc: 'Rápido · Nova geração Google', icon: Zap, badge: 'NEW' },
 ];
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {

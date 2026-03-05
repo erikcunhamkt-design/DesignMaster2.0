@@ -446,8 +446,7 @@ function CustomPromptSection({ config, onUpdate }: { config: HeroConfig; onUpdat
 
 // ── Main Panel ──────────────────────────────────────────────────────────────
 export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
-  const needsApiKey = aiModel === 'pro';
-  const canGenerate = (!needsApiKey || !!apiKey) && !isGenerating;
+  const canGenerate = !!apiKey && apiKey.length >= 10 && !isGenerating;
 
   return (
     <div className="flex h-full w-[300px] shrink-0 flex-col border-l border-border/10 bg-background/95 backdrop-blur-xl">

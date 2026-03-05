@@ -42,9 +42,9 @@ Generate a powerful cover image with the following requirements:
 - 8K quality, sharp focus, no artifacts
 - The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
 
-async function generateWithGoogleDirect(parts: any[], googleApiKey: string) {
-  const model = "gemini-3.1-pro-image-preview";
+async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+  console.log(`Calling Google Gemini ${model} directly...`);
 
   const response = await fetch(url, {
     method: "POST",
@@ -72,45 +72,6 @@ async function generateWithGoogleDirect(parts: any[], googleApiKey: string) {
   return imageUrl;
 }
 
-async function generateWithLovableGateway(promptText: string, referenceImages: string[]) {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) throw { status: 500, message: "LOVABLE_API_KEY não configurado." };
-
-  console.log("Calling Lovable AI Gateway with gemini-2.5-flash-image...");
-
-  const content: any[] = [];
-  for (const refImg of (referenceImages || []).slice(0, 3)) {
-    if (refImg.startsWith("data:")) {
-      content.push({ type: "image_url", image_url: { url: refImg } });
-    }
-  }
-  content.push({ type: "text", text: promptText });
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image",
-      messages: [{ role: "user", content }],
-      modalities: ["image", "text"],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Lovable AI gateway error:", response.status, errorText);
-    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido. Aguarde." };
-    if (response.status === 402) throw { status: 402, message: "Créditos insuficientes." };
-    throw { status: 500, message: `Erro no gateway: ${response.status}` };
-  }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.images?.[0]?.image_url?.url ?? null;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -119,14 +80,16 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const { studioType, googleApiKey, referenceImages = [], aiModel } = body;
-    const useFlash = aiModel === "flash";
 
-    if (!useFlash && (!googleApiKey || googleApiKey.trim().length < 10)) {
+    if (!googleApiKey || googleApiKey.trim().length < 10) {
       return new Response(
         JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Model selection: pro = gemini-3-pro-image-preview, flash = gemini-3.1-flash-image-preview (Nano Banana 2)
+    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
     let systemPrompt = "";
     let userInstructions = "";
@@ -156,29 +119,21 @@ serve(async (req) => {
 
     const fullPrompt = `${systemPrompt}\n\n--- USER SPECIFICATIONS (HIGHEST PRIORITY) ---\n${userInstructions}\n\n--- END OF SPECIFICATIONS ---\nRemember: The user's specific instructions above are the HIGHEST PRIORITY. Follow them exactly.`;
 
-    let imageUrl: string | null = null;
-
-    if (useFlash) {
-      const promptWithRef = referenceImages.length > 0
-        ? "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph following ALL instructions below:\n\n" + fullPrompt
-        : fullPrompt;
-      imageUrl = await generateWithLovableGateway(promptWithRef, referenceImages);
-    } else {
-      // Build parts — reference images FIRST
-      const parts: any[] = [];
-      for (const refImg of referenceImages.slice(0, 3)) {
-        const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
-        if (match) {
-          parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-        }
+    // Build parts — reference images FIRST
+    const parts: any[] = [];
+    for (const refImg of referenceImages.slice(0, 3)) {
+      const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
       }
-      if (parts.length > 0) {
-        parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following ALL instructions below (especially any MANDATORY USER INSTRUCTIONS):\n\n" + fullPrompt });
-      } else {
-        parts.push({ text: fullPrompt });
-      }
-      imageUrl = await generateWithGoogleDirect(parts, googleApiKey);
     }
+    if (parts.length > 0) {
+      parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following ALL instructions below (especially any MANDATORY USER INSTRUCTIONS):\n\n" + fullPrompt });
+    } else {
+      parts.push({ text: fullPrompt });
+    }
+
+    const imageUrl = await generateWithGoogle(parts, googleApiKey, model);
 
     if (!imageUrl) {
       return new Response(JSON.stringify({ error: "Nenhuma imagem gerada." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
