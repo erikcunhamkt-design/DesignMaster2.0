@@ -7,17 +7,23 @@ const corsHeaders = {
 };
 
 const PRODUCT_SYSTEM = `You are the world's best product photography specialist for e-commerce and premium packshots.
-Generate a professional product photograph with the following requirements:
-- Studio-quality lighting setup (three-point or specified)
+
+CRITICAL INSTRUCTIONS:
+- You MUST generate a BRAND NEW professional studio photograph based on the user's specifications below.
+- If a reference image is provided, use it ONLY to understand the product's shape, color, material, and branding — then CREATE A COMPLETELY NEW photograph of that product in the specified studio setting.
+- DO NOT simply reproduce, copy, or slightly modify the reference image. The output must be an entirely new composition.
+- The final image must look like a REAL photograph taken by a professional product photographer — NOT AI-generated.
+
+Technical requirements:
+- Studio-quality lighting setup (three-point or as specified)
 - Controlled shadows for depth and dimension
 - Faithful material representation (textures, reflections, transparency)
 - Clean, distraction-free composition
 - E-commerce ready framing with proper negative space
 - Ultra-sharp focus on the product
 - Professional post-production quality
-- 8K photorealistic rendering, no AI artifacts
+- 8K photorealistic rendering, zero AI artifacts
 - NO real humans in the image
-- Output should look like a real studio photograph, not AI-generated
 - The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
 
 const COVERS_SYSTEM = `You are a specialist in creating magnetic, attention-grabbing cover images.
@@ -73,14 +79,20 @@ serve(async (req) => {
       );
     }
 
-    // Build parts
-    const parts: any[] = [{ text: prompt }];
+    // Build parts — reference images FIRST so the model sees them before the prompt
+    const parts: any[] = [];
 
     for (const refImg of referenceImages.slice(0, 3)) {
       const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
       if (match) {
         parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
       }
+    }
+
+    if (parts.length > 0) {
+      parts.push({ text: "The image(s) above are REFERENCE ONLY — showing the product's appearance. DO NOT replicate them. Instead, create a completely new professional studio photograph of this product following these instructions:\n\n" + prompt });
+    } else {
+      parts.push({ text: prompt });
     }
 
     const model = "gemini-3-pro-image-preview";
