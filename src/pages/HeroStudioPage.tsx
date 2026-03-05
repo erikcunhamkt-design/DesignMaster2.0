@@ -230,6 +230,7 @@ export default function HeroStudioPage() {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<HeroConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
