@@ -274,6 +274,7 @@ export default function FootballCreatorPage() {
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
+          aiModel,
         },
       });
 
