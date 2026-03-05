@@ -236,6 +236,7 @@ export default function FootballCreatorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'avancado' | 'guiado'>('avancado');
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<FootballConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
