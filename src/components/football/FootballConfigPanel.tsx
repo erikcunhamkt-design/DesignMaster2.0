@@ -556,9 +556,10 @@ function AdvancedSection({ config, onUpdate }: { config: FootballConfig; onUpdat
 }
 
 // ── Main Panel ─────────────────────────────────────────────────────────────
-export function FootballConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
+export function FootballConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (hasFreePrompt || config.dimension !== null);
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (!needsApiKey || apiKey.length >= 10) && (hasFreePrompt || config.dimension !== null);
 
   const subjectSubtitle = `${config.subjectType.replace('_', ' ')} · ${config.subjectPosition.replace('_', ' ')}`;
   const styleSubtitle = config.visualStyle ? config.visualStyle.replace('_', ' ') : 'Selecionar estilo';
