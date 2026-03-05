@@ -490,9 +490,10 @@ function AdvancedSection({ config, onUpdate }: { config: AutoConfig; onUpdate: (
 }
 
 // ── Main Panel ─────────────────────────────────────────────────────────────
-export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
+export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (hasFreePrompt || config.dimension !== null);
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (!needsApiKey || apiKey.length >= 10) && (hasFreePrompt || config.dimension !== null);
 
   const subjectSubtitle = config.subjectType.replace(/_/g, ' ');
   const styleSubtitle = config.visualStyle ? config.visualStyle.replace(/_/g, ' ') : 'Selecionar estilo';
