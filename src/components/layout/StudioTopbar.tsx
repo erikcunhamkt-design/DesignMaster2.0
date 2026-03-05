@@ -21,6 +21,9 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
   const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { user, signOut } = useAuth();
+  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   return (
     <header className="relative z-30 flex h-12 items-center border-b border-border/20 bg-background/95 backdrop-blur-xl px-4 gap-3 shrink-0">
