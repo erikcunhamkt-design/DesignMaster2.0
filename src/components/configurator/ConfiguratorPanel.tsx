@@ -16,6 +16,7 @@ import {
   Sparkles, Copy, Loader2, ChevronDown,
   User, Smartphone, Palette, Type, Settings2, SlidersHorizontal, Clapperboard
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from './ModelSelector';
 import { cn } from '@/lib/utils';
 import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
