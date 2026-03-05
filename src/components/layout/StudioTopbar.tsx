@@ -118,6 +118,31 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
           </PopoverContent>
         </Popover>
       )}
+
+      {/* User avatar + logout */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex h-7 w-7 items-center justify-center rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
+            <Avatar className="h-7 w-7">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
+              <AvatarFallback className="bg-primary/15 text-primary text-[9px] font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {user?.email && (
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground truncate border-b border-border mb-1">
+              {user.email}
+            </div>
+          )}
+          <DropdownMenuItem onClick={signOut} className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer">
+            <LogOut className="h-3.5 w-3.5" />
+            Sair
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
