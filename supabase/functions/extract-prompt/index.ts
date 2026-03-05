@@ -64,7 +64,7 @@ Respond ONLY with the JSON object, no markdown, no code blocks.`;
       parts.push({ text: `Analyze this image: ${imageBase64.substring(0, 100)}...` });
     }
 
-    const model = "gemini-2.5-flash";
+    const model = "gemini-3.1-pro-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     console.log(`Calling Google Gemini ${model} for prompt extraction...`);
