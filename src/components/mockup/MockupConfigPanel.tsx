@@ -421,9 +421,10 @@ function TextSection({ config, onUpdate }: { config: MockupConfig; onUpdate: (p:
 }
 
 // ── Main Panel ─────────────────────────────────────────────────────────────
-export function MockupConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
+export function MockupConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (hasFreePrompt || config.dimension !== null);
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (!needsApiKey || apiKey.length >= 10) && (hasFreePrompt || config.dimension !== null);
 
   const objectLabel: Record<MockupConfig['mockupObject'], string> = {
     caixa_embalagem: 'Caixa', garrafa_lata: 'Garrafa/Lata', camiseta_vestuario: 'Camiseta',
