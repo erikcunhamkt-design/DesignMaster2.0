@@ -6,25 +6,27 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PRODUCT_SYSTEM = `You are the world's best product photography specialist for e-commerce and premium packshots.
+const PRODUCT_SYSTEM = `Ultra realistic commercial product photography of the original product.
 
 CRITICAL INSTRUCTIONS:
-- You MUST generate a BRAND NEW professional studio photograph based on the user's specifications below.
-- If a reference image is provided, use it ONLY to understand the product's shape, color, material, and branding — then CREATE A COMPLETELY NEW photograph of that product in the specified studio setting.
+- If a reference image is provided, use it ONLY to understand the product's exact shape, proportions, colors and branding — then CREATE A COMPLETELY NEW professional photograph of that product.
 - DO NOT simply reproduce, copy, or slightly modify the reference image. The output must be an entirely new composition.
-- The final image must look like a REAL photograph taken by a professional product photographer — NOT AI-generated.
+- Maintain the exact shape, proportions, colors and branding of the real item.
 
-Technical requirements:
-- Studio-quality lighting setup (three-point or as specified)
-- Controlled shadows for depth and dimension
-- Faithful material representation (textures, reflections, transparency)
-- Clean, distraction-free composition
-- E-commerce ready framing with proper negative space
-- Ultra-sharp focus on the product
-- Professional post-production quality
-- 8K photorealistic rendering, zero AI artifacts
-- NO real humans in the image
-- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
+Photography requirements:
+- Professional studio photo, photographed with a high-end DSLR camera and macro lens.
+- Natural lighting setup with soft shadows, subtle reflections and realistic highlights.
+- Enhance the product beauty while preserving authenticity.
+- Textures must look natural and tactile (plastic, metal, paper, fabric or glass exactly as in real life).
+- Include small natural imperfections, micro-texture, slight lighting falloff and real material behavior.
+- Avoid any CGI or AI-render look.
+- No plastic, waxy, overly smooth or hyper-polished surfaces.
+- The image must look like a real photograph taken for an e-commerce catalog or premium advertising campaign.
+- Neutral background, soft gradient or lifestyle surface depending on the product type.
+- Balanced composition, sharp focus on the product, shallow depth of field.
+- Photorealistic, professional product photography, natural color science, realistic contrast, real-world materials.
+- NO real humans in the image.
+- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding.`;
 
 const COVERS_SYSTEM = `You are a specialist in creating magnetic, attention-grabbing cover images.
 Generate a powerful cover image with the following requirements:
