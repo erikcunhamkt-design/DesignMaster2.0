@@ -7,6 +7,7 @@ import { Upload, Loader2, ShoppingBag, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
@@ -27,6 +28,7 @@ export default function ProductsStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
   const { downloadState, download } = useWatermarkDownload(resultImage, 'packshot');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +55,7 @@ export default function ProductsStudioPage() {
           extra: (extra + getFormatPromptSuffix(format)).trim(),
           referenceImages: productImage ? [productImage] : [],
           googleApiKey: apiKey,
+          aiModel,
         },
       });
       if (error) throw new Error(error.message);
@@ -131,7 +134,12 @@ export default function ProductsStudioPage() {
               <Textarea value={extra} onChange={e => setExtra(e.target.value)} placeholder="Instruções adicionais..." className="min-h-[60px] bg-secondary/40 border-border/15 text-xs rounded-lg resize-none" />
             </div>
 
-            <Button onClick={handleGenerate} disabled={isGenerating || !productName || apiKey.length < 10} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">Modelo de IA</p>
+              <ModelSelector value={aiModel} onChange={setAiModel} />
+            </div>
+
+            <Button onClick={handleGenerate} disabled={isGenerating || !productName || (aiModel === 'pro' && apiKey.length < 10)} className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md">
               {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               {isGenerating ? 'Gerando...' : 'Gerar Packshot'}
             </Button>

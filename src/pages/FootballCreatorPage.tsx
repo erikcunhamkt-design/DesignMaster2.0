@@ -6,6 +6,7 @@ import { buildFootballRequest } from '@/core/prompt/FootballPromptAgent';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { AiModel } from '@/components/configurator/ModelSelector';
 import {
   Download, ZoomIn, ZoomOut,
   Check, Loader2, Droplets, Lock, SlidersHorizontal, ListChecks
@@ -235,6 +236,7 @@ export default function FootballCreatorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'avancado' | 'guiado'>('avancado');
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<FootballConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
@@ -272,6 +274,7 @@ export default function FootballCreatorPage() {
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
+          aiModel,
         },
       });
 
@@ -348,6 +351,8 @@ export default function FootballCreatorPage() {
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
               apiKey={apiKey}
+              aiModel={aiModel}
+              onModelChange={setAiModel}
             />
           </>
         ) : (

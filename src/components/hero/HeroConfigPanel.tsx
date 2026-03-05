@@ -10,6 +10,7 @@ import {
   Sparkles, Loader2, ChevronDown, Monitor, Type,
   Settings2, Layers, Plus, X, Zap, Sun, Image,
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -18,6 +19,8 @@ interface Props {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
+  aiModel?: AiModel;
+  onModelChange?: (model: AiModel) => void;
 }
 
 // ── CollapsibleBlock ──────────────────────────────────────────────────────
@@ -442,8 +445,9 @@ function CustomPromptSection({ config, onUpdate }: { config: HeroConfig; onUpdat
 }
 
 // ── Main Panel ──────────────────────────────────────────────────────────────
-export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
-  const canGenerate = !!apiKey && !isGenerating;
+export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = (!needsApiKey || !!apiKey) && !isGenerating;
 
   return (
     <div className="flex h-full w-[300px] shrink-0 flex-col border-l border-border/10 bg-background/95 backdrop-blur-xl">
@@ -511,7 +515,13 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
 
       {/* Generate button */}
       <div className="shrink-0 border-t border-border/10 p-3 space-y-2">
-        {!apiKey && (
+        {onModelChange && (
+          <div className="mb-1">
+            <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Modelo de IA</p>
+            <ModelSelector value={aiModel} onChange={onModelChange} />
+          </div>
+        )}
+        {needsApiKey && !apiKey && (
           <div className="rounded-lg bg-amber-500/8 border border-amber-500/15 px-3 py-2">
             <p className="text-[9px] text-amber-400/80 leading-relaxed">
               Configure sua chave de API Google para gerar imagens.

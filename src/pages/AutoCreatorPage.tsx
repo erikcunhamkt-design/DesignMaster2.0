@@ -6,6 +6,7 @@ import { buildAutoRequest } from '@/core/prompt/AutoPromptAgent';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { AiModel } from '@/components/configurator/ModelSelector';
 import {
   Download, ZoomIn, ZoomOut,
   Check, Loader2, Droplets, Lock, SlidersHorizontal,
@@ -232,6 +233,7 @@ export default function AutoCreatorPage() {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
 
   const updateConfig = useCallback((patch: Partial<AutoConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
@@ -269,6 +271,7 @@ export default function AutoCreatorPage() {
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
+          aiModel,
         },
       });
 
@@ -321,6 +324,8 @@ export default function AutoCreatorPage() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           apiKey={apiKey}
+          aiModel={aiModel}
+          onModelChange={setAiModel}
         />
       </div>
     </div>

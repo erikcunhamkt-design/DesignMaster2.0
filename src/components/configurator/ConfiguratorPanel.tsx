@@ -16,6 +16,7 @@ import {
   Sparkles, Copy, Loader2, ChevronDown,
   User, Smartphone, Palette, Type, Settings2, SlidersHorizontal, Clapperboard
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from './ModelSelector';
 import { cn } from '@/lib/utils';
 import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
@@ -33,6 +34,8 @@ interface ConfiguratorPanelProps {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
+  aiModel?: AiModel;
+  onModelChange?: (model: AiModel) => void;
 }
 
 interface CollapsibleBlockProps {
@@ -105,11 +108,14 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen 
   );
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: ConfiguratorPanelProps) {
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (
+    !needsApiKey || apiKey.length >= 10
+  ) && (
     hasFreePrompt || (
       config.dimension !== null &&
       config.niche.length > 0 &&
@@ -244,6 +250,12 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
 
       {/* Footer */}
       <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
+        {onModelChange && (
+          <div className="mb-2">
+            <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Modelo de IA</p>
+            <ModelSelector value={aiModel} onChange={onModelChange} />
+          </div>
+        )}
         {!canGenerate && !hasFreePrompt && config.dimension === null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar

@@ -13,6 +13,7 @@ interface FootballArtsPayload {
   withText: boolean;
   format: string;
   googleApiKey: string;
+  aiModel?: string;
 }
 
 function buildPrompt(payload: FootballArtsPayload): string {
@@ -57,7 +58,7 @@ function buildPrompt(payload: FootballArtsPayload): string {
     ? "Include bold professional sports typography integrated into the design: match details, team names, or date/time. Use athletic display fonts, strong hierarchy — headline dominant, supporting text secondary. Text must be part of the visual design, not overlaid generically."
     : "No text whatsoever. Pure visual art only. Every element is graphical.";
 
-  const basePrompt = `
+  return `
 Generate a PROFESSIONAL football/soccer sports art graphic. This must look like official club marketing material or a premium sports agency campaign — NOT amateur or generic.
 
 ART TYPE: ${artTypeMap[artType] || artType}
@@ -83,8 +84,71 @@ MANDATORY VISUAL STANDARDS:
 
 OUTPUT REQUIREMENT: A single, complete, ready-to-publish professional football sports art image.
 `.trim();
+}
 
-  return basePrompt;
+async function generateWithGoogleDirect(prompt: string, googleApiKey: string) {
+  const model = "gemini-3.1-pro-image-preview";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Google API error:", response.status, errorText);
+    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido. Aguarde e tente novamente." };
+    if (response.status === 403) throw { status: 403, message: "API Key sem permissão." };
+    throw { status: 500, message: `Erro na API do Google: ${response.status}. Tente novamente.` };
+  }
+
+  const data = await response.json();
+  let imageUrl: string | null = null;
+  if (data.candidates?.[0]?.content?.parts) {
+    for (const part of data.candidates[0].content.parts) {
+      if (part.inlineData) {
+        imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        break;
+      }
+    }
+  }
+  return imageUrl;
+}
+
+async function generateWithLovableGateway(prompt: string) {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw { status: 500, message: "LOVABLE_API_KEY não configurado." };
+
+  console.log("Calling Lovable AI Gateway with gemini-2.5-flash-image...");
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-image",
+      messages: [{ role: "user", content: prompt }],
+      modalities: ["image", "text"],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Lovable AI gateway error:", response.status, errorText);
+    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido. Aguarde." };
+    if (response.status === 402) throw { status: 402, message: "Créditos insuficientes." };
+    throw { status: 500, message: `Erro no gateway: ${response.status}` };
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.images?.[0]?.image_url?.url ?? null;
 }
 
 serve(async (req) => {
@@ -94,9 +158,10 @@ serve(async (req) => {
 
   try {
     const payload: FootballArtsPayload = await req.json();
-    const { googleApiKey } = payload;
+    const { googleApiKey, aiModel } = payload;
+    const useFlash = aiModel === "flash";
 
-    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10) {
+    if (!useFlash && (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10)) {
       return new Response(
         JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -104,57 +169,14 @@ serve(async (req) => {
     }
 
     const prompt = buildPrompt(payload);
-    console.log("Football Arts prompt built, calling Gemini...");
-
-    const model = "gemini-3.1-pro-image-preview";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"],
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Google API error:", response.status, errorText);
-
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Aguarde e tente novamente." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 403) {
-        return new Response(
-          JSON.stringify({ error: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      return new Response(
-        JSON.stringify({ error: `Erro na API do Google: ${response.status}. Tente novamente.` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await response.json();
+    console.log("Football Arts prompt built, calling AI...");
 
     let imageUrl: string | null = null;
-    const candidates = data.candidates;
-    if (candidates && candidates.length > 0) {
-      const contentParts = candidates[0]?.content?.parts || [];
-      for (const part of contentParts) {
-        if (part.inlineData) {
-          imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-          break;
-        }
-      }
+
+    if (useFlash) {
+      imageUrl = await generateWithLovableGateway(prompt);
+    } else {
+      imageUrl = await generateWithGoogleDirect(prompt, googleApiKey);
     }
 
     if (!imageUrl) {
@@ -168,11 +190,13 @@ serve(async (req) => {
       JSON.stringify({ imageUrl, prompt }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("football-arts error:", error);
+    const status = error?.status || 500;
+    const message = error?.message || (error instanceof Error ? error.message : "Erro desconhecido");
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Erro desconhecido" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: message }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

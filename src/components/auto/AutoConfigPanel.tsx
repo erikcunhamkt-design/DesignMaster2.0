@@ -11,6 +11,7 @@ import {
   Palette, Type, Settings2, Wind, Plus, X,
   AlignLeft, AlignCenter, AlignRight, ZoomIn,
 } from 'lucide-react';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -19,6 +20,8 @@ interface Props {
   onGenerate: () => void;
   isGenerating: boolean;
   apiKey: string;
+  aiModel?: AiModel;
+  onModelChange?: (model: AiModel) => void;
 }
 
 // ── CollapsibleBlock ──────────────────────────────────────────────────────
@@ -487,9 +490,10 @@ function AdvancedSection({ config, onUpdate }: { config: AutoConfig; onUpdate: (
 }
 
 // ── Main Panel ─────────────────────────────────────────────────────────────
-export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey }: Props) {
+export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: Props) {
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && apiKey.length >= 10 && (hasFreePrompt || config.dimension !== null);
+  const needsApiKey = aiModel === 'pro';
+  const canGenerate = !isGenerating && (!needsApiKey || apiKey.length >= 10) && (hasFreePrompt || config.dimension !== null);
 
   const subjectSubtitle = config.subjectType.replace(/_/g, ' ');
   const styleSubtitle = config.visualStyle ? config.visualStyle.replace(/_/g, ' ') : 'Selecionar estilo';
@@ -547,6 +551,12 @@ export function AutoConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
 
       {/* Footer */}
       <div className="border-t border-border/10 p-4 space-y-2 shrink-0">
+        {onModelChange && (
+          <div className="mb-1">
+            <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Modelo de IA</p>
+            <ModelSelector value={aiModel} onChange={onModelChange} />
+          </div>
+        )}
         {!canGenerate && !hasFreePrompt && config.dimension === null && (
           <p className="text-[9px] text-muted-foreground/40 text-center">
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
