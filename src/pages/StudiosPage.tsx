@@ -227,6 +227,7 @@ export default function StudiosPage() {
                     images={studioImages}
                     isFavorite={isFavorite}
                     onToggleFavorite={toggleFavorite}
+                    onNavigate={navigateToStudio}
                   />
                 </div>
               ))}
