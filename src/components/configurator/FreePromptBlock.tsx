@@ -1,7 +1,8 @@
 import { Switch } from '@/components/ui/switch';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
-import { Zap } from 'lucide-react';
+import { Zap, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FreePromptBlockProps {
   freePrompt: string;
@@ -9,6 +10,14 @@ interface FreePromptBlockProps {
   onUpdate: (patch: { freePrompt?: string; ignoreRest?: boolean }) => void;
   placeholder?: string;
 }
+
+const PROMPT_EXAMPLES = [
+  'Produto premium em fundo minimalista',
+  'Jogador de futebol em ação, estilo esportivo',
+  'Mockup de embalagem moderna',
+  'Mulher executiva confiante, fundo urbano noturno',
+  'Retrato editorial com iluminação dramática',
+];
 
 export function FreePromptBlock({
   freePrompt,
@@ -32,12 +41,26 @@ export function FreePromptBlock({
           <Zap className="h-3.5 w-3.5" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className={cn(
-            'text-[11px] font-semibold tracking-wide transition-colors',
-            ignoreRest ? 'text-primary' : 'text-foreground'
-          )}>
-            Prompt Livre
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className={cn(
+              'text-[11px] font-semibold tracking-wide transition-colors',
+              ignoreRest ? 'text-primary' : 'text-foreground'
+            )}>
+              Prompt Livre
+            </p>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center justify-center rounded-full text-muted-foreground/40 hover:text-primary/60 transition-colors cursor-help">
+                    <HelpCircle className="h-3 w-3" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="left" className="max-w-[200px] text-[10px]">
+                  Descreva a imagem que deseja gerar. Seja específico sobre estilo, composição e detalhes.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <p className="text-[9px] text-muted-foreground/50 mt-0.5">
             Digite ou dite um prompt — use sozinho ou com os campos abaixo
           </p>
@@ -57,6 +80,26 @@ export function FreePromptBlock({
           {freePrompt.length.toLocaleString()}/9.000
         </p>
       </div>
+
+      {/* Quick examples */}
+      {!freePrompt && (
+        <div className="px-4 pb-3">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/40 mb-1.5">
+            Exemplos rápidos
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {PROMPT_EXAMPLES.map((example) => (
+              <button
+                key={example}
+                onClick={() => onUpdate({ freePrompt: example })}
+                className="rounded-full px-2.5 py-1 text-[9px] font-medium border border-border/20 bg-secondary/20 text-muted-foreground/60 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Toggle ignorar o resto */}
       <div className={cn(

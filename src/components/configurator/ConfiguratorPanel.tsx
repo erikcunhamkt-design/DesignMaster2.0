@@ -13,7 +13,7 @@ import { FreePromptBlock } from './FreePromptBlock';
 import { NegativePromptBlock } from './NegativePromptBlock';
 import { Button } from '@/components/ui/button';
 import {
-  Sparkles, Copy, Loader2, ChevronDown,
+  Sparkles, Copy, Loader2, ChevronDown, HelpCircle,
   User, Smartphone, Palette, Type, Settings2, SlidersHorizontal, Clapperboard
 } from 'lucide-react';
 import { ModelSelector, type AiModel } from './ModelSelector';
@@ -22,11 +22,7 @@ import { creativePresets } from '@/data/creativePresets';
 import { useTipsMode } from '@/hooks/useTipsMode';
 import { tipsConfig } from '@/data/tipsConfig';
 import { SectionLabel } from './SectionLabel';
-import genderMale from '@/assets/gender-male.png';
-import genderFemale from '@/assets/gender-female.png';
-import homerNeutro from '@/assets/expressions/homer-neutro.png';
-import margeNeutro from '@/assets/expressions/marge-neutro.png';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ConfiguratorPanelProps {
   config: ProjectConfig;
@@ -43,12 +39,23 @@ interface CollapsibleBlockProps {
   avatarSrc?: string;
   title: string;
   subtitle?: string;
+  helpText?: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
   accent?: boolean;
 }
 
-function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen = false, children, accent }: CollapsibleBlockProps) {
+const sectionHelp: Record<string, string> = {
+  'Sujeito': 'Defina o gênero, pose e posição do personagem na imagem.',
+  'Estilo Visual': 'Define o estilo artístico da imagem gerada.',
+  'Direção do Personagem': 'Controla expressão, ângulo de câmera, lente e direção do olhar.',
+  'Formato & Composição': 'Define proporção da imagem como quadrado, retrato ou paisagem.',
+  'Cores & Iluminação': 'Ajusta o clima visual, cores e iluminação da imagem.',
+  'Texto na Imagem': 'Permite gerar imagens com textos ou tipografia.',
+  'Avançado': 'Configurações avançadas para maior controle da geração.',
+};
+
+function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, helpText, defaultOpen = false, children, accent }: CollapsibleBlockProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -62,14 +69,7 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen 
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
       >
-        {avatarSrc ? (
-          <div className={cn(
-            'h-7 w-7 shrink-0 rounded-full overflow-hidden border-2 transition-all duration-300',
-            open ? 'border-primary/40' : 'border-border/20'
-          )}>
-            <img src={avatarSrc} alt="avatar" className="h-full w-full object-cover object-top" />
-          </div>
-        ) : Icon ? (
+        {Icon ? (
           <div className={cn(
             'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-300',
             open
@@ -81,12 +81,31 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, defaultOpen 
         ) : null}
 
         <div className="flex-1 min-w-0">
-          <p className={cn(
-            'text-[11px] font-semibold tracking-wide transition-colors duration-200',
-            open ? 'text-foreground' : 'text-foreground/60'
-          )}>
-            {title}
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className={cn(
+              'text-[11px] font-semibold tracking-wide transition-colors duration-200',
+              open ? 'text-foreground' : 'text-foreground/60'
+            )}>
+              {title}
+            </p>
+            {helpText && (
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="inline-flex items-center justify-center rounded-full text-muted-foreground/40 hover:text-primary/60 transition-colors cursor-help"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <HelpCircle className="h-3 w-3" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="max-w-[200px] text-[10px]">
+                    {helpText}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           {subtitle && (
             <p className="text-[9px] text-muted-foreground/40 mt-0.5 truncate">{subtitle}</p>
           )}
@@ -126,13 +145,6 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
     onUpdate(preset.values);
   };
 
-  // Derive subtitles from current config
-  const subjectSubtitle = [
-    config.quantity > 1 ? `${config.quantity} pessoas` : null,
-    config.gender === 'masculino' ? 'Masculino' : 'Feminino',
-    config.poseDescription ? config.poseDescription.slice(0, 20) + (config.poseDescription.length > 20 ? '…' : '') : null,
-  ].filter(Boolean).join(' · ');
-
   const dimensionSubtitle = config.dimension
     ? { stories: 'Stories 9:16', horizontal: 'Horizontal 16:9', 'feed-quadrado': 'Feed 1:1', 'feed-retrato': 'Feed 4:5' }[config.dimension]
     : 'Selecionar formato';
@@ -167,6 +179,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={User}
           title="Sujeito"
           subtitle={config.gender === 'masculino' ? 'Masculino' : 'Feminino'}
+          helpText={sectionHelp['Sujeito']}
           defaultOpen
           accent
         >
@@ -178,6 +191,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={SlidersHorizontal}
           title="Estilo Visual"
           subtitle={styleSubtitle}
+          helpText={sectionHelp['Estilo Visual']}
         >
           <VisualStyleSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
@@ -187,6 +201,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={Clapperboard}
           title="Direção do Personagem"
           subtitle="Expressão · Ângulo · Lente · Olhar"
+          helpText={sectionHelp['Direção do Personagem']}
         >
           <CharacterDirectionSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
@@ -196,6 +211,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={Smartphone}
           title="Formato & Composição"
           subtitle={dimensionSubtitle}
+          helpText={sectionHelp['Formato & Composição']}
         >
           <div className="space-y-5">
             <div>
@@ -214,6 +230,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={Palette}
           title="Cores & Iluminação"
           subtitle={colorSubtitle}
+          helpText={sectionHelp['Cores & Iluminação']}
         >
           <ColorsSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
@@ -223,6 +240,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={Type}
           title="Texto na Imagem"
           subtitle={textSubtitle}
+          helpText={sectionHelp['Texto na Imagem']}
         >
           <TextSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
@@ -232,6 +250,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           icon={Settings2}
           title="Avançado"
           subtitle={`${scenarioSubtitle} · Referências`}
+          helpText={sectionHelp['Avançado']}
         >
           <div className="space-y-5">
             <div>

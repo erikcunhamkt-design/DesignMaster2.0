@@ -189,20 +189,24 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
       {/* Canvas area */}
       <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-10">
         {state === 'aguardando' && (
-          <div className="flex flex-col items-center gap-8 animate-fade-up max-w-[220px] text-center">
+          <div className="flex flex-col items-center gap-8 animate-fade-up max-w-[280px] text-center">
             <div className="relative">
               <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-border/10 bg-card/20">
                 <ImageIcon className="h-8 w-8 text-muted-foreground/12" />
               </div>
               <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-primary/4 to-accent/3 -z-10 animate-breathe" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <p className="font-display text-base font-semibold tracking-tight text-foreground/50">
-                Pronto para criar
+                Nenhuma imagem gerada ainda
               </p>
               <p className="text-[11px] text-muted-foreground/30 leading-relaxed">
-                Configure os controles à direita e clique em{' '}
-                <span className="text-primary/60 font-semibold">Gerar Imagem</span>
+                Configure seu prompt e clique em{' '}
+                <span className="text-primary/60 font-semibold">Gerar Imagem</span>{' '}
+                para começar.
+              </p>
+              <p className="text-[10px] text-muted-foreground/20 leading-relaxed mt-1">
+                Use os controles à direita para personalizar estilo, composição e iluminação.
               </p>
             </div>
           </div>
