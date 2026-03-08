@@ -1,4 +1,4 @@
-import { ArrowUp, Minus, ArrowDown } from 'lucide-react';
+import { ArrowUp, Minus, ArrowDown, ScanSearch, User, Move } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
@@ -9,16 +9,6 @@ import dinheiroImg from '@/assets/floating/dinheiro.png';
 import luzesImg from '@/assets/floating/luzes.png';
 import boletosImg from '@/assets/floating/boletos.png';
 import moedasImg from '@/assets/floating/moedas.png';
-
-// Homer composition images
-import homerCloseup from '@/assets/composition/homer-closeup.png';
-import homerMedio from '@/assets/composition/homer-medio.png';
-import homerAmericano from '@/assets/composition/homer-americano.png';
-
-// Marge composition images
-import margeCloseup from '@/assets/composition/marge-closeup.png';
-import margeMedio from '@/assets/composition/marge-medio.png';
-import margeAmericano from '@/assets/composition/marge-americano.png';
 
 interface Props {
   config: ProjectConfig;
@@ -34,21 +24,9 @@ const floatingPresets = [
 ];
 
 const framings = [
-  {
-    id: 'closeup' as const,
-    label: 'Close-up',
-    images: { homer: homerCloseup, marge: margeCloseup },
-  },
-  {
-    id: 'plano-medio' as const,
-    label: 'Médio',
-    images: { homer: homerMedio, marge: margeMedio },
-  },
-  {
-    id: 'plano-americano' as const,
-    label: 'Americano',
-    images: { homer: homerAmericano, marge: margeAmericano },
-  },
+  { id: 'closeup' as const, label: 'Close-up', emoji: '🔍', desc: 'Rosto e detalhes' },
+  { id: 'plano-medio' as const, label: 'Médio', emoji: '👤', desc: 'Cintura para cima' },
+  { id: 'plano-americano' as const, label: 'Americano', emoji: '🧍', desc: 'Joelhos para cima' },
 ];
 
 const verticalPositions = [
@@ -58,11 +36,9 @@ const verticalPositions = [
 ];
 
 export function CompositionSection({ config, onUpdate }: Props) {
-  const imgKey = config.gender === 'feminino' ? 'marge' : 'homer';
-
   return (
     <div className="space-y-2.5">
-      {/* Framing cards with images */}
+      {/* Framing chips */}
       <div className="grid grid-cols-3 gap-1.5">
         {framings.map((f) => {
           const isSelected = config.framing === f.id;
@@ -71,29 +47,20 @@ export function CompositionSection({ config, onUpdate }: Props) {
               key={f.id}
               onClick={() => onUpdate({ framing: f.id })}
               className={cn(
-                'flex flex-col items-center rounded-md overflow-hidden border transition-all duration-150',
+                'flex flex-col items-center gap-1 rounded-lg py-3 px-2 border transition-all duration-200',
                 isSelected
-                  ? 'border-primary/50 ring-1 ring-primary/30'
-                  : 'border-border/20 hover:border-border/40'
+                  ? 'bg-primary/15 border-primary/40 shadow-[0_0_10px_hsl(var(--primary)/0.15)]'
+                  : 'bg-secondary/20 border-border/15 hover:border-primary/20 hover:bg-primary/5'
               )}
             >
-              <div className="w-full aspect-square overflow-hidden">
-                <img
-                  src={f.images[imgKey]}
-                  alt={f.label}
-                  className="w-full h-full object-cover object-top"
-                />
-              </div>
-              <span
-                className={cn(
-                  'w-full py-1 text-[9px] font-medium text-center',
-                  isSelected
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-secondary/30 text-muted-foreground'
-                )}
-              >
+              <span className="text-lg">{f.emoji}</span>
+              <span className={cn(
+                'text-[10px] font-semibold',
+                isSelected ? 'text-primary' : 'text-muted-foreground/70'
+              )}>
                 {f.label}
               </span>
+              <span className="text-[8px] text-muted-foreground/40">{f.desc}</span>
             </button>
           );
         })}
