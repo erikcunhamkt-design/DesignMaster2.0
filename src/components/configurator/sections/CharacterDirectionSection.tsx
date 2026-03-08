@@ -2,123 +2,9 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
 import { directionGroups, directionPresets, DirectionGroup } from '@/data/characterDirectionData';
-import { ChevronLeft, ChevronRight, Shuffle, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shuffle, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Expression images — unique per expression, per gender
-import homerExprSorrindo    from '@/assets/expressions/homer-sorrindo.png';
-import homerExprSerio       from '@/assets/expressions/homer-serio.png';
-import homerExprNeutro      from '@/assets/expressions/homer-neutro.png';
-import homerExprConfiante   from '@/assets/expressions/homer-confiante.png';
-import homerExprBravo       from '@/assets/expressions/homer-bravo.png';
-import homerExprPensativo   from '@/assets/expressions/homer-pensativo.png';
-import homerExprDeterminado from '@/assets/expressions/homer-determinado.png';
-
-import margeExprSorrindo    from '@/assets/expressions/marge-sorrindo.png';
-import margeExprSerio       from '@/assets/expressions/marge-serio.png';
-import margeExprNeutro      from '@/assets/expressions/marge-neutro.png';
-import margeExprConfiante   from '@/assets/expressions/marge-confiante.png';
-import margeExprBravo       from '@/assets/expressions/marge-bravo.png';
-import margeExprPensativo   from '@/assets/expressions/marge-pensativo.png';
-import margeExprDeterminado from '@/assets/expressions/marge-determinado.png';
-
-// Pose images for lens / gaze groups
-import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
-import homerMaosBolso      from '@/assets/poses/homer-maos-bolso.png';
-import homerPoseHeroica    from '@/assets/poses/homer-pose-heroica.png';
-import homerSentado        from '@/assets/poses/homer-sentado.png';
-import homerAndando        from '@/assets/poses/homer-andando.png';
-import homerApoiado        from '@/assets/poses/homer-apoiado.png';
-import homerApontando      from '@/assets/poses/homer-apontando.png';
-import homerDeCostas       from '@/assets/poses/homer-de-costas.png';
-
-import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
-import margeMaosBolso      from '@/assets/poses/marge-maos-bolso.png';
-import margePoseHeroica    from '@/assets/poses/marge-pose-heroica.png';
-import margeSentado        from '@/assets/poses/marge-sentado.png';
-import margeAndando        from '@/assets/poses/marge-andando.png';
-import margeApoiado        from '@/assets/poses/marge-apoiado.png';
-import margeApontando      from '@/assets/poses/marge-apontando.png';
-import margeDeCostas       from '@/assets/poses/marge-de-costas.png';
-
-// Angle-specific images — each matches the actual camera angle concept
-import homerAngleFrontal    from '@/assets/angles/homer-frontal.png';
-import homerAngleTresQuartos from '@/assets/angles/homer-tres-quartos.png';
-import homerAnglePerfil     from '@/assets/angles/homer-perfil.png';
-import homerAngleLowAngle   from '@/assets/angles/homer-low-angle.png';
-import homerAngleHighAngle  from '@/assets/angles/homer-high-angle.png';
-import homerAngleDutchAngle from '@/assets/angles/homer-dutch-angle.png';
-
-import margeAngleFrontal    from '@/assets/angles/marge-frontal.png';
-import margeAngleTresQuartos from '@/assets/angles/marge-tres-quartos.png';
-import margeAnglePerfil     from '@/assets/angles/marge-perfil.png';
-import margeAngleLowAngle   from '@/assets/angles/marge-low-angle.png';
-import margeAngleHighAngle  from '@/assets/angles/marge-high-angle.png';
-import margeAngleDutchAngle from '@/assets/angles/marge-dutch-angle.png';
-
-// Lens-specific images — each shows the visual effect of each focal length
-import homerLens24mm  from '@/assets/lenses/homer-24mm.png';
-import homerLens35mm  from '@/assets/lenses/homer-35mm.png';
-import homerLens50mm  from '@/assets/lenses/homer-50mm.png';
-import homerLens85mm  from '@/assets/lenses/homer-85mm.png';
-import homerLens135mm from '@/assets/lenses/homer-135mm.png';
-
-import margeLens24mm  from '@/assets/lenses/marge-24mm.png';
-import margeLens35mm  from '@/assets/lenses/marge-35mm.png';
-import margeLens50mm  from '@/assets/lenses/marge-50mm.png';
-import margeLens85mm  from '@/assets/lenses/marge-85mm.png';
-import margeLens135mm from '@/assets/lenses/marge-135mm.png';
-
-// Gaze-specific images — each shows the character's eye direction
-import homerGazeParaCamera from '@/assets/gaze/homer-para-camera.png';
-import homerGazeEsquerda   from '@/assets/gaze/homer-esquerda.png';
-import homerGazeDireita    from '@/assets/gaze/homer-direita.png';
-import homerGazeParaCima   from '@/assets/gaze/homer-para-cima.png';
-import homerGazeParaBaixo  from '@/assets/gaze/homer-para-baixo.png';
-import homerGazeDistante   from '@/assets/gaze/homer-distante.png';
-
-import margeGazeParaCamera from '@/assets/gaze/marge-para-camera.png';
-import margeGazeEsquerda   from '@/assets/gaze/marge-esquerda.png';
-import margeGazeDireita    from '@/assets/gaze/marge-direita.png';
-import margeGazeParaCima   from '@/assets/gaze/marge-para-cima.png';
-import margeGazeParaBaixo  from '@/assets/gaze/marge-para-baixo.png';
-import margeGazeDistante   from '@/assets/gaze/marge-distante.png';
-
-// ─── Avatar map: each chip → unique image per gender ─────────────────────────
-const chipAvatarMap: Record<string, { homer: string; marge: string }> = {
-  // EXPRESSÃO — uses new expression-specific images (all unique)
-  'Sorrindo':    { homer: homerExprSorrindo,    marge: margeExprSorrindo    },
-  'Sério':       { homer: homerExprSerio,       marge: margeExprSerio       },
-  'Neutro':      { homer: homerExprNeutro,      marge: margeExprNeutro      },
-  'Confiante':   { homer: homerExprConfiante,   marge: margeExprConfiante   },
-  'Bravo':       { homer: homerExprBravo,       marge: margeExprBravo       },
-  'Pensativo':   { homer: homerExprPensativo,   marge: margeExprPensativo   },
-  'Determinado': { homer: homerExprDeterminado, marge: margeExprDeterminado },
-
-  // ÂNGULO — imagens específicas para cada ângulo de câmera
-  'Frontal':     { homer: homerAngleFrontal,     marge: margeAngleFrontal     },
-  '3/4':         { homer: homerAngleTresQuartos, marge: margeAngleTresQuartos },
-  'Perfil':      { homer: homerAnglePerfil,      marge: margeAnglePerfil      },
-  'Low angle':   { homer: homerAngleLowAngle,    marge: margeAngleLowAngle    },
-  'High angle':  { homer: homerAngleHighAngle,   marge: margeAngleHighAngle   },
-  'Dutch angle': { homer: homerAngleDutchAngle,  marge: margeAngleDutchAngle  },
-
-  // LENTE — imagens específicas para cada distância focal
-  '24mm':        { homer: homerLens24mm,  marge: margeLens24mm  },
-  '35mm':        { homer: homerLens35mm,  marge: margeLens35mm  },
-  '50mm':        { homer: homerLens50mm,  marge: margeLens50mm  },
-  '85mm':        { homer: homerLens85mm,  marge: margeLens85mm  },
-  '135mm':       { homer: homerLens135mm, marge: margeLens135mm },
-
-  // OLHAR — imagens específicas para cada direção do olhar
-  'Para câmera': { homer: homerGazeParaCamera, marge: margeGazeParaCamera },
-  'Esquerda':    { homer: homerGazeEsquerda,   marge: margeGazeEsquerda   },
-  'Direita':     { homer: homerGazeDireita,    marge: margeGazeDireita    },
-  'Para cima':   { homer: homerGazeParaCima,   marge: margeGazeParaCima   },
-  'Para baixo':  { homer: homerGazeParaBaixo,  marge: margeGazeParaBaixo  },
-  'Distante':    { homer: homerGazeDistante,   marge: margeGazeDistante   },
-};
 
 interface Props {
   config: ProjectConfig;
@@ -132,10 +18,24 @@ const fieldMap: Record<string, { chip: keyof ProjectConfig; custom: keyof Projec
   gazeDirection:{ chip: 'gazeDirection',custom: 'gazeDirectionCustom' },
 };
 
+// Emoji maps for visual clarity without character images
+const chipEmojiMap: Record<string, string> = {
+  // Expressions
+  'Sorrindo': '😊', 'Sério': '😐', 'Neutro': '😶', 'Confiante': '😎',
+  'Bravo': '😠', 'Pensativo': '🤔', 'Determinado': '😤',
+  // Angles
+  'Frontal': '🎯', '3/4': '↗️', 'Perfil': '➡️',
+  'Low angle': '⬆️', 'High angle': '⬇️', 'Dutch angle': '↩️',
+  // Lenses
+  '24mm': '🔭', '35mm': '📷', '50mm': '📸', '85mm': '🖼️', '135mm': '🔍',
+  // Gaze
+  'Para câmera': '👁️', 'Esquerda': '👈', 'Direita': '👉',
+  'Para cima': '👆', 'Para baixo': '👇', 'Distante': '🌅',
+};
+
 export function CharacterDirectionSection({ config, onUpdate }: Props) {
   const [presetsOpen, setPresetsOpen] = useState(false);
   const [customEnabled, setCustomEnabled] = useState<Record<string, boolean>>({});
-  const isMasculino = config.gender === 'masculino';
 
   const getChipValue = (key: string) => config[fieldMap[key].chip] as string;
   const getCustomValue = (key: string) => config[fieldMap[key].custom] as string;
@@ -245,16 +145,15 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Direction groups — card carousel */}
-      <div className="space-y-5">
+      {/* Direction groups — chip grid */}
+      <div className="space-y-4">
         {directionGroups.map((group) => (
-          <ChipCardCarousel
+          <ChipGridSection
             key={group.key}
             group={group}
             chipValue={getChipValue(group.key)}
             customValue={getCustomValue(group.key)}
             customEnabled={!!customEnabled[group.key]}
-            isMasculino={isMasculino}
             onSelect={(val) => setChipValue(group.key, val)}
             onCustomChange={(val) => setCustomValue(group.key, val)}
             onToggleCustom={() => toggleCustom(group.key)}
@@ -292,12 +191,11 @@ export function CharacterDirectionSection({ config, onUpdate }: Props) {
   );
 }
 
-function ChipCardCarousel({
+function ChipGridSection({
   group,
   chipValue,
   customValue,
   customEnabled,
-  isMasculino,
   onSelect,
   onCustomChange,
   onToggleCustom,
@@ -306,43 +204,11 @@ function ChipCardCarousel({
   chipValue: string;
   customValue: string;
   customEnabled: boolean;
-  isMasculino: boolean;
   onSelect: (val: string) => void;
   onCustomChange: (val: string) => void;
   onToggleCustom: () => void;
 }) {
-  // Local index for navigation; sync to chipValue when defined
   const chips = group.chips;
-  const selectedIdx = chips.indexOf(chipValue);
-  const [navIdx, setNavIdx] = useState(selectedIdx >= 0 ? selectedIdx : 0);
-
-  const currentChip = chips[navIdx];
-  const avatarEntry = chipAvatarMap[currentChip];
-  const avatarSrc = avatarEntry
-    ? (isMasculino ? avatarEntry.homer : avatarEntry.marge)
-    : (isMasculino ? homerExprNeutro : margeExprNeutro);
-
-  const isSelected = chipValue === currentChip;
-
-  const goNext = () => {
-    const next = (navIdx + 1) % chips.length;
-    setNavIdx(next);
-    onSelect(chips[next]);
-  };
-
-  const goPrev = () => {
-    const prev = (navIdx - 1 + chips.length) % chips.length;
-    setNavIdx(prev);
-    onSelect(chips[prev]);
-  };
-
-  const handleCardClick = () => {
-    if (isSelected) {
-      onSelect('');
-    } else {
-      onSelect(currentChip);
-    }
-  };
 
   return (
     <div className="space-y-1.5">
@@ -351,7 +217,6 @@ function ChipCardCarousel({
         <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/50">
           {group.label}
         </span>
-        {/* Custom toggle */}
         <div className="flex items-center gap-1.5">
           <span className="text-[8px] text-muted-foreground/40">livre</span>
           <button
@@ -370,92 +235,27 @@ function ChipCardCarousel({
         </div>
       </div>
 
-      {/* Card carousel */}
-      <div className="relative flex items-center gap-2">
-        {/* Prev arrow */}
-        <button
-          onClick={goPrev}
-          className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
-        >
-          <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-        </button>
-
-        {/* Card */}
-        <button
-          onClick={handleCardClick}
-          className={cn(
-            'flex-1 relative rounded-xl overflow-hidden border transition-all duration-200',
-            isSelected
-              ? 'border-primary/50 shadow-[0_0_16px_hsl(var(--primary)/0.25)]'
-              : 'border-border/20 hover:border-border/40'
-          )}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={navIdx}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.15 }}
+      {/* Chip grid */}
+      <div className="flex flex-wrap gap-1.5">
+        {chips.map((chip) => {
+          const isActive = chipValue === chip;
+          const emoji = chipEmojiMap[chip];
+          return (
+            <button
+              key={chip}
+              onClick={() => onSelect(isActive ? '' : chip)}
+              className={cn(
+                'flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-medium border transition-all duration-200',
+                isActive
+                  ? 'bg-primary/15 border-primary/40 text-primary shadow-[0_0_8px_hsl(var(--primary)/0.15)]'
+                  : 'bg-secondary/20 border-border/15 text-muted-foreground/60 hover:border-primary/20 hover:text-foreground hover:bg-primary/5'
+              )}
             >
-              {/* Character image — fills the full card */}
-              <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                <img
-                  src={avatarSrc}
-                  alt={currentChip}
-                  className="absolute inset-0 h-full w-full object-cover object-top"
-                />
-              </div>
-
-              {/* Label overlay */}
-              <div className={cn(
-                'px-2 py-2 flex items-center justify-between transition-colors duration-200',
-                isSelected ? 'bg-primary/20' : 'bg-secondary/40'
-              )}>
-                <p className={cn(
-                  'text-[10px] font-semibold',
-                  isSelected ? 'text-primary' : 'text-muted-foreground/70'
-                )}>
-                  {currentChip}
-                </p>
-                <span className="text-[8px] text-muted-foreground/40">
-                  {navIdx + 1}/{chips.length}
-                </span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Selected indicator */}
-          {isSelected && (
-            <div className="absolute top-2 right-2 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-[8px] text-primary-foreground font-bold">✓</span>
-            </div>
-          )}
-        </button>
-
-        {/* Next arrow */}
-        <button
-          onClick={goNext}
-          className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
-        >
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </div>
-
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-1">
-        {chips.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setNavIdx(i); onSelect(chips[i]); }}
-            className={cn(
-              'rounded-full transition-all duration-200',
-              i === navIdx
-                ? 'w-3 h-1.5 bg-primary'
-                : 'w-1.5 h-1.5 bg-border/40 hover:bg-border/70'
-            )}
-          />
-        ))}
+              {emoji && <span className="text-xs">{emoji}</span>}
+              {chip}
+            </button>
+          );
+        })}
       </div>
 
       {/* Custom text field */}

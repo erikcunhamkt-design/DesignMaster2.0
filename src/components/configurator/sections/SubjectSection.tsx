@@ -1,47 +1,26 @@
-import { Plus, X, AlignLeft, AlignCenter, AlignRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
 import genderFemale from '@/assets/gender-female.png';
 import genderMale from '@/assets/gender-male.png';
 
-// Homer poses
-import homerBracosCruzados from '@/assets/poses/homer-bracos-cruzados.png';
-import homerMaosBolso from '@/assets/poses/homer-maos-bolso.png';
-import homerPoseHeroica from '@/assets/poses/homer-pose-heroica.png';
-import homerSentado from '@/assets/poses/homer-sentado.png';
-import homerAndando from '@/assets/poses/homer-andando.png';
-import homerApoiado from '@/assets/poses/homer-apoiado.png';
-import homerApontando from '@/assets/poses/homer-apontando.png';
-import homerDeCostas from '@/assets/poses/homer-de-costas.png';
-
-// Marge poses
-import margeBracosCruzados from '@/assets/poses/marge-bracos-cruzados.png';
-import margeMaosBolso from '@/assets/poses/marge-maos-bolso.png';
-import margePoseHeroica from '@/assets/poses/marge-pose-heroica.png';
-import margeSentado from '@/assets/poses/marge-sentado.png';
-import margeAndando from '@/assets/poses/marge-andando.png';
-import margeApoiado from '@/assets/poses/marge-apoiado.png';
-import margeApontando from '@/assets/poses/marge-apontando.png';
-import margeDeCostas from '@/assets/poses/marge-de-costas.png';
+const POSES = [
+  { id: 'bracos_cruzados', label: 'Braços cruzados', emoji: '💪' },
+  { id: 'maos_bolso',      label: 'Mãos no bolso',   emoji: '🧍' },
+  { id: 'pose_heroica',    label: 'Pose heroica',     emoji: '🦸' },
+  { id: 'sentado',         label: 'Sentado',          emoji: '🪑' },
+  { id: 'andando',         label: 'Andando',          emoji: '🚶' },
+  { id: 'apoiado',         label: 'Apoiado',          emoji: '🧱' },
+  { id: 'apontando',       label: 'Apontando',        emoji: '👉' },
+  { id: 'de_costas',       label: 'De costas',        emoji: '🔄' },
+];
 
 interface Props {
   config: ProjectConfig;
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
-
-const POSES = [
-  { id: 'bracos_cruzados', label: 'Braços cruzados', homer: homerBracosCruzados, marge: margeBracosCruzados },
-  { id: 'maos_bolso',      label: 'Mãos no bolso',   homer: homerMaosBolso,      marge: margeMaosBolso },
-  { id: 'pose_heroica',    label: 'Pose heroica',     homer: homerPoseHeroica,    marge: margePoseHeroica },
-  { id: 'sentado',         label: 'Sentado',          homer: homerSentado,        marge: margeSentado },
-  { id: 'andando',         label: 'Andando',          homer: homerAndando,        marge: margeAndando },
-  { id: 'apoiado',         label: 'Apoiado',          homer: homerApoiado,        marge: margeApoiado },
-  { id: 'apontando',       label: 'Apontando',        homer: homerApontando,      marge: margeApontando },
-  { id: 'de_costas',       label: 'De costas',        homer: homerDeCostas,       marge: margeDeCostas },
-];
 
 export function SubjectSection({ config, onUpdate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,9 +49,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
   };
 
   const selectPose = (poseLabel: string) => {
-    // Single selection: if already selected, deselect; otherwise replace
     const current = config.poseDescription || '';
-    // Keep any custom text (non-preset parts)
     const customParts = current
       .split(',')
       .map(p => p.trim())
@@ -87,8 +64,6 @@ export function SubjectSection({ config, onUpdate }: Props) {
   const isSelected = (poseLabel: string) => {
     return (config.poseDescription || '').split(',').map(p => p.trim()).includes(poseLabel);
   };
-
-  const isMasculino = config.gender === 'masculino';
 
   return (
     <div className="space-y-3">
@@ -160,18 +135,34 @@ export function SubjectSection({ config, onUpdate }: Props) {
         </div>
       </div>
 
-      {/* Pose carousel — card único com setas */}
+      {/* Pose grid — text chips with emoji */}
       <div>
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-2 tracking-wide">
-          Pose — como sua imagem vai aparecer
+          Pose
         </p>
 
-        <PoseCardCarousel
-          poses={POSES}
-          isMasculino={isMasculino}
-          selectedLabel={(config.poseDescription || '').split(',')[0]?.trim() || ''}
-          onSelect={selectPose}
-        />
+        <div className="grid grid-cols-2 gap-1.5">
+          {POSES.map((pose) => (
+            <button
+              key={pose.id}
+              onClick={() => selectPose(pose.label)}
+              className={cn(
+                'flex items-center gap-2 rounded-lg px-3 py-2.5 text-left border transition-all duration-200',
+                isSelected(pose.label)
+                  ? 'bg-primary/15 border-primary/40 shadow-[0_0_10px_hsl(var(--primary)/0.15)]'
+                  : 'bg-secondary/20 border-border/15 hover:border-primary/20 hover:bg-primary/5'
+              )}
+            >
+              <span className="text-sm">{pose.emoji}</span>
+              <span className={cn(
+                'text-[10px] font-medium',
+                isSelected(pose.label) ? 'text-primary' : 'text-muted-foreground/70'
+              )}>
+                {pose.label}
+              </span>
+            </button>
+          ))}
+        </div>
 
         {/* Custom pose text */}
         <div className="mt-2">
@@ -248,122 +239,6 @@ export function SubjectSection({ config, onUpdate }: Props) {
             </button>
           ))}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Pose Card Carousel ────────────────────────────────────────────────────
-
-function PoseCardCarousel({
-  poses,
-  isMasculino,
-  selectedLabel,
-  onSelect,
-}: {
-  poses: typeof POSES;
-  isMasculino: boolean;
-  selectedLabel: string;
-  onSelect: (label: string) => void;
-}) {
-  const initIdx = Math.max(0, poses.findIndex(p => p.label === selectedLabel));
-  const [navIdx, setNavIdx] = useState(initIdx);
-  const currentPose = poses[navIdx];
-  const img = isMasculino ? currentPose.homer : currentPose.marge;
-  const isSelected = selectedLabel === currentPose.label;
-
-  const goPrev = () => {
-    const prev = (navIdx - 1 + poses.length) % poses.length;
-    setNavIdx(prev);
-    onSelect(poses[prev].label);
-  };
-
-  const goNext = () => {
-    const next = (navIdx + 1) % poses.length;
-    setNavIdx(next);
-    onSelect(poses[next].label);
-  };
-
-  return (
-    <div className="space-y-1.5">
-      <div className="relative flex items-center gap-2">
-        {/* Prev */}
-        <button
-          onClick={goPrev}
-          className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
-        >
-          <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-        </button>
-
-        {/* Card */}
-        <button
-          onClick={() => isSelected ? onSelect('') : onSelect(currentPose.label)}
-          className={cn(
-            'flex-1 relative rounded-xl overflow-hidden border transition-all duration-200',
-            isSelected
-              ? 'border-primary/50 shadow-[0_0_16px_hsl(var(--primary)/0.25)]'
-              : 'border-border/20 hover:border-border/40'
-          )}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={navIdx}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.15 }}
-            >
-              <div className="relative w-full overflow-hidden" style={{ aspectRatio: '3/4' }}>
-                <img
-                  src={img}
-                  alt={currentPose.label}
-                  className="absolute inset-0 h-full w-full object-cover object-top"
-                />
-              </div>
-              <div className={cn(
-                'px-2 py-2 flex items-center justify-between transition-colors',
-                isSelected ? 'bg-primary/20' : 'bg-secondary/40'
-              )}>
-                <p className={cn(
-                  'text-[10px] font-semibold',
-                  isSelected ? 'text-primary' : 'text-muted-foreground/70'
-                )}>
-                  {currentPose.label}
-                </p>
-                <span className="text-[8px] text-muted-foreground/40">
-                  {navIdx + 1}/{poses.length}
-                </span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          {isSelected && (
-            <div className="absolute top-2 right-2 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-[8px] text-primary-foreground font-bold">✓</span>
-            </div>
-          )}
-        </button>
-
-        {/* Next */}
-        <button
-          onClick={goNext}
-          className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-secondary/40 border border-border/20 hover:bg-secondary/70 hover:border-border/40 transition-all"
-        >
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </div>
-
-      {/* Dots */}
-      <div className="flex justify-center gap-1">
-        {poses.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setNavIdx(i); onSelect(poses[i].label); }}
-            className={cn(
-              'rounded-full transition-all duration-200',
-              i === navIdx ? 'w-3 h-1.5 bg-primary' : 'w-1.5 h-1.5 bg-border/40 hover:bg-border/70'
-            )}
-          />
-        ))}
       </div>
     </div>
   );
