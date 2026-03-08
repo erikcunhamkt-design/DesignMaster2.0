@@ -1,6 +1,15 @@
 import { studios } from '@/data/studios';
-import logoImg from '@/assets/logo.png';
-import heroBg from '@/assets/hero-bg.jpg';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import { HeroCard } from '@/components/dashboard/HeroCard';
+import { ToolSection } from '@/components/dashboard/ToolSection';
+import { ToolCard } from '@/components/dashboard/ToolCard';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import { cn } from '@/lib/utils';
+
+// Import hero images
 import extratorHero from '@/assets/extrator-hero.png';
 import promptBuilderHero from '@/assets/prompt-builder-hero.png';
 import upscaleHero from '@/assets/upscale-hero.png';
@@ -13,18 +22,6 @@ import footballCreatorHero from '@/assets/football-creator-hero.png';
 import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
-import { useAdmin } from '@/hooks/useAdmin';
-import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Sparkles, Glasses, Sun, LogOut, KeyRound, ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
-import { useAuth } from '@/hooks/useAuth';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
@@ -41,256 +38,82 @@ const studioImages: Record<string, string> = {
   'mockup-studio': mockupStudioHero,
 };
 
-const FEATURED_STUDIO_ID = 'criador';
+// Section definitions with studio IDs
+const sections = [
+  {
+    title: '🚀 Start Creating',
+    ids: ['criador', 'prompt-builder', 'extrator', 'galeria'],
+  },
+  {
+    title: '🔥 Most Used',
+    ids: ['mockup-studio', 'capas', 'hero-studio'],
+  },
+  {
+    title: '📢 Marketing & Content',
+    ids: ['capas', 'hero-studio', 'chat', 'markdown'],
+  },
+  {
+    title: '🛍️ Products & Ecommerce',
+    ids: ['produtos', 'mockup-studio'],
+  },
+  {
+    title: '🎯 Creative Niches',
+    ids: ['football-creator', 'auto-creator'],
+  },
+  {
+    title: '🛠️ Image Tools',
+    ids: ['upscale'],
+  },
+];
 
 export default function StudiosPage() {
-  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
-  const { user, signOut } = useAuth();
-  const { apiKey, saveKey } = useGoogleApiKey();
-  const hasKey = apiKey.length >= 10;
-  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
-  const avatarUrl = user?.user_metadata?.avatar_url;
+  const [activeSection, setActiveSection] = useState('home');
+  const { largeText, lightMode } = useAccessibility();
 
-  const featured = studios.find(s => s.id === FEATURED_STUDIO_ID)!;
-  const rest = studios.filter(s => s.id !== FEATURED_STUDIO_ID);
+  const studioMap = new Map(studios.map((s) => [s.id, s]));
+
+  const navigateToStudio = (id: string) => {
+    const studio = studioMap.get(id);
+    if (studio) navigate(studio.route);
+  };
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Hero background image */}
-      <div className="pointer-events-none absolute inset-0">
-        <img
-          src={heroBg}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-20"
-        />
-        {/* Dark overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/60" />
-      </div>
+    <div className={cn('flex h-screen w-full overflow-hidden bg-background', largeText && 'accessible-large-text', lightMode && 'accessible-light-mode')}>
+      <DashboardSidebar activeSection={activeSection} onNavigate={setActiveSection} />
 
-      {/* Topbar */}
-      <header className="relative z-10 flex h-16 items-center justify-between px-8 border-b border-border/8">
-        <div className="flex items-center gap-3">
-          <img src={logoImg} alt="Design Master" className="h-8 w-8 rounded-xl shadow-glow-sm" />
-          <span className="font-display text-[15px] font-bold tracking-tight text-foreground">
-            Design<span className="text-gradient">Master</span>
-          </span>
-          <SubscriptionBadge />
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Accessibility toggles */}
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleLargeText}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
-                    largeText
-                      ? 'bg-primary/15 text-primary border border-primary/30'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  )}
-                >
-                  <Glasses className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
-              </TooltipContent>
-            </Tooltip>
+      <div className="flex flex-1 flex-col min-w-0">
+        <DashboardTopbar />
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleLightMode}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
-                    lightMode
-                      ? 'bg-primary/15 text-primary border border-primary/30'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  )}
-                >
-                  <Sun className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                {lightMode ? 'Desativar modo claro' : 'Ativar modo claro'}
-              </TooltipContent>
-            </Tooltip>
+        {/* Main scrollable content */}
+        <main className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className="max-w-[1400px] mx-auto px-8 py-8 space-y-10">
+            {/* Hero */}
+            <HeroCard onOpen={() => navigate('/studio/criador')} />
+
+            {/* Netflix-style sections */}
+            {sections.map((section) => (
+              <ToolSection key={section.title} title={section.title}>
+                {section.ids.map((id) => {
+                  const studio = studioMap.get(id);
+                  if (!studio) return null;
+                  return (
+                    <ToolCard
+                      key={`${section.title}-${id}`}
+                      name={studio.name}
+                      description={studio.description}
+                      icon={studio.icon}
+                      gradient={studio.gradient}
+                      image={studioImages[studio.id]}
+                      onClick={() => navigateToStudio(id)}
+                    />
+                  );
+                })}
+              </ToolSection>
+            ))}
           </div>
-
-          {/* API Key */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                className={cn(
-                  'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-semibold tracking-wider uppercase transition-all duration-200 border',
-                  hasKey
-                    ? 'bg-primary/8 text-primary/80 border-primary/20 hover:bg-primary/12'
-                    : 'bg-destructive/8 text-destructive/70 border-destructive/20 hover:bg-destructive/12'
-                )}
-              >
-                <KeyRound className="h-2.5 w-2.5" />
-                <span className="hidden sm:inline">API</span>
-                <ChevronDown className="h-2 w-2 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3 rounded-xl">
-              <ApiKeySection apiKey={apiKey} onChangeKey={saveKey} />
-            </PopoverContent>
-          </Popover>
-
-          {isAdmin && (
-            <button
-              onClick={() => navigate('/admin')}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-            >
-              <Shield className="h-3.5 w-3.5" />
-              Admin
-            </button>
-          )}
-
-          {/* User avatar + logout */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex h-8 w-8 items-center justify-center rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
-                <Avatar className="h-8 w-8">
-                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
-                  <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {user?.email && (
-                <div className="px-2 py-1.5 text-[10px] text-muted-foreground truncate border-b border-border mb-1">
-                  {user.email}
-                </div>
-              )}
-              <DropdownMenuItem onClick={signOut} className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer">
-                <LogOut className="h-3.5 w-3.5" />
-                Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="relative z-10 flex-1 px-8 pb-16 pt-10 max-w-[1280px] mx-auto w-full">
-
-        {/* Page title */}
-        <div className="mb-10 animate-fade-up">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60 mb-2">Workspace</p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground font-display">
-            Seus Studios
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Escolha uma ferramenta e comece a criar agora
-          </p>
-        </div>
-
-        {/* Featured card */}
-        <div className="relative mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
-          {/* Outer glow pulse ring */}
-          <div className="absolute -inset-[2px] rounded-[18px] bg-gradient-to-r from-primary/60 via-primary/90 to-primary/60 opacity-70 blur-[2px] animate-pulse pointer-events-none" />
-          {/* Secondary shimmer ring */}
-          <div className="absolute -inset-[1px] rounded-[17px] bg-gradient-to-r from-transparent via-primary/40 to-transparent pointer-events-none" />
-
-          <button
-            onClick={() => navigate(featured.route)}
-            className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 flex items-stretch h-[150px] bg-card/70 backdrop-blur-sm"
-          >
-            {/* Animated gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-transparent pointer-events-none" />
-
-            {/* Top shimmer line */}
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/80 to-transparent" />
-            {/* Bottom accent line */}
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-            {/* Floating glow orb */}
-            <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-64 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/18 transition-all duration-700" />
-
-            {/* Content — full width */}
-            <div className="relative flex flex-1 items-center justify-between px-10 py-6 min-w-0">
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">{featured.tagline}</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary border border-primary/30 shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Principal
-                  </span>
-                </div>
-                <h2 className="text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
-                  {featured.name}
-                </h2>
-                <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{featured.description}</p>
-              </div>
-
-              {/* Arrow — pinned to the right end of the card */}
-              <div className="flex items-center justify-center w-11 h-11 rounded-full border border-primary/25 bg-primary/10 group-hover:border-primary/50 group-hover:bg-primary/20 group-hover:shadow-[0_0_16px_hsl(var(--primary)/0.4)] transition-all duration-300 shrink-0 ml-8">
-                <ArrowRight className="h-4 w-4 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
-              </div>
-            </div>
-          </button>
-        </div>
-
-
-        {/* Grid of remaining studios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {rest.map((studio, i) => (
-            <button
-              key={studio.id}
-              onClick={() => navigate(studio.route)}
-              className="group relative flex flex-col gap-4 rounded-2xl border border-border/12 bg-card/30 p-6 text-left transition-all duration-200 hover:border-primary/20 hover:bg-card/60 hover:shadow-glow-sm hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 overflow-hidden animate-fade-up"
-              style={{ animationDelay: `${(i + 2) * 55}ms` }}
-            >
-              {/* Background image — full card, semi-transparent */}
-              {studioImages[studio.id] && (
-                <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                  <img
-                    src={studioImages[studio.id]}
-                    alt=""
-                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                    style={{ opacity: 0.18 }}
-                  />
-                  {/* dark overlay to ensure text readability */}
-                  <div className="absolute inset-0 bg-background/40" />
-                </div>
-              )}
-
-              {/* Hover gradient */}
-              <div className={cn('absolute inset-0 bg-gradient-to-br', studio.gradient, 'opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-2xl')} />
-
-              {/* Icon (only when no image) */}
-              {!studioImages[studio.id] && (
-                <span className="relative text-3xl transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
-              )}
-
-              {/* Text */}
-              <div className="relative space-y-1.5 flex-1">
-                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary/60">{studio.tagline}</p>
-                <h3 className="text-[15px] font-bold text-foreground font-display tracking-tight leading-tight">{studio.name}</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{studio.description}</p>
-              </div>
-
-              {/* Arrow */}
-              <div className="relative flex items-center justify-between pt-1">
-                <div className="h-px flex-1 bg-border/10 group-hover:bg-primary/10 transition-colors" />
-                <ArrowRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-primary transition-colors ml-2" />
-              </div>
-
-              {/* Bottom accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-          ))}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
