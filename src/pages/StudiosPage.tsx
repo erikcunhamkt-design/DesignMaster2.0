@@ -67,8 +67,20 @@ export default function StudiosPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const { largeText, lightMode } = useAccessibility();
   const { isFavorite, toggleFavorite, favorites } = useFavorites();
+  const { recents, trackUsage } = useRecentTools();
 
   const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
+
+  // Navigate to studio and track usage
+  const navigateToStudio = useCallback((route: string, studioId: string) => {
+    trackUsage(studioId);
+    navigate(route);
+  }, [navigate, trackUsage]);
+
+  // Recent studios resolved from IDs
+  const recentStudios = useMemo(() => {
+    return recents.map((id) => studios.find((s) => s.id === id)).filter(Boolean) as typeof studios;
+  }, [recents]);
 
   const studioMap = useMemo(() => {
     const map: Record<string, (typeof studios)[0]> = {};
