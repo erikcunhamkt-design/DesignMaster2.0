@@ -16,7 +16,7 @@ interface ToolSectionProps {
   onToggleFavorite?: (id: string) => void;
 }
 
-export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite }: ToolSectionProps) {
+export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite, onNavigate }: ToolSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
