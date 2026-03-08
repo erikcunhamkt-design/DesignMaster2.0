@@ -24,11 +24,10 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { id: 'home', label: 'Home', icon: Home },
-  { id: 'criar', label: 'Criar', icon: PenTool, section: 'criar' },
-  { id: 'marketing', label: 'Marketing', icon: Megaphone, section: 'marketing' },
-  { id: 'produtos', label: 'Produtos', icon: ShoppingBag, section: 'produtos' },
-  { id: 'nichos', label: 'Nichos', icon: Layers, section: 'nichos' },
-  { id: 'ferramentas', label: 'Ferramentas', icon: Wrench, section: 'ferramentas' },
+  { id: 'image-creators', label: 'Criadores', icon: Wand2, section: 'image-creators' },
+  { id: 'creative-assistant', label: 'Assistente', icon: Brain, section: 'creative-assistant' },
+  { id: 'prompt-tools', label: 'Prompts', icon: PenTool, section: 'prompt-tools' },
+  { id: 'image-tools', label: 'Imagem', icon: Wrench, section: 'image-tools' },
 ];
 
 const secondaryItems: SidebarItem[] = [
