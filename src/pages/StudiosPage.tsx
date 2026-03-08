@@ -127,7 +127,7 @@ export default function StudiosPage() {
               <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
               <button
-                onClick={() => navigate(featured.route)}
+                onClick={() => navigateToStudio(featured.route, featured.id)}
                 className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
