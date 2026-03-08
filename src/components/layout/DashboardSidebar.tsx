@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Home,
+  Wand2,
+  Brain,
   PenTool,
-  Megaphone,
-  ShoppingBag,
-  Layers,
   Wrench,
   Star,
   Clock,
