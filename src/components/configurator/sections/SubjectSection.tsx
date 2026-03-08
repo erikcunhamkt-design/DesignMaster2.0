@@ -106,9 +106,9 @@ export function SubjectSection({ config, onUpdate }: Props) {
         <p className="text-[9px] font-semibold uppercase text-muted-foreground/60 mb-1.5 tracking-wide">Gênero</p>
         <div className="grid grid-cols-2 gap-1.5">
           {([
-            { id: 'masculino', label: 'Masculino', img: genderMale },
-            { id: 'feminino',  label: 'Feminino',  img: genderFemale },
-          ] as const).map(({ id, label, img }) => (
+            { id: 'masculino', label: 'Masculino' },
+            { id: 'feminino',  label: 'Feminino' },
+          ] as const).map(({ id, label }) => (
             <button
               key={id}
               onClick={() => onUpdate({ gender: id })}
@@ -119,8 +119,11 @@ export function SubjectSection({ config, onUpdate }: Props) {
                   : 'bg-secondary/30 border-transparent hover:border-border/30 hover:bg-secondary/50'
               )}
             >
-              <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-border/20">
-                <img src={img} alt={label} className="h-full w-full object-cover object-top" />
+              <div className={cn(
+                'h-12 w-12 rounded-full flex items-center justify-center border-2',
+                config.gender === id ? 'border-primary/40 bg-primary/10' : 'border-border/20 bg-secondary/40'
+              )}>
+                <User className={cn('h-6 w-6', config.gender === id ? 'text-primary' : 'text-muted-foreground/50')} />
               </div>
               <span className={cn(
                 'text-[9px] font-semibold tracking-wide uppercase',
