@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { Studio } from '@/data/studios';
@@ -10,7 +10,7 @@ interface ToolCardProps {
   onToggleFavorite?: (id: string) => void;
 }
 
-export function ToolCard({ studio, image }: ToolCardProps) {
+export function ToolCard({ studio, image, isFavorite, onToggleFavorite }: ToolCardProps) {
   const navigate = useNavigate();
 
   return (
@@ -18,6 +18,26 @@ export function ToolCard({ studio, image }: ToolCardProps) {
       onClick={() => navigate(studio.route)}
       className="group relative flex flex-col min-w-[220px] w-[220px] h-[160px] rounded-2xl border border-border/20 bg-card/40 backdrop-blur-sm overflow-hidden text-left transition-all duration-300 hover:border-primary/30 hover:shadow-glow-sm hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 shrink-0"
     >
+      {/* Favorite button */}
+      {onToggleFavorite && (
+        <div
+          role="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onToggleFavorite(studio.id);
+          }}
+          className={cn(
+            'absolute top-3 right-3 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200',
+            isFavorite
+              ? 'bg-primary/20 text-primary shadow-[0_0_8px_hsl(var(--primary)/0.3)]'
+              : 'bg-card/60 text-muted-foreground/40 opacity-0 group-hover:opacity-100 hover:text-primary hover:bg-primary/10'
+          )}
+        >
+          <Star className={cn('h-3.5 w-3.5 transition-transform duration-200', isFavorite && 'fill-primary scale-110')} />
+        </div>
+      )}
+
       {/* BG image or gradient */}
       {image ? (
         <div className="absolute inset-0 pointer-events-none">

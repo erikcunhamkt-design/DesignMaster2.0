@@ -8,9 +8,11 @@ interface ToolSectionProps {
   title: string;
   studios: Studio[];
   images: Record<string, string>;
+  isFavorite?: (id: string) => boolean;
+  onToggleFavorite?: (id: string) => void;
 }
 
-export function ToolSection({ title, studios, images }: ToolSectionProps) {
+export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite }: ToolSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -57,11 +59,9 @@ export function ToolSection({ title, studios, images }: ToolSectionProps) {
       </div>
 
       <div className="relative">
-        {/* Left fade */}
         {canScrollLeft && (
           <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
         )}
-        {/* Right fade */}
         {canScrollRight && (
           <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
         )}
@@ -72,7 +72,13 @@ export function ToolSection({ title, studios, images }: ToolSectionProps) {
           className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
         >
           {studios.map((s) => (
-            <ToolCard key={s.id} studio={s} image={images[s.id]} />
+            <ToolCard
+              key={s.id}
+              studio={s}
+              image={images[s.id]}
+              isFavorite={isFavorite?.(s.id)}
+              onToggleFavorite={onToggleFavorite}
+            />
           ))}
         </div>
       </div>

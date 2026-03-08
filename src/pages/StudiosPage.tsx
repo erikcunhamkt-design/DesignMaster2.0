@@ -4,8 +4,10 @@ import { studios } from '@/data/studios';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { DashboardTopbar } from '@/components/layout/DashboardTopbar';
 import { ToolSection } from '@/components/dashboard/ToolSection';
+import { ToolCard } from '@/components/dashboard/ToolCard';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
 
 import extratorHero from '@/assets/extrator-hero.png';
@@ -36,41 +38,15 @@ const studioImages: Record<string, string> = {
   'mockup-studio': mockupStudioHero,
 };
 
-// Section definitions with studio IDs
 const sections = [
-  {
-    id: 'criar',
-    title: 'Começar a criar',
-    studioIds: ['prompt-builder', 'extrator', 'galeria'],
-  },
-  {
-    id: 'popular',
-    title: 'Mais usados',
-    studioIds: ['mockup-studio', 'capas', 'hero-studio'],
-  },
-  {
-    id: 'marketing',
-    title: 'Marketing & Conteúdo',
-    studioIds: ['capas', 'hero-studio', 'chat', 'markdown'],
-  },
-  {
-    id: 'produtos',
-    title: 'Produtos & E-commerce',
-    studioIds: ['produtos', 'mockup-studio'],
-  },
-  {
-    id: 'nichos',
-    title: 'Nichos Criativos',
-    studioIds: ['football-creator', 'auto-creator'],
-  },
-  {
-    id: 'ferramentas',
-    title: 'Ferramentas de Imagem',
-    studioIds: ['upscale'],
-  },
+  { id: 'criar', title: 'Começar a criar', studioIds: ['prompt-builder', 'extrator', 'galeria'] },
+  { id: 'popular', title: 'Mais usados', studioIds: ['mockup-studio', 'capas', 'hero-studio'] },
+  { id: 'marketing', title: 'Marketing & Conteúdo', studioIds: ['capas', 'hero-studio', 'chat', 'markdown'] },
+  { id: 'produtos', title: 'Produtos & E-commerce', studioIds: ['produtos', 'mockup-studio'] },
+  { id: 'nichos', title: 'Nichos Criativos', studioIds: ['football-creator', 'auto-creator'] },
+  { id: 'ferramentas', title: 'Ferramentas de Imagem', studioIds: ['upscale'] },
 ];
 
-// Map section filter to which sections to show
 const sectionFilterMap: Record<string, string[]> = {
   home: sections.map((s) => s.id),
   criar: ['criar'],
@@ -89,6 +65,7 @@ export default function StudiosPage() {
   const [activeSection, setActiveSection] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const { largeText, lightMode } = useAccessibility();
+  const { isFavorite, toggleFavorite, favorites } = useFavorites();
 
   const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
 
@@ -97,6 +74,11 @@ export default function StudiosPage() {
     studios.forEach((s) => (map[s.id] = s));
     return map;
   }, []);
+
+  // Studios that are favorited
+  const favoriteStudios = useMemo(() => {
+    return studios.filter((s) => favorites.has(s.id));
+  }, [favorites]);
 
   const filteredSections = useMemo(() => {
     const allowed = sectionFilterMap[activeSection] || sections.map((s) => s.id);
@@ -128,7 +110,6 @@ export default function StudiosPage() {
           {/* Hero section */}
           {activeSection === 'home' && !searchQuery && (
             <div className="relative mt-8 mb-10 animate-fade-up">
-              {/* Glow */}
               <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-primary/50 via-primary/80 to-accent/50 opacity-60 blur-[3px] animate-pulse pointer-events-none" />
               <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
@@ -136,7 +117,6 @@ export default function StudiosPage() {
                 onClick={() => navigate(featured.route)}
                 className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md"
               >
-                {/* BG effects */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -180,28 +160,53 @@ export default function StudiosPage() {
             </div>
           )}
 
-          {/* Favorites / Recents placeholder */}
-          {(activeSection === 'favoritos' || activeSection === 'recentes') && (
+          {/* Favorites section */}
+          {activeSection === 'favoritos' && (
+            favoriteStudios.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
+                {favoriteStudios.map((s) => (
+                  <ToolCard
+                    key={s.id}
+                    studio={s}
+                    image={studioImages[s.id]}
+                    isFavorite={true}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+                Nenhuma ferramenta favoritada ainda. Clique na ⭐ em qualquer card para favoritar.
+              </div>
+            )
+          )}
+
+          {/* Recents placeholder */}
+          {activeSection === 'recentes' && (
             <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
-              {activeSection === 'favoritos' ? 'Nenhuma ferramenta favoritada ainda.' : 'Nenhuma ferramenta usada recentemente.'}
+              Nenhuma ferramenta usada recentemente.
             </div>
           )}
 
           {/* Netflix sections */}
-          <div className={cn(activeSection === 'home' && !searchQuery ? '' : 'mt-2')}>
-            {filteredSections.map((section, i) => (
-              <div key={section.id} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
-                <ToolSection
-                  title={section.title}
-                  studios={section.studios}
-                  images={studioImages}
-                />
-              </div>
-            ))}
-          </div>
+          {activeSection !== 'favoritos' && activeSection !== 'recentes' && (
+            <div className={cn(activeSection === 'home' && !searchQuery ? '' : 'mt-2')}>
+              {filteredSections.map((section, i) => (
+                <div key={section.id} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+                  <ToolSection
+                    title={section.title}
+                    studios={section.studios}
+                    images={studioImages}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* No results */}
-          {searchQuery && filteredSections.length === 0 && (
+          {searchQuery && filteredSections.length === 0 && activeSection !== 'favoritos' && (
             <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
               Nenhuma ferramenta encontrada para "{searchQuery}"
             </div>
