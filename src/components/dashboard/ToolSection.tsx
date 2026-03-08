@@ -79,6 +79,7 @@ export function ToolSection({ title, studios, images, isFavorite, onToggleFavori
               image={images[s.id]}
               isFavorite={isFavorite?.(s.id)}
               onToggleFavorite={onToggleFavorite}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
