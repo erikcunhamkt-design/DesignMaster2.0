@@ -15,7 +15,7 @@ export function NegativePromptBlock({
   negativePrompt,
   negativePromptEnabled,
   onUpdate,
-  placeholder = 'Ex: blurry, low quality, watermark, extra fingers, deformed hands',
+  placeholder = 'Ex: desfocado, baixa qualidade, marca d\'água, dedos extras, mãos deformadas',
 }: NegativePromptBlockProps) {
   return (
     <div className={cn(
