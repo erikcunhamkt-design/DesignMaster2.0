@@ -12,9 +12,6 @@ interface ToolSectionProps {
   onToggleFavorite?: (id: string) => void;
   onNavigate?: (route: string, studioId: string) => void;
 }
-  isFavorite?: (id: string) => boolean;
-  onToggleFavorite?: (id: string) => void;
-}
 
 export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite, onNavigate }: ToolSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
