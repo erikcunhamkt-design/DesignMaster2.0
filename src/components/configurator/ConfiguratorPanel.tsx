@@ -128,7 +128,7 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, helpText, de
   );
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange, onDuplicate }: ConfiguratorPanelProps) {
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
