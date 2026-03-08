@@ -136,7 +136,6 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
   ) && (
     hasFreePrompt || (
       config.dimension !== null &&
-      config.niche.length > 0 &&
       (!config.textEnabled || config.text01.length >= 3)
     )
   );
