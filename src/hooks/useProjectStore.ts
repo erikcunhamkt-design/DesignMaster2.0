@@ -71,6 +71,7 @@ export function useProjectStore() {
     activeProjectId,
     setActiveProjectId,
     addProject,
+    duplicateProject,
     removeProject,
     updateConfig,
   };
