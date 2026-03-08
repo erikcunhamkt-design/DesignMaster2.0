@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studios } from '@/data/studios';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
@@ -8,6 +8,7 @@ import { ToolCard } from '@/components/dashboard/ToolCard';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useRecentTools } from '@/hooks/useRecentTools';
 import { cn } from '@/lib/utils';
 
 import extratorHero from '@/assets/extrator-hero.png';
@@ -66,8 +67,20 @@ export default function StudiosPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const { largeText, lightMode } = useAccessibility();
   const { isFavorite, toggleFavorite, favorites } = useFavorites();
+  const { recents, trackUsage } = useRecentTools();
 
   const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
+
+  // Navigate to studio and track usage
+  const navigateToStudio = useCallback((route: string, studioId: string) => {
+    trackUsage(studioId);
+    navigate(route);
+  }, [navigate, trackUsage]);
+
+  // Recent studios resolved from IDs
+  const recentStudios = useMemo(() => {
+    return recents.map((id) => studios.find((s) => s.id === id)).filter(Boolean) as typeof studios;
+  }, [recents]);
 
   const studioMap = useMemo(() => {
     const map: Record<string, (typeof studios)[0]> = {};
@@ -114,7 +127,7 @@ export default function StudiosPage() {
               <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
               <button
-                onClick={() => navigate(featured.route)}
+                onClick={() => navigateToStudio(featured.route, featured.id)}
                 className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
@@ -181,11 +194,26 @@ export default function StudiosPage() {
             )
           )}
 
-          {/* Recents placeholder */}
+          {/* Recents section */}
           {activeSection === 'recentes' && (
-            <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
-              Nenhuma ferramenta usada recentemente.
-            </div>
+            recentStudios.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
+                {recentStudios.map((s) => (
+                  <ToolCard
+                    key={s.id}
+                    studio={s}
+                    image={studioImages[s.id]}
+                    isFavorite={isFavorite(s.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onNavigate={navigateToStudio}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+                Nenhuma ferramenta usada recentemente. Comece usando qualquer ferramenta!
+              </div>
+            )
           )}
 
           {/* Netflix sections */}
@@ -199,6 +227,7 @@ export default function StudiosPage() {
                     images={studioImages}
                     isFavorite={isFavorite}
                     onToggleFavorite={toggleFavorite}
+                    onNavigate={navigateToStudio}
                   />
                 </div>
               ))}

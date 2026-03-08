@@ -133,6 +133,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_recent_tools: {
+        Row: {
+          id: string
+          studio_id: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          studio_id: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          studio_id?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

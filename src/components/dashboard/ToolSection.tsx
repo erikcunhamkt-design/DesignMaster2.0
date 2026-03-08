@@ -10,9 +10,10 @@ interface ToolSectionProps {
   images: Record<string, string>;
   isFavorite?: (id: string) => boolean;
   onToggleFavorite?: (id: string) => void;
+  onNavigate?: (route: string, studioId: string) => void;
 }
 
-export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite }: ToolSectionProps) {
+export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite, onNavigate }: ToolSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -78,6 +79,7 @@ export function ToolSection({ title, studios, images, isFavorite, onToggleFavori
               image={images[s.id]}
               isFavorite={isFavorite?.(s.id)}
               onToggleFavorite={onToggleFavorite}
+              onNavigate={onNavigate}
             />
           ))}
         </div>

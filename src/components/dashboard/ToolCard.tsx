@@ -8,14 +8,20 @@ interface ToolCardProps {
   image?: string;
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
+  onNavigate?: (route: string, studioId: string) => void;
 }
 
-export function ToolCard({ studio, image, isFavorite, onToggleFavorite }: ToolCardProps) {
+export function ToolCard({ studio, image, isFavorite, onToggleFavorite, onNavigate }: ToolCardProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onNavigate) onNavigate(studio.route, studio.id);
+    else navigate(studio.route);
+  };
 
   return (
     <button
-      onClick={() => navigate(studio.route)}
+      onClick={handleClick}
       className="group relative flex flex-col min-w-[220px] w-[220px] h-[160px] rounded-2xl border border-border/20 bg-card/40 backdrop-blur-sm overflow-hidden text-left transition-all duration-300 hover:border-primary/30 hover:shadow-glow-sm hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 shrink-0"
     >
       {/* Favorite button */}
