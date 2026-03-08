@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studios } from '@/data/studios';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
@@ -8,6 +8,7 @@ import { ToolCard } from '@/components/dashboard/ToolCard';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useRecentTools } from '@/hooks/useRecentTools';
 import { cn } from '@/lib/utils';
 
 import extratorHero from '@/assets/extrator-hero.png';
