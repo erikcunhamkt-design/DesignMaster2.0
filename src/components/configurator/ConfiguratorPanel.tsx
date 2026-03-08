@@ -278,11 +278,6 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
             Selecione um <span className="text-foreground/50 font-semibold">Formato</span> para continuar
           </p>
         )}
-        {!canGenerate && !hasFreePrompt && config.niche.length === 0 && config.dimension !== null && (
-          <p className="text-[9px] text-muted-foreground/40 text-center">
-            Informe o <span className="text-foreground/50 font-semibold">Nicho</span> em Avançado
-          </p>
-        )}
         <Button
           disabled={!canGenerate}
           onClick={onGenerate}
