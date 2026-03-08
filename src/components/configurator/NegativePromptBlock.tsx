@@ -15,7 +15,7 @@ export function NegativePromptBlock({
   negativePrompt,
   negativePromptEnabled,
   onUpdate,
-  placeholder = 'Ex: texto ilegível, mãos deformadas, fundo poluído, cores apagadas...',
+  placeholder = 'Ex: blurry, low quality, watermark, extra fingers, deformed hands',
 }: NegativePromptBlockProps) {
   return (
     <div className={cn(
@@ -37,10 +37,10 @@ export function NegativePromptBlock({
             'text-[11px] font-semibold tracking-wide transition-colors',
             negativePromptEnabled ? 'text-destructive' : 'text-foreground/50'
           )}>
-            Coisas que eu NÃO quero
+            Prompt Negativo
           </p>
           <p className="text-[9px] text-muted-foreground/40 mt-0.5">
-            Elementos indesejados no design
+            Elementos que a IA deve evitar gerar na imagem
           </p>
         </div>
         <Switch
