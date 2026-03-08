@@ -218,6 +218,7 @@ const Index = () => {
                 apiKey={apiKey}
                 aiModel={aiModel}
                 onModelChange={setAiModel}
+                onDuplicate={duplicateProject}
               />
             </>
           )
