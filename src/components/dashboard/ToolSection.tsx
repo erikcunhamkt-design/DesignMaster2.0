@@ -10,6 +10,10 @@ interface ToolSectionProps {
   images: Record<string, string>;
   isFavorite?: (id: string) => boolean;
   onToggleFavorite?: (id: string) => void;
+  onNavigate?: (route: string, studioId: string) => void;
+}
+  isFavorite?: (id: string) => boolean;
+  onToggleFavorite?: (id: string) => void;
 }
 
 export function ToolSection({ title, studios, images, isFavorite, onToggleFavorite }: ToolSectionProps) {
