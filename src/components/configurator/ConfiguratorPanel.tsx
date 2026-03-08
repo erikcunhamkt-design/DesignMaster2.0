@@ -32,6 +32,7 @@ interface ConfiguratorPanelProps {
   apiKey: string;
   aiModel?: AiModel;
   onModelChange?: (model: AiModel) => void;
+  onDuplicate?: () => void;
 }
 
 interface CollapsibleBlockProps {
