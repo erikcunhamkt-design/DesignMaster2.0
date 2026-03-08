@@ -11,13 +11,6 @@ interface FreePromptBlockProps {
   placeholder?: string;
 }
 
-const PROMPT_EXAMPLES = [
-  'Produto premium em fundo minimalista',
-  'Jogador de futebol em ação, estilo esportivo',
-  'Mockup de embalagem moderna',
-  'Mulher executiva confiante, fundo urbano noturno',
-  'Retrato editorial com iluminação dramática',
-];
 
 export function FreePromptBlock({
   freePrompt,
@@ -81,25 +74,6 @@ export function FreePromptBlock({
         </p>
       </div>
 
-      {/* Quick examples */}
-      {!freePrompt && (
-        <div className="px-4 pb-3">
-          <p className="text-[8px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/40 mb-1.5">
-            Exemplos rápidos
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {PROMPT_EXAMPLES.map((example) => (
-              <button
-                key={example}
-                onClick={() => onUpdate({ freePrompt: example })}
-                className="rounded-full px-2.5 py-1 text-[9px] font-medium border border-border/20 bg-secondary/20 text-muted-foreground/60 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200"
-              >
-                {example}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Toggle ignorar o resto */}
       <div className={cn(
