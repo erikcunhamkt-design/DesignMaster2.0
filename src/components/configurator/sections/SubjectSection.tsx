@@ -1,10 +1,8 @@
-import { Plus, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Plus, X, AlignLeft, AlignCenter, AlignRight, User } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
-import genderFemale from '@/assets/gender-female.png';
-import genderMale from '@/assets/gender-male.png';
 
 const POSES = [
   { id: 'bracos_cruzados', label: 'Braços cruzados', emoji: '💪' },
