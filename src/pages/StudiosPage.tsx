@@ -40,21 +40,18 @@ const studioImages: Record<string, string> = {
 };
 
 const sections = [
-  { id: 'criar', title: 'Começar a criar', studioIds: ['prompt-builder', 'extrator', 'galeria'] },
-  { id: 'popular', title: 'Mais usados', studioIds: ['mockup-studio', 'capas', 'hero-studio'] },
-  { id: 'marketing', title: 'Marketing & Conteúdo', studioIds: ['capas', 'hero-studio', 'chat', 'markdown'] },
-  { id: 'produtos', title: 'Produtos & E-commerce', studioIds: ['produtos', 'mockup-studio'] },
-  { id: 'nichos', title: 'Nichos Criativos', studioIds: ['football-creator', 'auto-creator'] },
-  { id: 'ferramentas', title: 'Ferramentas de Imagem', studioIds: ['upscale'] },
+  { id: 'image-creators', title: 'Criadores de Imagem', studioIds: ['criador', 'capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
+  { id: 'creative-assistant', title: 'Assistente Criativo', studioIds: ['chat'] },
+  { id: 'prompt-tools', title: 'Ferramentas de Prompt', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
+  { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale'] },
 ];
 
 const sectionFilterMap: Record<string, string[]> = {
   home: sections.map((s) => s.id),
-  criar: ['criar'],
-  marketing: ['marketing'],
-  produtos: ['produtos'],
-  nichos: ['nichos'],
-  ferramentas: ['ferramentas'],
+  'image-creators': ['image-creators'],
+  'creative-assistant': ['creative-assistant'],
+  'prompt-tools': ['prompt-tools'],
+  'image-tools': ['image-tools'],
   favoritos: [],
   recentes: [],
 };
