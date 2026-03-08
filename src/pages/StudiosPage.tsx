@@ -41,7 +41,7 @@ const sections = [
   {
     id: 'criar',
     title: 'Começar a criar',
-    studioIds: ['criador', 'prompt-builder', 'extrator', 'galeria'],
+    studioIds: ['prompt-builder', 'extrator', 'galeria'],
   },
   {
     id: 'popular',
