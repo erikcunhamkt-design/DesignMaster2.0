@@ -8,10 +8,16 @@ interface ToolCardProps {
   image?: string;
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
+  onNavigate?: (route: string, studioId: string) => void;
 }
 
-export function ToolCard({ studio, image, isFavorite, onToggleFavorite }: ToolCardProps) {
+export function ToolCard({ studio, image, isFavorite, onToggleFavorite, onNavigate }: ToolCardProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onNavigate) onNavigate(studio.route, studio.id);
+    else navigate(studio.route);
+  };
 
   return (
     <button
