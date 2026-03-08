@@ -23,6 +23,17 @@ export function useProjectStore() {
     setActiveProjectId(newProject.id);
   }, [projects.length]);
 
+  const duplicateProject = useCallback(() => {
+    if (!activeProject) return;
+    const dup: Project = {
+      id: crypto.randomUUID(),
+      name: `${activeProject.name} (cópia)`,
+      config: { ...activeProject.config },
+    };
+    setProjects((prev) => [...prev, dup]);
+    setActiveProjectId(dup.id);
+  }, [activeProject]);
+
   const removeProject = useCallback(
     (id: string) => {
       setProjects((prev) => {
@@ -60,6 +71,7 @@ export function useProjectStore() {
     activeProjectId,
     setActiveProjectId,
     addProject,
+    duplicateProject,
     removeProject,
     updateConfig,
   };

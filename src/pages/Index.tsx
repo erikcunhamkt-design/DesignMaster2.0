@@ -33,6 +33,7 @@ const Index = () => {
     activeProjectId,
     setActiveProjectId,
     addProject,
+    duplicateProject,
     removeProject,
     updateConfig,
   } = useProjectStore();
@@ -217,6 +218,7 @@ const Index = () => {
                 apiKey={apiKey}
                 aiModel={aiModel}
                 onModelChange={setAiModel}
+                onDuplicate={duplicateProject}
               />
             </>
           )

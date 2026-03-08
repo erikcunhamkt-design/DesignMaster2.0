@@ -32,6 +32,7 @@ interface ConfiguratorPanelProps {
   apiKey: string;
   aiModel?: AiModel;
   onModelChange?: (model: AiModel) => void;
+  onDuplicate?: () => void;
 }
 
 interface CollapsibleBlockProps {
@@ -127,7 +128,7 @@ function CollapsibleBlock({ icon: Icon, avatarSrc, title, subtitle, helpText, de
   );
 }
 
-export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange }: ConfiguratorPanelProps) {
+export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, apiKey, aiModel = 'pro', onModelChange, onDuplicate }: ConfiguratorPanelProps) {
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
@@ -290,7 +291,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
           )}
           {isGenerating ? 'Gerando...' : 'Gerar Imagem'}
         </Button>
-        <Button variant="ghost" className="w-full h-8 gap-2 text-[10px] font-medium text-muted-foreground/40 hover:text-muted-foreground rounded-lg">
+        <Button variant="ghost" onClick={onDuplicate} className="w-full h-8 gap-2 text-[10px] font-medium text-muted-foreground/40 hover:text-muted-foreground rounded-lg">
           <Copy className="h-3 w-3" />
           Duplicar Config
         </Button>
