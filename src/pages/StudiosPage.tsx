@@ -194,11 +194,26 @@ export default function StudiosPage() {
             )
           )}
 
-          {/* Recents placeholder */}
+          {/* Recents section */}
           {activeSection === 'recentes' && (
-            <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
-              Nenhuma ferramenta usada recentemente.
-            </div>
+            recentStudios.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
+                {recentStudios.map((s) => (
+                  <ToolCard
+                    key={s.id}
+                    studio={s}
+                    image={studioImages[s.id]}
+                    isFavorite={isFavorite(s.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onNavigate={navigateToStudio}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+                Nenhuma ferramenta usada recentemente. Comece usando qualquer ferramenta!
+              </div>
+            )
           )}
 
           {/* Netflix sections */}
