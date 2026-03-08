@@ -1,6 +1,13 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { studios } from '@/data/studios';
-import logoImg from '@/assets/logo.png';
-import heroBg from '@/assets/hero-bg.jpg';
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
+import { DashboardTopbar } from '@/components/layout/DashboardTopbar';
+import { ToolSection } from '@/components/dashboard/ToolSection';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import { cn } from '@/lib/utils';
+
 import extratorHero from '@/assets/extrator-hero.png';
 import promptBuilderHero from '@/assets/prompt-builder-hero.png';
 import upscaleHero from '@/assets/upscale-hero.png';
@@ -13,18 +20,6 @@ import footballCreatorHero from '@/assets/football-creator-hero.png';
 import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
-import { useAdmin } from '@/hooks/useAdmin';
-import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Sparkles, Glasses, Sun, LogOut, KeyRound, ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
-import { useAuth } from '@/hooks/useAuth';
 
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
@@ -41,256 +36,178 @@ const studioImages: Record<string, string> = {
   'mockup-studio': mockupStudioHero,
 };
 
+// Section definitions with studio IDs
+const sections = [
+  {
+    id: 'criar',
+    title: 'Começar a criar',
+    studioIds: ['criador', 'prompt-builder', 'extrator', 'galeria'],
+  },
+  {
+    id: 'popular',
+    title: 'Mais usados',
+    studioIds: ['mockup-studio', 'capas', 'hero-studio'],
+  },
+  {
+    id: 'marketing',
+    title: 'Marketing & Conteúdo',
+    studioIds: ['capas', 'hero-studio', 'chat', 'markdown'],
+  },
+  {
+    id: 'produtos',
+    title: 'Produtos & E-commerce',
+    studioIds: ['produtos', 'mockup-studio'],
+  },
+  {
+    id: 'nichos',
+    title: 'Nichos Criativos',
+    studioIds: ['football-creator', 'auto-creator'],
+  },
+  {
+    id: 'ferramentas',
+    title: 'Ferramentas de Imagem',
+    studioIds: ['upscale'],
+  },
+];
+
+// Map section filter to which sections to show
+const sectionFilterMap: Record<string, string[]> = {
+  home: sections.map((s) => s.id),
+  criar: ['criar'],
+  marketing: ['marketing'],
+  produtos: ['produtos'],
+  nichos: ['nichos'],
+  ferramentas: ['ferramentas'],
+  favoritos: [],
+  recentes: [],
+};
+
 const FEATURED_STUDIO_ID = 'criador';
 
 export default function StudiosPage() {
-  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
-  const { user, signOut } = useAuth();
-  const { apiKey, saveKey } = useGoogleApiKey();
-  const hasKey = apiKey.length >= 10;
-  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
-  const avatarUrl = user?.user_metadata?.avatar_url;
+  const [activeSection, setActiveSection] = useState('home');
+  const [searchQuery, setSearchQuery] = useState('');
+  const { largeText, lightMode } = useAccessibility();
 
-  const featured = studios.find(s => s.id === FEATURED_STUDIO_ID)!;
-  const rest = studios.filter(s => s.id !== FEATURED_STUDIO_ID);
+  const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
+
+  const studioMap = useMemo(() => {
+    const map: Record<string, (typeof studios)[0]> = {};
+    studios.forEach((s) => (map[s.id] = s));
+    return map;
+  }, []);
+
+  const filteredSections = useMemo(() => {
+    const allowed = sectionFilterMap[activeSection] || sections.map((s) => s.id);
+    return sections
+      .filter((s) => allowed.includes(s.id))
+      .map((section) => ({
+        ...section,
+        studios: section.studioIds
+          .map((id) => studioMap[id])
+          .filter(Boolean)
+          .filter((s) =>
+            searchQuery
+              ? s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                s.description.toLowerCase().includes(searchQuery.toLowerCase())
+              : true
+          ),
+      }))
+      .filter((s) => s.studios.length > 0);
+  }, [activeSection, searchQuery, studioMap]);
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Hero background image */}
-      <div className="pointer-events-none absolute inset-0">
-        <img
-          src={heroBg}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-20"
-        />
-        {/* Dark overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/60" />
-      </div>
+    <div className={cn('flex h-screen w-full bg-background overflow-hidden', largeText && 'accessible-large-text', lightMode && 'accessible-light-mode')}>
+      <DashboardSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      {/* Topbar */}
-      <header className="relative z-10 flex h-16 items-center justify-between px-8 border-b border-border/8">
-        <div className="flex items-center gap-3">
-          <img src={logoImg} alt="Design Master" className="h-8 w-8 rounded-xl shadow-glow-sm" />
-          <span className="font-display text-[15px] font-bold tracking-tight text-foreground">
-            Design<span className="text-gradient">Master</span>
-          </span>
-          <SubscriptionBadge />
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Accessibility toggles */}
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleLargeText}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
-                    largeText
-                      ? 'bg-primary/15 text-primary border border-primary/30'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  )}
-                >
-                  <Glasses className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
-              </TooltipContent>
-            </Tooltip>
+      <div className="flex flex-1 flex-col min-w-0">
+        <DashboardTopbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleLightMode}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
-                    lightMode
-                      ? 'bg-primary/15 text-primary border border-primary/30'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  )}
-                >
-                  <Sun className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                {lightMode ? 'Desativar modo claro' : 'Ativar modo claro'}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+        <main className="flex-1 overflow-y-auto px-8 pb-16">
+          {/* Hero section */}
+          {activeSection === 'home' && !searchQuery && (
+            <div className="relative mt-8 mb-10 animate-fade-up">
+              {/* Glow */}
+              <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-primary/50 via-primary/80 to-accent/50 opacity-60 blur-[3px] animate-pulse pointer-events-none" />
+              <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
-          {/* API Key */}
-          <Popover>
-            <PopoverTrigger asChild>
               <button
-                className={cn(
-                  'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-semibold tracking-wider uppercase transition-all duration-200 border',
-                  hasKey
-                    ? 'bg-primary/8 text-primary/80 border-primary/20 hover:bg-primary/12'
-                    : 'bg-destructive/8 text-destructive/70 border-destructive/20 hover:bg-destructive/12'
-                )}
+                onClick={() => navigate(featured.route)}
+                className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md"
               >
-                <KeyRound className="h-2.5 w-2.5" />
-                <span className="hidden sm:inline">API</span>
-                <ChevronDown className="h-2 w-2 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3 rounded-xl">
-              <ApiKeySection apiKey={apiKey} onChangeKey={saveKey} />
-            </PopoverContent>
-          </Popover>
+                {/* BG effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-72 h-36 bg-primary/8 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/15 transition-all duration-700" />
 
-          {isAdmin && (
-            <button
-              onClick={() => navigate('/admin')}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-            >
-              <Shield className="h-3.5 w-3.5" />
-              Admin
-            </button>
+                <div className="relative flex items-center justify-between h-full px-10">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70">Ferramenta principal</span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/25 shadow-[0_0_8px_hsl(var(--primary)/0.3)]">
+                        <Sparkles className="h-2.5 w-2.5" />
+                        Destaque
+                      </span>
+                    </div>
+                    <h1 className="text-[28px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2.5 drop-shadow-[0_0_20px_hsl(var(--primary)/0.25)]">
+                      {featured.name}
+                    </h1>
+                    <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
+                      Crie imagens com IA usando controles avançados de estilo, iluminação e composição.
+                    </p>
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary/15 border border-primary/25 px-4 py-2 text-xs font-semibold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                      Abrir Criador
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full border border-primary/20 bg-primary/10 group-hover:border-primary/40 group-hover:bg-primary/20 group-hover:shadow-glow-sm transition-all duration-300 shrink-0 ml-8">
+                    <ArrowRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </div>
+              </button>
+            </div>
           )}
 
-          {/* User avatar + logout */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex h-8 w-8 items-center justify-center rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
-                <Avatar className="h-8 w-8">
-                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
-                  <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {user?.email && (
-                <div className="px-2 py-1.5 text-[10px] text-muted-foreground truncate border-b border-border mb-1">
-                  {user.email}
-                </div>
-              )}
-              <DropdownMenuItem onClick={signOut} className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer">
-                <LogOut className="h-3.5 w-3.5" />
-                Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="relative z-10 flex-1 px-8 pb-16 pt-10 max-w-[1280px] mx-auto w-full">
-
-        {/* Page title */}
-        <div className="mb-10 animate-fade-up">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60 mb-2">Workspace</p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground font-display">
-            Seus Studios
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Escolha uma ferramenta e comece a criar agora
-          </p>
-        </div>
-
-        {/* Featured card */}
-        <div className="relative mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
-          {/* Outer glow pulse ring */}
-          <div className="absolute -inset-[2px] rounded-[18px] bg-gradient-to-r from-primary/60 via-primary/90 to-primary/60 opacity-70 blur-[2px] animate-pulse pointer-events-none" />
-          {/* Secondary shimmer ring */}
-          <div className="absolute -inset-[1px] rounded-[17px] bg-gradient-to-r from-transparent via-primary/40 to-transparent pointer-events-none" />
-
-          <button
-            onClick={() => navigate(featured.route)}
-            className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 flex items-stretch h-[150px] bg-card/70 backdrop-blur-sm"
-          >
-            {/* Animated gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-transparent pointer-events-none" />
-
-            {/* Top shimmer line */}
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/80 to-transparent" />
-            {/* Bottom accent line */}
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-            {/* Floating glow orb */}
-            <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-64 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/18 transition-all duration-700" />
-
-            {/* Content — full width */}
-            <div className="relative flex flex-1 items-center justify-between px-10 py-6 min-w-0">
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">{featured.tagline}</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary border border-primary/30 shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Principal
-                  </span>
-                </div>
-                <h2 className="text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
-                  {featured.name}
-                </h2>
-                <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{featured.description}</p>
-              </div>
-
-              {/* Arrow — pinned to the right end of the card */}
-              <div className="flex items-center justify-center w-11 h-11 rounded-full border border-primary/25 bg-primary/10 group-hover:border-primary/50 group-hover:bg-primary/20 group-hover:shadow-[0_0_16px_hsl(var(--primary)/0.4)] transition-all duration-300 shrink-0 ml-8">
-                <ArrowRight className="h-4 w-4 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
-              </div>
+          {/* Section title when filtered */}
+          {activeSection !== 'home' && (
+            <div className="mt-8 mb-6 animate-fade-up">
+              <h1 className="text-xl font-bold text-foreground font-display tracking-tight capitalize">
+                {activeSection === 'favoritos' ? '⭐ Favoritos' : activeSection === 'recentes' ? '🕐 Recentes' : activeSection}
+              </h1>
             </div>
-          </button>
-        </div>
+          )}
 
+          {/* Favorites / Recents placeholder */}
+          {(activeSection === 'favoritos' || activeSection === 'recentes') && (
+            <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+              {activeSection === 'favoritos' ? 'Nenhuma ferramenta favoritada ainda.' : 'Nenhuma ferramenta usada recentemente.'}
+            </div>
+          )}
 
-        {/* Grid of remaining studios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {rest.map((studio, i) => (
-            <button
-              key={studio.id}
-              onClick={() => navigate(studio.route)}
-              className="group relative flex flex-col gap-4 rounded-2xl border border-border/12 bg-card/30 p-6 text-left transition-all duration-200 hover:border-primary/20 hover:bg-card/60 hover:shadow-glow-sm hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 overflow-hidden animate-fade-up"
-              style={{ animationDelay: `${(i + 2) * 55}ms` }}
-            >
-              {/* Background image — full card, semi-transparent */}
-              {studioImages[studio.id] && (
-                <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                  <img
-                    src={studioImages[studio.id]}
-                    alt=""
-                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                    style={{ opacity: 0.18 }}
-                  />
-                  {/* dark overlay to ensure text readability */}
-                  <div className="absolute inset-0 bg-background/40" />
-                </div>
-              )}
-
-              {/* Hover gradient */}
-              <div className={cn('absolute inset-0 bg-gradient-to-br', studio.gradient, 'opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-2xl')} />
-
-              {/* Icon (only when no image) */}
-              {!studioImages[studio.id] && (
-                <span className="relative text-3xl transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
-              )}
-
-              {/* Text */}
-              <div className="relative space-y-1.5 flex-1">
-                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-primary/60">{studio.tagline}</p>
-                <h3 className="text-[15px] font-bold text-foreground font-display tracking-tight leading-tight">{studio.name}</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{studio.description}</p>
+          {/* Netflix sections */}
+          <div className={cn(activeSection === 'home' && !searchQuery ? '' : 'mt-2')}>
+            {filteredSections.map((section, i) => (
+              <div key={section.id} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+                <ToolSection
+                  title={section.title}
+                  studios={section.studios}
+                  images={studioImages}
+                />
               </div>
+            ))}
+          </div>
 
-              {/* Arrow */}
-              <div className="relative flex items-center justify-between pt-1">
-                <div className="h-px flex-1 bg-border/10 group-hover:bg-primary/10 transition-colors" />
-                <ArrowRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-primary transition-colors ml-2" />
-              </div>
-
-              {/* Bottom accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-          ))}
-        </div>
-      </main>
+          {/* No results */}
+          {searchQuery && filteredSections.length === 0 && (
+            <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
+              Nenhuma ferramenta encontrada para "{searchQuery}"
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
