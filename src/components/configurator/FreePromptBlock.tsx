@@ -11,13 +11,6 @@ interface FreePromptBlockProps {
   placeholder?: string;
 }
 
-const PROMPT_EXAMPLES = [
-  'Produto premium em fundo minimalista',
-  'Jogador de futebol em ação, estilo esportivo',
-  'Mockup de embalagem moderna',
-  'Mulher executiva confiante, fundo urbano noturno',
-  'Retrato editorial com iluminação dramática',
-];
 
 export function FreePromptBlock({
   freePrompt,
