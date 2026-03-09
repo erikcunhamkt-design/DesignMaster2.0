@@ -50,8 +50,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'markdown',
-    name: 'Gerador Markdown',
-    tagline: 'Prompts formatados',
+    name: 'Estúdio Markdown',
+    tagline: 'Transforme prompts em templates organizados.',
     description: 'Gere prompts prontos em formato Markdown com blocos, presets e variações.',
     icon: '📝',
     route: '/studio/markdown',
