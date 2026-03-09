@@ -40,7 +40,7 @@ const studioImages: Record<string, string> = {
 };
 
 const sections = [
-{ id: 'image-creators', title: 'Criadores de Imagem', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
+{ id: 'image-creators', title: 'Geradores Especializados', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
 { id: 'creative-assistant', title: 'Assistente Criativo', studioIds: ['chat'] },
 { id: 'prompt-tools', title: 'Ferramentas de Prompt', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
 { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale'] }];
