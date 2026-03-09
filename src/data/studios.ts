@@ -60,7 +60,7 @@ export const studios: Studio[] = [
   {
     id: 'produtos',
     name: 'Produto Lendário',
-    tagline: 'Transforme ou crie qualquer produto em uma imagem de alto impacto',
+    tagline: 'Transforme ou crie qualquer produto em uma imagem de alto impacto.',
     description: 'Bot especialista em fotografia de produtos com iluminação de estúdio e acabamento premium.',
     icon: '📦',
     route: '/studio/produtos',
@@ -69,7 +69,7 @@ export const studios: Studio[] = [
   {
     id: 'capas',
     name: 'Animais Fantásticos',
-    tagline: 'Crie imagens com animais em alta resolução',
+    tagline: 'Crie imagens com animais em alta resolução.',
     description: 'Capas magnéticas com animais, personagens e elementos gráficos — sem pessoa real.',
     icon: '🦁',
     route: '/studio/capas',
@@ -96,7 +96,7 @@ export const studios: Studio[] = [
   {
     id: 'football-creator',
     name: 'Clube das Lendas',
-    tagline: 'Crie artes épicas para futebol e esportes',
+    tagline: 'Crie artes épicas para futebol e esportes.',
     description: 'Crie artes de futebol profissionais com IA — matchday, jogador destaque, flyers esportivos e muito mais.',
     icon: '🏟️',
     route: '/studio/football-creator',
@@ -104,8 +104,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'auto-creator',
-    name: 'Auto Creator',
-    tagline: 'Motorsport & Performance',
+    name: 'Velozes & Imortais',
+    tagline: 'Crie imagens automotivas de alta performance',
     description: 'Crie artes automotivas profissionais com IA — race day, drift, trackday, supercar e muito mais.',
     icon: '🏎️',
     route: '/studio/auto-creator',
@@ -114,7 +114,7 @@ export const studios: Studio[] = [
   {
     id: 'hero-studio',
     name: 'Liga dos Heróis',
-    tagline: 'Crie imagens hero para páginas de alta conversão',
+    tagline: 'Crie imagens hero para páginas de alta conversão.',
     description: 'Crie hero sections premium para landing pages e sites SaaS — sem escrever prompt, resultado comparável às melhores marcas do mundo.',
     icon: '🖥️',
     route: '/studio/hero-studio',
@@ -123,7 +123,7 @@ export const studios: Studio[] = [
   {
     id: 'mockup-studio',
     name: 'Laboratório de Mockups',
-    tagline: 'Gere apresentações profissionais para seus designs',
+    tagline: 'Gere apresentações profissionais para seus designs.',
     description: 'Gere mockups realistas de produtos, embalagens, dispositivos e branding sem escrever uma linha de prompt.',
     icon: '📦',
     route: '/studio/mockup-studio',
