@@ -79,6 +79,7 @@ export function useProjectStore() {
     addProject,
     duplicateProject,
     removeProject,
+    renameProject,
     updateConfig,
   };
 }
