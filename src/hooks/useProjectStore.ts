@@ -52,6 +52,12 @@ export function useProjectStore() {
     [activeProjectId]
   );
 
+  const renameProject = useCallback((id: string, newName: string) => {
+    setProjects((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, name: newName } : p))
+    );
+  }, []);
+
   const updateConfig = useCallback(
     (patch: Partial<ProjectConfig>) => {
       setProjects((prev) =>
