@@ -191,6 +191,7 @@ const Index = () => {
               onSelect={setActiveProjectId}
               onClose={removeProject}
               onAdd={addProject}
+              onRename={renameProject}
             />
           </div>
         )}
