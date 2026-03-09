@@ -32,8 +32,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'prompt-builder',
-    name: 'Criador de Prompts',
-    tagline: 'Assistente inteligente',
+    name: 'Arquiteto de Prompts',
+    tagline: 'Crie prompts poderosos com IA.',
     description: 'Monte prompts guiados com presets, estrutura e IA para resultados perfeitos.',
     icon: '✍️',
     route: '/studio/prompt-builder',
