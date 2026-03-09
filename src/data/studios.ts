@@ -86,8 +86,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'chat',
-    name: 'Design Master',
-    tagline: 'Mentor criativo com IA',
+    name: 'Creator Master',
+    tagline: 'Seu mentor de elite em design',
     description: 'Chat especialista em design, viralização, calendário de conteúdo e ideias magnéticas para Instagram.',
     icon: '🧠',
     route: '/studio/chat',
