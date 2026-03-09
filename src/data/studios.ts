@@ -96,7 +96,7 @@ export const studios: Studio[] = [
   {
     id: 'football-creator',
     name: 'Clube das Lendas',
-    tagline: 'Crie artes épicas para futebol e esportes',
+    tagline: 'Crie artes épicas para futebol e esportes.',
     description: 'Crie artes de futebol profissionais com IA — matchday, jogador destaque, flyers esportivos e muito mais.',
     icon: '🏟️',
     route: '/studio/football-creator',
