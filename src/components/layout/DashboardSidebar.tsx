@@ -11,8 +11,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SidebarItem {
   id: string;
@@ -40,8 +44,18 @@ interface DashboardSidebarProps {
   onSectionChange: (section: string) => void;
 }
 
-export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+// Sidebar content component to reuse in both mobile and desktop
+function SidebarContent({
+  activeSection,
+  onSectionChange,
+  collapsed,
+  onClose,
+}: {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  collapsed: boolean;
+  onClose?: () => void;
+}) {
   const navigate = useNavigate();
 
   const handleClick = (item: SidebarItem) => {
@@ -50,27 +64,11 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
     } else {
       onSectionChange(item.section || item.id);
     }
+    onClose?.();
   };
 
   return (
-    <aside
-      className={cn(
-        'relative flex h-screen flex-col border-r border-border/40 bg-sidebar transition-all duration-300 ease-in-out z-20',
-        collapsed ? 'w-[68px]' : 'w-[220px]'
-      )}
-    >
-      {/* Logo */}
-      <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-          <Zap className="h-4 w-4" />
-        </div>
-        {!collapsed && (
-          <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
-            Design<span className="text-gradient">Master</span>
-          </span>
-        )}
-      </div>
-
+    <>
       {/* Main nav */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-hide">
         {!collapsed && (
@@ -125,6 +123,78 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
           );
         })}
       </nav>
+    </>
+  );
+}
+
+// Mobile trigger button component
+export function MobileSidebarTrigger({
+  activeSection,
+  onSectionChange,
+}: DashboardSidebarProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors md:hidden">
+          <Menu className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[260px] p-0 bg-sidebar border-r border-border/40">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border/30">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
+            <Zap className="h-4 w-4" />
+          </div>
+          <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
+            Design<span className="text-gradient">Master</span>
+          </span>
+        </div>
+        <SidebarContent
+          activeSection={activeSection}
+          onSectionChange={onSectionChange}
+          collapsed={false}
+          onClose={() => setOpen(false)}
+        />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+
+  // On mobile, don't render the sidebar at all (it's in the Sheet)
+  if (isMobile) {
+    return null;
+  }
+
+  return (
+    <aside
+      className={cn(
+        'relative hidden md:flex h-screen flex-col border-r border-border/40 bg-sidebar transition-all duration-300 ease-in-out z-20',
+        collapsed ? 'w-[68px]' : 'w-[220px]'
+      )}
+    >
+      {/* Logo */}
+      <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
+          <Zap className="h-4 w-4" />
+        </div>
+        {!collapsed && (
+          <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
+            Design<span className="text-gradient">Master</span>
+          </span>
+        )}
+      </div>
+
+      <SidebarContent
+        activeSection={activeSection}
+        onSectionChange={onSectionChange}
+        collapsed={collapsed}
+      />
 
       {/* Collapse toggle */}
       <div className="px-3 pb-4">
