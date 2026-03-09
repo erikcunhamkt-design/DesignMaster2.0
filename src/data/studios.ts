@@ -14,7 +14,7 @@ export interface Studio {
 export const studios: Studio[] = [
   {
     id: 'criador',
-    name: 'Criador',
+    name: 'DESIGN MASTER',
     tagline: 'Seu canvas de criação',
     description: 'Área principal para gerar imagens com controles avançados de composição, iluminação e estilo.',
     icon: '🎨',
