@@ -60,7 +60,7 @@ export const studios: Studio[] = [
   {
     id: 'produtos',
     name: 'Produto Lendário',
-    tagline: 'Transforme ou crie qualquer produto em uma imagem de alto impacto',
+    tagline: 'Transforme ou crie qualquer produto em uma imagem de alto impacto.',
     description: 'Bot especialista em fotografia de produtos com iluminação de estúdio e acabamento premium.',
     icon: '📦',
     route: '/studio/produtos',
