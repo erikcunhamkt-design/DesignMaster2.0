@@ -36,15 +36,15 @@ const studioImages: Record<string, string> = {
   'football-creator': footballCreatorHero,
   'auto-creator': autoCreatorHero,
   'hero-studio': heroStudioHero,
-  'mockup-studio': mockupStudioHero,
+  'mockup-studio': mockupStudioHero
 };
 
 const sections = [
-  { id: 'image-creators', title: 'Criadores de Imagem', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
-  { id: 'creative-assistant', title: 'Assistente Criativo', studioIds: ['chat'] },
-  { id: 'prompt-tools', title: 'Ferramentas de Prompt', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
-  { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale'] },
-];
+{ id: 'image-creators', title: 'Criadores de Imagem', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
+{ id: 'creative-assistant', title: 'Assistente Criativo', studioIds: ['chat'] },
+{ id: 'prompt-tools', title: 'Ferramentas de Prompt', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
+{ id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale'] }];
+
 
 const sectionFilterMap: Record<string, string[]> = {
   home: sections.map((s) => s.id),
@@ -53,7 +53,7 @@ const sectionFilterMap: Record<string, string[]> = {
   'prompt-tools': ['prompt-tools'],
   'image-tools': ['image-tools'],
   favoritos: [],
-  recentes: [],
+  recentes: []
 };
 
 const FEATURED_STUDIO_ID = 'criador';
@@ -81,7 +81,7 @@ export default function StudiosPage() {
 
   const studioMap = useMemo(() => {
     const map: Record<string, (typeof studios)[0]> = {};
-    studios.forEach((s) => (map[s.id] = s));
+    studios.forEach((s) => map[s.id] = s);
     return map;
   }, []);
 
@@ -92,21 +92,21 @@ export default function StudiosPage() {
 
   const filteredSections = useMemo(() => {
     const allowed = sectionFilterMap[activeSection] || sections.map((s) => s.id);
-    return sections
-      .filter((s) => allowed.includes(s.id))
-      .map((section) => ({
-        ...section,
-        studios: section.studioIds
-          .map((id) => studioMap[id])
-          .filter(Boolean)
-          .filter((s) =>
-            searchQuery
-              ? s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.description.toLowerCase().includes(searchQuery.toLowerCase())
-              : true
-          ),
-      }))
-      .filter((s) => s.studios.length > 0);
+    return sections.
+    filter((s) => allowed.includes(s.id)).
+    map((section) => ({
+      ...section,
+      studios: section.studioIds.
+      map((id) => studioMap[id]).
+      filter(Boolean).
+      filter((s) =>
+      searchQuery ?
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.description.toLowerCase().includes(searchQuery.toLowerCase()) :
+      true
+      )
+    })).
+    filter((s) => s.studios.length > 0);
   }, [activeSection, searchQuery, studioMap]);
 
   return (
@@ -118,15 +118,15 @@ export default function StudiosPage() {
 
         <main className="flex-1 overflow-y-auto px-8 pb-16">
           {/* Hero section */}
-          {activeSection === 'home' && !searchQuery && (
-            <div className="relative mt-8 mb-10 animate-fade-up">
+          {activeSection === 'home' && !searchQuery &&
+          <div className="relative mt-8 mb-10 animate-fade-up">
               <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-primary/50 via-primary/80 to-accent/50 opacity-60 blur-[3px] animate-pulse pointer-events-none" />
               <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
               <button
-                onClick={() => navigateToStudio(featured.route, featured.id)}
-                className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md"
-              >
+              onClick={() => navigateToStudio(featured.route, featured.id)}
+              className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[180px] bg-card/60 backdrop-blur-md">
+              
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -147,9 +147,9 @@ export default function StudiosPage() {
                     <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
                       Crie imagens com IA usando controles avançados de estilo, iluminação e composição.
                     </p>
-                    <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary/15 border border-primary/25 px-4 py-2 text-xs font-semibold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                      Abrir Criador
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary/15 border border-primary/25 px-4 py-2 text-xs font-semibold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">Abrir o Design Master
+
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
 
@@ -159,86 +159,86 @@ export default function StudiosPage() {
                 </div>
               </button>
             </div>
-          )}
+          }
 
           {/* Section title when filtered */}
-          {activeSection !== 'home' && (
-            <div className="mt-8 mb-6 animate-fade-up">
+          {activeSection !== 'home' &&
+          <div className="mt-8 mb-6 animate-fade-up">
               <h1 className="text-xl font-bold text-foreground font-display tracking-tight capitalize">
                 {activeSection === 'favoritos' ? '⭐ Favoritos' : activeSection === 'recentes' ? '🕐 Recentes' : activeSection}
               </h1>
             </div>
-          )}
+          }
 
           {/* Favorites section */}
           {activeSection === 'favoritos' && (
-            favoriteStudios.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
-                {favoriteStudios.map((s) => (
-                  <ToolCard
-                    key={s.id}
-                    studio={s}
-                    image={studioImages[s.id]}
-                    isFavorite={true}
-                    onToggleFavorite={toggleFavorite}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+          favoriteStudios.length > 0 ?
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
+                {favoriteStudios.map((s) =>
+            <ToolCard
+              key={s.id}
+              studio={s}
+              image={studioImages[s.id]}
+              isFavorite={true}
+              onToggleFavorite={toggleFavorite} />
+
+            )}
+              </div> :
+
+          <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
                 Nenhuma ferramenta favoritada ainda. Clique na ⭐ em qualquer card para favoritar.
-              </div>
-            )
-          )}
+              </div>)
+
+          }
 
           {/* Recents section */}
           {activeSection === 'recentes' && (
-            recentStudios.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
-                {recentStudios.map((s) => (
-                  <ToolCard
-                    key={s.id}
-                    studio={s}
-                    image={studioImages[s.id]}
-                    isFavorite={isFavorite(s.id)}
-                    onToggleFavorite={toggleFavorite}
-                    onNavigate={navigateToStudio}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
+          recentStudios.length > 0 ?
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 animate-fade-up">
+                {recentStudios.map((s) =>
+            <ToolCard
+              key={s.id}
+              studio={s}
+              image={studioImages[s.id]}
+              isFavorite={isFavorite(s.id)}
+              onToggleFavorite={toggleFavorite}
+              onNavigate={navigateToStudio} />
+
+            )}
+              </div> :
+
+          <div className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border/30 bg-card/20 text-muted-foreground text-sm mt-4">
                 Nenhuma ferramenta usada recentemente. Comece usando qualquer ferramenta!
-              </div>
-            )
-          )}
+              </div>)
+
+          }
 
           {/* Netflix sections */}
-          {activeSection !== 'favoritos' && activeSection !== 'recentes' && (
-            <div className={cn(activeSection === 'home' && !searchQuery ? '' : 'mt-2')}>
-              {filteredSections.map((section, i) => (
-                <div key={section.id} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+          {activeSection !== 'favoritos' && activeSection !== 'recentes' &&
+          <div className={cn(activeSection === 'home' && !searchQuery ? '' : 'mt-2')}>
+              {filteredSections.map((section, i) =>
+            <div key={section.id} className="animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
                   <ToolSection
-                    title={section.title}
-                    studios={section.studios}
-                    images={studioImages}
-                    isFavorite={isFavorite}
-                    onToggleFavorite={toggleFavorite}
-                    onNavigate={navigateToStudio}
-                  />
+                title={section.title}
+                studios={section.studios}
+                images={studioImages}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+                onNavigate={navigateToStudio} />
+              
                 </div>
-              ))}
+            )}
             </div>
-          )}
+          }
 
           {/* No results */}
-          {searchQuery && filteredSections.length === 0 && activeSection !== 'favoritos' && (
-            <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
+          {searchQuery && filteredSections.length === 0 && activeSection !== 'favoritos' &&
+          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
               Nenhuma ferramenta encontrada para "{searchQuery}"
             </div>
-          )}
+          }
         </main>
       </div>
-    </div>
-  );
+    </div>);
+
 }
