@@ -104,8 +104,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'auto-creator',
-    name: 'Auto Creator',
-    tagline: 'Motorsport & Performance',
+    name: 'Velozes & Imortais',
+    tagline: 'Crie imagens automotivas de alta performance',
     description: 'Crie artes automotivas profissionais com IA — race day, drift, trackday, supercar e muito mais.',
     icon: '🏎️',
     route: '/studio/auto-creator',
