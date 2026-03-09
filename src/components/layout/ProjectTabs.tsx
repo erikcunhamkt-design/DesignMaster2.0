@@ -1,6 +1,7 @@
 import { Plus, X, Folder } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Project } from '@/types/project';
+import { useState, useRef, useEffect } from 'react';
 
 interface ProjectTabsProps {
   projects: Project[];
@@ -8,17 +9,52 @@ interface ProjectTabsProps {
   onSelect: (id: string) => void;
   onClose: (id: string) => void;
   onAdd: () => void;
+  onRename: (id: string, newName: string) => void;
 }
 
-export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: ProjectTabsProps) {
+export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd, onRename }: ProjectTabsProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingId && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingId]);
+
+  const handleDoubleClick = (p: Project, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(p.id);
+    setEditValue(p.name);
+  };
+
+  const handleBlur = () => {
+    if (editingId && editValue.trim()) {
+      onRename(editingId, editValue.trim());
+    }
+    setEditingId(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBlur();
+    } else if (e.key === 'Escape') {
+      setEditingId(null);
+    }
+  };
+
   return (
     <div className="flex items-center px-4 gap-1 h-full overflow-x-auto">
       {projects.map((p) => {
         const active = p.id === activeId;
+        const isEditing = editingId === p.id;
+        
         return (
           <button
             key={p.id}
-            onClick={() => onSelect(p.id)}
+            onClick={() => !isEditing && onSelect(p.id)}
             className={cn(
               'group flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium transition-all duration-200 shrink-0 rounded-md',
               active
@@ -27,7 +63,20 @@ export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: Pr
             )}
           >
             <Folder className={cn('h-2.5 w-2.5 shrink-0', active ? 'text-primary' : 'text-muted-foreground/30')} />
-            <span>{p.name}</span>
+            {isEditing ? (
+              <input
+                ref={inputRef}
+                type="text"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-transparent border-none outline-none w-20 text-[10px] font-medium"
+              />
+            ) : (
+              <span onDoubleClick={(e) => handleDoubleClick(p, e)}>{p.name}</span>
+            )}
             <span
               role="button"
               onClick={(e) => {

@@ -35,6 +35,7 @@ const Index = () => {
     addProject,
     duplicateProject,
     removeProject,
+    renameProject,
     updateConfig,
   } = useProjectStore();
 
@@ -190,6 +191,7 @@ const Index = () => {
               onSelect={setActiveProjectId}
               onClose={removeProject}
               onAdd={addProject}
+              onRename={renameProject}
             />
           </div>
         )}
