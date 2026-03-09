@@ -68,8 +68,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'capas',
-    name: 'Capas Magnéticas',
-    tagline: 'Impacto visual máximo',
+    name: 'Animais Fantásticos',
+    tagline: 'Crie imagens com animais em alta resolução',
     description: 'Capas magnéticas com animais, personagens e elementos gráficos — sem pessoa real.',
     icon: '🦁',
     route: '/studio/capas',
