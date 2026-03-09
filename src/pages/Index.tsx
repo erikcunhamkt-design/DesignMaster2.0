@@ -35,6 +35,7 @@ const Index = () => {
     addProject,
     duplicateProject,
     removeProject,
+    renameProject,
     updateConfig,
   } = useProjectStore();
 
