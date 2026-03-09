@@ -113,8 +113,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'hero-studio',
-    name: 'Hero Studio',
-    tagline: 'Landing pages de alta conversão',
+    name: 'Liga dos Heróis',
+    tagline: 'Crie imagens hero para páginas de alta conversão',
     description: 'Crie hero sections premium para landing pages e sites SaaS — sem escrever prompt, resultado comparável às melhores marcas do mundo.',
     icon: '🖥️',
     route: '/studio/hero-studio',
