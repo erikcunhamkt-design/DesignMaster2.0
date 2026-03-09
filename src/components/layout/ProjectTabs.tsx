@@ -1,6 +1,7 @@
 import { Plus, X, Folder } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Project } from '@/types/project';
+import { useState, useRef, useEffect } from 'react';
 
 interface ProjectTabsProps {
   projects: Project[];
@@ -8,6 +9,7 @@ interface ProjectTabsProps {
   onSelect: (id: string) => void;
   onClose: (id: string) => void;
   onAdd: () => void;
+  onRename: (id: string, newName: string) => void;
 }
 
 export function ProjectTabs({ projects, activeId, onSelect, onClose, onAdd }: ProjectTabsProps) {
