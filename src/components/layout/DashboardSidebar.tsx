@@ -24,10 +24,10 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { id: 'home', label: 'Home', icon: Home },
-  { id: 'image-creators', label: 'Criadores', icon: Wand2, section: 'image-creators' },
-  { id: 'creative-assistant', label: 'Assistente', icon: Brain, section: 'creative-assistant' },
-  { id: 'prompt-tools', label: 'Prompts', icon: PenTool, section: 'prompt-tools' },
-  { id: 'image-tools', label: 'Imagem', icon: Wrench, section: 'image-tools' },
+  { id: 'image-creators', label: 'Geradores', icon: Wand2, section: 'image-creators' },
+  { id: 'creative-assistant', label: 'Agentes', icon: Brain, section: 'creative-assistant' },
+  { id: 'prompt-tools', label: 'Prompt Lab', icon: PenTool, section: 'prompt-tools' },
+  { id: 'image-tools', label: 'Ferramentas', icon: Wrench, section: 'image-tools' },
 ];
 
 const secondaryItems: SidebarItem[] = [

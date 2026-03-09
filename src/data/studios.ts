@@ -24,7 +24,7 @@ export const studios: Studio[] = [
   {
     id: 'extrator',
     name: 'Extrator de Prompts',
-    tagline: 'Engenharia reversa visual',
+    tagline: 'Extraia prompts de imagens com IA.',
     description: 'Extraia, limpe e organize prompts a partir de imagens existentes.',
     icon: '🔬',
     route: '/studio/extrator',
@@ -32,8 +32,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'prompt-builder',
-    name: 'Criador de Prompts',
-    tagline: 'Assistente inteligente',
+    name: 'Arquiteto de Prompts',
+    tagline: 'Crie prompts poderosos com IA.',
     description: 'Monte prompts guiados com presets, estrutura e IA para resultados perfeitos.',
     icon: '✍️',
     route: '/studio/prompt-builder',
@@ -41,8 +41,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'upscale',
-    name: 'Upscale',
-    tagline: 'Resolução profissional',
+    name: 'Ultra Upscale',
+    tagline: 'Ampliação de imagem com qualidade máxima.',
     description: 'Restauração e upscale inteligente com preservação total da identidade visual.',
     icon: '🔍',
     route: '/studio/upscale',
@@ -50,8 +50,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'markdown',
-    name: 'Gerador Markdown',
-    tagline: 'Prompts formatados',
+    name: 'Estúdio Markdown',
+    tagline: 'Transforme prompts em templates organizados.',
     description: 'Gere prompts prontos em formato Markdown com blocos, presets e variações.',
     icon: '📝',
     route: '/studio/markdown',
