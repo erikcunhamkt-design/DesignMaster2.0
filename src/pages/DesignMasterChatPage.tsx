@@ -14,10 +14,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger } from
+'@/components/ui/dropdown-menu';
 
-type Msg = { role: 'user' | 'assistant'; content: string };
+type Msg = {role: 'user' | 'assistant';content: string;};
 
 interface Conversation {
   id: string;
@@ -29,12 +29,12 @@ interface Conversation {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-design-master`;
 
 const SUGGESTIONS = [
-  '🎨 Me dê 5 ideias criativas de posts para Instagram de um coach',
-  '📅 Crie um calendário semanal de conteúdo para uma loja de roupas',
-  '🧲 Como criar imagens magnéticas que param o scroll?',
-  '🎯 Quais tendências de design estão viralizando em 2025?',
-  '✍️ Gere um prompt de imagem para um post motivacional',
-];
+'🎨 Me dê 5 ideias criativas de posts para Instagram de um coach',
+'📅 Crie um calendário semanal de conteúdo para uma loja de roupas',
+'🧲 Como criar imagens magnéticas que param o scroll?',
+'🎯 Quais tendências de design estão viralizando em 2025?',
+'✍️ Gere um prompt de imagem para um post motivacional'];
+
 
 export default function DesignMasterChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -53,21 +53,21 @@ export default function DesignMasterChatPage() {
   // Load conversations
   const loadConversations = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('chat_conversations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false });
+    const { data } = await supabase.
+    from('chat_conversations').
+    select('*').
+    eq('user_id', user.id).
+    order('updated_at', { ascending: false });
     if (data) setConversations(data as Conversation[]);
   }, [user]);
 
   // Load messages for active conversation
   const loadMessages = useCallback(async (convoId: string) => {
-    const { data } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('conversation_id', convoId)
-      .order('created_at', { ascending: true });
+    const { data } = await supabase.
+    from('chat_messages').
+    select('*').
+    eq('conversation_id', convoId).
+    order('created_at', { ascending: true });
     if (data) {
       setMessages(data.map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content })));
     }
@@ -94,20 +94,20 @@ export default function DesignMasterChatPage() {
   // Create new conversation
   const createConversation = async (firstMessage?: string) => {
     if (!user) return null;
-    const title = firstMessage
-      ? firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '…' : '')
-      : 'Nova conversa';
-    const { data, error } = await supabase
-      .from('chat_conversations')
-      .insert({ user_id: user.id, title })
-      .select()
-      .single();
+    const title = firstMessage ?
+    firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '…' : '') :
+    'Nova conversa';
+    const { data, error } = await supabase.
+    from('chat_conversations').
+    insert({ user_id: user.id, title }).
+    select().
+    single();
     if (error || !data) {
       toast.error('Erro ao criar conversa');
       return null;
     }
     const convo = data as Conversation;
-    setConversations(prev => [convo, ...prev]);
+    setConversations((prev) => [convo, ...prev]);
     setActiveConvoId(convo.id);
     setMessages([]);
     return convo.id;
@@ -124,7 +124,7 @@ export default function DesignMasterChatPage() {
 
   const handleDeleteConvo = async (id: string) => {
     await supabase.from('chat_conversations').delete().eq('id', id);
-    setConversations(prev => prev.filter(c => c.id !== id));
+    setConversations((prev) => prev.filter((c) => c.id !== id));
     if (activeConvoId === id) {
       setActiveConvoId(null);
       setMessages([]);
@@ -135,7 +135,7 @@ export default function DesignMasterChatPage() {
   const handleRenameConvo = async (id: string, newTitle: string) => {
     if (!newTitle.trim()) return;
     await supabase.from('chat_conversations').update({ title: newTitle.trim() }).eq('id', id);
-    setConversations(prev => prev.map(c => c.id === id ? { ...c, title: newTitle.trim() } : c));
+    setConversations((prev) => prev.map((c) => c.id === id ? { ...c, title: newTitle.trim() } : c));
     setEditingId(null);
   };
 
@@ -144,7 +144,7 @@ export default function DesignMasterChatPage() {
     await supabase.from('chat_messages').insert({
       conversation_id: convoId,
       role,
-      content,
+      content
     });
     // Update conversation's updated_at
     await supabase.from('chat_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convoId);
@@ -167,7 +167,7 @@ export default function DesignMasterChatPage() {
     }
 
     const userMsg: Msg = { role: 'user', content: msg };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
@@ -182,9 +182,9 @@ export default function DesignMasterChatPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
         },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey })
       });
 
       if (!resp.ok) {
@@ -201,10 +201,10 @@ export default function DesignMasterChatPage() {
 
       const upsertAssistant = (chunk: string) => {
         assistantSoFar += chunk;
-        setMessages(prev => {
+        setMessages((prev) => {
           const last = prev[prev.length - 1];
           if (last?.role === 'assistant') {
-            return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
+            return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
           }
           return [...prev, { role: 'assistant', content: assistantSoFar }];
         });
@@ -225,7 +225,7 @@ export default function DesignMasterChatPage() {
           if (!line.startsWith('data: ')) continue;
 
           const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') { streamDone = true; break; }
+          if (jsonStr === '[DONE]') {streamDone = true;break;}
 
           try {
             const parsed = JSON.parse(jsonStr);
@@ -251,7 +251,7 @@ export default function DesignMasterChatPage() {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined;
             if (content) upsertAssistant(content);
-          } catch { /* ignore */ }
+          } catch {/* ignore */}
         }
       }
 
@@ -263,7 +263,7 @@ export default function DesignMasterChatPage() {
       console.error(e);
       toast.error(e.message || 'Erro ao enviar mensagem');
       if (!assistantSoFar) {
-        setMessages(prev => prev.slice(0, -1));
+        setMessages((prev) => prev.slice(0, -1));
       }
     } finally {
       setIsLoading(false);
@@ -308,15 +308,15 @@ export default function DesignMasterChatPage() {
           className={cn(
             'flex flex-col border-r border-border/15 bg-card/30 backdrop-blur-sm transition-all duration-300 shrink-0',
             sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
-          )}
-        >
+          )}>
+          
           {/* New chat button */}
           <div className="p-3 border-b border-border/10">
             <Button
               onClick={handleNewChat}
               variant="outline"
-              className="w-full gap-2 h-9 text-xs font-semibold rounded-xl border-border/20 bg-secondary/30 hover:bg-secondary/50"
-            >
+              className="w-full gap-2 h-9 text-xs font-semibold rounded-xl border-border/20 bg-secondary/30 hover:bg-secondary/50">
+              
               <Plus className="h-3.5 w-3.5" />
               Nova conversa
             </Button>
@@ -325,83 +325,83 @@ export default function DesignMasterChatPage() {
           {/* Conversations list */}
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-0.5">
-              {conversations.length === 0 ? (
-                <p className="text-[10px] text-muted-foreground/40 text-center py-8">
+              {conversations.length === 0 ?
+              <p className="text-[10px] text-muted-foreground/40 text-center py-8">
                   Nenhuma conversa ainda
-                </p>
-              ) : (
-                conversations.map((convo) => (
-                  <div
-                    key={convo.id}
-                    className={cn(
-                      'group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150',
-                      activeConvoId === convo.id
-                        ? 'bg-primary/10 text-foreground'
-                        : 'hover:bg-secondary/40 text-muted-foreground hover:text-foreground'
-                    )}
-                    onClick={() => handleSelectConvo(convo.id)}
-                  >
+                </p> :
+
+              conversations.map((convo) =>
+              <div
+                key={convo.id}
+                className={cn(
+                  'group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150',
+                  activeConvoId === convo.id ?
+                  'bg-primary/10 text-foreground' :
+                  'hover:bg-secondary/40 text-muted-foreground hover:text-foreground'
+                )}
+                onClick={() => handleSelectConvo(convo.id)}>
+                
                     <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-50" />
                     <div className="flex-1 min-w-0">
-                      {editingId === convo.id ? (
-                        <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                      {editingId === convo.id ?
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <input
-                            type="text"
-                            value={editTitle}
-                            onChange={e => setEditTitle(e.target.value)}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') handleRenameConvo(convo.id, editTitle);
-                              if (e.key === 'Escape') setEditingId(null);
-                            }}
-                            className="flex-1 bg-transparent border-b border-primary/30 text-[11px] outline-none py-0.5"
-                            autoFocus
-                          />
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleRenameConvo(convo.id, editTitle);
+                        if (e.key === 'Escape') setEditingId(null);
+                      }}
+                      className="flex-1 bg-transparent border-b border-primary/30 text-[11px] outline-none py-0.5"
+                      autoFocus />
+                    
                           <button onClick={() => handleRenameConvo(convo.id, editTitle)} className="p-0.5">
                             <Check className="h-3 w-3 text-primary" />
                           </button>
                           <button onClick={() => setEditingId(null)} className="p-0.5">
                             <X className="h-3 w-3 text-muted-foreground" />
                           </button>
-                        </div>
-                      ) : (
-                        <>
+                        </div> :
+
+                  <>
                           <p className="text-[11px] font-medium truncate leading-tight">{convo.title}</p>
                           <p className="text-[9px] text-muted-foreground/40 mt-0.5">{formatDate(convo.updated_at)}</p>
                         </>
-                      )}
+                  }
                     </div>
-                    {editingId !== convo.id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+                    {editingId !== convo.id &&
+                <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <button className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-secondary/60 transition-opacity">
                             <MoreHorizontal className="h-3 w-3" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-36">
                           <DropdownMenuItem onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingId(convo.id);
-                            setEditTitle(convo.title);
-                          }}>
+                      e.stopPropagation();
+                      setEditingId(convo.id);
+                      setEditTitle(convo.title);
+                    }}>
                             <Pencil className="h-3 w-3 mr-2" />
                             Renomear
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteConvo(convo.id);
-                            }}
-                          >
+                      className="text-destructive focus:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteConvo(convo.id);
+                      }}>
+                      
                             <Trash className="h-3 w-3 mr-2" />
                             Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    )}
+                }
                   </div>
-                ))
-              )}
+              )
+              }
             </div>
           </ScrollArea>
         </div>
@@ -410,8 +410,8 @@ export default function DesignMasterChatPage() {
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-card/60 border border-border/15 rounded-r-lg p-1.5 hover:bg-card/80 transition-all"
-          style={{ left: sidebarOpen ? '256px' : '0px', transition: 'left 0.3s' }}
-        >
+          style={{ left: sidebarOpen ? '256px' : '0px', transition: 'left 0.3s' }}>
+          
           {sidebarOpen ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
         </button>
 
@@ -419,56 +419,56 @@ export default function DesignMasterChatPage() {
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Messages */}
           <ScrollArea className="flex-1 px-4 py-6" ref={scrollRef}>
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-6 animate-fade-up">
-                <div className="text-6xl">🧠</div>
+            {messages.length === 0 ?
+            <div className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-6 animate-fade-up">
+                <div className="text-6xl">
+</div>
                 <div className="text-center space-y-2">
-                  <h2 className="text-2xl font-bold font-display text-foreground">Design Master</h2>
+                  <h2 className="text-2xl font-bold font-display text-foreground">Creator Master</h2>
                   <p className="text-sm text-muted-foreground max-w-md">
                     Seu mentor de elite em design, viralização e conteúdo magnético para Instagram.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 max-w-xl justify-center">
-                  {SUGGESTIONS.map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => send(s)}
-                      className="rounded-xl border border-border/30 bg-card/50 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-card/80 transition-all duration-200 text-left"
-                    >
+                  {SUGGESTIONS.map((s, i) => <button
+                    key={i}
+                    onClick={() => send(s)}
+                    className="rounded-xl border border-border/30 bg-card/50 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-card/80 transition-all duration-200 text-left">
+                  
                       {s}
                     </button>
-                  ))}
+                )}
                 </div>
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto space-y-6">
-                {messages.map((msg, i) => (
-                  <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                    {msg.role === 'assistant' && (
-                      <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
+              </div> :
+
+            <div className="max-w-3xl mx-auto space-y-6">
+                {messages.map((msg, i) =>
+              <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                    {msg.role === 'assistant' &&
+                <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
                         🧠
                       </div>
-                    )}
+                }
                     <div
-                      className={cn(
-                        'rounded-2xl px-4 py-3 max-w-[85%] text-sm',
-                        msg.role === 'user'
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-card/60 border border-border/20 rounded-bl-md'
-                      )}
-                    >
-                      {msg.role === 'assistant' ? (
-                        <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                  className={cn(
+                    'rounded-2xl px-4 py-3 max-w-[85%] text-sm',
+                    msg.role === 'user' ?
+                    'bg-primary text-primary-foreground rounded-br-md' :
+                    'bg-card/60 border border-border/20 rounded-bl-md'
+                  )}>
+                  
+                      {msg.role === 'assistant' ?
+                  <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div>
-                      ) : (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      )}
+                        </div> :
+
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  }
                     </div>
                   </div>
-                ))}
-                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-                  <div className="flex gap-3">
+              )}
+                {isLoading && messages[messages.length - 1]?.role !== 'assistant' &&
+              <div className="flex gap-3">
                     <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
                       🧠
                     </div>
@@ -476,19 +476,19 @@ export default function DesignMasterChatPage() {
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                     </div>
                   </div>
-                )}
+              }
               </div>
-            )}
+            }
           </ScrollArea>
 
           {/* Input */}
           <div className="border-t border-border/20 bg-background/95 backdrop-blur-xl px-4 py-3">
             <div className="max-w-3xl mx-auto flex items-end gap-2">
-              {messages.length > 0 && (
-                <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10 text-muted-foreground hover:text-destructive" onClick={clearChat}>
+              {messages.length > 0 &&
+              <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10 text-muted-foreground hover:text-destructive" onClick={clearChat}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
-              )}
+              }
               <div className="relative flex-1">
                 <Textarea
                   ref={textareaRef}
@@ -497,14 +497,14 @@ export default function DesignMasterChatPage() {
                   onKeyDown={handleKeyDown}
                   placeholder="Pergunte ao Design Master..."
                   className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/30 bg-card/50 text-sm"
-                  rows={1}
-                />
+                  rows={1} />
+                
                 <Button
                   size="icon"
                   className="absolute right-1.5 bottom-1.5 h-8 w-8 rounded-lg"
                   onClick={() => send()}
-                  disabled={!input.trim() || isLoading}
-                >
+                  disabled={!input.trim() || isLoading}>
+                  
                   {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                 </Button>
               </div>
@@ -512,6 +512,6 @@ export default function DesignMasterChatPage() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
