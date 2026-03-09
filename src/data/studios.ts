@@ -122,8 +122,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'mockup-studio',
-    name: 'Mockup Studio',
-    tagline: 'Mockups profissionais com IA',
+    name: 'Laboratório de Mockups',
+    tagline: 'Gere apresentações profissionais para seus designs',
     description: 'Gere mockups realistas de produtos, embalagens, dispositivos e branding sem escrever uma linha de prompt.',
     icon: '📦',
     route: '/studio/mockup-studio',
