@@ -24,7 +24,7 @@ export const studios: Studio[] = [
   {
     id: 'extrator',
     name: 'Extrator de Prompts',
-    tagline: 'Engenharia reversa visual',
+    tagline: 'Extraia prompts de imagens com IA.',
     description: 'Extraia, limpe e organize prompts a partir de imagens existentes.',
     icon: '🔬',
     route: '/studio/extrator',
