@@ -41,8 +41,8 @@ export const studios: Studio[] = [
   },
   {
     id: 'upscale',
-    name: 'Upscale',
-    tagline: 'Resolução profissional',
+    name: 'Ultra Upscale',
+    tagline: 'Ampliação de imagem com qualidade máxima.',
     description: 'Restauração e upscale inteligente com preservação total da identidade visual.',
     icon: '🔍',
     route: '/studio/upscale',
