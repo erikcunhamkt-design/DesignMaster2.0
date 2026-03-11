@@ -53,6 +53,45 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
           <SubscriptionBadge />
         </div>
 
+        {/* Accessibility */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={toggleLargeText}
+              className={cn(
+                'flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl transition-colors',
+                largeText
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              )}
+            >
+              <Glasses className="h-4 w-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={toggleLightMode}
+              className={cn(
+                'flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl transition-colors',
+                lightMode
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              )}
+            >
+              <Sun className="h-4 w-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            {lightMode ? 'Modo escuro' : 'Modo claro'}
+          </TooltipContent>
+        </Tooltip>
+
         {/* API Key */}
         <Popover>
           <PopoverTrigger asChild>
