@@ -1,21 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Camera, Loader2, ArrowLeft, AtSign, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Camera, Loader2, AtSign, Check, Shield, Instagram, Linkedin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+const SOCIAL_FIELDS = [
+  { key: 'instagram', label: 'Instagram', icon: Instagram, placeholder: 'seu.usuario' },
+  { key: 'behance', label: 'Behance', icon: ExternalLink, placeholder: 'behance.net/usuario' },
+  { key: 'tiktok', label: 'TikTok', icon: ExternalLink, placeholder: '@usuario' },
+  { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, placeholder: 'linkedin.com/in/usuario' },
+] as const;
+
+type SocialKey = typeof SOCIAL_FIELDS[number]['key'];
+
 export default function ProfilePage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [cargo, setCargo] = useState('');
   const [title, setTitle] = useState('');
+  const [bio, setBio] = useState('');
+  const [socials, setSocials] = useState<Record<SocialKey, string>>({ instagram: '', behance: '', tiktok: '', linkedin: '' });
+  const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -26,16 +38,33 @@ export default function ProfilePage() {
   const loadProfile = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    if (data) {
-      const p = data as any;
+    
+    const [{ data: profile }, { data: userRoles }] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', user.id).single(),
+      supabase.from('user_roles').select('role').eq('user_id', user.id),
+    ]);
+    
+    if (profile) {
+      const p = profile as any;
       setDisplayName(p.display_name || '');
       setUsername(p.username || '');
       setOriginalUsername(p.username || '');
       setAvatarUrl(p.avatar_url || null);
       setCargo(p.cargo || '');
       setTitle(p.title || '');
+      setBio(p.bio || '');
+      setSocials({
+        instagram: p.instagram || '',
+        behance: p.behance || '',
+        tiktok: p.tiktok || '',
+        linkedin: p.linkedin || '',
+      });
     }
+    
+    if (userRoles) {
+      setRoles(userRoles.map((r: any) => r.role));
+    }
+    
     setLoading(false);
   }, [user]);
 
@@ -82,7 +111,14 @@ export default function ProfilePage() {
     if (username !== originalUsername && usernameAvailable === false) { toast.error('Username já está em uso'); return; }
     if (!displayName.trim()) { toast.error('Nome de exibição é obrigatório'); return; }
     setSaving(true);
-    const updates: any = { display_name: displayName.trim() };
+    const updates: any = {
+      display_name: displayName.trim(),
+      bio: bio.trim(),
+      instagram: socials.instagram.trim(),
+      behance: socials.behance.trim(),
+      tiktok: socials.tiktok.trim(),
+      linkedin: socials.linkedin.trim(),
+    };
     if (username) updates.username = username;
     const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
     if (error) {
@@ -105,12 +141,18 @@ export default function ProfilePage() {
     );
   }
 
+  const roleLabels: Record<string, { label: string; className: string }> = {
+    admin: { label: 'Administrador', className: 'bg-destructive/15 text-destructive border-destructive/20' },
+    moderator: { label: 'Moderador', className: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+    user: { label: 'Usuário', className: 'bg-primary/15 text-primary border-primary/20' },
+  };
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Meu Perfil" showApiKey={false} />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-md mx-auto px-4 py-8 space-y-8">
+        <div className="max-w-md mx-auto px-4 py-8 space-y-6">
           {/* Avatar */}
           <div className="flex flex-col items-center gap-3">
             <div className="relative group">
@@ -128,6 +170,36 @@ export default function ProfilePage() {
             </div>
             <p className="text-[10px] text-muted-foreground">Clique para alterar o avatar</p>
           </div>
+
+          {/* Roles & Badges */}
+          {(roles.length > 0 || cargo || title) && (
+            <div className="space-y-3 p-4 rounded-xl bg-card/50 border border-border/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Poderes & Títulos</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {roles.map(role => {
+                  const info = roleLabels[role] || roleLabels.user;
+                  return (
+                    <Badge key={role} variant="outline" className={`text-[10px] font-semibold ${info.className}`}>
+                      {info.label}
+                    </Badge>
+                  );
+                })}
+                {cargo && (
+                  <Badge variant="outline" className="text-[10px] font-semibold bg-primary/15 text-primary border-primary/20">
+                    {cargo}
+                  </Badge>
+                )}
+                {title && (
+                  <Badge variant="outline" className="text-[10px] font-medium bg-accent/20 text-accent-foreground/70 border-accent/30">
+                    {title}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Fields */}
           <div className="space-y-5">
@@ -155,7 +227,7 @@ export default function ProfilePage() {
                 />
                 {checkingUsername && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />}
                 {!checkingUsername && usernameAvailable === true && username !== originalUsername && (
-                  <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+                  <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
                 )}
               </div>
               {username.length > 0 && username.length < 3 && (
@@ -166,22 +238,38 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Read-only fields */}
-            {(cargo || title) && (
-              <div className="space-y-3 p-3 rounded-xl bg-card/40 border border-border/15">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Atribuições (definido por admin)</p>
-                {cargo && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold bg-primary/15 text-primary px-2 py-0.5 rounded-full">{cargo}</span>
+            {/* Bio */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Sobre mim</label>
+              <Textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Conte um pouco sobre você..."
+                className="min-h-[80px] bg-secondary/30 border-border/20 resize-none"
+                maxLength={300}
+              />
+              <p className="text-[9px] text-muted-foreground/50 text-right">{bio.length}/300</p>
+            </div>
+
+            {/* Social Links */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-foreground">Redes sociais</label>
+              <div className="space-y-2.5">
+                {SOCIAL_FIELDS.map(({ key, label, icon: Icon, placeholder }) => (
+                  <div key={key} className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <Input
+                      value={socials[key]}
+                      onChange={(e) => setSocials(prev => ({ ...prev, [key]: e.target.value }))}
+                      placeholder={placeholder}
+                      className="h-10 pl-9 bg-secondary/30 border-border/20 text-sm"
+                    />
                   </div>
-                )}
-                {title && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-medium bg-accent/30 text-accent-foreground/70 px-2 py-0.5 rounded-full">{title}</span>
-                  </div>
-                )}
+                ))}
               </div>
-            )}
+            </div>
 
             <div className="text-[10px] text-muted-foreground/50">
               E-mail: {user?.email}
