@@ -24,6 +24,7 @@ import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
 import carouselMasterHero from '@/assets/carousel-master-hero.png';
+import restorePhotoHero from '@/assets/restore-photo-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
