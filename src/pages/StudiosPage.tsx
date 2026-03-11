@@ -27,6 +27,7 @@ import carouselMasterHero from '@/assets/carousel-master-hero.png';
 import restorePhotoHero from '@/assets/restore-photo-hero.png';
 import editorialHero from '@/assets/editorial-hero.png';
 import calendarHero from '@/assets/calendar-hero.png';
+import bioHero from '@/assets/bio-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
