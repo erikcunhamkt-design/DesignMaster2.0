@@ -25,6 +25,7 @@ import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
 import carouselMasterHero from '@/assets/carousel-master-hero.png';
 import restorePhotoHero from '@/assets/restore-photo-hero.png';
+import editorialHero from '@/assets/editorial-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
@@ -40,11 +41,12 @@ const studioImages: Record<string, string> = {
   'mockup-studio': mockupStudioHero,
   'carousel-master': carouselMasterHero,
   'restore-photo': restorePhotoHero,
+  'editorial': editorialHero,
 };
 
 const sections = [
 { id: 'image-creators', title: 'Geradores Especializados', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
-{ id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat', 'carousel-master'] },
+{ id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat', 'carousel-master', 'editorial'] },
 { id: 'prompt-tools', title: 'Laboratório de Prompts', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
 { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale', 'restore-photo'] }];
 

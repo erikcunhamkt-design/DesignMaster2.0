@@ -24,6 +24,7 @@ import AutoCreatorPage from "./pages/AutoCreatorPage";
 import MockupStudioPage from "./pages/MockupStudioPage";
 import HeroStudioPage from "./pages/HeroStudioPage";
 import CarouselMasterChatPage from "./pages/CarouselMasterChatPage";
+import EditorialChatPage from "./pages/EditorialChatPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="/studio/hero-studio" element={<ProtectedRoute><HeroStudioPage /></ProtectedRoute>} />
             <Route path="/studio/carousel-master" element={<ProtectedRoute><CarouselMasterChatPage /></ProtectedRoute>} />
             <Route path="/studio/restore-photo" element={<ProtectedRoute><RestorePhotoPage /></ProtectedRoute>} />
+            <Route path="/studio/editorial" element={<ProtectedRoute><EditorialChatPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
