@@ -313,7 +313,11 @@ export default function CommunityChatPage() {
                                 ? 'bg-primary text-primary-foreground rounded-br-md'
                                 : 'bg-card/60 border border-border/20 rounded-bl-md text-foreground'
                             )}>
-                              <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                              {msg.message_type !== 'text' && msg.media_url ? (
+                                <MediaMessageContent type={msg.message_type} url={msg.media_url} />
+                              ) : (
+                                <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                              )}
                               <p className={cn(
                                 'text-[9px] mt-1 text-right',
                                 isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40'
