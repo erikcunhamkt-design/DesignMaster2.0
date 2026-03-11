@@ -14,6 +14,7 @@ import {
   X,
   MessageCircle,
   Mail,
+  User,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
@@ -41,6 +42,7 @@ const mainItems: SidebarItem[] = [
 const secondaryItems: SidebarItem[] = [
   { id: 'favoritos', label: 'Favoritos', icon: Star },
   { id: 'recentes', label: 'Recentes', icon: Clock },
+  { id: 'profile', label: 'Meu Perfil', icon: User, route: '/studio/profile' },
 ];
 
 interface DashboardSidebarProps {
