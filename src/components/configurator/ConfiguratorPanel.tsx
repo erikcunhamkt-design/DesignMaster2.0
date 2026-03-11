@@ -132,9 +132,8 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && (
-    apiKey.length >= 10
-  ) && (
+  const hasValidKey = apiKey.length >= 10;
+  const canGenerate = !isGenerating && hasValidKey && (
     hasFreePrompt || (
       config.dimension !== null &&
       (!config.textEnabled || config.text01.length >= 3)
@@ -282,14 +281,19 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
         <Button
           disabled={!canGenerate}
           onClick={onGenerate}
-          className="w-full h-11 gap-2.5 text-xs font-bold tracking-wider bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-glow-md transition-all duration-500 hover:shadow-glow-lg rounded-xl disabled:opacity-25 disabled:shadow-none uppercase"
+          className={cn(
+            "w-full h-11 gap-2.5 text-xs font-bold tracking-wider text-primary-foreground transition-all duration-500 rounded-xl disabled:opacity-25 disabled:shadow-none uppercase",
+            !hasValidKey
+              ? "bg-destructive hover:bg-destructive/90 shadow-[0_0_15px_-3px_hsl(var(--destructive)/0.4)]"
+              : "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-glow-md hover:shadow-glow-lg"
+          )}
         >
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Sparkles className="h-4 w-4" />
           )}
-          {isGenerating ? 'Gerando...' : 'Gerar Imagem'}
+          {isGenerating ? 'Gerando...' : !hasValidKey ? 'API Key Não Conectada' : 'Gerar Imagem'}
         </Button>
         <Button variant="ghost" onClick={onDuplicate} className="w-full h-8 gap-2 text-[10px] font-medium text-muted-foreground/40 hover:text-muted-foreground rounded-lg">
           <Copy className="h-3 w-3" />
