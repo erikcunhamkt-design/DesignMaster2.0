@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle } from 'lucide-react';
+import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 // ScrollArea removed - using native overflow
