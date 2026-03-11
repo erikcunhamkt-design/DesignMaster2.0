@@ -184,16 +184,21 @@ export function MobileSidebarTrigger({
   onSectionChange,
 }: DashboardSidebarProps) {
   const [open, setOpen] = useState(false);
+  const { unreadCount } = useUnreadDMs();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors md:hidden">
+        <button className="relative flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors md:hidden">
           <Menu className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[260px] p-0 bg-sidebar border-r border-border/40">
-        {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border/30">
           <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
@@ -205,6 +210,7 @@ export function MobileSidebarTrigger({
           onSectionChange={onSectionChange}
           collapsed={false}
           onClose={() => setOpen(false)}
+          unreadDMs={unreadCount}
         />
       </SheetContent>
     </Sheet>
