@@ -9,7 +9,8 @@ interface ModelSelectorProps {
 }
 
 const models: { id: AiModel; label: string; desc: string; icon: React.ElementType; badge?: string }[] = [
-  { id: 'flash', label: 'Nano Banana 2', desc: 'Gemini 3.1 · Rápido e potente', icon: Zap, badge: '3.1' },
+  { id: 'pro', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3.1', icon: Crown, badge: 'PRO' },
+  { id: 'flash', label: 'Nano Banana 2', desc: 'Rápido · Gemini 3.1', icon: Zap, badge: 'NEW' },
 ];
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
