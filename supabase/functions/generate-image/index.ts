@@ -52,7 +52,7 @@ RULES:
 - Write in English only`;
 
 async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, googleApiKey: string): Promise<{ expandedPrompt: string; expandedNegative: string }> {
-  const model = "gemini-2.5-flash";
+  const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
   const response = await fetch(url, {
