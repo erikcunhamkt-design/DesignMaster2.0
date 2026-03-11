@@ -137,8 +137,10 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={3}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button
-              onClick={() => navigate("/")}
+            <a
+              href="https://pay.kiwify.com.br/7b1lH1a"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg hover:brightness-110 transition-all shadow-lg shadow-primary/25"
             >
               Assinar Agora
