@@ -568,7 +568,12 @@ export default function DirectMessagesPage() {
               </div>
 
               <div className="border-t border-border/15 bg-card/20 backdrop-blur-sm p-3">
-                <div className="max-w-3xl mx-auto flex gap-2">
+                <div className="max-w-3xl mx-auto flex items-end gap-2">
+                  <ChatMediaInput
+                    onMediaSent={(url, type) => sendMessage(url, type)}
+                    onEmojiSelect={(emoji) => setInput(prev => prev + emoji)}
+                    disabled={isLoading}
+                  />
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -578,7 +583,7 @@ export default function DirectMessagesPage() {
                     rows={1}
                   />
                   <Button
-                    onClick={sendMessage}
+                    onClick={() => sendMessage()}
                     disabled={isLoading || !input.trim()}
                     size="icon"
                     className="h-[44px] w-[44px] rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.3)] disabled:opacity-30 disabled:shadow-none"
