@@ -1,10 +1,13 @@
-import { Settings, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, ArrowLeft, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AccessibilityPanel } from '@/components/AccessibilityPanel';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { LicenseCountdown } from '@/components/LicenseCountdown';
 import { useLicense } from '@/hooks/useLicense';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Crown, Clock, AlertTriangle, KeyRound, Glasses } from 'lucide-react';
 
 function LicenseSection() {
