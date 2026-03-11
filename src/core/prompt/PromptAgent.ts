@@ -119,6 +119,8 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     const dim = DIMENSIONS[config.dimension ?? 'stories'];
     return {
       prompt: config.freePrompt.trim(),
+      lockedPrompt: config.freePrompt.trim(),
+      expandablePrompt: '',
       negative_prompt: BASE_NEGATIVE,
       width: dim.width,
       height: dim.height,
@@ -128,142 +130,143 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
       layout_plan: '',
     };
   }
-  const parts: string[] = [];
+
+  // LOCKED = user's explicit sidebar choices (NEVER rewritten)
+  const locked: string[] = [];
+  // EXPANDABLE = contextual/style parts the Architect CAN enhance
+  const expandable: string[] = [];
   const negativeParts: string[] = [BASE_NEGATIVE];
   const dim = config.dimension ? DIMENSIONS[config.dimension] : DIMENSIONS['feed-quadrado'];
 
-  // ─── 0. FREE PROMPT (absolute highest priority — user's own words) ───
+  // ─── FREE PROMPT → LOCKED ───
   if (config.freePrompt?.trim()) {
-    parts.push(`MANDATORY USER INSTRUCTIONS (must be followed exactly): ${config.freePrompt.trim()}`);
+    locked.push(config.freePrompt.trim());
   }
 
-  // ─── 1. DIMENSION & ASPECT RATIO ───
-  parts.push(`${dim.ratio} aspect ratio, professional social media advertisement`);
+  // ─── DIMENSION → EXPANDABLE ───
+  expandable.push(`${dim.ratio} aspect ratio, professional social media advertisement`);
 
-  // ─── 2. RESERVED TEXT AREA (safe zones) ───
+  // ─── RESERVED TEXT AREA → LOCKED (layout is exact) ───
   let reservedArea: ReservedArea | null = null;
   let layoutPlan = '';
 
   if (config.verticalPosition === 'cima') {
     reservedArea = { position: 'bottom', percentage: 40 };
     layoutPlan = 'subject upper 55%, clean negative space bottom 40%';
-    parts.push('subject positioned in the upper 55% of the frame');
-    parts.push('clean negative space in the bottom 35-45% of the image, minimal details in lower area, safe margins for typography overlay');
+    locked.push('subject positioned in the upper 55% of the frame');
+    locked.push('clean negative space in the bottom 35-45% of the image for typography overlay');
   } else if (config.verticalPosition === 'baixo') {
     reservedArea = { position: 'top', percentage: 40 };
     layoutPlan = 'subject lower 55%, clean negative space top 40%';
-    parts.push('subject positioned in the lower 55% of the frame');
-    parts.push('clean negative space in the top 35-45% of the image, minimal details in upper area, safe margins for typography overlay');
+    locked.push('subject positioned in the lower 55% of the frame');
+    locked.push('clean negative space in the top 35-45% of the image for typography overlay');
   } else {
     reservedArea = { position: 'center-bottom', percentage: 25 };
     layoutPlan = 'subject centered, clean space bottom 25%';
-    parts.push('subject centered in the frame');
-    parts.push('clean negative space in the bottom 20-30% of the image for text overlay, safe margins for typography');
+    locked.push('subject centered in the frame');
+    locked.push('clean negative space in the bottom 20-30% for text overlay');
   }
 
-  // ─── 3. SUBJECT IDENTITY (second priority) ───
+  // ─── SUBJECT → LOCKED ───
   const genderLabel = config.gender === 'masculino' ? 'male' : 'female';
-  parts.push(`${genderLabel} hero subject, main focus of the composition`);
+  locked.push(`${genderLabel} hero subject`);
 
   if (config.poseDescription) {
-    parts.push(`pose: ${config.poseDescription}`);
+    locked.push(`pose: ${config.poseDescription}`);
   }
 
-  // ─── CHARACTER DIRECTION ───
+  // ─── CHARACTER DIRECTION → ALL LOCKED ───
   const dirExpression = config.expression || config.expressionCustom;
   const dirPose = config.pose || config.poseCustom;
   const dirAngle = config.cameraAngle || config.cameraAngleCustom;
   const dirLens = config.lens || config.lensCustom;
   const dirGaze = config.gazeDirection || config.gazeDirectionCustom;
 
-  if (dirExpression) parts.push(`facial expression: ${dirExpression}`);
-  if (dirPose) parts.push(`body pose: ${dirPose}`);
-  if (dirAngle) parts.push(`camera angle: ${dirAngle}`);
-  if (dirLens) parts.push(`shot with ${dirLens} lens`);
-  if (dirGaze) parts.push(`gaze direction: ${dirGaze}`);
+  if (dirExpression) locked.push(`facial expression: ${dirExpression}`);
+  if (dirPose) locked.push(`body pose: ${dirPose}`);
+  if (dirAngle) locked.push(`camera angle: ${dirAngle}`);
+  if (dirLens) locked.push(`shot with ${dirLens} lens`);
+  if (dirGaze) locked.push(`gaze direction: ${dirGaze}`);
 
-  // Subject horizontal position
+  // Subject horizontal position → LOCKED
   if (config.subjectPosition === 'esquerda') {
-    parts.push('subject positioned on the left third of frame, following rule of thirds');
+    locked.push('subject positioned on the left third of frame');
   } else if (config.subjectPosition === 'direita') {
-    parts.push('subject positioned on the right third of frame, following rule of thirds');
+    locked.push('subject positioned on the right third of frame');
   } else {
-    parts.push('subject centered in frame, symmetrical composition');
+    locked.push('subject centered in frame');
   }
 
-  // ─── 4. COLOR PALETTE (third priority) ───
+  // ─── COLORS → LOCKED if manual, EXPANDABLE if auto ───
   if (config.colorMode === 'manual') {
-    parts.push(`color palette: ambient ${config.ambientColor}, rim light ${config.rimLightColor}, complementary accent ${config.complementaryLightColor}`);
-    parts.push('colors applied through lighting and environment, cohesive color harmony');
+    locked.push(`color palette: ambient ${config.ambientColor}, rim light ${config.rimLightColor}, complementary accent ${config.complementaryLightColor}`);
   } else {
-    parts.push('choose the most coherent and harmonious color palette for the lighting and environment based on the overall design context, niche, and mood');
+    expandable.push('choose the most coherent color palette for the lighting and environment');
   }
 
-  // ─── 5. COMPOSITION / FRAMING (fourth priority) ───
+  // ─── FRAMING → LOCKED ───
   if (config.framing === 'closeup') {
-    parts.push('close-up shot focusing on face and shoulders, intimate framing');
+    locked.push('close-up shot focusing on face and shoulders');
   } else if (config.framing === 'plano-medio') {
-    parts.push('medium shot from waist up, balanced framing');
+    locked.push('medium shot from waist up');
   } else {
-    parts.push('american shot from knees up, full body presence');
+    locked.push('american shot from knees up');
   }
 
-  // ─── 6. STYLE (fifth priority) ───
+  // ─── STYLE → EXPANDABLE (Architect can enhance) ───
   if (config.visualStyleEnabled && config.visualStyle) {
     const vfx = STYLE_VFX[config.visualStyle] || config.visualStyle;
-    parts.push(`visual style: ${vfx}`);
+    expandable.push(`visual style: ${vfx}`);
   }
 
-  // ─── 7. NICHE / ENVIRONMENT ───
+  // ─── NICHE / ENVIRONMENT → EXPANDABLE ───
   if (config.niche) {
-    parts.push(`niche context: ${config.niche}, theme-appropriate elements and atmosphere`);
+    expandable.push(`niche context: ${config.niche}`);
   }
   if (config.environment) {
-    parts.push(`environment setting: ${config.environment}`);
+    expandable.push(`environment setting: ${config.environment}`);
   }
 
-  // ─── 8. SOBRIETY ───
+  // ─── SOBRIETY → EXPANDABLE ───
   if (config.sobriety > 70) {
-    parts.push('professional corporate clean restrained aesthetic');
+    expandable.push('professional corporate clean restrained aesthetic');
   } else if (config.sobriety < 30) {
-    parts.push('creative artistic bold expressive experimental look');
+    expandable.push('creative artistic bold expressive experimental look');
   }
 
-  // ─── 9. EFFECTS ───
+  // ─── EFFECTS → LOCKED ───
   if (config.useBlur) {
-    parts.push('beautiful bokeh background blur, shallow depth of field, subject isolation');
+    locked.push('beautiful bokeh background blur, shallow depth of field');
   }
   if (config.useSideGradient) {
-    parts.push('subtle lateral gradient color transition on both sides of the frame');
+    locked.push('subtle lateral gradient color transition on both sides of the frame');
   }
 
-  // ─── 10. FLOATING ELEMENTS (sixth priority) ───
+  // ─── FLOATING ELEMENTS → LOCKED ───
   if (config.floatingElements && config.floatingElementsText) {
-    parts.push(`floating decorative elements around subject: ${config.floatingElementsText}, arranged aesthetically, depth layers`);
+    locked.push(`floating decorative elements around subject: ${config.floatingElementsText}`);
   }
 
-  // ─── 11. TEXT HANDLING ───
+  // ─── TEXT HANDLING → LOCKED (exact text is sacred) ───
   if (!config.textEnabled || config.textMode === 'camada') {
-    // Layer mode: no text in image, just clean space
-    parts.push('NO text in the image, clean background areas for post-production text overlay');
+    locked.push('NO text in the image, clean background for post-production text overlay');
     negativeParts.push('any text, letters, words, numbers, watermarks in image');
   } else if (config.textEnabled && config.textMode === 'imagem') {
-    // Text in image mode
-    if (config.text01) parts.push(`prominent headline text reading "${config.text01}", bold, high readability, clean kerning, professional typography`);
-    if (config.text02) parts.push(`secondary text reading "${config.text02}", smaller, supporting the headline`);
-    if (config.cta) parts.push(`call-to-action button or text reading "${config.cta}", visually distinct, actionable`);
+    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography`);
+    if (config.text02) locked.push(`secondary text reading "${config.text02}", smaller, supporting the headline`);
+    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct`);
     negativeParts.push(TEXT_NEGATIVE);
   }
 
-  // ─── 12. ADDITIONAL PROMPT ───
+  // ─── ADDITIONAL PROMPT → LOCKED ───
   if (config.additionalPromptEnabled && config.additionalPrompt) {
-    parts.push(config.additionalPrompt);
+    locked.push(config.additionalPrompt);
   }
 
-  // ─── ULTRA REALISM BOOST (auto for human subjects) ───
+  // ─── ULTRA REALISM BOOST → EXPANDABLE ───
   if (isHumanSubject(config) && !isNonRealistStyle(config)) {
-    parts.push(HUMAN_REALISM_BOOST);
-    parts.push(HUMAN_LIPS_BOOST);
+    expandable.push(HUMAN_REALISM_BOOST);
+    expandable.push(HUMAN_LIPS_BOOST);
     negativeParts.push(HUMAN_NEGATIVE_BOOST);
   }
 
@@ -272,53 +275,36 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     negativeParts.push(config.negativePrompt.trim());
   }
 
-  // ─── ALWAYS INJECT BASE STYLE ───
-  parts.push(BASE_STYLE);
+  // ─── BASE STYLE → EXPANDABLE ───
+  expandable.push(BASE_STYLE);
 
   // ─── BUILD REFERENCES ───
   const references: ReferenceEntry[] = [];
 
-  // Subject photos = identity (highest strength)
   for (const url of config.subjectPhotos) {
-    references.push({
-      url,
-      role: 'identity',
-      strength: 80,
-      preserve_identity: true,
-    });
+    references.push({ url, role: 'identity', strength: 80, preserve_identity: true });
   }
 
-  // Scenery photos
   if (config.sceneryPhotosEnabled) {
     for (const url of config.sceneryPhotos) {
-      references.push({
-        url,
-        role: 'scenery',
-        strength: 50,
-        preserve_identity: false,
-      });
+      references.push({ url, role: 'scenery', strength: 50, preserve_identity: false });
     }
   }
 
-  // Style references = inspiration (lowest strength, never override identity)
   config.styleReferences.forEach((url, i) => {
     const attrs = config.referenceAttributes?.[i] as string[] | undefined;
     const note = config.referenceNotes?.[i];
-    references.push({
-      url,
-      role: 'inspiration',
-      strength: 35,
-      preserve_identity: false,
-      attributes: attrs,
-    });
-    // Add reference note to prompt if available
-    if (note) {
-      parts.push(`reference image ${i + 1} guidance: ${note}`);
-    }
+    references.push({ url, role: 'inspiration', strength: 35, preserve_identity: false, attributes: attrs });
+    if (note) expandable.push(`reference image ${i + 1} guidance: ${note}`);
   });
 
+  const lockedPrompt = locked.join('. ') + '.';
+  const expandablePrompt = expandable.join('. ') + '.';
+
   return {
-    prompt: parts.join('. ') + '.',
+    prompt: `${lockedPrompt} ${expandablePrompt}`,
+    lockedPrompt,
+    expandablePrompt,
     negative_prompt: negativeParts.join(', '),
     width: dim.width,
     height: dim.height,
