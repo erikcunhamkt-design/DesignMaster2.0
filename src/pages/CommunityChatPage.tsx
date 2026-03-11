@@ -157,14 +157,13 @@ export default function CommunityChatPage() {
     };
   }, [user?.id]);
 
-  const sendMessage = async () => {
+  const sendMessage = async (mediaUrl?: string, mediaType?: 'image' | 'audio') => {
     const msg = input.trim();
-    if (!msg || isLoading || !user) return;
+    const isMedia = !!mediaUrl;
+    if (!isMedia && !msg) return;
+    if (isLoading || !user) return;
 
-    if (chatStatus === 'banned') {
-      toast.error('Você foi banido do chat.');
-      return;
-    }
+    if (chatStatus === 'banned') { toast.error('Você foi banido do chat.'); return; }
     if (chatStatus === 'muted') {
       const until = mutedUntil ? new Date(mutedUntil).toLocaleString('pt-BR') : '';
       toast.error(`Você está silenciado${until ? ` até ${until}` : ''}.`);
@@ -174,27 +173,30 @@ export default function CommunityChatPage() {
     setInput('');
     setIsLoading(true);
 
-    // Optimistic update
+    const msgType = isMedia ? mediaType! : 'text';
+    const content = isMedia ? (mediaType === 'image' ? '📷 Imagem' : '🎵 Áudio') : msg;
+
     const optimisticMsg: CommunityMessage = {
       id: crypto.randomUUID(),
       user_id: user.id,
-      content: msg,
-      message_type: 'text',
-      media_url: null,
+      content,
+      message_type: msgType,
+      media_url: mediaUrl || null,
       created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimisticMsg]);
 
     const { error } = await supabase.from('community_messages').insert({
       user_id: user.id,
-      content: msg,
-      message_type: 'text',
+      content,
+      message_type: msgType,
+      media_url: mediaUrl || null,
     } as any);
 
     if (error) {
       toast.error('Erro ao enviar mensagem. Verifique seu status.');
       setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
-      setInput(msg);
+      if (!isMedia) setInput(msg);
     }
     setIsLoading(false);
   };
