@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw, Shield, MessageCircle, AlertTriangle, Ban } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw, Shield, MessageCircle, AlertTriangle, Ban, Bell, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
