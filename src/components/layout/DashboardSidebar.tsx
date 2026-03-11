@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUnreadDMs } from '@/hooks/useUnreadDMs';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { NotificationBell } from '@/components/NotificationBell';
 
 interface SidebarItem {
   id: string;
@@ -139,12 +140,15 @@ function SidebarContent({
           );
         })}
 
-        {/* Social divider */}
+        {/* Notifications */}
         <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
 
         {!collapsed && (
           <p className="px-2 mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Social</p>
         )}
+
+        <NotificationBell collapsed={collapsed} />
+
         {socialItems.map((item) => {
           const active = activeSection === item.id;
           return (
