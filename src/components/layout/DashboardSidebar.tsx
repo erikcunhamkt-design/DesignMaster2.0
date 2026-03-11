@@ -133,7 +133,46 @@ function SidebarContent({
             </button>
           );
         })}
-      </nav>
+
+        {/* Social divider */}
+        <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+
+        {!collapsed && (
+          <p className="px-2 mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Social</p>
+        )}
+        {socialItems.map((item) => {
+          const active = activeSection === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              className={cn(
+                'group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                collapsed && 'justify-center px-0',
+                active
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+              )}
+            >
+              <div className="relative">
+                <item.icon className="h-[18px] w-[18px] shrink-0" />
+                {item.badge && item.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
+                    {item.badge > 9 ? '9+' : item.badge}
+                  </span>
+                )}
+              </div>
+              {!collapsed && (
+                <span className="truncate flex-1">{item.label}</span>
+              )}
+              {!collapsed && item.badge && item.badge > 0 && (
+                <span className="bg-primary/15 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
     </>
   );
 }
