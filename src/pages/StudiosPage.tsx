@@ -45,6 +45,7 @@ const studioImages: Record<string, string> = {
   'restore-photo': restorePhotoHero,
   'editorial': editorialHero,
   'calendar': calendarHero,
+  'bio': bioHero,
 };
 
 const sections = [

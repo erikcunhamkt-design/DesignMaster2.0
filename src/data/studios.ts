@@ -170,4 +170,14 @@ export const studios: Studio[] = [
     gradient: 'from-indigo-500/15 to-blue-500/10',
     isNew: true,
   },
+  {
+    id: 'bio',
+    name: 'Bio Master',
+    tagline: 'Crie biografias estratégicas para Instagram com IA.',
+    description: 'Agente especialista em bios de Instagram — posicionamento, proposta de valor e conversão em 3 opções prontas para qualquer nicho.',
+    icon: '✍️',
+    route: '/studio/bio',
+    gradient: 'from-pink-500/15 to-rose-500/10',
+    isNew: true,
+  },
 ];
