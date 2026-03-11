@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS title text DEFAULT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS cargo text DEFAULT NULL;

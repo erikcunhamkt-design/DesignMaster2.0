@@ -28,6 +28,8 @@ interface Profile {
   display_name: string;
   avatar_url: string | null;
   username?: string | null;
+  title?: string | null;
+  cargo?: string | null;
 }
 
 type ChatStatus = 'active' | 'muted' | 'banned';
@@ -48,6 +50,8 @@ const MessageBubble = memo(function MessageBubble({
 }) {
   const name = profile?.display_name || 'Usuário';
   const uname = profile?.username || null;
+  const cargo = profile?.cargo || null;
+  const title = profile?.title || null;
   const initials = name.slice(0, 2).toUpperCase();
   const time = new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
@@ -71,8 +75,10 @@ const MessageBubble = memo(function MessageBubble({
             friendStatus={friendStatus} onAddFriend={onAddFriend}
             onAcceptFriend={onAcceptFriend} onStartConversation={onStartConversation}
           >
-            <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors">
+            <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors inline-flex items-center gap-1.5 flex-wrap">
               {name} {uname && <span className="text-muted-foreground/50">@{uname}</span>}
+              {cargo && <span className="text-[8px] font-bold bg-primary/15 text-primary px-1.5 py-0.5 rounded-full">{cargo}</span>}
+              {title && <span className="text-[8px] font-medium bg-accent/30 text-accent-foreground/70 px-1.5 py-0.5 rounded-full">{title}</span>}
             </button>
           </UserProfilePopover>
         )}
@@ -88,7 +94,7 @@ const MessageBubble = memo(function MessageBubble({
           <p className={cn('text-[9px] mt-1 text-right', isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40')}>{time}</p>
         </div>
       </div>
-      {(isOwn || isAdmin) && (
+      {isAdmin && (
         <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-destructive/10 transition-opacity self-center" title="Excluir">
           <Trash2 className="h-3 w-3 text-destructive/60" />
         </button>

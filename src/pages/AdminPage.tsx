@@ -567,6 +567,8 @@ function ChatModerationPanel() {
           <TableHeader>
             <TableRow className="border-border/30">
               <TableHead>Usuário</TableHead>
+              <TableHead>Cargo</TableHead>
+              <TableHead>Título</TableHead>
               <TableHead>Status Chat</TableHead>
               <TableHead>Silenciado até</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -574,9 +576,9 @@ function ChatModerationPanel() {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Nenhum usuário</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum usuário</TableCell></TableRow>
             ) : filtered.map(u => {
               const status = getStatus(u.id);
               const statusInfo = statuses[u.id];
@@ -589,6 +591,32 @@ function ChatModerationPanel() {
                       </div>
                       <span className="text-sm font-medium text-foreground">{u.display_name || 'Sem nome'}</span>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={u.cargo || ''}
+                      placeholder="Ex: Admin"
+                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
+                      onBlur={(e) => {
+                        const val = e.target.value.trim() || null;
+                        if (val !== (u.cargo || null)) {
+                          supabase.from('profiles').update({ cargo: val } as any).eq('id', u.id).then(() => toast.success('Cargo atualizado'));
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={u.title || ''}
+                      placeholder="Ex: Fundador"
+                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
+                      onBlur={(e) => {
+                        const val = e.target.value.trim() || null;
+                        if (val !== (u.title || null)) {
+                          supabase.from('profiles').update({ title: val } as any).eq('id', u.id).then(() => toast.success('Título atualizado'));
+                        }
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
                     {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
