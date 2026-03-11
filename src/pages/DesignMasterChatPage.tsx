@@ -529,5 +529,5 @@ export default function DesignMasterChatPage() {
         </div>
       </div>
     </div>);
-
+  
 }
