@@ -331,16 +331,14 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => navigate("/")}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${
-                    plan.popular
-                      ? "bg-primary text-primary-foreground hover:brightness-110 shadow-md shadow-primary/20"
-                      : "border border-border/30 text-foreground hover:bg-secondary/30"
-                  }`}
+                <a
+                  href={plan.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-3 rounded-xl font-semibold text-sm transition-all text-center bg-primary text-primary-foreground hover:brightness-110 shadow-md shadow-primary/20"
                 >
                   {plan.cta}
-                </button>
+                </a>
               </motion.div>
             ))}
           </div>
