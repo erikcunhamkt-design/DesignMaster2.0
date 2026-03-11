@@ -80,16 +80,20 @@ export default function DirectMessagesPage() {
     if (data) setConversations(data as Conversation[]);
   }, [user]);
 
+  const addProfiles = useCallback((newProfiles: Profile[]) => {
+    let changed = false;
+    newProfiles.forEach(p => {
+      if (!profilesRef.current[p.id]) { profilesRef.current[p.id] = p; changed = true; }
+    });
+    if (changed) setProfilesVersion(v => v + 1);
+  }, []);
+
   const loadProfiles = useCallback(async (userIds: string[]) => {
-    const uniqueIds = [...new Set(userIds)].filter(id => !profiles[id]);
+    const uniqueIds = [...new Set(userIds)].filter(id => !profilesRef.current[id]);
     if (uniqueIds.length === 0) return;
     const { data } = await supabase.from('profiles').select('*').in('id', uniqueIds);
-    if (data) {
-      const newProfiles: Record<string, Profile> = {};
-      (data as Profile[]).forEach(p => newProfiles[p.id] = p);
-      setProfiles(prev => ({ ...prev, ...newProfiles }));
-    }
-  }, [profiles]);
+    if (data) addProfiles(data as Profile[]);
+  }, [addProfiles]);
 
   const loadMessages = useCallback(async (convoId: string) => {
     const { data } = await supabase
