@@ -593,6 +593,31 @@ function ChatModerationPanel() {
                     </div>
                   </TableCell>
                   <TableCell>
+                    <Input
+                      defaultValue={u.cargo || ''}
+                      placeholder="Ex: Admin"
+                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
+                      onBlur={(e) => {
+                        const val = e.target.value.trim() || null;
+                        if (val !== (u.cargo || null)) {
+                          supabase.from('profiles').update({ cargo: val } as any).eq('id', u.id).then(() => toast.success('Cargo atualizado'));
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      defaultValue={u.title || ''}
+                      placeholder="Ex: Fundador"
+                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
+                      onBlur={(e) => {
+                        const val = e.target.value.trim() || null;
+                        if (val !== (u.title || null)) {
+                          supabase.from('profiles').update({ title: val } as any).eq('id', u.id).then(() => toast.success('Título atualizado'));
+                        }
+                      }}
+                    />
+                  <TableCell>
                     {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
                     {status === 'muted' && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Silenciado</Badge>}
                     {status === 'banned' && <Badge className="bg-destructive/15 text-destructive border-destructive/20">Banido</Badge>}
