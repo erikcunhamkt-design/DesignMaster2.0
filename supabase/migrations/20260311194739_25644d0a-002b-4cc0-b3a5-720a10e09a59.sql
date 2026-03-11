@@ -1,0 +1,7 @@
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS bio text DEFAULT '',
+  ADD COLUMN IF NOT EXISTS instagram text DEFAULT '',
+  ADD COLUMN IF NOT EXISTS behance text DEFAULT '',
+  ADD COLUMN IF NOT EXISTS tiktok text DEFAULT '',
+  ADD COLUMN IF NOT EXISTS linkedin text DEFAULT '';
