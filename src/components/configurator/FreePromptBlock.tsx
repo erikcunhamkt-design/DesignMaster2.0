@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 interface FreePromptBlockProps {
   freePrompt: string;
   ignoreRest: boolean;
-  onUpdate: (patch: { freePrompt?: string; ignoreRest?: boolean }) => void;
+  onUpdate: (patch: {freePrompt?: string;ignoreRest?: boolean;}) => void;
   placeholder?: string;
 }
 
@@ -16,14 +16,14 @@ export function FreePromptBlock({
   freePrompt,
   ignoreRest,
   onUpdate,
-  placeholder = 'Digite seu prompt livremente aqui...',
+  placeholder = 'Digite seu prompt livremente aqui...'
 }: FreePromptBlockProps) {
   return (
     <div className={cn(
       'rounded-xl border transition-all duration-300 overflow-hidden',
-      ignoreRest
-        ? 'border-primary/40 bg-primary/8 shadow-glow-sm'
-        : 'border-border/20 bg-card/30'
+      ignoreRest ?
+      'border-primary/40 bg-primary/8 shadow-glow-sm' :
+      'border-border/20 bg-card/30'
     )}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3.5 pb-2.5">
@@ -54,8 +54,8 @@ export function FreePromptBlock({
               </Tooltip>
             </TooltipProvider>
           </div>
-          <p className="text-[9px] text-muted-foreground/50 mt-0.5">
-            Digite ou dite um prompt — use sozinho ou com os campos abaixo
+          <p className="text-[9px] text-muted-foreground/50 mt-0.5">Digite ou dite o que deseja— use sozinho ou com os campos abaixo
+
           </p>
         </div>
       </div>
@@ -67,8 +67,8 @@ export function FreePromptBlock({
           placeholder={placeholder}
           value={freePrompt}
           onChange={(v) => onUpdate({ freePrompt: v.slice(0, 9000) })}
-          className="min-h-[64px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-        />
+          className="min-h-[64px] resize-none bg-secondary/30 border-border/20 text-[10px]" />
+        
         <p className="text-[8px] text-muted-foreground/40 text-right mt-1">
           {freePrompt.length.toLocaleString()}/9.000
         </p>
@@ -88,16 +88,16 @@ export function FreePromptBlock({
             Ignorar o resto
           </p>
           <p className="text-[8px] text-muted-foreground/40 mt-0.5">
-            {ignoreRest
-              ? 'A IA usa só este prompt — os campos abaixo serão ignorados'
-              : 'A IA combina este prompt com os campos abaixo'}
+            {ignoreRest ?
+            'A IA usa só este prompt — os campos abaixo serão ignorados' :
+            'A IA combina este prompt com os campos abaixo'}
           </p>
         </div>
         <Switch
           checked={ignoreRest}
-          onCheckedChange={(v) => onUpdate({ ignoreRest: v })}
-        />
+          onCheckedChange={(v) => onUpdate({ ignoreRest: v })} />
+        
       </div>
-    </div>
-  );
+    </div>);
+
 }

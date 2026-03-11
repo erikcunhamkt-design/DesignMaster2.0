@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface NegativePromptBlockProps {
   negativePrompt: string;
   negativePromptEnabled: boolean;
-  onUpdate: (patch: { negativePrompt?: string; negativePromptEnabled?: boolean }) => void;
+  onUpdate: (patch: {negativePrompt?: string;negativePromptEnabled?: boolean;}) => void;
   placeholder?: string;
 }
 
@@ -15,14 +15,14 @@ export function NegativePromptBlock({
   negativePrompt,
   negativePromptEnabled,
   onUpdate,
-  placeholder = 'Ex: desfocado, baixa qualidade, marca d\'água, dedos extras, mãos deformadas',
+  placeholder = 'Ex: desfocado, baixa qualidade, marca d\'água, dedos extras, mãos deformadas'
 }: NegativePromptBlockProps) {
   return (
     <div className={cn(
       'rounded-xl border transition-all duration-300 overflow-hidden',
-      negativePromptEnabled
-        ? 'border-destructive/30 bg-destructive/5'
-        : 'border-border/15 bg-card/20'
+      negativePromptEnabled ?
+      'border-destructive/30 bg-destructive/5' :
+      'border-border/15 bg-card/20'
     )}>
       {/* Header toggle */}
       <div className="flex items-center gap-3 px-4 py-3">
@@ -36,8 +36,8 @@ export function NegativePromptBlock({
           <p className={cn(
             'text-[11px] font-semibold tracking-wide transition-colors',
             negativePromptEnabled ? 'text-destructive' : 'text-foreground/50'
-          )}>
-            Prompt Negativo
+          )}>O que eu não quero na minha imagem?
+
           </p>
           <p className="text-[9px] text-muted-foreground/40 mt-0.5">
             Elementos que a IA deve evitar gerar na imagem
@@ -45,22 +45,22 @@ export function NegativePromptBlock({
         </div>
         <Switch
           checked={negativePromptEnabled}
-          onCheckedChange={(v) => onUpdate({ negativePromptEnabled: v })}
-        />
+          onCheckedChange={(v) => onUpdate({ negativePromptEnabled: v })} />
+        
       </div>
 
       {/* Textarea (visible when enabled) */}
-      {negativePromptEnabled && (
-        <div className="px-4 pb-3">
+      {negativePromptEnabled &&
+      <div className="px-4 pb-3">
           <VoiceTextField
-            textarea
-            placeholder={placeholder}
-            value={negativePrompt}
-            onChange={(v) => onUpdate({ negativePrompt: v })}
-            className="min-h-[56px] resize-none bg-secondary/30 border-border/20 text-[10px]"
-          />
+          textarea
+          placeholder={placeholder}
+          value={negativePrompt}
+          onChange={(v) => onUpdate({ negativePrompt: v })}
+          className="min-h-[56px] resize-none bg-secondary/30 border-border/20 text-[10px]" />
+        
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
