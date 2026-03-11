@@ -64,6 +64,11 @@ export function ToolCard({ studio, image, isFavorite, onToggleFavorite, onNaviga
 
       {/* Content */}
       <div className="relative flex flex-col justify-end flex-1 p-4">
+        {studio.isNew && (
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-primary/20 border border-primary/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary shadow-[0_0_10px_hsl(var(--primary)/0.3)] animate-pulse">
+            ✨ Novo
+          </span>
+        )}
         {!image && (
           <span className="text-2xl mb-2 transition-transform duration-300 group-hover:scale-110">{studio.icon}</span>
         )}

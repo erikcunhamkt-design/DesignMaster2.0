@@ -23,7 +23,7 @@ import footballCreatorHero from '@/assets/football-creator-hero.png';
 import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
-
+import carouselMasterHero from '@/assets/carousel-master-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
@@ -36,12 +36,13 @@ const studioImages: Record<string, string> = {
   'football-creator': footballCreatorHero,
   'auto-creator': autoCreatorHero,
   'hero-studio': heroStudioHero,
-  'mockup-studio': mockupStudioHero
+  'mockup-studio': mockupStudioHero,
+  'carousel-master': carouselMasterHero,
 };
 
 const sections = [
 { id: 'image-creators', title: 'Geradores Especializados', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
-{ id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat'] },
+{ id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat', 'carousel-master'] },
 { id: 'prompt-tools', title: 'Laboratório de Prompts', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
 { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale'] }];
 

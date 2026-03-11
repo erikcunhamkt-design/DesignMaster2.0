@@ -9,6 +9,7 @@ export interface Studio {
   image?: string;
   route: string;
   gradient: string;
+  isNew?: boolean;
 }
 
 export const studios: Studio[] = [
@@ -128,5 +129,15 @@ export const studios: Studio[] = [
     icon: '📦',
     route: '/studio/mockup-studio',
     gradient: 'from-violet-500/15 to-purple-500/10',
+  },
+  {
+    id: 'carousel-master',
+    name: 'Carrossel Master',
+    tagline: 'Crie carrosséis magnéticos e virais para Instagram.',
+    description: 'Agente especialista em carrosséis de alto impacto — slides prontos, headlines magnéticas e estrutura AIDA para máxima retenção.',
+    icon: '🎠',
+    route: '/studio/carousel-master',
+    gradient: 'from-orange-500/15 to-amber-500/10',
+    isNew: true,
   },
 ];
