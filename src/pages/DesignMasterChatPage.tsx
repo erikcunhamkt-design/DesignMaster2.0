@@ -314,7 +314,7 @@ export default function DesignMasterChatPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Design Master Chat" showApiKey={true} />
+      <StudioTopbar title="Creator Master" showApiKey={true} />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}

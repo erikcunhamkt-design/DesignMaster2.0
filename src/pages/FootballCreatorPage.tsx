@@ -299,7 +299,7 @@ export default function FootballCreatorPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Football Creator" />
+      <StudioTopbar title="Clube das Lendas" />
 
       {/* Mode bar with tabs */}
       <div className="flex items-center border-b border-border/10 bg-background/90 backdrop-blur-sm shrink-0 h-9 px-3 gap-2">

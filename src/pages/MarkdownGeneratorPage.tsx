@@ -45,7 +45,7 @@ export default function MarkdownGeneratorPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Gerador Markdown" />
+      <StudioTopbar title="Estúdio Markdown" />
       <div className="flex flex-1 overflow-hidden">
         <div className="w-[400px] shrink-0 border-r border-border/15 bg-card/20 flex flex-col overflow-y-auto">
           <div className="p-6 space-y-5">
