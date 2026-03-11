@@ -26,6 +26,7 @@ import HeroStudioPage from "./pages/HeroStudioPage";
 import CarouselMasterChatPage from "./pages/CarouselMasterChatPage";
 import EditorialChatPage from "./pages/EditorialChatPage";
 import CalendarChatPage from "./pages/CalendarChatPage";
+import BioChatPage from "./pages/BioChatPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
