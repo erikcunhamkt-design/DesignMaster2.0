@@ -140,10 +140,10 @@ export default function DirectMessagesPage() {
             [newMsg.conversation_id]: (prev[newMsg.conversation_id] || 0) + 1,
           }));
           const showToast = async () => {
-            let name = profiles[newMsg.sender_id]?.display_name;
+            let name = profilesRef.current[newMsg.sender_id]?.display_name;
             if (!name) {
               const { data } = await supabase.from('profiles').select('*').eq('id', newMsg.sender_id).maybeSingle();
-              if (data) { name = (data as Profile).display_name; setProfiles(prev => ({ ...prev, [newMsg.sender_id]: data as Profile })); }
+              if (data) { name = (data as Profile).display_name; addProfiles([data as Profile]); }
             }
             toast.info(`💬 Nova mensagem de ${name || 'alguém'}`);
           };
