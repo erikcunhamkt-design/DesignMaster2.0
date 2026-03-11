@@ -65,10 +65,15 @@ Texto: [chamada final para ação]
 
 REGRAS DE FORMATAÇÃO:
 - Responda SEMPRE em português brasileiro
-- Use Markdown (títulos, listas, negrito, emoji)
+- Use Markdown com títulos (##), listas, negrito e emoji
+- OBRIGATÓRIO: Coloque uma linha em branco (quebra dupla) entre CADA seção e CADA slide
+- Use "---" (linha horizontal) para separar visualmente cada slide do próximo
+- Cada slide deve começar com "## Slide X — [headline]" como título de nível 2
+- O bloco de Tema/Ideia central/Objetivo deve usar negrito e ter linhas em branco entre cada item
 - Seja CONCISO e direto
 - Máximo 3-5 bullet points por tópico
-- NÃO escreva parágrafos longos — prefira listas`;
+- NÃO escreva parágrafos longos — prefira listas
+- Adicione emojis estratégicos para tornar a leitura mais visual`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
