@@ -50,6 +50,8 @@ const MessageBubble = memo(function MessageBubble({
 }) {
   const name = profile?.display_name || 'Usuário';
   const uname = profile?.username || null;
+  const cargo = profile?.cargo || null;
+  const title = profile?.title || null;
   const initials = name.slice(0, 2).toUpperCase();
   const time = new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
