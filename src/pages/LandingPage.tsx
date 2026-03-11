@@ -41,28 +41,14 @@ const testimonials = [
 
 const plans = [
   {
-    name: "Starter",
-    price: "Grátis",
-    period: "",
-    features: ["5 gerações por dia", "Acesso a 3 ferramentas", "Qualidade padrão", "Suporte por email"],
-    cta: "Começar Grátis",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "R$ 47",
+    name: "Plano Mensal",
+    price: "R$ 69,99",
+    originalPrice: "R$ 149,90",
     period: "/mês",
-    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro"],
-    cta: "Assinar Pro",
+    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro", "Cancele quando quiser"],
+    cta: "Assinar Agora",
     popular: true,
-  },
-  {
-    name: "Business",
-    price: "R$ 97",
-    period: "/mês",
-    features: ["Tudo do Pro", "API de integração", "White-label", "Múltiplos usuários", "Dashboard analytics", "Suporte dedicado"],
-    cta: "Falar com Vendas",
-    popular: false,
+    url: "https://pay.kiwify.com.br/7b1lH1a",
   },
 ];
 
