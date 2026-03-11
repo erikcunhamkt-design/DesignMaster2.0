@@ -150,4 +150,14 @@ export const studios: Studio[] = [
     gradient: 'from-amber-500/15 to-yellow-500/10',
     isNew: true,
   },
+  {
+    id: 'editorial',
+    name: 'Estrategista Editorial',
+    tagline: 'Crie linhas editoriais estratégicas com IA.',
+    description: 'Agente especialista em criação de linhas editoriais — pilares de conteúdo, posicionamento, autoridade e conversão para qualquer nicho.',
+    icon: '📰',
+    route: '/studio/editorial',
+    gradient: 'from-teal-500/15 to-cyan-500/10',
+    isNew: true,
+  },
 ];
