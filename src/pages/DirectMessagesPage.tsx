@@ -32,6 +32,7 @@ interface Profile {
   id: string;
   display_name: string;
   avatar_url: string | null;
+  username?: string | null;
 }
 
 type SidebarTab = 'conversations' | 'friends' | 'requests';
