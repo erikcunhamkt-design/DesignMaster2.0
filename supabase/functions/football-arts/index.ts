@@ -131,8 +131,8 @@ serve(async (req) => {
       );
     }
 
-    // Model selection: pro = gemini-3-pro-image-preview (Nano Banana Pro), flash = gemini-3.1-flash-image-preview (Nano Banana 2)
-    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
+    // Model: gemini-3.1-flash-image-preview (Nano Banana 2)
+    const model = "gemini-3.1-flash-image-preview";
 
     const prompt = buildPrompt(payload);
     console.log("Football Arts prompt built, calling AI...");
