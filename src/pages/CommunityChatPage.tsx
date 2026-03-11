@@ -188,10 +188,11 @@ export default function CommunityChatPage() {
       await supabase.from('profiles').insert({ id: user.id, display_name: displayName } as any);
       setNeedsUsername(true);
     } else {
+      addProfiles([data as Profile]);
       setNeedsUsername(!(data as any).username);
     }
     setCheckingUsername(false);
-  }, [user]);
+  }, [user, addProfiles]);
 
   const loadChatStatus = useCallback(async () => {
     if (!user) return;
