@@ -123,3 +123,86 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
     </header>
   );
 }
+
+function NotificationPopover() {
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
+
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'agora';
+    if (diffMin < 60) return `${diffMin}m`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `${diffH}h`;
+    const diffD = Math.floor(diffH / 24);
+    return `${diffD}d`;
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="relative flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+          <Bell className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-[8px] font-bold shadow-[0_0_8px_hsl(var(--primary)/0.5)] animate-pulse">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-0 glass-card shadow-elevation-3 rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/20">
+          <span className="text-xs font-bold text-foreground">Notificações</span>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllAsRead}
+              className="text-[10px] font-semibold text-primary hover:underline"
+            >
+              Marcar todas como lidas
+            </button>
+          )}
+        </div>
+
+        {/* List */}
+        <div className="max-h-72 overflow-y-auto">
+          {loading ? (
+            <div className="px-4 py-8 text-center text-xs text-muted-foreground">Carregando...</div>
+          ) : notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center px-4 py-10 gap-2">
+              <BellOff className="h-8 w-8 text-muted-foreground/30" />
+              <span className="text-xs text-muted-foreground/60 font-medium">Nenhuma notificação</span>
+              <span className="text-[10px] text-muted-foreground/40">Você será avisado quando houver novidades</span>
+            </div>
+          ) : (
+            notifications.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => !n.read && markAsRead(n.id)}
+                className={cn(
+                  'w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/30 transition-colors',
+                  !n.read && 'bg-primary/5'
+                )}
+              >
+                <div className="flex items-start gap-2">
+                  {!n.read && (
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.5)]" />
+                  )}
+                  <div className={cn('flex-1 min-w-0', n.read && 'ml-4')}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-foreground truncate">{n.title}</span>
+                      <span className="text-[9px] text-muted-foreground/50 shrink-0">{formatDate(n.created_at)}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5 line-clamp-2">{n.message}</p>
+                  </div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
