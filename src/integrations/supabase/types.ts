@@ -73,6 +73,125 @@ export type Database = {
           },
         ]
       }
+      chat_user_status: {
+        Row: {
+          id: string
+          muted_until: string | null
+          reason: string | null
+          status: Database["public"]["Enums"]["chat_status"]
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          muted_until?: string | null
+          reason?: string | null
+          status?: Database["public"]["Enums"]["chat_status"]
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          muted_until?: string | null
+          reason?: string | null
+          status?: Database["public"]["Enums"]["chat_status"]
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          media_url: string | null
+          message_type: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          message_type?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          message_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      direct_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          participant_1: string
+          participant_2: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          participant_1: string
+          participant_2: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          participant_1?: string
+          participant_2?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          media_url: string | null
+          message_type: string
+          sender_id: string
+        }
+        Insert: {
+          content?: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          message_type?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          message_type?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "direct_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       licenses: {
         Row: {
           access_key: string | null
@@ -112,6 +231,27 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
         }
         Relationships: []
       }
@@ -198,6 +338,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_chat_status: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["chat_status"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -205,9 +349,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_conversation_participant: {
+        Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      chat_status: "active" | "muted" | "banned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -336,6 +485,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      chat_status: ["active", "muted", "banned"],
     },
   },
 } as const

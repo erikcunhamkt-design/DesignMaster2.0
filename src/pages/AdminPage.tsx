@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw, Shield, MessageCircle, AlertTriangle, Ban } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -89,6 +89,7 @@ export default function AdminPage() {
         <Tabs defaultValue="users" className="w-full">
           <TabsList className="bg-secondary/50">
             <TabsTrigger value="users">Usuários & Licenças</TabsTrigger>
+            <TabsTrigger value="moderation">Moderação Chat</TabsTrigger>
             <TabsTrigger value="content">Conteúdo</TabsTrigger>
           </TabsList>
 
@@ -183,6 +184,11 @@ export default function AdminPage() {
                 </TableBody>
               </Table>
             </div>
+          </TabsContent>
+
+          {/* Moderation Tab */}
+          <TabsContent value="moderation" className="space-y-4 mt-4">
+            <ChatModerationPanel />
           </TabsContent>
 
           {/* Content Tab */}
@@ -464,4 +470,158 @@ function CountdownCell({ expiresAt }: { expiresAt: string }) {
     return <span className="text-amber-400">{hours}h {minutes}m {seconds}s</span>;
   }
   return <span className="text-destructive">{minutes}m {seconds}s</span>;
+}
+
+function ChatModerationPanel() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [statuses, setStatuses] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(true);
+  const [searchMod, setSearchMod] = useState('');
+  const [muteMinutes, setMuteMinutes] = useState('30');
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    // Get all profiles
+    const { data: profilesData } = await supabase.from('profiles').select('*');
+    if (profilesData) setUsers(profilesData);
+
+    // Get all chat statuses (admin can see all)
+    const { data: statusData } = await supabase.from('chat_user_status').select('*');
+    if (statusData) {
+      const map: Record<string, any> = {};
+      statusData.forEach((s: any) => map[s.user_id] = s);
+      setStatuses(map);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+
+  const muteUser = async (userId: string) => {
+    const mutedUntil = new Date(Date.now() + parseInt(muteMinutes) * 60 * 1000).toISOString();
+    const existing = statuses[userId];
+    if (existing) {
+      await supabase.from('chat_user_status').update({ status: 'muted', muted_until: mutedUntil, reason: 'Admin action' } as any).eq('user_id', userId);
+    } else {
+      await supabase.from('chat_user_status').insert({ user_id: userId, status: 'muted', muted_until: mutedUntil, reason: 'Admin action' } as any);
+    }
+    toast.success('Usuário silenciado');
+    fetchUsers();
+  };
+
+  const banUser = async (userId: string) => {
+    const existing = statuses[userId];
+    if (existing) {
+      await supabase.from('chat_user_status').update({ status: 'banned', muted_until: null, reason: 'Admin ban' } as any).eq('user_id', userId);
+    } else {
+      await supabase.from('chat_user_status').insert({ user_id: userId, status: 'banned', muted_until: null, reason: 'Admin ban' } as any);
+    }
+    toast.success('Usuário banido');
+    fetchUsers();
+  };
+
+  const unmuteUser = async (userId: string) => {
+    await supabase.from('chat_user_status').update({ status: 'active', muted_until: null, reason: null } as any).eq('user_id', userId);
+    toast.success('Restrição removida');
+    fetchUsers();
+  };
+
+  const filtered = users.filter(u =>
+    (u.display_name || '').toLowerCase().includes(searchMod.toLowerCase()) ||
+    (u.id || '').toLowerCase().includes(searchMod.toLowerCase())
+  );
+
+  const getStatus = (userId: string) => {
+    const s = statuses[userId];
+    if (!s) return 'active';
+    if (s.status === 'muted' && s.muted_until && new Date(s.muted_until) < new Date()) return 'active';
+    return s.status;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Buscar por nome..." value={searchMod} onChange={e => setSearchMod(e.target.value)} className="pl-9" />
+        </div>
+        <Select value={muteMinutes} onValueChange={setMuteMinutes}>
+          <SelectTrigger className="w-36 h-9 text-xs">
+            <SelectValue placeholder="Tempo mute" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="5">5 minutos</SelectItem>
+            <SelectItem value="15">15 minutos</SelectItem>
+            <SelectItem value="30">30 minutos</SelectItem>
+            <SelectItem value="60">1 hora</SelectItem>
+            <SelectItem value="360">6 horas</SelectItem>
+            <SelectItem value="1440">24 horas</SelectItem>
+            <SelectItem value="10080">7 dias</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline" size="sm" onClick={fetchUsers}><RefreshCw className="h-3.5 w-3.5 mr-1" /> Atualizar</Button>
+      </div>
+
+      <div className="rounded-xl border border-border/40 glass-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border/30">
+              <TableHead>Usuário</TableHead>
+              <TableHead>Status Chat</TableHead>
+              <TableHead>Silenciado até</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
+            ) : filtered.length === 0 ? (
+              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Nenhum usuário</TableCell></TableRow>
+            ) : filtered.map(u => {
+              const status = getStatus(u.id);
+              const statusInfo = statuses[u.id];
+              return (
+                <TableRow key={u.id} className="border-border/20">
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
+                        {(u.display_name || '?').slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{u.display_name || 'Sem nome'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
+                    {status === 'muted' && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Silenciado</Badge>}
+                    {status === 'banned' && <Badge className="bg-destructive/15 text-destructive border-destructive/20">Banido</Badge>}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {status === 'muted' && statusInfo?.muted_until
+                      ? new Date(statusInfo.muted_until).toLocaleString('pt-BR')
+                      : '—'}
+                  </TableCell>
+                  <TableCell className="text-right space-x-1">
+                    {status === 'active' ? (
+                      <>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs text-amber-500 hover:text-amber-500" onClick={() => muteUser(u.id)}>
+                          <AlertTriangle className="h-3.5 w-3.5 mr-1" /> Silenciar
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => banUser(u.id)}>
+                          <Ban className="h-3.5 w-3.5 mr-1" /> Banir
+                        </Button>
+                      </>
+                    ) : (
+                      <Button size="sm" variant="ghost" className="h-7 text-xs text-primary hover:text-primary" onClick={() => unmuteUser(u.id)}>
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Desbloquear
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 }

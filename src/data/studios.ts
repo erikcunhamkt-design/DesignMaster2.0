@@ -180,4 +180,14 @@ export const studios: Studio[] = [
     gradient: 'from-pink-500/15 to-rose-500/10',
     isNew: true,
   },
+  {
+    id: 'community-chat',
+    name: 'Arena Social',
+    tagline: 'Chat da comunidade em tempo real.',
+    description: 'Converse com outros membros da comunidade em tempo real — chat em grupo, mensagens diretas e interação social.',
+    icon: '💬',
+    route: '/studio/community-chat',
+    gradient: 'from-cyan-500/15 to-blue-500/10',
+    isNew: true,
+  },
 ];
