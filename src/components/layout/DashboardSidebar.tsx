@@ -67,6 +67,7 @@ function SidebarContent({
   unreadDMs?: number;
 }) {
   const navigate = useNavigate();
+  const { canInstall, install } = usePWAInstall();
 
   const socialItems: SidebarItem[] = [
     { id: 'social', label: 'Comunidade', icon: MessageCircle, route: '/studio/community-chat' },
