@@ -506,11 +506,11 @@ export default function LandingPage() {
             <TiltCard>
               <div className="relative rounded-2xl border border-border/20 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl shadow-primary/5">
                 {/* Window chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-card/50">
+                <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 border-b border-border/15 bg-card/50">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-red-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-yellow-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-green-500/60" />
                   </div>
                   <div className="flex-1 flex justify-center">
                     <div className="px-4 py-1 rounded-md bg-background/50 text-xs text-muted-foreground">
