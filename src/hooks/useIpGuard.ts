@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface IpGuardState {
   checking: boolean;
@@ -22,7 +23,6 @@ export function useIpGuard() {
     async function checkIp() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Not logged in — skip IP check
         if (!cancelled) setState({ checking: false, allowed: true, ip: null, message: null });
         return;
       }
@@ -32,9 +32,16 @@ export function useIpGuard() {
 
         if (error) {
           console.error("IP check error:", error);
-          // On error, allow access (fail-open to not lock users out)
           if (!cancelled) setState({ checking: false, allowed: true, ip: null, message: null });
           return;
+        }
+
+        // If IP switched, show toast info
+        if (data.reason === "ip_switched") {
+          toast.info("Sessão transferida para este dispositivo.", {
+            description: "Outros dispositivos foram deslogados automaticamente.",
+            duration: 5000,
+          });
         }
 
         if (!cancelled) {
