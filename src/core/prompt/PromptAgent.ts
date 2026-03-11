@@ -130,7 +130,12 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   const negativeParts: string[] = [BASE_NEGATIVE];
   const dim = config.dimension ? DIMENSIONS[config.dimension] : DIMENSIONS['feed-quadrado'];
 
-  // ─── 1. DIMENSION & ASPECT RATIO (highest priority) ───
+  // ─── 0. FREE PROMPT (absolute highest priority — user's own words) ───
+  if (config.freePrompt?.trim()) {
+    parts.push(`MANDATORY USER INSTRUCTIONS (must be followed exactly): ${config.freePrompt.trim()}`);
+  }
+
+  // ─── 1. DIMENSION & ASPECT RATIO ───
   parts.push(`${dim.ratio} aspect ratio, professional social media advertisement`);
 
   // ─── 2. RESERVED TEXT AREA (safe zones) ───
