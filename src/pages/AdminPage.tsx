@@ -726,17 +726,25 @@ function ChatModerationPanel() {
                     />
                   </TableCell>
                   <TableCell>
-                    <Input
-                      defaultValue={u.title || ''}
-                      placeholder="Ex: Fundador"
-                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
-                      onBlur={(e) => {
-                        const val = e.target.value.trim() || null;
-                        if (val !== (u.title || null)) {
-                          supabase.from('profiles').update({ title: val } as any).eq('id', u.id).then(() => toast.success('Título atualizado'));
-                        }
+                    <Select
+                      defaultValue={u.title || '__none__'}
+                      onValueChange={(val) => {
+                        const newTitle = val === '__none__' ? null : val;
+                        supabase.from('profiles').update({ title: newTitle } as any).eq('id', u.id).then(() => toast.success('Título atualizado'));
                       }}
-                    />
+                    >
+                      <SelectTrigger className="h-7 text-xs w-32 bg-secondary/30 border-border/20">
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Nenhum</SelectItem>
+                        <SelectItem value="MASTER">👑 MASTER</SelectItem>
+                        <SelectItem value="Fundador">⚜️ Fundador</SelectItem>
+                        <SelectItem value="VIP">⭐ VIP</SelectItem>
+                        <SelectItem value="Elite">💎 Elite</SelectItem>
+                        <SelectItem value="Membro">🏅 Membro</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                   <TableCell>
                     {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
