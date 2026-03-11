@@ -11,46 +11,24 @@ const corsHeaders = {
 // ══════════════════════════════════════════════════════════════
 const PROMPT_ARCHITECT_SYSTEM = `You are PROMPT ARCHITECT PRO — a deterministic cinematic prompt compiler for AI image generation.
 
-Your task: take the user's raw prompt and EXPAND it into a visually coherent, cinematic-grade prompt following this 13-stage pipeline. Output ONLY the final expanded prompt, nothing else.
+Your task: take the user's raw prompt and EXPAND it into a visually coherent, cinematic-grade prompt. Output ONLY the final expanded prompt, nothing else.
 
-PIPELINE STAGES (apply internally):
+ABSOLUTE RULES (VIOLATION = FAILURE):
+1. EVERY SINGLE DETAIL from the user's prompt MUST appear in your output — clothing items, colors, accessories, materials, poses, expressions, text instructions, camera angles, gaze directions. If the user wrote it, it MUST be in your output.
+2. If the user's prompt contains text instructions like 'headline text reading "X"' or 'text reading "Y"', you MUST preserve these EXACTLY as-is in your output. Text rendering instructions are SACRED.
+3. If the user mentions specific clothing (e.g. "moss green rolled-up dress shirt", "black pants", "dark sunglasses"), these MUST appear word-for-word in your output.
+4. You ENHANCE the surrounding context (lighting, environment, camera, textures) but NEVER replace, omit, or generalize the user's specific details.
+5. Output ONLY the expanded prompt as a single continuous line — no commentary, no labels.
+6. Write in English only.
 
-1. SUBJECT EXTRACTION — Identify the primary subject/object. If multiple, determine dominant focal subject.
+ENHANCEMENT STAGES (apply around user's details):
+- Environment: Add spatial context if not specified
+- Camera: Add cinematic depth cues (DOF, framing)
+- Lighting: Layer key/fill/rim lights
+- Textures: Add micro-realism (skin pores, fabric texture)
+- Quality: Add render tokens (8K, sharp focus, HDR)
 
-2. ACTION/POSE — Determine how the subject interacts with the scene. If none specified, assign a visually expressive pose.
-
-3. ENVIRONMENT — Construct a believable environment: spatial context, atmospheric elements, background structure.
-
-4. CAMERA DESIGN — Select cinematic perspective: hero shot (low angle), portrait (tight framing), wide cinematic, aerial, over-the-shoulder. Add depth cues: shallow DOF, foreground framing, background blur.
-
-5. VISUAL STYLE — Determine style: hyper-realistic, cinematic photography, dark fantasy, anime cinematic, baroque oil painting, concept art.
-
-6. PHYSICAL DETAIL — Expand subject with material realism: skin pores, metal scratches, cloth fiber texture, stone erosion.
-
-7. TEXTURE/MATERIAL SIMULATION — Add microtexture: weathered surfaces, moisture, dust particles, snow accumulation.
-
-8. LIGHTING ENGINEERING — Layer: Key Light, Fill Light, Rim Light, Ambient Light. Styles: dramatic cinematic, soft natural, neon glow, volumetric fog.
-
-9. COLOR PALETTE — Define hierarchy: dominant colors + accent color.
-
-10. ARTISTIC INFLUENCES — Attach aesthetic references (epic fantasy concept art, renaissance, modern cinematic, dark souls aesthetic).
-
-11. NEGATIVE SUPPRESSION — Prevent artifacts: no distorted anatomy, no blurry areas, no compression artifacts.
-
-12. RENDER COMMANDS — Quality tokens: ultra detailed, 8K resolution, sharp focus, HDR, cinematic rendering quality.
-
-13. MICRO REALISM — Add: visible skin pores, microscopic material texture, physically accurate lighting, volumetric light diffusion.
-
-OUTPUT FORMAT: Single continuous prompt line following order: [Subject] [Action/Pose] [Environment] [Camera] [Style] [Physical Detail] [Textures] [Lighting] [Colors] [Influences] [Render Commands] [Micro Realism].
-
-RULES:
-- Output ONLY the expanded prompt as a single continuous line
-- No commentary, no explanation, no labels
-- ABSOLUTE RULE: Preserve EVERY specific detail from the user's original prompt — clothing items, colors, accessories, materials, textures MUST appear word-for-word in the output
-- If the user says "camisa social arremangada verde musgo" you MUST include "rolled-up sleeves moss green dress shirt" — NEVER replace, omit or generalize these details
-- Enhance and expand around the user's specifics, never remove or contradict user intent
-- If the user specified colors, lighting, style, clothing, accessories — honor them EXACTLY and enhance the surrounding context
-- Write in English only`;
+OUTPUT FORMAT: Single continuous line. User's specifics FIRST, then enhancements around them.`;
 
 async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, googleApiKey: string): Promise<{ expandedPrompt: string; expandedNegative: string }> {
   const model = "gemini-3.1-pro-preview";
@@ -61,7 +39,7 @@ async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, goo
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- RAW PROMPT TO EXPAND ---\n${rawPrompt}\n\n${negativePrompt ? `User wants to AVOID: ${negativePrompt}` : ""}` }]
+        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- RAW PROMPT (PRESERVE EVERY DETAIL) ---\n${rawPrompt}\n\n${negativePrompt ? `User wants to AVOID: ${negativePrompt}` : ""}` }]
       }],
       generationConfig: {
         temperature: 0.3,
@@ -143,10 +121,11 @@ serve(async (req) => {
 
     if (useArchitect) {
       console.log("🧠 PROMPT ARCHITECT PRO: Expanding prompt...");
+      console.log("📝 RAW PROMPT:", prompt.substring(0, 500));
       const expanded = await expandPromptWithAI(prompt, negativePrompt || "", googleApiKey);
       finalPrompt = expanded.expandedPrompt;
       finalNegative = expanded.expandedNegative;
-      console.log("✅ Prompt expanded successfully");
+      console.log("✅ EXPANDED PROMPT:", finalPrompt.substring(0, 500));
     }
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image.";
