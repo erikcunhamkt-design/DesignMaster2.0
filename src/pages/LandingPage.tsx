@@ -401,7 +401,7 @@ export default function LandingPage() {
             <motion.button
               whileHover={{ scale: 1.05, borderColor: "hsl(var(--primary))" }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/auth")}}
               className="px-4 py-2 text-sm font-medium text-foreground rounded-lg border border-border/30 hover:bg-secondary/40 transition-colors"
             >
               Login
