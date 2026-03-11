@@ -141,10 +141,18 @@ export default function ProfilePage() {
     );
   }
 
-  const roleLabels: Record<string, { label: string; className: string }> = {
-    admin: { label: 'Administrador', className: 'bg-destructive/15 text-destructive border-destructive/20' },
-    moderator: { label: 'Moderador', className: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+  const roleLabels: Record<string, { label: string; icon?: string; className: string }> = {
+    admin: { label: 'Administrador', className: 'bg-destructive/15 text-destructive border-destructive/30' },
+    moderator: { label: 'Moderador', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
     user: { label: 'Usuário', className: 'bg-primary/15 text-primary border-primary/20' },
+  };
+
+  // Special title styles
+  const getTitleStyle = (t: string) => {
+    const lower = t.toLowerCase();
+    if (lower.includes('master')) return 'master';
+    if (lower.includes('fundador') || lower.includes('founder')) return 'founder';
+    return 'default';
   };
 
   return (
@@ -169,16 +177,47 @@ export default function ProfilePage() {
               </label>
             </div>
             <p className="text-[10px] text-muted-foreground">Clique para alterar o avatar</p>
-          </div>
 
-          {/* Roles & Badges */}
-          {(roles.length > 0 || cargo || title) && (
-            <div className="space-y-3 p-4 rounded-xl bg-card/50 border border-border/20">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-3.5 w-3.5 text-muted-foreground" />
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Poderes & Títulos</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
+            {/* Titles & Roles directly below avatar */}
+            {(roles.length > 0 || cargo || title) && (
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+                {title && (
+                  (() => {
+                    const style = getTitleStyle(title);
+                    if (style === 'master') {
+                      return (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-gradient-to-r from-yellow-600/20 via-amber-400/25 to-yellow-600/20 border border-amber-400/40 shadow-[0_0_12px_rgba(251,191,36,0.3),inset_0_1px_0_rgba(251,191,36,0.2)]"
+                          style={{ backgroundImage: 'linear-gradient(135deg, #92400e22, #f59e0b33, #92400e22)', color: '#fbbf24' }}>
+                          <span style={{ filter: 'drop-shadow(0 0 4px #fbbf24)' }}>👑</span>
+                          <span style={{ backgroundImage: 'linear-gradient(to right, #f59e0b, #fde68a, #f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.5))' }}>
+                            {title}
+                          </span>
+                        </span>
+                      );
+                    }
+                    if (style === 'founder') {
+                      return (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-slate-400/30 shadow-[0_0_10px_rgba(148,163,184,0.2)]"
+                          style={{ backgroundImage: 'linear-gradient(135deg, #47556922, #94a3b833, #47556922)' }}>
+                          <span style={{ filter: 'drop-shadow(0 0 3px #94a3b8)' }}>⚜️</span>
+                          <span style={{ backgroundImage: 'linear-gradient(to right, #94a3b8, #e2e8f0, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 0 4px rgba(148,163,184,0.4))' }}>
+                            {title}
+                          </span>
+                        </span>
+                      );
+                    }
+                    return (
+                      <Badge variant="outline" className="text-[10px] font-medium bg-accent/20 text-accent-foreground/70 border-accent/30">
+                        {title}
+                      </Badge>
+                    );
+                  })()
+                )}
+                {cargo && (
+                  <Badge variant="outline" className="text-[10px] font-semibold bg-primary/15 text-primary border-primary/20">
+                    {cargo}
+                  </Badge>
+                )}
                 {roles.map(role => {
                   const info = roleLabels[role] || roleLabels.user;
                   return (
@@ -187,21 +226,9 @@ export default function ProfilePage() {
                     </Badge>
                   );
                 })}
-                {cargo && (
-                  <Badge variant="outline" className="text-[10px] font-semibold bg-primary/15 text-primary border-primary/20">
-                    {cargo}
-                  </Badge>
-                )}
-                {title && (
-                  <Badge variant="outline" className="text-[10px] font-medium bg-accent/20 text-accent-foreground/70 border-accent/30">
-                    {title}
-                  </Badge>
-                )}
               </div>
-            </div>
-          )}
-
-          {/* Fields */}
+            )}
+          </div>
           <div className="space-y-5">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Nome de exibição</label>
