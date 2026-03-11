@@ -61,10 +61,7 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
         </Tooltip>
 
         {/* Notifications */}
-        <button className="relative flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1 right-1 md:top-1.5 md:right-1.5 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.6)]" />
-        </button>
+        <NotificationPopover />
 
         {isAdmin && (
           <button
