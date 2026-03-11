@@ -246,7 +246,7 @@ export default function DirectMessagesPage() {
 
   const getOtherUserId = (convo: Conversation) =>
     convo.participant_1 === user?.id ? convo.participant_2 : convo.participant_1;
-  const getName = (userId: string) => profiles[userId]?.display_name || 'Usuário';
+  const getName = (userId: string) => profilesRef.current[userId]?.display_name || 'Usuário';
   const getInitials = (name: string) => name.slice(0, 2).toUpperCase();
   const formatTime = (d: string) => new Date(d).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const formatDate = (d: string) => {
