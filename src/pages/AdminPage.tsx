@@ -192,6 +192,11 @@ export default function AdminPage() {
             <ChatModerationPanel />
           </TabsContent>
 
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-4 mt-4">
+            <NotificationManager />
+          </TabsContent>
+
           {/* Content Tab */}
           <TabsContent value="content" className="space-y-4 mt-4">
             <ContentManager />
