@@ -132,9 +132,8 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
   const { tipsEnabled } = useTipsMode();
 
   const hasFreePrompt = config.ignoreRest && config.freePrompt.trim().length > 0;
-  const canGenerate = !isGenerating && (
-    apiKey.length >= 10
-  ) && (
+  const hasValidKey = apiKey.length >= 10;
+  const canGenerate = !isGenerating && hasValidKey && (
     hasFreePrompt || (
       config.dimension !== null &&
       (!config.textEnabled || config.text01.length >= 3)
