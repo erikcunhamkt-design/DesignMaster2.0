@@ -7,6 +7,12 @@ import {
   Star, ArrowRight, Check, PenTool,
 } from "lucide-react";
 import logo3d from "@/assets/logo-3d.png";
+import demoResult1 from "@/assets/demo/demo-result-1.jpg";
+import demoResult2 from "@/assets/demo/demo-result-2.jpg";
+import demoResult3 from "@/assets/demo/demo-result-3.jpg";
+
+const demoImages = [demoResult1, demoResult2, demoResult3];
+const demoLabels = ["Retrato Editorial", "Mockup de Produto", "Post para Instagram"];
 
 /* ─── PARTICLE FIELD ─── */
 function ParticleField() {
