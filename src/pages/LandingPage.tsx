@@ -501,7 +501,7 @@ export default function LandingPage() {
           {/* ─── ANIMATED MOCKUP DEMO ─── */}
           <motion.div
             initial="hidden" animate="visible" variants={fadeUp} custom={5}
-            className="mt-16 max-w-3xl mx-auto"
+            className="mt-10 md:mt-16 max-w-3xl mx-auto px-2"
           >
             <TiltCard>
               <div className="relative rounded-2xl border border-border/20 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl shadow-primary/5">
