@@ -298,7 +298,7 @@ export default function LandingPage() {
             <p className="text-muted-foreground text-lg">Acesso completo a todas as ferramentas por um preço único.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="max-w-md mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
