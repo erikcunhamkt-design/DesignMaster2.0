@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       chat_conversations: {
         Row: {
+          agent_id: string
           created_at: string
           id: string
           title: string
@@ -23,6 +24,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          agent_id?: string
           created_at?: string
           id?: string
           title?: string
@@ -30,6 +32,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          agent_id?: string
           created_at?: string
           id?: string
           title?: string
