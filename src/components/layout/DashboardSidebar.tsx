@@ -15,12 +15,14 @@ import {
   MessageCircle,
   Mail,
   User,
+  Download,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUnreadDMs } from '@/hooks/useUnreadDMs';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 interface SidebarItem {
   id: string;
