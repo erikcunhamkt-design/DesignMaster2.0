@@ -7,9 +7,12 @@ import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useFriendships } from '@/hooks/useFriendships';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
+import { UsernameSetupDialog } from '@/components/chat/UsernameSetupDialog';
+import { UserProfilePopover } from '@/components/chat/UserProfilePopover';
 
 interface CommunityMessage {
   id: string;
@@ -24,6 +27,7 @@ interface Profile {
   id: string;
   display_name: string;
   avatar_url: string | null;
+  username?: string | null;
 }
 
 type ChatStatus = 'active' | 'muted' | 'banned';
@@ -36,26 +40,35 @@ export default function CommunityChatPage() {
   const [chatStatus, setChatStatus] = useState<ChatStatus>('active');
   const [mutedUntil, setMutedUntil] = useState<string | null>(null);
   const [onlineCount, setOnlineCount] = useState(0);
+  const [needsUsername, setNeedsUsername] = useState(false);
+  const [checkingUsername, setCheckingUsername] = useState(true);
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const { sendRequest, acceptRequest, getFriendStatus, getFriendshipId } = useFriendships();
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Ensure profile exists
+  // Ensure profile exists and check username
   const ensureProfile = useCallback(async () => {
     if (!user) return;
+    setCheckingUsername(true);
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
     if (!data) {
       const displayName = user.email?.split('@')[0] || 'Usuário';
       await supabase.from('profiles').insert({ id: user.id, display_name: displayName } as any);
+      setNeedsUsername(true);
+    } else {
+      const profile = data as any;
+      setNeedsUsername(!profile.username);
     }
+    setCheckingUsername(false);
   }, [user]);
 
   // Load chat status
   const loadChatStatus = useCallback(async () => {
     if (!user) return;
-    const { data, error } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).maybeSingle();
+    const { data } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).maybeSingle();
     if (data) {
       const status = data as any;
       if (status.status === 'muted' && status.muted_until && new Date(status.muted_until) < new Date()) {
@@ -84,7 +97,7 @@ export default function CommunityChatPage() {
     const { data } = await supabase.from('profiles').select('*').in('id', uniqueIds);
     if (data) {
       const newProfiles: Record<string, Profile> = { ...profiles };
-      (data as Profile[]).forEach(p => newProfiles[p.id] = p);
+      (data as any[]).forEach(p => newProfiles[p.id] = p);
       setProfiles(newProfiles);
     }
   }, [profiles]);
@@ -97,14 +110,11 @@ export default function CommunityChatPage() {
     }
   }, [messages.length]);
 
-  // Scroll to bottom
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
   // Realtime subscription
   useEffect(() => {
@@ -112,19 +122,15 @@ export default function CommunityChatPage() {
       .channel('community-chat')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_messages' }, (payload) => {
         const newMsg = payload.new as CommunityMessage;
-        // Avoid duplicates from optimistic updates (own messages)
         setMessages(prev => {
           if (prev.some(m => m.id === newMsg.id)) return prev;
-          // Remove optimistic message if exists (same user, same content within 5s)
           const filtered = prev.filter(m => !(
-            m.user_id === newMsg.user_id && 
-            m.content === newMsg.content && 
-            Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 5000 &&
-            !m.id.includes('-') === false // optimistic IDs from crypto.randomUUID
+            m.user_id === newMsg.user_id &&
+            m.content === newMsg.content &&
+            Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 5000
           ));
           return [...filtered, newMsg];
         });
-        // Load profile if needed
         if (!profiles[newMsg.user_id]) {
           supabase.from('profiles').select('*').eq('id', newMsg.user_id).single().then(({ data }) => {
             if (data) setProfiles(prev => ({ ...prev, [newMsg.user_id]: data as Profile }));
@@ -137,7 +143,6 @@ export default function CommunityChatPage() {
       })
       .subscribe();
 
-    // Presence for online count
     const presenceChannel = supabase.channel('community-presence', {
       config: { presence: { key: user?.id || 'anon' } }
     });
@@ -162,39 +167,26 @@ export default function CommunityChatPage() {
     const isMedia = !!mediaUrl;
     if (!isMedia && !msg) return;
     if (isLoading || !user) return;
-
     if (chatStatus === 'banned') { toast.error('Você foi banido do chat.'); return; }
     if (chatStatus === 'muted') {
       const until = mutedUntil ? new Date(mutedUntil).toLocaleString('pt-BR') : '';
       toast.error(`Você está silenciado${until ? ` até ${until}` : ''}.`);
       return;
     }
-
     setInput('');
     setIsLoading(true);
-
     const msgType = isMedia ? mediaType! : 'text';
     const content = isMedia ? (mediaType === 'image' ? '📷 Imagem' : '🎵 Áudio') : msg;
-
     const optimisticMsg: CommunityMessage = {
-      id: crypto.randomUUID(),
-      user_id: user.id,
-      content,
-      message_type: msgType,
-      media_url: mediaUrl || null,
-      created_at: new Date().toISOString(),
+      id: crypto.randomUUID(), user_id: user.id, content,
+      message_type: msgType, media_url: mediaUrl || null, created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimisticMsg]);
-
     const { error } = await supabase.from('community_messages').insert({
-      user_id: user.id,
-      content,
-      message_type: msgType,
-      media_url: mediaUrl || null,
+      user_id: user.id, content, message_type: msgType, media_url: mediaUrl || null,
     } as any);
-
     if (error) {
-      toast.error('Erro ao enviar mensagem. Verifique seu status.');
+      toast.error('Erro ao enviar mensagem.');
       setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
       if (!isMedia) setInput(msg);
     }
@@ -211,12 +203,9 @@ export default function CommunityChatPage() {
   };
 
   const getDisplayName = (userId: string) => profiles[userId]?.display_name || 'Usuário';
+  const getUsername = (userId: string) => profiles[userId]?.username || null;
   const getInitials = (name: string) => name.slice(0, 2).toUpperCase();
-
-  const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  };
-
+  const formatTime = (dateStr: string) => new Date(dateStr).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     const today = new Date();
@@ -227,23 +216,24 @@ export default function CommunityChatPage() {
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
-  // Group messages by date
   const groupedMessages: { date: string; msgs: CommunityMessage[] }[] = [];
   messages.forEach(msg => {
     const date = formatDate(msg.created_at);
     const lastGroup = groupedMessages[groupedMessages.length - 1];
-    if (lastGroup && lastGroup.date === date) {
-      lastGroup.msgs.push(msg);
-    } else {
-      groupedMessages.push({ date, msgs: [msg] });
-    }
+    if (lastGroup && lastGroup.date === date) lastGroup.msgs.push(msg);
+    else groupedMessages.push({ date, msgs: [msg] });
   });
 
   const isBanned = chatStatus === 'banned';
   const isMuted = chatStatus === 'muted';
 
+  if (checkingUsername) return null;
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+      {needsUsername && user && (
+        <UsernameSetupDialog userId={user.id} onComplete={() => setNeedsUsername(false)} />
+      )}
       <StudioTopbar title="Arena Social" showApiKey={false} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -296,16 +286,45 @@ export default function CommunityChatPage() {
                     {group.msgs.map((msg) => {
                       const isOwn = msg.user_id === user?.id;
                       const name = getDisplayName(msg.user_id);
+                      const uname = getUsername(msg.user_id);
                       return (
                         <div key={msg.id} className={cn('group flex gap-2.5', isOwn ? 'justify-end' : 'justify-start')}>
                           {!isOwn && (
-                            <div className="shrink-0 w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
-                              {getInitials(name)}
-                            </div>
+                            <UserProfilePopover
+                              userId={msg.user_id}
+                              displayName={name}
+                              username={uname}
+                              friendStatus={getFriendStatus(msg.user_id)}
+                              onAddFriend={() => sendRequest(msg.user_id)}
+                              onAcceptFriend={() => {
+                                const fId = getFriendshipId(msg.user_id);
+                                if (fId) acceptRequest(fId);
+                              }}
+                              onStartConversation={() => navigate('/studio/direct-messages')}
+                            >
+                              <button className="shrink-0 w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5 hover:ring-2 hover:ring-primary/30 transition-all cursor-pointer">
+                                {getInitials(name)}
+                              </button>
+                            </UserProfilePopover>
                           )}
                           <div className={cn('max-w-[75%]', isOwn ? 'items-end' : 'items-start')}>
                             {!isOwn && (
-                              <p className="text-[10px] font-semibold text-muted-foreground/60 mb-0.5 ml-1">{name}</p>
+                              <UserProfilePopover
+                                userId={msg.user_id}
+                                displayName={name}
+                                username={uname}
+                                friendStatus={getFriendStatus(msg.user_id)}
+                                onAddFriend={() => sendRequest(msg.user_id)}
+                                onAcceptFriend={() => {
+                                  const fId = getFriendshipId(msg.user_id);
+                                  if (fId) acceptRequest(fId);
+                                }}
+                                onStartConversation={() => navigate('/studio/direct-messages')}
+                              >
+                                <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors">
+                                  {name} {uname && <span className="text-muted-foreground/50">@{uname}</span>}
+                                </button>
+                              </UserProfilePopover>
                             )}
                             <div className={cn(
                               'rounded-2xl px-3.5 py-2 text-sm relative',
