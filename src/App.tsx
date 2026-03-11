@@ -11,6 +11,7 @@ import { StudioTopbar } from "./components/layout/StudioTopbar";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { useIpGuard } from "./hooks/useIpGuard";
 import { IpBlockedScreen } from "./components/IpBlockedScreen";
+import { PublicOrDashboard } from "./components/PublicOrDashboard";
 
 // Lazy-loaded pages for code-splitting
 const StudiosPage = lazy(() => import("./pages/StudiosPage"));
