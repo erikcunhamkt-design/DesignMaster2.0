@@ -123,6 +123,7 @@ export default function DesignMasterChatPage() {
   };
 
   const handleDeleteConvo = async (id: string) => {
+    await supabase.from('chat_messages').delete().eq('conversation_id', id);
     await supabase.from('chat_conversations').delete().eq('id', id);
     setConversations((prev) => prev.filter((c) => c.id !== id));
     if (activeConvoId === id) {
@@ -130,6 +131,18 @@ export default function DesignMasterChatPage() {
       setMessages([]);
     }
     toast.success('Conversa excluída');
+  };
+
+  const handleDeleteAll = async () => {
+    if (!user || conversations.length === 0) return;
+    for (const c of conversations) {
+      await supabase.from('chat_messages').delete().eq('conversation_id', c.id);
+    }
+    await supabase.from('chat_conversations').delete().eq('user_id', user.id);
+    setConversations([]);
+    setActiveConvoId(null);
+    setMessages([]);
+    toast.success('Todas as conversas foram excluídas');
   };
 
   const handleRenameConvo = async (id: string, newTitle: string) => {
@@ -311,15 +324,19 @@ export default function DesignMasterChatPage() {
           )}>
           
           {/* New chat button */}
-          <div className="p-3 border-b border-border/10">
+          <div className="p-3 border-b border-border/10 space-y-2">
             <Button
               onClick={handleNewChat}
               variant="outline"
               className="w-full gap-2 h-9 text-xs font-semibold rounded-xl border-border/20 bg-secondary/30 hover:bg-secondary/50">
-              
               <Plus className="h-3.5 w-3.5" />
               Nova conversa
             </Button>
+            {conversations.length > 0 && (
+              <Button onClick={handleDeleteAll} variant="ghost" className="w-full gap-2 h-8 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
+                <Trash2 className="h-3 w-3" /> Apagar todas
+              </Button>
+            )}
           </div>
 
           {/* Conversations list */}
@@ -513,5 +530,5 @@ export default function DesignMasterChatPage() {
         </div>
       </div>
     </div>);
-
+  
 }
