@@ -86,7 +86,7 @@ serve(async (req) => {
     }
 
     const model = "gemini-3.1-pro-preview";
-    const url = \`https://generativelanguage.googleapis.com/v1beta/models/\${model}:streamGenerateContent?alt=sse&key=\${googleApiKey}\`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${googleApiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -103,7 +103,7 @@ serve(async (req) => {
       if (response.status === 403) {
         return new Response(JSON.stringify({ error: "API Key inválida ou sem permissão." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      return new Response(JSON.stringify({ error: \`Erro na API Google: \${response.status}\` }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: `Erro na API Google: ${response.status}` }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
