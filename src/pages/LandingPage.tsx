@@ -226,7 +226,7 @@ function GeneratingDemo() {
             className="flex flex-col items-center gap-3"
           >
             <motion.div
-              className="w-40 h-40 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
+              className="w-28 h-28 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
               animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
@@ -501,16 +501,16 @@ export default function LandingPage() {
           {/* ─── ANIMATED MOCKUP DEMO ─── */}
           <motion.div
             initial="hidden" animate="visible" variants={fadeUp} custom={5}
-            className="mt-16 max-w-3xl mx-auto"
+            className="mt-10 md:mt-16 max-w-3xl mx-auto px-2"
           >
             <TiltCard>
               <div className="relative rounded-2xl border border-border/20 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl shadow-primary/5">
                 {/* Window chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-card/50">
+                <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 border-b border-border/15 bg-card/50">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-red-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-yellow-500/60" />
+                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-green-500/60" />
                   </div>
                   <div className="flex-1 flex justify-center">
                     <div className="px-4 py-1 rounded-md bg-background/50 text-xs text-muted-foreground">
@@ -520,7 +520,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* App content mockup */}
-                <div className="p-6 flex gap-5 min-h-[320px]">
+                <div className="p-3 md:p-6 flex gap-5 min-h-[240px] md:min-h-[320px]">
                   {/* Sidebar */}
                   <div className="hidden md:flex flex-col gap-3 w-44 shrink-0">
                     {["🎨 Design Master", "🧠 Creator", "🎠 Carrossel", "📦 Mockups", "🖼️ Restaurador"].map((item, idx) => (
@@ -539,8 +539,8 @@ export default function LandingPage() {
                   {/* Main area */}
                   <div className="flex-1 flex flex-col gap-4">
                     {/* Prompt input with typing effect */}
-                    <div className="rounded-xl border border-border/20 bg-background/40 p-4">
-                      <p className="text-xs text-muted-foreground mb-2">Descreva sua imagem:</p>
+                    <div className="rounded-lg md:rounded-xl border border-border/20 bg-background/40 p-3 md:p-4">
+                      <p className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2">Descreva sua imagem:</p>
                       <TypingDemo />
                     </div>
 
