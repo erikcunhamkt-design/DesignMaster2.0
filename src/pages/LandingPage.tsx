@@ -41,28 +41,14 @@ const testimonials = [
 
 const plans = [
   {
-    name: "Starter",
-    price: "Grátis",
-    period: "",
-    features: ["5 gerações por dia", "Acesso a 3 ferramentas", "Qualidade padrão", "Suporte por email"],
-    cta: "Começar Grátis",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "R$ 47",
+    name: "Plano Mensal",
+    price: "R$ 69,99",
+    originalPrice: "R$ 149,90",
     period: "/mês",
-    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro"],
-    cta: "Assinar Pro",
+    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro", "Cancele quando quiser"],
+    cta: "Assinar Agora",
     popular: true,
-  },
-  {
-    name: "Business",
-    price: "R$ 97",
-    period: "/mês",
-    features: ["Tudo do Pro", "API de integração", "White-label", "Múltiplos usuários", "Dashboard analytics", "Suporte dedicado"],
-    cta: "Falar com Vendas",
-    popular: false,
+    url: "https://pay.kiwify.com.br/7b1lH1a",
   },
 ];
 
@@ -102,12 +88,14 @@ export default function LandingPage() {
             >
               Login
             </button>
-            <button
-              onClick={() => navigate("/")}
+            <a
+              href="https://pay.kiwify.com.br/7b1lH1a"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:brightness-110 transition-all"
             >
-              Começar Grátis
-            </button>
+              Assinar Agora
+            </a>
           </div>
         </div>
       </nav>
@@ -149,13 +137,15 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={3}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button
-              onClick={() => navigate("/")}
+            <a
+              href="https://pay.kiwify.com.br/7b1lH1a"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg hover:brightness-110 transition-all shadow-lg shadow-primary/25"
             >
-              Começar Grátis
+              Assinar Agora
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
             <a
               href="#features"
               className="flex items-center gap-2 px-8 py-4 rounded-xl border border-border/30 text-foreground font-medium hover:bg-secondary/30 transition-colors"
@@ -304,11 +294,11 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Planos Simples e Transparentes</h2>
-            <p className="text-muted-foreground text-lg">Comece grátis, escale quando quiser.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Invista no Seu Conteúdo</h2>
+            <p className="text-muted-foreground text-lg">Acesso completo a todas as ferramentas por um preço único.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="max-w-md mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
@@ -327,6 +317,9 @@ export default function LandingPage() {
                 )}
                 <h3 className="font-bold text-xl mb-2">{plan.name}</h3>
                 <div className="mb-6">
+                  {plan.originalPrice && (
+                    <span className="text-muted-foreground text-lg line-through mr-2">{plan.originalPrice}</span>
+                  )}
                   <span className="text-4xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground text-sm">{plan.period}</span>
                 </div>
@@ -338,16 +331,14 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => navigate("/")}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${
-                    plan.popular
-                      ? "bg-primary text-primary-foreground hover:brightness-110 shadow-md shadow-primary/20"
-                      : "border border-border/30 text-foreground hover:bg-secondary/30"
-                  }`}
+                <a
+                  href={plan.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-3 rounded-xl font-semibold text-sm transition-all text-center bg-primary text-primary-foreground hover:brightness-110 shadow-md shadow-primary/20"
                 >
                   {plan.cta}
-                </button>
+                </a>
               </motion.div>
             ))}
           </div>
