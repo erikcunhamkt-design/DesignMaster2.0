@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
 import { Send, Loader2, ArrowLeft, MessageCircle, Plus, User, UserPlus, UserCheck, UserX, Users, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +47,8 @@ export default function DirectMessagesPage() {
 
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('conversations');
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const profilesRef = useRef<Record<string, Profile>>({});
+  const [profilesVersion, setProfilesVersion] = useState(0);
   const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [input, setInput] = useState('');
@@ -79,16 +80,20 @@ export default function DirectMessagesPage() {
     if (data) setConversations(data as Conversation[]);
   }, [user]);
 
+  const addProfiles = useCallback((newProfiles: Profile[]) => {
+    let changed = false;
+    newProfiles.forEach(p => {
+      if (!profilesRef.current[p.id]) { profilesRef.current[p.id] = p; changed = true; }
+    });
+    if (changed) setProfilesVersion(v => v + 1);
+  }, []);
+
   const loadProfiles = useCallback(async (userIds: string[]) => {
-    const uniqueIds = [...new Set(userIds)].filter(id => !profiles[id]);
+    const uniqueIds = [...new Set(userIds)].filter(id => !profilesRef.current[id]);
     if (uniqueIds.length === 0) return;
     const { data } = await supabase.from('profiles').select('*').in('id', uniqueIds);
-    if (data) {
-      const newProfiles: Record<string, Profile> = {};
-      (data as Profile[]).forEach(p => newProfiles[p.id] = p);
-      setProfiles(prev => ({ ...prev, ...newProfiles }));
-    }
-  }, [profiles]);
+    if (data) addProfiles(data as Profile[]);
+  }, [addProfiles]);
 
   const loadMessages = useCallback(async (convoId: string) => {
     const { data } = await supabase
@@ -135,10 +140,10 @@ export default function DirectMessagesPage() {
             [newMsg.conversation_id]: (prev[newMsg.conversation_id] || 0) + 1,
           }));
           const showToast = async () => {
-            let name = profiles[newMsg.sender_id]?.display_name;
+            let name = profilesRef.current[newMsg.sender_id]?.display_name;
             if (!name) {
               const { data } = await supabase.from('profiles').select('*').eq('id', newMsg.sender_id).maybeSingle();
-              if (data) { name = (data as Profile).display_name; setProfiles(prev => ({ ...prev, [newMsg.sender_id]: data as Profile })); }
+              if (data) { name = (data as Profile).display_name; addProfiles([data as Profile]); }
             }
             toast.info(`💬 Nova mensagem de ${name || 'alguém'}`);
           };
@@ -241,7 +246,7 @@ export default function DirectMessagesPage() {
 
   const getOtherUserId = (convo: Conversation) =>
     convo.participant_1 === user?.id ? convo.participant_2 : convo.participant_1;
-  const getName = (userId: string) => profiles[userId]?.display_name || 'Usuário';
+  const getName = (userId: string) => profilesRef.current[userId]?.display_name || 'Usuário';
   const getInitials = (name: string) => name.slice(0, 2).toUpperCase();
   const formatTime = (d: string) => new Date(d).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const formatDate = (d: string) => {
