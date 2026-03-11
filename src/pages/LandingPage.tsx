@@ -520,7 +520,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* App content mockup */}
-                <div className="p-6 flex gap-5 min-h-[320px]">
+                <div className="p-3 md:p-6 flex gap-5 min-h-[240px] md:min-h-[320px]">
                   {/* Sidebar */}
                   <div className="hidden md:flex flex-col gap-3 w-44 shrink-0">
                     {["🎨 Design Master", "🧠 Creator", "🎠 Carrossel", "📦 Mockups", "🖼️ Restaurador"].map((item, idx) => (
