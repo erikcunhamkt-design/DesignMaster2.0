@@ -52,6 +52,69 @@ function LicenseSection() {
   );
 }
 
+function ChangePasswordSection() {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('A nova senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('As senhas não coincidem.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success('Senha alterada com sucesso!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao alterar senha.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="text-xs font-semibold text-foreground block mb-1">Nova senha</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="Mínimo 6 caracteres"
+          className="w-full h-9 rounded-lg bg-secondary/50 border border-border/30 px-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-foreground block mb-1">Confirmar nova senha</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Repita a nova senha"
+          className="w-full h-9 rounded-lg bg-secondary/50 border border-border/30 px-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <button
+        onClick={handleChangePassword}
+        disabled={loading || !newPassword || !confirmPassword}
+        className="w-full h-9 rounded-lg bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        {loading ? 'Alterando...' : 'Alterar Senha'}
+      </button>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { apiKey, saveKey } = useGoogleApiKey();
