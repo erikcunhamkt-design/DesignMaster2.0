@@ -7,30 +7,32 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// PROMPT ARCHITECT PRO — Cinematic Prompt Compiler Engine
+// PROMPT ARCHITECT PRO — Cinematic Context Enhancer
+// Only enhances EXPANDABLE context. LOCKED parts pass through untouched.
 // ══════════════════════════════════════════════════════════════
-const PROMPT_ARCHITECT_SYSTEM = `You are PROMPT ARCHITECT PRO — a deterministic cinematic prompt compiler for AI image generation.
+const PROMPT_ARCHITECT_SYSTEM = `You are PROMPT ARCHITECT PRO — a cinematic context enhancer for AI image generation.
 
-Your task: take the user's raw prompt and EXPAND it into a visually coherent, cinematic-grade prompt. Output ONLY the final expanded prompt, nothing else.
+You will receive an EXPANDABLE CONTEXT section. Your job is to ENHANCE it with cinematic quality — better lighting descriptions, richer environment details, texture realism, and quality tokens.
 
-ABSOLUTE RULES (VIOLATION = FAILURE):
-1. EVERY SINGLE DETAIL from the user's prompt MUST appear in your output — clothing items, colors, accessories, materials, poses, expressions, text instructions, camera angles, gaze directions. If the user wrote it, it MUST be in your output.
-2. If the user's prompt contains text instructions like 'headline text reading "X"' or 'text reading "Y"', you MUST preserve these EXACTLY as-is in your output. Text rendering instructions are SACRED.
-3. If the user mentions specific clothing (e.g. "moss green rolled-up dress shirt", "black pants", "dark sunglasses"), these MUST appear word-for-word in your output.
-4. You ENHANCE the surrounding context (lighting, environment, camera, textures) but NEVER replace, omit, or generalize the user's specific details.
-5. Output ONLY the expanded prompt as a single continuous line — no commentary, no labels.
-6. Write in English only.
+IMPORTANT: You are NOT rewriting the full prompt. You are ONLY enhancing the expandable context section. The user's specific choices (clothing, pose, expression, text, accessories) are handled separately and will NOT be passed to you.
 
-ENHANCEMENT STAGES (apply around user's details):
-- Environment: Add spatial context if not specified
-- Camera: Add cinematic depth cues (DOF, framing)
-- Lighting: Layer key/fill/rim lights
-- Textures: Add micro-realism (skin pores, fabric texture)
-- Quality: Add render tokens (8K, sharp focus, HDR)
+ENHANCEMENT STAGES:
+- Environment: Enrich spatial context, atmosphere, background depth
+- Lighting: Layer cinematic key/fill/rim lights, volumetric effects
+- Textures: Add micro-realism (skin pores, fabric fiber, material detail)
+- Quality: Add render tokens (8K, sharp focus, HDR, cinematic grade)
+- Color: Enhance color harmony and grading
 
-OUTPUT FORMAT: Single continuous line. User's specifics FIRST, then enhancements around them.`;
+RULES:
+- Output ONLY the enhanced context as a single continuous line
+- No commentary, no explanation, no labels
+- Do NOT invent new subject details, clothing, poses, or expressions
+- Only enhance atmosphere, lighting, textures, and quality
+- Write in English only`;
 
-async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, googleApiKey: string): Promise<{ expandedPrompt: string; expandedNegative: string }> {
+async function expandContextWithAI(expandablePrompt: string, googleApiKey: string): Promise<string> {
+  if (!expandablePrompt?.trim()) return "";
+  
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
@@ -39,27 +41,22 @@ async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, goo
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- RAW PROMPT (PRESERVE EVERY DETAIL) ---\n${rawPrompt}\n\n${negativePrompt ? `User wants to AVOID: ${negativePrompt}` : ""}` }]
+        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- EXPANDABLE CONTEXT TO ENHANCE ---\n${expandablePrompt}` }]
       }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 800,
       },
     }),
   });
 
   if (!response.ok) {
-    console.error("Prompt expansion failed, using raw prompt:", response.status);
-    return { expandedPrompt: rawPrompt, expandedNegative: negativePrompt };
+    console.error("Context expansion failed, using raw context:", response.status);
+    return expandablePrompt;
   }
 
   const data = await response.json();
-  const expanded = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || rawPrompt;
-
-  return {
-    expandedPrompt: expanded,
-    expandedNegative: negativePrompt || "distorted anatomy, blurry areas, compression artifacts, plastic skin, waxy appearance, low quality, watermark, text artifacts",
-  };
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || expandablePrompt;
 }
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
@@ -103,7 +100,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, negativePrompt, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
+    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
       return new Response(
@@ -115,22 +112,29 @@ serve(async (req) => {
     // Model selection
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
-    // ── PROMPT ARCHITECT PRO expansion ──
-    let finalPrompt = prompt;
-    let finalNegative = negativePrompt || "";
+    // ── Build final prompt with LOCKED + EXPANDED approach ──
+    let finalPrompt: string;
+    const locked = lockedPrompt || prompt || "";
+    const expandable = expandablePrompt || "";
 
-    if (useArchitect) {
-      console.log("🧠 PROMPT ARCHITECT PRO: Expanding prompt...");
-      console.log("📝 RAW PROMPT:", prompt.substring(0, 500));
-      const expanded = await expandPromptWithAI(prompt, negativePrompt || "", googleApiKey);
-      finalPrompt = expanded.expandedPrompt;
-      finalNegative = expanded.expandedNegative;
-      console.log("✅ EXPANDED PROMPT:", finalPrompt.substring(0, 500));
+    if (useArchitect && expandable.trim()) {
+      console.log("🧠 PROMPT ARCHITECT PRO: Enhancing expandable context...");
+      console.log("🔒 LOCKED (untouched):", locked.substring(0, 300));
+      console.log("🔓 EXPANDABLE (to enhance):", expandable.substring(0, 300));
+      const enhancedContext = await expandContextWithAI(expandable, googleApiKey);
+      console.log("✅ ENHANCED CONTEXT:", enhancedContext.substring(0, 300));
+      // Locked parts FIRST (highest priority), then enhanced context
+      finalPrompt = `${locked}\n\n${enhancedContext}`;
+    } else {
+      // No Architect or no expandable — use full prompt as-is
+      finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
     }
+
+    const finalNegative = negativePrompt || "distorted anatomy, blurry areas, compression artifacts, plastic skin, waxy appearance, low quality, watermark, text artifacts";
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image.";
 
-    const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}${finalNegative ? `\n\nAvoid: ${finalNegative}` : ""}`;
+    const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}\n\nAvoid: ${finalNegative}`;
 
     // Build parts for Google direct API
     const parts: any[] = [];
