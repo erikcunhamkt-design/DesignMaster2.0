@@ -433,12 +433,6 @@ export default function LandingPage() {
                   <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
                   {/* Glow on hover */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/8 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                  <motion.div
-                    className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: "conic-gradient(from 0deg, hsl(var(--primary) / 0.15), transparent, hsl(var(--accent) / 0.1), transparent, hsl(var(--primary) / 0.15))" }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  />
                 </motion.div>
               </TiltCard>
             ))}
@@ -567,12 +561,6 @@ export default function LandingPage() {
                   className="relative p-8 rounded-2xl border border-primary/30 bg-card/40 backdrop-blur-sm shadow-2xl shadow-primary/10 overflow-hidden"
                 >
                   {/* Animated border glow */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    style={{ background: "conic-gradient(from 0deg, hsl(var(--primary) / 0.2), transparent 30%, hsl(var(--accent) / 0.15), transparent 70%, hsl(var(--primary) / 0.2))" }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  />
                   <div className="relative z-10">
                     <motion.span
                       className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
