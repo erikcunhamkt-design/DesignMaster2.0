@@ -192,6 +192,33 @@ export type Database = {
           },
         ]
       }
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       licenses: {
         Row: {
           access_key: string | null
@@ -351,6 +378,10 @@ export type Database = {
       }
       is_conversation_participant: {
         Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_friend: {
+        Args: { _other_id: string; _user_id: string }
         Returns: boolean
       }
     }
