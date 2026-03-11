@@ -12,11 +12,14 @@ import {
   ChevronRight,
   Menu,
   X,
+  MessageCircle,
+  Mail,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUnreadDMs } from '@/hooks/useUnreadDMs';
 
 interface SidebarItem {
   id: string;
@@ -24,6 +27,7 @@ interface SidebarItem {
   icon: React.ElementType;
   route?: string;
   section?: string;
+  badge?: number;
 }
 
 const mainItems: SidebarItem[] = [
@@ -50,13 +54,20 @@ function SidebarContent({
   onSectionChange,
   collapsed,
   onClose,
+  unreadDMs = 0,
 }: {
   activeSection: string;
   onSectionChange: (section: string) => void;
   collapsed: boolean;
   onClose?: () => void;
+  unreadDMs?: number;
 }) {
   const navigate = useNavigate();
+
+  const socialItems: SidebarItem[] = [
+    { id: 'social', label: 'Comunidade', icon: MessageCircle, section: 'social' },
+    { id: 'direct-messages', label: 'DMs', icon: Mail, route: '/studio/direct-messages', badge: unreadDMs },
+  ];
 
   const handleClick = (item: SidebarItem) => {
     if (item.route) {
@@ -122,6 +133,46 @@ function SidebarContent({
             </button>
           );
         })}
+
+        {/* Social divider */}
+        <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+
+        {!collapsed && (
+          <p className="px-2 mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Social</p>
+        )}
+        {socialItems.map((item) => {
+          const active = activeSection === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              className={cn(
+                'group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                collapsed && 'justify-center px-0',
+                active
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+              )}
+            >
+              <div className="relative">
+                <item.icon className="h-[18px] w-[18px] shrink-0" />
+                {item.badge && item.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
+                    {item.badge > 9 ? '9+' : item.badge}
+                  </span>
+                )}
+              </div>
+              {!collapsed && (
+                <span className="truncate flex-1">{item.label}</span>
+              )}
+              {!collapsed && item.badge && item.badge > 0 && (
+                <span className="bg-primary/15 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </nav>
     </>
   );
@@ -133,16 +184,21 @@ export function MobileSidebarTrigger({
   onSectionChange,
 }: DashboardSidebarProps) {
   const [open, setOpen] = useState(false);
+  const { unreadCount } = useUnreadDMs();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors md:hidden">
+        <button className="relative flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors md:hidden">
           <Menu className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[260px] p-0 bg-sidebar border-r border-border/40">
-        {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border/30">
           <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
@@ -154,6 +210,7 @@ export function MobileSidebarTrigger({
           onSectionChange={onSectionChange}
           collapsed={false}
           onClose={() => setOpen(false)}
+          unreadDMs={unreadCount}
         />
       </SheetContent>
     </Sheet>
@@ -163,11 +220,9 @@ export function MobileSidebarTrigger({
 export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useIsMobile();
+  const { unreadCount } = useUnreadDMs();
 
-  // On mobile, don't render the sidebar at all (it's in the Sheet)
-  if (isMobile) {
-    return null;
-  }
+  if (isMobile) return null;
 
   return (
     <aside
@@ -176,7 +231,6 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
         collapsed ? 'w-[68px]' : 'w-[220px]'
       )}
     >
-      {/* Logo */}
       <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
         <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
         {!collapsed && (
@@ -190,6 +244,7 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
         activeSection={activeSection}
         onSectionChange={onSectionChange}
         collapsed={collapsed}
+        unreadDMs={unreadCount}
       />
 
       {/* Collapse toggle */}

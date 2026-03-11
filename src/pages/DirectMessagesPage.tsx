@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useFriendships } from '@/hooks/useFriendships';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
 
 interface DirectMessage {
   id: string;
@@ -183,20 +184,26 @@ export default function DirectMessagesPage() {
     setSidebarTab('conversations');
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (mediaUrl?: string, mediaType?: 'image' | 'audio') => {
     const msg = input.trim();
-    if (!msg || isLoading || !user || !selectedConvo) return;
+    const isMedia = !!mediaUrl;
+    if (!isMedia && !msg) return;
+    if (isLoading || !user || !selectedConvo) return;
     setInput('');
     setIsLoading(true);
+
+    const msgType = isMedia ? mediaType! : 'text';
+    const content = isMedia ? (mediaType === 'image' ? '📷 Imagem' : '🎵 Áudio') : msg;
+
     const optimistic: DirectMessage = {
       id: crypto.randomUUID(), conversation_id: selectedConvo.id, sender_id: user.id,
-      content: msg, message_type: 'text', media_url: null, created_at: new Date().toISOString(),
+      content, message_type: msgType, media_url: mediaUrl || null, created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimistic]);
     const { error } = await supabase.from('direct_messages').insert({
-      conversation_id: selectedConvo.id, sender_id: user.id, content: msg, message_type: 'text',
+      conversation_id: selectedConvo.id, sender_id: user.id, content, message_type: msgType, media_url: mediaUrl || null,
     } as any);
-    if (error) { toast.error('Erro ao enviar'); setMessages(prev => prev.filter(m => m.id !== optimistic.id)); setInput(msg); }
+    if (error) { toast.error('Erro ao enviar'); setMessages(prev => prev.filter(m => m.id !== optimistic.id)); if (!isMedia) setInput(msg); }
     setIsLoading(false);
   };
 
@@ -540,7 +547,11 @@ export default function DirectMessagesPage() {
                                     ? 'bg-primary text-primary-foreground rounded-br-md'
                                     : 'bg-card/60 border border-border/20 rounded-bl-md text-foreground'
                                 )}>
-                                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                                  {msg.message_type !== 'text' && msg.media_url ? (
+                                    <MediaMessageContent type={msg.message_type} url={msg.media_url} />
+                                  ) : (
+                                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                                  )}
                                   <p className={cn('text-[9px] mt-1 text-right', isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40')}>
                                     {formatTime(msg.created_at)}
                                   </p>
@@ -557,7 +568,12 @@ export default function DirectMessagesPage() {
               </div>
 
               <div className="border-t border-border/15 bg-card/20 backdrop-blur-sm p-3">
-                <div className="max-w-3xl mx-auto flex gap-2">
+                <div className="max-w-3xl mx-auto flex items-end gap-2">
+                  <ChatMediaInput
+                    onMediaSent={(url, type) => sendMessage(url, type)}
+                    onEmojiSelect={(emoji) => setInput(prev => prev + emoji)}
+                    disabled={isLoading}
+                  />
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -567,7 +583,7 @@ export default function DirectMessagesPage() {
                     rows={1}
                   />
                   <Button
-                    onClick={sendMessage}
+                    onClick={() => sendMessage()}
                     disabled={isLoading || !input.trim()}
                     size="icon"
                     className="h-[44px] w-[44px] rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.3)] disabled:opacity-30 disabled:shadow-none"

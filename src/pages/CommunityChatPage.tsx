@@ -3,13 +3,13 @@ import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle, Mai
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-// ScrollArea removed - using native overflow
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
 
 interface CommunityMessage {
   id: string;
@@ -157,14 +157,13 @@ export default function CommunityChatPage() {
     };
   }, [user?.id]);
 
-  const sendMessage = async () => {
+  const sendMessage = async (mediaUrl?: string, mediaType?: 'image' | 'audio') => {
     const msg = input.trim();
-    if (!msg || isLoading || !user) return;
+    const isMedia = !!mediaUrl;
+    if (!isMedia && !msg) return;
+    if (isLoading || !user) return;
 
-    if (chatStatus === 'banned') {
-      toast.error('Você foi banido do chat.');
-      return;
-    }
+    if (chatStatus === 'banned') { toast.error('Você foi banido do chat.'); return; }
     if (chatStatus === 'muted') {
       const until = mutedUntil ? new Date(mutedUntil).toLocaleString('pt-BR') : '';
       toast.error(`Você está silenciado${until ? ` até ${until}` : ''}.`);
@@ -174,27 +173,30 @@ export default function CommunityChatPage() {
     setInput('');
     setIsLoading(true);
 
-    // Optimistic update
+    const msgType = isMedia ? mediaType! : 'text';
+    const content = isMedia ? (mediaType === 'image' ? '📷 Imagem' : '🎵 Áudio') : msg;
+
     const optimisticMsg: CommunityMessage = {
       id: crypto.randomUUID(),
       user_id: user.id,
-      content: msg,
-      message_type: 'text',
-      media_url: null,
+      content,
+      message_type: msgType,
+      media_url: mediaUrl || null,
       created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimisticMsg]);
 
     const { error } = await supabase.from('community_messages').insert({
       user_id: user.id,
-      content: msg,
-      message_type: 'text',
+      content,
+      message_type: msgType,
+      media_url: mediaUrl || null,
     } as any);
 
     if (error) {
       toast.error('Erro ao enviar mensagem. Verifique seu status.');
       setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
-      setInput(msg);
+      if (!isMedia) setInput(msg);
     }
     setIsLoading(false);
   };
@@ -311,7 +313,11 @@ export default function CommunityChatPage() {
                                 ? 'bg-primary text-primary-foreground rounded-br-md'
                                 : 'bg-card/60 border border-border/20 rounded-bl-md text-foreground'
                             )}>
-                              <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                              {msg.message_type !== 'text' && msg.media_url ? (
+                                <MediaMessageContent type={msg.message_type} url={msg.media_url} />
+                              ) : (
+                                <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                              )}
                               <p className={cn(
                                 'text-[9px] mt-1 text-right',
                                 isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40'
@@ -358,7 +364,12 @@ export default function CommunityChatPage() {
               Você está silenciado{mutedUntil ? ` até ${new Date(mutedUntil).toLocaleString('pt-BR')}` : ''}.
             </div>
           ) : (
-            <div className="max-w-3xl mx-auto flex gap-2">
+            <div className="max-w-3xl mx-auto flex items-end gap-2">
+              <ChatMediaInput
+                onMediaSent={(url, type) => sendMessage(url, type)}
+                onEmojiSelect={(emoji) => setInput(prev => prev + emoji)}
+                disabled={isLoading}
+              />
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -368,7 +379,7 @@ export default function CommunityChatPage() {
                 rows={1}
               />
               <Button
-                onClick={sendMessage}
+                onClick={() => sendMessage()}
                 disabled={isLoading || !input.trim()}
                 size="icon"
                 className="h-[44px] w-[44px] rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.3)] disabled:opacity-30 disabled:shadow-none"
