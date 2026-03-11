@@ -226,7 +226,7 @@ function GeneratingDemo() {
             className="flex flex-col items-center gap-3"
           >
             <motion.div
-              className="w-40 h-40 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
+              className="w-28 h-28 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
               animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
