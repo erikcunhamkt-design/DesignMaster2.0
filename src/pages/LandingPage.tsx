@@ -561,12 +561,6 @@ export default function LandingPage() {
                   className="relative p-8 rounded-2xl border border-primary/30 bg-card/40 backdrop-blur-sm shadow-2xl shadow-primary/10 overflow-hidden"
                 >
                   {/* Animated border glow */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    style={{ background: "conic-gradient(from 0deg, hsl(var(--primary) / 0.2), transparent 30%, hsl(var(--accent) / 0.15), transparent 70%, hsl(var(--primary) / 0.2))" }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  />
                   <div className="relative z-10">
                     <motion.span
                       className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
