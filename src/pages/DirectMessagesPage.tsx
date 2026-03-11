@@ -155,13 +155,39 @@ export default function DirectMessagesPage() {
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (query.length < 2) { setSearchResults([]); return; }
+    // Search by display_name or username
+    const isUsernameSearch = query.startsWith('@');
+    const cleanQuery = isUsernameSearch ? query.slice(1) : query;
+    if (cleanQuery.length < 1) { setSearchResults([]); return; }
+    
     const { data } = await supabase
       .from('profiles')
       .select('*')
-      .ilike('display_name', `%${query}%`)
+      .or(`display_name.ilike.%${cleanQuery}%,username.ilike.%${cleanQuery}%`)
       .neq('id', user?.id || '')
       .limit(10);
     if (data) setSearchResults(data as Profile[]);
+  };
+
+  const sendRequestByUsername = async (username: string) => {
+    const clean = username.replace(/^@/, '').trim().toLowerCase();
+    if (clean.length < 3) { toast.error('Nome de usuário inválido'); return; }
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, display_name, username')
+      .eq('username', clean)
+      .neq('id', user?.id || '')
+      .maybeSingle();
+    if (!data) { toast.error('Usuário não encontrado'); return; }
+    const profile = data as any;
+    const status = getFriendStatus(profile.id);
+    if (status === 'accepted') { toast.info('Vocês já são amigos!'); return; }
+    if (status === 'pending_sent') { toast.info('Solicitação já enviada'); return; }
+    if (status === 'pending_received') {
+      const fId = getFriendshipId(profile.id);
+      if (fId) { acceptRequest(fId); return; }
+    }
+    sendRequest(profile.id);
   };
 
   const startConversation = async (otherUserId: string) => {
