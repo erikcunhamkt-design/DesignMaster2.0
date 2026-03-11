@@ -10,10 +10,10 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  Zap,
   Menu,
   X,
 } from 'lucide-react';
+import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -144,9 +144,7 @@ export function MobileSidebarTrigger({
       <SheetContent side="left" className="w-[260px] p-0 bg-sidebar border-r border-border/40">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border/30">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-            <Zap className="h-4 w-4" />
-          </div>
+          <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
             Design<span className="text-gradient">Master</span>
           </span>
@@ -180,9 +178,7 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
     >
       {/* Logo */}
       <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-          <Zap className="h-4 w-4" />
-        </div>
+        <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
         {!collapsed && (
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
             Design<span className="text-gradient">Master</span>
