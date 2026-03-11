@@ -148,8 +148,7 @@ function SidebarContent({
         )}
 
         <NotificationBell collapsed={collapsed} />
-          <p className="px-2 mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Social</p>
-        )}
+
         {socialItems.map((item) => {
           const active = activeSection === item.id;
           return (
