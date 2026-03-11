@@ -15,12 +15,14 @@ import {
   MessageCircle,
   Mail,
   User,
+  Download,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUnreadDMs } from '@/hooks/useUnreadDMs';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 interface SidebarItem {
   id: string;
@@ -65,6 +67,7 @@ function SidebarContent({
   unreadDMs?: number;
 }) {
   const navigate = useNavigate();
+  const { canInstall, install } = usePWAInstall();
 
   const socialItems: SidebarItem[] = [
     { id: 'social', label: 'Comunidade', icon: MessageCircle, route: '/studio/community-chat' },
@@ -175,6 +178,24 @@ function SidebarContent({
             </button>
           );
         })}
+
+        {/* Install App */}
+        {canInstall && (
+          <>
+            <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+            <button
+              onClick={() => { install(); onClose?.(); }}
+              className={cn(
+                'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20',
+                collapsed && 'justify-center px-0'
+              )}
+            >
+              <Download className="h-[18px] w-[18px] shrink-0 animate-bounce" />
+              {!collapsed && <span className="truncate">Instalar App</span>}
+            </button>
+          </>
+        )}
       </nav>
     </>
   );
