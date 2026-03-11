@@ -39,6 +39,7 @@ const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,7 @@ const App = () => {
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>
+              <Route path="/landing" element={<LandingPage />} />
               <Route path="/" element={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />
               <Route path="/studio/criador" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/studio/extrator" element={<ProtectedRoute><ExtractorWrapper /></ProtectedRoute>} />
