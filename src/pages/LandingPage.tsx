@@ -88,12 +88,14 @@ export default function LandingPage() {
             >
               Login
             </button>
-            <button
-              onClick={() => navigate("/")}
+            <a
+              href="https://pay.kiwify.com.br/7b1lH1a"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:brightness-110 transition-all"
             >
-              Começar Grátis
-            </button>
+              Assinar Agora
+            </a>
           </div>
         </div>
       </nav>
