@@ -82,7 +82,7 @@ const App = () => {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
-              <Route path="/" element={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />
+              <Route path="/" element={<PublicOrDashboard publicPage={<LandingPage />} dashboardPage={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />} />
               <Route path="/studio/criador" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/studio/extrator" element={<ProtectedRoute><ExtractorWrapper /></ProtectedRoute>} />
               <Route path="/studio/prompt-builder" element={<ProtectedRoute><PromptBuilderPage /></ProtectedRoute>} />
