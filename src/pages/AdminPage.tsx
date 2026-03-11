@@ -250,7 +250,120 @@ function ContentManager() {
   );
 }
 
-function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
+function NotificationManager() {
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [notifs, setNotifs] = useState<{ id: string; title: string; message: string; created_at: string }[]>([]);
+  const [loadingNotifs, setLoadingNotifs] = useState(true);
+
+  const fetchNotifs = useCallback(async () => {
+    setLoadingNotifs(true);
+    const { data } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    setNotifs(data || []);
+    setLoadingNotifs(false);
+  }, []);
+
+  useEffect(() => { fetchNotifs(); }, [fetchNotifs]);
+
+  const handleSend = async () => {
+    if (!title.trim() || !message.trim()) {
+      toast.error('Preencha título e mensagem');
+      return;
+    }
+    setSending(true);
+    const { data: session } = await supabase.auth.getSession();
+    const userId = session?.session?.user?.id;
+    if (!userId) { toast.error('Não autenticado'); setSending(false); return; }
+
+    const { error } = await supabase
+      .from('notifications')
+      .insert({ title: title.trim(), message: message.trim(), created_by: userId });
+
+    if (error) {
+      toast.error('Erro ao enviar notificação');
+    } else {
+      toast.success('Notificação enviada para todos os usuários!');
+      setTitle('');
+      setMessage('');
+      fetchNotifs();
+    }
+    setSending(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from('notifications').delete().eq('id', id);
+    if (error) toast.error('Erro ao remover');
+    else { toast.success('Removida'); fetchNotifs(); }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Send notification form */}
+      <div className="glass-card rounded-xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Bell className="h-5 w-5 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">Enviar Notificação</h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Título</label>
+            <Input
+              placeholder="Ex: Nova funcionalidade disponível!"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Mensagem</label>
+            <Input
+              placeholder="Descreva o aviso para os usuários..."
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+            />
+          </div>
+          <Button onClick={handleSend} disabled={sending} className="gap-1.5">
+            <Send className="h-4 w-4" />
+            {sending ? 'Enviando...' : 'Enviar para todos'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Sent notifications list */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">Notificações Enviadas</h3>
+        {loadingNotifs ? (
+          <p className="text-xs text-muted-foreground">Carregando...</p>
+        ) : notifs.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Nenhuma notificação enviada ainda.</p>
+        ) : (
+          <div className="space-y-2">
+            {notifs.map(n => (
+              <div key={n.id} className="glass-card rounded-xl p-4 flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">{n.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                  <p className="text-[10px] text-muted-foreground/60 mt-1">
+                    {new Date(n.created_at).toLocaleString('pt-BR')}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(n.id)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
