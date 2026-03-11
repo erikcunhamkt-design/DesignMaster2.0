@@ -567,6 +567,8 @@ function ChatModerationPanel() {
           <TableHeader>
             <TableRow className="border-border/30">
               <TableHead>Usuário</TableHead>
+              <TableHead>Cargo</TableHead>
+              <TableHead>Título</TableHead>
               <TableHead>Status Chat</TableHead>
               <TableHead>Silenciado até</TableHead>
               <TableHead className="text-right">Ações</TableHead>
