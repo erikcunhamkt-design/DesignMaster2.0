@@ -39,7 +39,7 @@ export function FreePromptBlock({
               'text-[11px] font-semibold tracking-wide transition-colors',
               ignoreRest ? 'text-primary' : 'text-foreground'
             )}>
-              Prompt Livre
+              O que vamos criar hoje?
             </p>
             <TooltipProvider delayDuration={200}>
               <Tooltip>
