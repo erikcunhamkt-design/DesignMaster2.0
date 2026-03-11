@@ -54,13 +54,20 @@ function SidebarContent({
   onSectionChange,
   collapsed,
   onClose,
+  unreadDMs = 0,
 }: {
   activeSection: string;
   onSectionChange: (section: string) => void;
   collapsed: boolean;
   onClose?: () => void;
+  unreadDMs?: number;
 }) {
   const navigate = useNavigate();
+
+  const socialItems: SidebarItem[] = [
+    { id: 'social', label: 'Comunidade', icon: MessageCircle, section: 'social' },
+    { id: 'direct-messages', label: 'DMs', icon: Mail, route: '/studio/direct-messages', badge: unreadDMs },
+  ];
 
   const handleClick = (item: SidebarItem) => {
     if (item.route) {
