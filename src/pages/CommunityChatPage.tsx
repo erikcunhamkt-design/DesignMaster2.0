@@ -3,13 +3,13 @@ import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle, Mai
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-// ScrollArea removed - using native overflow
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
 
 interface CommunityMessage {
   id: string;
