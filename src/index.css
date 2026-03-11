@@ -188,7 +188,7 @@
 
 /* ── Accessibility: Large Text Mode ── */
 .accessible-large-text {
-  font-size: 150% !important;
+  font-size: var(--a11y-font-size, 150%) !important;
   line-height: 1.55 !important;
   word-spacing: 0.04em;
   letter-spacing: 0.01em;
@@ -241,6 +241,25 @@
 .accessible-large-text .text-xs {
   font-size: 0.85rem !important;
   line-height: 1.45 !important;
+}
+
+/* ── Accessibility: High Contrast Mode ── */
+.accessible-high-contrast {
+  --foreground: 0 0% 100%;
+  --muted-foreground: 0 0% 85%;
+  --border: 0 0% 50%;
+}
+.accessible-high-contrast .text-muted-foreground {
+  color: hsl(0 0% 85%) !important;
+}
+
+/* ── Accessibility: Reduced Motion ── */
+.accessible-reduced-motion,
+.accessible-reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 /* ── Accessibility: Light / High-Contrast Mode ── */
