@@ -65,7 +65,7 @@ function SidebarContent({
   const navigate = useNavigate();
 
   const socialItems: SidebarItem[] = [
-    { id: 'social', label: 'Comunidade', icon: MessageCircle, section: 'social' },
+    { id: 'social', label: 'Comunidade', icon: MessageCircle, route: '/studio/community-chat' },
     { id: 'direct-messages', label: 'DMs', icon: Mail, route: '/studio/direct-messages', badge: unreadDMs },
   ];
 
