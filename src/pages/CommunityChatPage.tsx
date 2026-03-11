@@ -264,7 +264,7 @@ export default function CommunityChatPage() {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto px-4 py-4" ref={scrollRef}>
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4 animate-fade-up">
               <div className="text-5xl">💬</div>
@@ -334,7 +334,8 @@ export default function CommunityChatPage() {
               ))}
             </div>
           )}
-        </ScrollArea>
+          <div ref={messagesEndRef} />
+        </div>
 
         {/* Input */}
         <div className="border-t border-border/15 bg-card/20 backdrop-blur-sm p-3 md:p-4">
