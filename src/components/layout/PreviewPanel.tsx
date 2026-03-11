@@ -187,7 +187,7 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
       )}
 
       {/* Canvas area */}
-      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-10">
+      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-4">
         {state === 'aguardando' && (
           <div className="flex flex-col items-center gap-8 animate-fade-up max-w-[280px] text-center">
             <div className="relative">
@@ -260,12 +260,20 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
         )}
 
         {state === 'concluido' && imageUrl && (
-          <div className="relative inline-block group" style={{ maxWidth: `${zoom}%`, maxHeight: `${zoom}%` }}>
+          <div
+            className="relative group flex items-center justify-center"
+            style={{
+              width: `${zoom}%`,
+              height: `${zoom}%`,
+              minWidth: zoom >= 100 ? '100%' : undefined,
+              minHeight: zoom >= 100 ? '100%' : undefined,
+            }}
+          >
             <img
               ref={imgRef}
               src={imageUrl}
               alt="Imagem gerada"
-              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.03]"
+              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 max-w-full max-h-full w-full h-full ring-1 ring-white/[0.03]"
             />
 
             {/* Watermark overlay (visual only, CSS-based) */}
