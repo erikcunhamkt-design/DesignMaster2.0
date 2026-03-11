@@ -32,6 +32,7 @@ interface Profile {
   id: string;
   display_name: string;
   avatar_url: string | null;
+  username?: string | null;
 }
 
 type SidebarTab = 'conversations' | 'friends' | 'requests';
@@ -55,6 +56,7 @@ export default function DirectMessagesPage() {
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
+  const [usernameInput, setUsernameInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Ensure own profile
@@ -155,13 +157,39 @@ export default function DirectMessagesPage() {
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (query.length < 2) { setSearchResults([]); return; }
+    // Search by display_name or username
+    const isUsernameSearch = query.startsWith('@');
+    const cleanQuery = isUsernameSearch ? query.slice(1) : query;
+    if (cleanQuery.length < 1) { setSearchResults([]); return; }
+    
     const { data } = await supabase
       .from('profiles')
       .select('*')
-      .ilike('display_name', `%${query}%`)
+      .or(`display_name.ilike.%${cleanQuery}%,username.ilike.%${cleanQuery}%`)
       .neq('id', user?.id || '')
       .limit(10);
     if (data) setSearchResults(data as Profile[]);
+  };
+
+  const sendRequestByUsername = async (username: string) => {
+    const clean = username.replace(/^@/, '').trim().toLowerCase();
+    if (clean.length < 3) { toast.error('Nome de usuário inválido'); return; }
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, display_name, username')
+      .eq('username', clean)
+      .neq('id', user?.id || '')
+      .maybeSingle();
+    if (!data) { toast.error('Usuário não encontrado'); return; }
+    const profile = data as any;
+    const status = getFriendStatus(profile.id);
+    if (status === 'accepted') { toast.info('Vocês já são amigos!'); return; }
+    if (status === 'pending_sent') { toast.info('Solicitação já enviada'); return; }
+    if (status === 'pending_received') {
+      const fId = getFriendshipId(profile.id);
+      if (fId) { acceptRequest(fId); return; }
+    }
+    sendRequest(profile.id);
   };
 
   const startConversation = async (otherUserId: string) => {
@@ -301,7 +329,10 @@ export default function DirectMessagesPage() {
                         <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
                           {getInitials(p.display_name)}
                         </div>
-                        <span className="text-sm text-foreground font-medium truncate flex-1">{p.display_name}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-foreground font-medium truncate block">{p.display_name}</span>
+                          {p.username && <span className="text-[10px] text-muted-foreground">@{p.username}</span>}
+                        </div>
                         {status === 'none' && (
                           <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 text-primary" onClick={() => sendRequest(p.id)}>
                             <UserPlus className="h-3 w-3" /> Adicionar
@@ -388,6 +419,31 @@ export default function DirectMessagesPage() {
             {/* FRIENDS TAB */}
             {sidebarTab === 'friends' && (
               <>
+                {/* Add by username */}
+                <div className="p-3 border-b border-border/15 space-y-2">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Adicionar por nome de usuário</p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">@</span>
+                      <Input
+                        value={usernameInput}
+                        onChange={(e) => setUsernameInput(e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ''))}
+                        placeholder="nome.usuario"
+                        className="h-9 pl-7 text-sm bg-secondary/30 border-border/20"
+                        onKeyDown={(e) => { if (e.key === 'Enter') { sendRequestByUsername(usernameInput); setUsernameInput(''); } }}
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 text-xs gap-1"
+                      disabled={usernameInput.length < 3}
+                      onClick={() => { sendRequestByUsername(usernameInput); setUsernameInput(''); }}
+                    >
+                      <UserPlus className="h-3.5 w-3.5" /> Enviar
+                    </Button>
+                  </div>
+                </div>
                 {friends.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-64 gap-3 p-6">
                     <Users className="h-10 w-10 text-muted-foreground/30" />
