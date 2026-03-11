@@ -35,11 +35,28 @@ import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import SettingsPage from "./pages/SettingsPage";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { useIpGuard } from "./hooks/useIpGuard";
+import { IpBlockedScreen } from "./components/IpBlockedScreen";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
+  const { checking, allowed, ip, message } = useIpGuard();
+
+  // Show nothing while checking IP
+  if (checking) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Block if IP not allowed
+  if (allowed === false) {
+    return <IpBlockedScreen ip={ip} message={message} />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
