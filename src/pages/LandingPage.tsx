@@ -292,8 +292,8 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Planos Simples e Transparentes</h2>
-            <p className="text-muted-foreground text-lg">Comece grátis, escale quando quiser.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Invista no Seu Conteúdo</h2>
+            <p className="text-muted-foreground text-lg">Acesso completo a todas as ferramentas por um preço único.</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
