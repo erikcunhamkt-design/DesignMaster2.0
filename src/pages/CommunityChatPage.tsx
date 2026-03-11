@@ -53,7 +53,7 @@ export default function CommunityChatPage() {
   // Load chat status
   const loadChatStatus = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).single();
+    const { data, error } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).maybeSingle();
     if (data) {
       const status = data as any;
       if (status.status === 'muted' && status.muted_until && new Date(status.muted_until) < new Date()) {
