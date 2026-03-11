@@ -42,6 +42,7 @@ const mainItems: SidebarItem[] = [
 const secondaryItems: SidebarItem[] = [
   { id: 'favoritos', label: 'Favoritos', icon: Star },
   { id: 'recentes', label: 'Recentes', icon: Clock },
+  { id: 'profile', label: 'Meu Perfil', icon: User, route: '/studio/profile' },
 ];
 
 interface DashboardSidebarProps {
