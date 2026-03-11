@@ -173,6 +173,7 @@ function SidebarContent({
             </button>
           );
         })}
+      </nav>
     </>
   );
 }
