@@ -433,12 +433,6 @@ export default function LandingPage() {
                   <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
                   {/* Glow on hover */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/8 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                  <motion.div
-                    className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: "conic-gradient(from 0deg, hsl(var(--primary) / 0.15), transparent, hsl(var(--accent) / 0.1), transparent, hsl(var(--primary) / 0.15))" }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  />
                 </motion.div>
               </TiltCard>
             ))}
