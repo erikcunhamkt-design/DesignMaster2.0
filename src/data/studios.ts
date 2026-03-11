@@ -9,6 +9,7 @@ export interface Studio {
   image?: string;
   route: string;
   gradient: string;
+  isNew?: boolean;
 }
 
 export const studios: Studio[] = [
