@@ -29,6 +29,7 @@ import CalendarChatPage from "./pages/CalendarChatPage";
 import BioChatPage from "./pages/BioChatPage";
 import CommunityChatPage from "./pages/CommunityChatPage";
 import DirectMessagesPage from "./pages/DirectMessagesPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
