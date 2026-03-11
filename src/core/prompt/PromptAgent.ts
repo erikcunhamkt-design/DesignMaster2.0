@@ -252,9 +252,12 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     locked.push('NO text in the image, clean background for post-production text overlay');
     negativeParts.push('any text, letters, words, numbers, watermarks in image');
   } else if (config.textEnabled && config.textMode === 'imagem') {
-    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography`);
-    if (config.text02) locked.push(`secondary text reading "${config.text02}", smaller, supporting the headline`);
-    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct`);
+    const posMap = { topo: 'top area', centro: 'center area', rodape: 'bottom area' };
+    const posLabel = posMap[config.textPosition] || 'center area';
+    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography, positioned in the ${posLabel} of the image`);
+    if (config.text02) locked.push(`secondary text reading "${config.text02}", smaller, supporting the headline, in the ${posLabel}`);
+    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct, in the ${posLabel}`);
+    locked.push(`all text elements must be placed in the ${posLabel} of the image`);
     negativeParts.push(TEXT_NEGATIVE);
   }
 
