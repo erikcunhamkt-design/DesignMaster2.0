@@ -41,6 +41,7 @@ const studioImages: Record<string, string> = {
   'mockup-studio': mockupStudioHero,
   'carousel-master': carouselMasterHero,
   'restore-photo': restorePhotoHero,
+  'editorial': editorialHero,
 };
 
 const sections = [
