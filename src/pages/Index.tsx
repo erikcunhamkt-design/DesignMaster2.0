@@ -147,7 +147,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Criador" />
+      <StudioTopbar title="Design Master" />
 
       {/* Mode switcher + project tabs row */}
       <div className="flex items-center border-b border-border/10 bg-background/90 backdrop-blur-sm shrink-0 h-9">
