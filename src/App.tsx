@@ -73,6 +73,7 @@ const App = () => {
             <Route path="/studio/community-chat" element={<ProtectedRoute><CommunityChatPage /></ProtectedRoute>} />
             <Route path="/studio/direct-messages" element={<ProtectedRoute><DirectMessagesPage /></ProtectedRoute>} />
             <Route path="/studio/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/studio/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
