@@ -145,7 +145,7 @@ export default function LandingPage() {
             >
               Assinar Agora
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
             <a
               href="#features"
               className="flex items-center gap-2 px-8 py-4 rounded-xl border border-border/30 text-foreground font-medium hover:bg-secondary/30 transition-colors"
