@@ -57,6 +57,7 @@ const App = () => {
             <Route path="/studio/mockup-studio" element={<ProtectedRoute><MockupStudioPage /></ProtectedRoute>} />
             <Route path="/studio/hero-studio" element={<ProtectedRoute><HeroStudioPage /></ProtectedRoute>} />
             <Route path="/studio/carousel-master" element={<ProtectedRoute><CarouselMasterChatPage /></ProtectedRoute>} />
+            <Route path="/studio/restore-photo" element={<ProtectedRoute><RestorePhotoPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
