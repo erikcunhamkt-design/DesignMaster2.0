@@ -110,7 +110,18 @@ export default function CommunityChatPage() {
       .channel('community-chat')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_messages' }, (payload) => {
         const newMsg = payload.new as CommunityMessage;
-        setMessages(prev => [...prev, newMsg]);
+        // Avoid duplicates from optimistic updates (own messages)
+        setMessages(prev => {
+          if (prev.some(m => m.id === newMsg.id)) return prev;
+          // Remove optimistic message if exists (same user, same content within 5s)
+          const filtered = prev.filter(m => !(
+            m.user_id === newMsg.user_id && 
+            m.content === newMsg.content && 
+            Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 5000 &&
+            !m.id.includes('-') === false // optimistic IDs from crypto.randomUUID
+          ));
+          return [...filtered, newMsg];
+        });
         // Load profile if needed
         if (!profiles[newMsg.user_id]) {
           supabase.from('profiles').select('*').eq('id', newMsg.user_id).single().then(({ data }) => {
