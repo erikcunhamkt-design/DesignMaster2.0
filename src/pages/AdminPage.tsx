@@ -617,6 +617,7 @@ function ChatModerationPanel() {
                         }
                       }}
                     />
+                  </TableCell>
                   <TableCell>
                     {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
                     {status === 'muted' && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Silenciado</Badge>}
