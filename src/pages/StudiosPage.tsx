@@ -64,6 +64,7 @@ const sectionFilterMap: Record<string, string[]> = {
   'creative-assistant': ['creative-assistant'],
   'prompt-tools': ['prompt-tools'],
   'image-tools': ['image-tools'],
+  'social': ['social'],
   favoritos: [],
   recentes: []
 };
