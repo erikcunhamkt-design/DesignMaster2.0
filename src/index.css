@@ -188,20 +188,38 @@
 
 /* ── Accessibility: Large Text Mode ── */
 .accessible-large-text {
-  font-size: 118% !important;
+  font-size: 137% !important;
+  line-height: 1.6 !important;
+  word-spacing: 0.05em;
 }
 .accessible-large-text button,
 .accessible-large-text input,
 .accessible-large-text textarea,
 .accessible-large-text select,
-.accessible-large-text label,
-.accessible-large-text span,
+.accessible-large-text label {
+  font-size: inherit !important;
+  letter-spacing: 0.02em;
+  line-height: 1.5 !important;
+}
 .accessible-large-text p,
-.accessible-large-text h1,
-.accessible-large-text h2,
-.accessible-large-text h3,
-.accessible-large-text h4 {
-  letter-spacing: 0.01em;
+.accessible-large-text span,
+.accessible-large-text li,
+.accessible-large-text td,
+.accessible-large-text th {
+  font-size: inherit !important;
+  letter-spacing: 0.02em;
+  line-height: 1.65 !important;
+}
+.accessible-large-text h1 { font-size: 2rem !important; }
+.accessible-large-text h2 { font-size: 1.65rem !important; }
+.accessible-large-text h3 { font-size: 1.4rem !important; }
+.accessible-large-text h4 { font-size: 1.2rem !important; }
+.accessible-large-text .text-\[8px\],
+.accessible-large-text .text-\[10px\],
+.accessible-large-text .text-\[11px\],
+.accessible-large-text .text-xs {
+  font-size: 0.85rem !important;
+  line-height: 1.5 !important;
 }
 
 /* ── Accessibility: Light / High-Contrast Mode ── */
