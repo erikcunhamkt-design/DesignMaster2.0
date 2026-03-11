@@ -100,7 +100,7 @@ export default function DesignMasterChatPage() {
     'Nova conversa';
     const { data, error } = await supabase.
     from('chat_conversations').
-    insert({ user_id: user.id, title }).
+    insert({ user_id: user.id, title, agent_id: 'design-master' } as any).
     select().
     single();
     if (error || !data) {

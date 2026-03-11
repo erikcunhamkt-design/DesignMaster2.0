@@ -90,7 +90,7 @@ export default function CarouselMasterChatPage() {
       : 'Nova conversa';
     const { data, error } = await supabase
       .from('chat_conversations')
-      .insert({ user_id: user.id, title })
+      .insert({ user_id: user.id, title, agent_id: 'carousel-master' } as any)
       .select()
       .single();
     if (error || !data) { toast.error('Erro ao criar conversa'); return null; }
