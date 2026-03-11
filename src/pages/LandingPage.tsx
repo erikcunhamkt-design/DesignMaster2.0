@@ -359,7 +359,7 @@ export default function LandingPage() {
       <motion.nav
         initial={{ y: -80 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, ease: cubicEase as any }}
         className="fixed top-0 inset-x-0 z-50 border-b border-border/10 bg-background/60 backdrop-blur-2xl"
       >
         <div className="mx-auto max-w-7xl flex items-center justify-between px-6 h-16">
