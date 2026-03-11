@@ -131,6 +131,21 @@ export default function SettingsPage() {
             <AccessibilityPanel />
           </section>
 
+          {/* Trocar Senha */}
+          <section className="rounded-2xl border border-border/30 bg-card/50 backdrop-blur-sm p-6 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+                <Lock className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Alterar Senha</h2>
+                <p className="text-[10px] text-muted-foreground">Atualize sua senha de acesso</p>
+              </div>
+            </div>
+            <div className="h-px bg-border/20" />
+            <ChangePasswordSection />
+          </section>
+
         </div>
       </main>
     </div>
