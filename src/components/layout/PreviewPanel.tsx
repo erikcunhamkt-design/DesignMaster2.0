@@ -372,7 +372,7 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
             {hasTextOverlay && showOverlay && (
               <div
                 className={`absolute left-0 right-0 flex flex-col items-center gap-2 px-6 ${
-                  overlayPos === 'top' ? 'top-[8%]' : 'bottom-[8%]'
+                  overlayPos === 'top' ? 'top-[8%]' : overlayPos === 'center' ? 'top-1/2 -translate-y-1/2' : 'bottom-[8%]'
                 }`}
                 style={{ pointerEvents: 'none', zIndex: watermarkEnabled ? 1 : 4 }}
               >
