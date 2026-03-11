@@ -43,6 +43,7 @@ const studioImages: Record<string, string> = {
   'carousel-master': carouselMasterHero,
   'restore-photo': restorePhotoHero,
   'editorial': editorialHero,
+  'calendar': calendarHero,
 };
 
 const sections = [

@@ -160,4 +160,14 @@ export const studios: Studio[] = [
     gradient: 'from-teal-500/15 to-cyan-500/10',
     isNew: true,
   },
+  {
+    id: 'calendar',
+    name: 'Calendário Master',
+    tagline: 'Crie calendários estratégicos de conteúdo com IA.',
+    description: 'Agente especialista em calendários de conteúdo quinzenais — organização, formatos, objetivos e ideias de posts para qualquer nicho.',
+    icon: '📅',
+    route: '/studio/calendar',
+    gradient: 'from-indigo-500/15 to-blue-500/10',
+    isNew: true,
+  },
 ];
