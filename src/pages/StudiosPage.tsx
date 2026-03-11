@@ -23,7 +23,7 @@ import footballCreatorHero from '@/assets/football-creator-hero.png';
 import autoCreatorHero from '@/assets/auto-creator-hero.png';
 import heroStudioHero from '@/assets/hero-studio-hero.png';
 import mockupStudioHero from '@/assets/mockup-studio-hero.png';
-
+import carouselMasterHero from '@/assets/carousel-master-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
