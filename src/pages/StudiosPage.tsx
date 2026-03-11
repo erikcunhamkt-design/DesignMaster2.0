@@ -47,6 +47,7 @@ const studioImages: Record<string, string> = {
   'editorial': editorialHero,
   'calendar': calendarHero,
   'bio': bioHero,
+  'community-chat': communityChatHero,
 };
 
 const sections = [
