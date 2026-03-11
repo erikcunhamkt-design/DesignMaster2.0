@@ -375,6 +375,62 @@ export default function LandingPage() {
               </div>
             ))}
           </motion.div>
+
+          {/* ─── ANIMATED MOCKUP DEMO ─── */}
+          <motion.div
+            initial="hidden" animate="visible" variants={fadeUp} custom={5}
+            className="mt-16 max-w-3xl mx-auto"
+          >
+            <TiltCard>
+              <div className="relative rounded-2xl border border-border/20 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl shadow-primary/5">
+                {/* Window chrome */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-card/50">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                  </div>
+                  <div className="flex-1 flex justify-center">
+                    <div className="px-4 py-1 rounded-md bg-background/50 text-xs text-muted-foreground">
+                      Design Master Studio
+                    </div>
+                  </div>
+                </div>
+
+                {/* App content mockup */}
+                <div className="p-6 flex gap-5 min-h-[320px]">
+                  {/* Sidebar */}
+                  <div className="hidden md:flex flex-col gap-3 w-44 shrink-0">
+                    {["🎨 Design Master", "🧠 Creator", "🎠 Carrossel", "📦 Mockups", "🖼️ Restaurador"].map((item, idx) => (
+                      <motion.div
+                        key={item}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium truncate ${idx === 0 ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:bg-card/60"}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1 + idx * 0.15 }}
+                      >
+                        {item}
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Main area */}
+                  <div className="flex-1 flex flex-col gap-4">
+                    {/* Prompt input with typing effect */}
+                    <div className="rounded-xl border border-border/20 bg-background/40 p-4">
+                      <p className="text-xs text-muted-foreground mb-2">Descreva sua imagem:</p>
+                      <TypingDemo />
+                    </div>
+
+                    {/* Generated result */}
+                    <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative">
+                      <GeneratingDemo />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TiltCard>
+          </motion.div>
         </motion.div>
       </section>
 
