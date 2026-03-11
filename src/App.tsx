@@ -39,6 +39,7 @@ const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
