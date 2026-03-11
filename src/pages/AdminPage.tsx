@@ -90,6 +90,7 @@ export default function AdminPage() {
           <TabsList className="bg-secondary/50">
             <TabsTrigger value="users">Usuários & Licenças</TabsTrigger>
             <TabsTrigger value="moderation">Moderação Chat</TabsTrigger>
+            <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="content">Conteúdo</TabsTrigger>
           </TabsList>
 
