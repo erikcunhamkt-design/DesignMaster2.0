@@ -1,4 +1,4 @@
-import { ArrowLeft, KeyRound, ChevronDown, Glasses, Sun, LogOut } from 'lucide-react';
+import { ArrowLeft, KeyRound, ChevronDown, Glasses, LogOut } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -6,7 +6,7 @@ import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sectio
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { cn } from '@/lib/utils';
 import { useAccessibility } from '@/hooks/useAccessibility';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { AccessibilityPanel } from '@/components/AccessibilityPanel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,7 +20,7 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
   const navigate = useNavigate();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { largeText } = useAccessibility();
   const { user, signOut } = useAuth();
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
   const avatarUrl = user?.user_metadata?.avatar_url;
@@ -55,46 +55,24 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
         <span className="hidden md:inline">{hasKey ? 'Online' : 'Offline'}</span>
       </div>
 
-      {/* Accessibility toggles */}
-      <div className="flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={toggleLargeText}
-              className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
-                largeText
-                  ? 'bg-primary/15 text-primary border border-primary/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              )}
-            >
-              <Glasses className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={toggleLightMode}
-              className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
-                lightMode
-                  ? 'bg-primary/15 text-primary border border-primary/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              )}
-            >
-              <Sun className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            {lightMode ? 'Desativar modo claro' : 'Ativar modo claro'}
-          </TooltipContent>
-        </Tooltip>
-      </div>
+      {/* Accessibility */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            className={cn(
+              'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
+              largeText
+                ? 'bg-primary/15 text-primary border border-primary/30'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+            )}
+          >
+            <Glasses className="h-3.5 w-3.5" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-auto p-4 glass-card shadow-elevation-3 rounded-xl">
+          <AccessibilityPanel />
+        </PopoverContent>
+      </Popover>
 
       {/* API Key */}
       {showApiKey && (

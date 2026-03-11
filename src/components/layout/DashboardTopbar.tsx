@@ -1,4 +1,4 @@
-import { Search, Bell, KeyRound, ChevronDown, LogOut, Shield, Glasses, Sun } from 'lucide-react';
+import { Search, Bell, KeyRound, ChevronDown, LogOut, Shield, Glasses } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -7,8 +7,8 @@ import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sectio
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useAccessibility } from '@/hooks/useAccessibility';
+import { AccessibilityPanel } from '@/components/AccessibilityPanel';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import { MobileSidebarTrigger } from './DashboardSidebar';
 
@@ -22,7 +22,7 @@ interface DashboardTopbarProps {
 export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, onSectionChange }: DashboardTopbarProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { largeText } = useAccessibility();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
   const navigate = useNavigate();
@@ -54,10 +54,9 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
         </div>
 
         {/* Accessibility */}
-        <Tooltip>
-          <TooltipTrigger asChild>
+        <Popover>
+          <PopoverTrigger asChild>
             <button
-              onClick={toggleLargeText}
               className={cn(
                 'flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl transition-colors',
                 largeText
@@ -67,30 +66,11 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
             >
               <Glasses className="h-4 w-4" />
             </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            {largeText ? 'Desativar texto grande' : 'Ativar texto grande'}
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={toggleLightMode}
-              className={cn(
-                'flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl transition-colors',
-                lightMode
-                  ? 'bg-primary/15 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              )}
-            >
-              <Sun className="h-4 w-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            {lightMode ? 'Modo escuro' : 'Modo claro'}
-          </TooltipContent>
-        </Tooltip>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-auto p-4 glass-card shadow-elevation-3 rounded-xl">
+            <AccessibilityPanel />
+          </PopoverContent>
+        </Popover>
 
         {/* API Key */}
         <Popover>
