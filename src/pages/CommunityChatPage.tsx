@@ -28,6 +28,8 @@ interface Profile {
   display_name: string;
   avatar_url: string | null;
   username?: string | null;
+  title?: string | null;
+  cargo?: string | null;
 }
 
 type ChatStatus = 'active' | 'muted' | 'banned';
