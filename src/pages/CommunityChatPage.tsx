@@ -94,7 +94,7 @@ const MessageBubble = memo(function MessageBubble({
           <p className={cn('text-[9px] mt-1 text-right', isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40')}>{time}</p>
         </div>
       </div>
-      {(isOwn || isAdmin) && (
+      {isAdmin && (
         <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-destructive/10 transition-opacity self-center" title="Excluir">
           <Trash2 className="h-3 w-3 text-destructive/60" />
         </button>
