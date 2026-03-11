@@ -38,7 +38,7 @@ OUTPUT FORMAT: Single continuous line. User's specifics FIRST, then enhancements
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- RAW PROMPT TO EXPAND ---\n${rawPrompt}\n\n${negativePrompt ? `User wants to AVOID: ${negativePrompt}` : ""}` }]
+        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- RAW PROMPT (PRESERVE EVERY DETAIL) ---\n${rawPrompt}\n\n${negativePrompt ? `User wants to AVOID: ${negativePrompt}` : ""}` }]
       }],
       generationConfig: {
         temperature: 0.3,
