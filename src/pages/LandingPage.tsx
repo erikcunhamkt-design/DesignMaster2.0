@@ -302,18 +302,6 @@ export default function LandingPage() {
             transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
           />
 
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-            <motion.span
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wider uppercase mb-8"
-              animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 20px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-                <Sparkles className="h-3.5 w-3.5" />
-              </motion.span>
-              Powered by AI
-            </motion.span>
-          </motion.div>
 
           <motion.h1
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
