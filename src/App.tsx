@@ -24,6 +24,7 @@ import AutoCreatorPage from "./pages/AutoCreatorPage";
 import MockupStudioPage from "./pages/MockupStudioPage";
 import HeroStudioPage from "./pages/HeroStudioPage";
 import CarouselMasterChatPage from "./pages/CarouselMasterChatPage";
+import EditorialChatPage from "./pages/EditorialChatPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
