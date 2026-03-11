@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import type { Easing } from "framer-motion";
 import {
   Wand2, Zap, Shield, Sparkles, ChevronDown, ChevronUp,
   Star, ArrowRight, Check, MessageSquare, Palette, Image,
