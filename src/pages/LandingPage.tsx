@@ -171,21 +171,25 @@ function TypingDemo() {
 /* ─── GENERATING DEMO ─── */
 function GeneratingDemo() {
   const [phase, setPhase] = useState<"idle" | "generating" | "done">("idle");
+  const [imageIndex, setImageIndex] = useState(0);
 
   useEffect(() => {
+    let t1: ReturnType<typeof setTimeout>, t2: ReturnType<typeof setTimeout>, t3: ReturnType<typeof setTimeout>;
     const loop = () => {
       setPhase("idle");
-      const t1 = setTimeout(() => setPhase("generating"), 2000);
-      const t2 = setTimeout(() => setPhase("done"), 5000);
-      const t3 = setTimeout(loop, 9000);
-      return [t1, t2, t3];
+      t1 = setTimeout(() => setPhase("generating"), 2000);
+      t2 = setTimeout(() => setPhase("done"), 5000);
+      t3 = setTimeout(() => {
+        setImageIndex((prev) => (prev + 1) % demoImages.length);
+        loop();
+      }, 9000);
     };
-    const timers = loop();
-    return () => timers.forEach(clearTimeout);
+    loop();
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-full min-h-[180px] relative">
+    <div className="flex items-center justify-center h-full min-h-[140px] md:min-h-[180px] relative">
       <AnimatePresence mode="wait">
         {phase === "idle" && (
           <motion.p
@@ -224,7 +228,7 @@ function GeneratingDemo() {
         )}
         {phase === "done" && (
           <motion.div
-            key="done"
+            key={`done-${imageIndex}`}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
@@ -232,16 +236,17 @@ function GeneratingDemo() {
             className="flex flex-col items-center gap-3"
           >
             <motion.div
-              className="w-28 h-28 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
+              className="w-28 h-28 md:w-48 md:h-48 rounded-xl overflow-hidden border border-primary/20 relative"
               animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <div className="text-center">
-                <motion.span className="text-5xl block mb-2" animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-                  ✨
-                </motion.span>
-                <p className="text-xs text-primary font-medium">Imagem Gerada!</p>
-                <p className="text-[10px] text-muted-foreground mt-1">4K • Alta Qualidade</p>
+              <img
+                src={demoImages[imageIndex]}
+                alt={demoLabels[imageIndex]}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/80 to-transparent p-2">
+                <p className="text-[10px] text-foreground font-medium text-center">{demoLabels[imageIndex]}</p>
               </div>
             </motion.div>
             <motion.div
@@ -250,7 +255,7 @@ function GeneratingDemo() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download</span>
+              <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download 4K</span>
               <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
             </motion.div>
           </motion.div>
