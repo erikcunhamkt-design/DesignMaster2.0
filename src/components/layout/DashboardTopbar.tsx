@@ -1,4 +1,4 @@
-import { Search, Bell, KeyRound, ChevronDown, LogOut, Shield } from 'lucide-react';
+import { Search, Bell, KeyRound, ChevronDown, LogOut, Shield, Glasses, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -6,7 +6,9 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useAccessibility } from '@/hooks/useAccessibility';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import { MobileSidebarTrigger } from './DashboardSidebar';
 
