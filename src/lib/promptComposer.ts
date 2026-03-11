@@ -38,6 +38,11 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   const parts: string[] = [];
   const dim = config.dimension ? dimensionMap[config.dimension] : { width: 1080, height: 1080 };
 
+  // 0. Free prompt (highest priority — user's exact words)
+  if (config.freePrompt?.trim()) {
+    parts.push(`MANDATORY USER INSTRUCTIONS (must be followed exactly): ${config.freePrompt.trim()}`);
+  }
+
   // 1. Dimension & safe zones
   const ratio = config.dimension === 'stories' ? '9:16 vertical' :
     config.dimension === 'horizontal' ? '16:9 horizontal' :
