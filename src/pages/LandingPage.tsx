@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import type { Easing } from "framer-motion";
-  Wand2, Zap, Sparkles, ChevronDown, ChevronUp,
+import {
+  Wand2, Zap, Sparkles, ChevronDown,
   Star, ArrowRight, Check, PenTool,
 } from "lucide-react";
 import logo3d from "@/assets/logo-3d.png";
