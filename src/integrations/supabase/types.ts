@@ -317,28 +317,43 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          behance: string | null
+          bio: string | null
           cargo: string | null
           created_at: string
           display_name: string
           id: string
+          instagram: string | null
+          linkedin: string | null
+          tiktok: string | null
           title: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          behance?: string | null
+          bio?: string | null
           cargo?: string | null
           created_at?: string
           display_name?: string
           id: string
+          instagram?: string | null
+          linkedin?: string | null
+          tiktok?: string | null
           title?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          behance?: string | null
+          bio?: string | null
           cargo?: string | null
           created_at?: string
           display_name?: string
           id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          tiktok?: string | null
           title?: string | null
           username?: string | null
         }
