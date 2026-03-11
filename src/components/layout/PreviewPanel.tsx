@@ -28,6 +28,10 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
 
   const getOverlayPosition = () => {
     if (!config) return 'bottom';
+    if (config.textPosition === 'topo') return 'top';
+    if (config.textPosition === 'rodape') return 'bottom';
+    if (config.textPosition === 'centro') return 'center';
+    // Fallback based on verticalPosition
     if (config.verticalPosition === 'cima') return 'bottom';
     if (config.verticalPosition === 'baixo') return 'top';
     return 'bottom';
