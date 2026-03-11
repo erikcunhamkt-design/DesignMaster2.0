@@ -51,9 +51,9 @@ export function ToolCard({ studio, image, isFavorite, onToggleFavorite, onNaviga
             src={image}
             alt=""
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            style={{ opacity: 0.15 }}
+            style={{ opacity: 0.28 }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
         </div>
       ) : (
         <div className={cn('absolute inset-0 bg-gradient-to-br opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none', studio.gradient)} />
