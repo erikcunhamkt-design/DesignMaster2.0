@@ -30,6 +30,7 @@ ENHANCEMENT STAGES (apply around user's details):
 
 OUTPUT FORMAT: Single continuous line. User's specifics FIRST, then enhancements around them.`;
 
+async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, googleApiKey: string): Promise<{ expandedPrompt: string; expandedNegative: string }> {
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
