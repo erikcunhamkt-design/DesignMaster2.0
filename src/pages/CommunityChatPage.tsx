@@ -161,6 +161,17 @@ export default function CommunityChatPage() {
     setInput('');
     setIsLoading(true);
 
+    // Optimistic update
+    const optimisticMsg: CommunityMessage = {
+      id: crypto.randomUUID(),
+      user_id: user.id,
+      content: msg,
+      message_type: 'text',
+      media_url: null,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
     const { error } = await supabase.from('community_messages').insert({
       user_id: user.id,
       content: msg,
@@ -169,6 +180,7 @@ export default function CommunityChatPage() {
 
     if (error) {
       toast.error('Erro ao enviar mensagem. Verifique seu status.');
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
       setInput(msg);
     }
     setIsLoading(false);
