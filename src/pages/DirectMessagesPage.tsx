@@ -329,7 +329,10 @@ export default function DirectMessagesPage() {
                         <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
                           {getInitials(p.display_name)}
                         </div>
-                        <span className="text-sm text-foreground font-medium truncate flex-1">{p.display_name}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-foreground font-medium truncate block">{p.display_name}</span>
+                          {p.username && <span className="text-[10px] text-muted-foreground">@{p.username}</span>}
+                        </div>
                         {status === 'none' && (
                           <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 text-primary" onClick={() => sendRequest(p.id)}>
                             <UserPlus className="h-3 w-3" /> Adicionar
