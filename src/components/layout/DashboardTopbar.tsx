@@ -1,16 +1,13 @@
-import { Search, Bell, KeyRound, ChevronDown, LogOut, Shield, Glasses } from 'lucide-react';
+import { Search, Bell, LogOut, Shield, Settings, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { AccessibilityPanel } from '@/components/AccessibilityPanel';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { useNavigate } from 'react-router-dom';
 import { MobileSidebarTrigger } from './DashboardSidebar';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 interface DashboardTopbarProps {
   searchQuery: string;
@@ -22,8 +19,7 @@ interface DashboardTopbarProps {
 export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, onSectionChange }: DashboardTopbarProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { largeText } = useAccessibility();
-  const { apiKey, saveKey } = useGoogleApiKey();
+  const { apiKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
   const navigate = useNavigate();
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
@@ -49,49 +45,18 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
       </div>
 
       <div className="flex items-center gap-2 md:gap-3">
-        <div className="hidden sm:block">
-          <SubscriptionBadge />
-        </div>
-
-        {/* Accessibility */}
-        <Popover>
-          <PopoverTrigger asChild>
+        {/* Settings gear */}
+        <Tooltip>
+          <TooltipTrigger asChild>
             <button
-              className={cn(
-                'flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl transition-colors',
-                largeText
-                  ? 'bg-primary/15 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              )}
+              onClick={() => navigate('/studio/settings')}
+              className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
             >
-              <Glasses className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-auto p-4 glass-card shadow-elevation-3 rounded-xl">
-            <AccessibilityPanel />
-          </PopoverContent>
-        </Popover>
-
-        {/* API Key */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              className={cn(
-                'flex items-center gap-1.5 rounded-full px-2 md:px-3 py-1.5 text-[10px] font-semibold tracking-wider uppercase transition-all duration-200 border',
-                hasKey
-                  ? 'bg-primary/8 text-primary/80 border-primary/20 hover:bg-primary/15'
-                  : 'bg-destructive/8 text-destructive/70 border-destructive/20 hover:bg-destructive/15'
-              )}
-            >
-              <KeyRound className="h-3 w-3" />
-              <span className="hidden sm:inline">API</span>
-              <ChevronDown className="h-2.5 w-2.5 opacity-50 hidden sm:block" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-4 glass-card shadow-elevation-3 rounded-xl">
-            <ApiKeySection apiKey={apiKey} onChangeKey={saveKey} />
-          </PopoverContent>
-        </Popover>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">Configurações</TooltipContent>
+        </Tooltip>
 
         {/* Notifications */}
         <button className="relative flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
@@ -109,16 +74,28 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
           </button>
         )}
 
-        {/* Avatar */}
+        {/* Avatar with API status badge */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full overflow-hidden ring-2 ring-border/40 hover:ring-primary/40 transition-all">
-              <Avatar className="h-8 w-8 md:h-9 md:w-9">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
-                <AvatarFallback className="bg-primary/15 text-primary text-[10px] md:text-[11px] font-bold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+            <button className="relative flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full overflow-visible">
+              <div className="h-full w-full rounded-full overflow-hidden ring-2 ring-border/40 hover:ring-primary/40 transition-all">
+                <Avatar className="h-8 w-8 md:h-9 md:w-9">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
+                  <AvatarFallback className="bg-primary/15 text-primary text-[10px] md:text-[11px] font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              {/* API status badge */}
+              <span className={cn(
+                'absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-background shadow-sm',
+                hasKey ? 'bg-primary' : 'bg-destructive'
+              )}>
+                {hasKey
+                  ? <Check className="h-2.5 w-2.5 text-primary-foreground" strokeWidth={3} />
+                  : <X className="h-2.5 w-2.5 text-destructive-foreground" strokeWidth={3} />
+                }
+              </span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -127,6 +104,10 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
                 {user.email}
               </div>
             )}
+            <DropdownMenuItem onClick={() => navigate('/studio/settings')} className="text-xs gap-2 cursor-pointer">
+              <Settings className="h-3.5 w-3.5" />
+              Configurações
+            </DropdownMenuItem>
             {isAdmin && (
               <DropdownMenuItem onClick={() => navigate('/admin')} className="text-xs gap-2 cursor-pointer md:hidden">
                 <Shield className="h-3.5 w-3.5" />

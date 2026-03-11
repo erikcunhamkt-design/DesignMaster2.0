@@ -1,15 +1,14 @@
-import { ArrowLeft, KeyRound, ChevronDown, Glasses, LogOut } from 'lucide-react';
+import { ArrowLeft, KeyRound, ChevronDown, Settings, LogOut, Check, X } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { cn } from '@/lib/utils';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { AccessibilityPanel } from '@/components/AccessibilityPanel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 interface StudioTopbarProps {
   title: string;
@@ -20,7 +19,6 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
   const navigate = useNavigate();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
-  const { largeText } = useAccessibility();
   const { user, signOut } = useAuth();
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
   const avatarUrl = user?.user_metadata?.avatar_url;
@@ -55,24 +53,18 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
         <span className="hidden md:inline">{hasKey ? 'Online' : 'Offline'}</span>
       </div>
 
-      {/* Accessibility */}
-      <Popover>
-        <PopoverTrigger asChild>
+      {/* Settings gear */}
+      <Tooltip>
+        <TooltipTrigger asChild>
           <button
-            className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200',
-              largeText
-                ? 'bg-primary/15 text-primary border border-primary/30'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-            )}
+            onClick={() => navigate('/studio/settings')}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all duration-200"
           >
-            <Glasses className="h-3.5 w-3.5" />
+            <Settings className="h-3.5 w-3.5" />
           </button>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-auto p-4 glass-card shadow-elevation-3 rounded-xl">
-          <AccessibilityPanel />
-        </PopoverContent>
-      </Popover>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="text-xs">Configurações</TooltipContent>
+      </Tooltip>
 
       {/* API Key */}
       {showApiKey && (
@@ -97,16 +89,27 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
         </Popover>
       )}
 
-      {/* User avatar + logout */}
+      {/* User avatar with API status badge */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex h-7 w-7 items-center justify-center rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
-            <Avatar className="h-7 w-7">
-              {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
-              <AvatarFallback className="bg-primary/15 text-primary text-[9px] font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+          <button className="relative flex h-7 w-7 items-center justify-center rounded-full overflow-visible">
+            <div className="h-full w-full rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
+              <Avatar className="h-7 w-7">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
+                <AvatarFallback className="bg-primary/15 text-primary text-[9px] font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            <span className={cn(
+              'absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-background shadow-sm',
+              hasKey ? 'bg-primary' : 'bg-destructive'
+            )}>
+              {hasKey
+                ? <Check className="h-2 w-2 text-primary-foreground" strokeWidth={3} />
+                : <X className="h-2 w-2 text-destructive-foreground" strokeWidth={3} />
+              }
+            </span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
@@ -115,6 +118,10 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
               {user.email}
             </div>
           )}
+          <DropdownMenuItem onClick={() => navigate('/studio/settings')} className="text-xs gap-2 cursor-pointer">
+            <Settings className="h-3.5 w-3.5" />
+            Configurações
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={signOut} className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer">
             <LogOut className="h-3.5 w-3.5" />
             Sair
