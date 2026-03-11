@@ -187,7 +187,7 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
       )}
 
       {/* Canvas area */}
-      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-10">
+      <div className="relative z-10 flex flex-1 items-center justify-center overflow-auto p-4">
         {state === 'aguardando' && (
           <div className="flex flex-col items-center gap-8 animate-fade-up max-w-[280px] text-center">
             <div className="relative">
