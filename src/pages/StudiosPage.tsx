@@ -36,7 +36,8 @@ const studioImages: Record<string, string> = {
   'football-creator': footballCreatorHero,
   'auto-creator': autoCreatorHero,
   'hero-studio': heroStudioHero,
-  'mockup-studio': mockupStudioHero
+  'mockup-studio': mockupStudioHero,
+  'carousel-master': carouselMasterHero,
 };
 
 const sections = [
