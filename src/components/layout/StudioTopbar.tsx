@@ -20,7 +20,7 @@ export function StudioTopbar({ title, showApiKey = true }: StudioTopbarProps) {
   const navigate = useNavigate();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { largeText } = useAccessibility();
   const { user, signOut } = useAuth();
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
   const avatarUrl = user?.user_metadata?.avatar_url;
