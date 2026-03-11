@@ -187,36 +187,60 @@
 }
 
 /* ── Accessibility: Large Text Mode ── */
-/* Use CSS zoom on content areas for clean 150% scaling without layout breakage */
 .accessible-large-text {
-  --a11y-zoom: 1.5;
+  font-size: 150% !important;
+  line-height: 1.55 !important;
+  word-spacing: 0.04em;
+  letter-spacing: 0.01em;
 }
 
-/* Scale only the main scrollable content, not nav/sidebar/topbar */
-.accessible-large-text main,
-.accessible-large-text [role="main"],
-.accessible-large-text .dashboard-content {
-  zoom: var(--a11y-zoom, 1);
-}
-
-/* Boost sidebar & topbar text slightly for readability without breaking layout */
-.accessible-large-text nav,
+/* Keep navigation, topbar, and sidebar compact so layout doesn't break */
 .accessible-large-text header,
-.accessible-large-text aside {
+.accessible-large-text nav,
+.accessible-large-text aside,
+.accessible-large-text [data-sidebar],
+.accessible-large-text .sidebar {
+  font-size: 0.65rem !important;
   letter-spacing: 0.02em;
-  word-spacing: 0.03em;
 }
 
-/* Ensure very small text stays readable everywhere */
-.accessible-large-text .text-\[8px\],
-.accessible-large-text .text-\[10px\] {
-  font-size: 11px !important;
+/* Buttons and form controls: scale proportionally but capped */
+.accessible-large-text button,
+.accessible-large-text input,
+.accessible-large-text textarea,
+.accessible-large-text select {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
 }
+
+/* Body text gets full benefit */
+.accessible-large-text p,
+.accessible-large-text span:not([data-sidebar] span),
+.accessible-large-text li,
+.accessible-large-text td,
+.accessible-large-text th,
+.accessible-large-text label {
+  line-height: 1.6 !important;
+}
+
+/* Headings scale nicely */
+.accessible-large-text h1 { font-size: 2.2rem !important; line-height: 1.2 !important; }
+.accessible-large-text h2 { font-size: 1.75rem !important; line-height: 1.25 !important; }
+.accessible-large-text h3 { font-size: 1.45rem !important; line-height: 1.3 !important; }
+.accessible-large-text h4 { font-size: 1.25rem !important; line-height: 1.35 !important; }
+
+/* Very small text gets a legible floor */
+.accessible-large-text .text-\[7px\],
+.accessible-large-text .text-\[8px\],
+.accessible-large-text .text-\[9px\],
+.accessible-large-text .text-\[10px\],
 .accessible-large-text .text-\[11px\] {
-  font-size: 12px !important;
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
 }
 .accessible-large-text .text-xs {
-  font-size: 13px !important;
+  font-size: 0.85rem !important;
+  line-height: 1.45 !important;
 }
 
 /* ── Accessibility: Light / High-Contrast Mode ── */
