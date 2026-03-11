@@ -220,11 +220,9 @@ export function MobileSidebarTrigger({
 export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useIsMobile();
+  const { unreadCount } = useUnreadDMs();
 
-  // On mobile, don't render the sidebar at all (it's in the Sheet)
-  if (isMobile) {
-    return null;
-  }
+  if (isMobile) return null;
 
   return (
     <aside
@@ -233,7 +231,6 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
         collapsed ? 'w-[68px]' : 'w-[220px]'
       )}
     >
-      {/* Logo */}
       <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
         <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
         {!collapsed && (
@@ -247,6 +244,7 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
         activeSection={activeSection}
         onSectionChange={onSectionChange}
         collapsed={collapsed}
+        unreadDMs={unreadCount}
       />
 
       {/* Collapse toggle */}
