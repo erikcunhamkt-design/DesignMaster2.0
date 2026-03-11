@@ -123,11 +123,27 @@ export default function DesignMasterChatPage() {
   };
 
   const handleDeleteConvo = async (id: string) => {
+    await supabase.from('chat_messages').delete().eq('conversation_id', id);
     await supabase.from('chat_conversations').delete().eq('id', id);
     setConversations((prev) => prev.filter((c) => c.id !== id));
     if (activeConvoId === id) {
       setActiveConvoId(null);
       setMessages([]);
+    }
+    toast.success('Conversa excluída');
+  };
+
+  const handleDeleteAll = async () => {
+    if (!user || conversations.length === 0) return;
+    for (const c of conversations) {
+      await supabase.from('chat_messages').delete().eq('conversation_id', c.id);
+    }
+    await supabase.from('chat_conversations').delete().eq('user_id', user.id);
+    setConversations([]);
+    setActiveConvoId(null);
+    setMessages([]);
+    toast.success('Todas as conversas foram excluídas');
+  };
     }
     toast.success('Conversa excluída');
   };

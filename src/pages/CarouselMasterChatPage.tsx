@@ -274,10 +274,15 @@ export default function CarouselMasterChatPage() {
             sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
           )}
         >
-          <div className="p-3 border-b border-border/10">
+          <div className="p-3 border-b border-border/10 space-y-2">
             <Button onClick={handleNewChat} variant="outline" className="w-full gap-2 h-9 text-xs font-semibold rounded-xl border-border/20 bg-secondary/30 hover:bg-secondary/50">
               <Plus className="h-3.5 w-3.5" /> Nova conversa
             </Button>
+            {conversations.length > 0 && (
+              <Button onClick={handleDeleteAll} variant="ghost" className="w-full gap-2 h-8 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
+                <Trash2 className="h-3 w-3" /> Apagar todas
+              </Button>
+            )}
           </div>
 
           <ScrollArea className="flex-1">
