@@ -157,17 +157,17 @@ function SidebarContent({
               )}
             >
               <div className="relative">
-                <item.icon className="h-[18px] w-[18px] shrink-0" />
-                {item.badge && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_hsl(var(--primary)/0.4)]">
-                    {item.badge > 9 ? '9+' : item.badge}
+                <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]')} />
+                {(item.badge ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_hsl(var(--primary)/0.4)] animate-pulse">
+                    {(item.badge ?? 0) > 9 ? '9+' : item.badge}
                   </span>
                 )}
               </div>
               {!collapsed && (
                 <span className="truncate flex-1">{item.label}</span>
               )}
-              {!collapsed && item.badge && item.badge > 0 && (
+              {!collapsed && (item.badge ?? 0) > 0 && (
                 <span className="bg-primary/15 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   {item.badge}
                 </span>
