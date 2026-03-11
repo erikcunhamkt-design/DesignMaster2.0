@@ -876,7 +876,7 @@ export default function LandingPage() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.3, ease: cubicEase as any }}
                     >
                       <div className="px-5 pb-5">
                         <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
