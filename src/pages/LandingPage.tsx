@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
+import type { Easing } from "framer-motion";
   Wand2, Zap, Sparkles, ChevronDown, ChevronUp,
   Star, ArrowRight, Check, PenTool,
 } from "lucide-react";
