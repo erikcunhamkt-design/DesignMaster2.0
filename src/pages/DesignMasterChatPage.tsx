@@ -57,6 +57,7 @@ export default function DesignMasterChatPage() {
     from('chat_conversations').
     select('*').
     eq('user_id', user.id).
+    eq('agent_id', 'design-master').
     order('updated_at', { ascending: false });
     if (data) setConversations(data as Conversation[]);
   }, [user]);
