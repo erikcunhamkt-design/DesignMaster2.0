@@ -139,7 +139,7 @@ export default function LandingPage() {
               onClick={() => navigate("/")}
               className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg hover:brightness-110 transition-all shadow-lg shadow-primary/25"
             >
-              Começar Grátis
+              Assinar Agora
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <a
