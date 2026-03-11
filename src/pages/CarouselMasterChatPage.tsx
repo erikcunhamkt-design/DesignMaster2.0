@@ -56,6 +56,7 @@ export default function CarouselMasterChatPage() {
       .from('chat_conversations')
       .select('*')
       .eq('user_id', user.id)
+      .eq('agent_id', 'carousel-master')
       .order('updated_at', { ascending: false });
     if (data) setConversations(data as Conversation[]);
   }, [user]);
