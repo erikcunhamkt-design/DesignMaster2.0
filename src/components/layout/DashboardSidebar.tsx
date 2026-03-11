@@ -10,10 +10,10 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  Zap,
   Menu,
   X,
 } from 'lucide-react';
+import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
