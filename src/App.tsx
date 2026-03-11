@@ -33,6 +33,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         {showIntro && <SplashIntro onComplete={() => setShowIntro(false)} />}
+        <PWAInstallPrompt />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />
