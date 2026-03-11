@@ -41,6 +41,7 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,7 @@ const App = () => {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
+              <Route path="/auth" element={<AuthPage />} />
               <Route path="/" element={<PublicOrDashboard publicPage={<LandingPage />} dashboardPage={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />} />
               <Route path="/studio/criador" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/studio/extrator" element={<ProtectedRoute><ExtractorWrapper /></ProtectedRoute>} />
