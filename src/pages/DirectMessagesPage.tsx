@@ -184,20 +184,26 @@ export default function DirectMessagesPage() {
     setSidebarTab('conversations');
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (mediaUrl?: string, mediaType?: 'image' | 'audio') => {
     const msg = input.trim();
-    if (!msg || isLoading || !user || !selectedConvo) return;
+    const isMedia = !!mediaUrl;
+    if (!isMedia && !msg) return;
+    if (isLoading || !user || !selectedConvo) return;
     setInput('');
     setIsLoading(true);
+
+    const msgType = isMedia ? mediaType! : 'text';
+    const content = isMedia ? (mediaType === 'image' ? '📷 Imagem' : '🎵 Áudio') : msg;
+
     const optimistic: DirectMessage = {
       id: crypto.randomUUID(), conversation_id: selectedConvo.id, sender_id: user.id,
-      content: msg, message_type: 'text', media_url: null, created_at: new Date().toISOString(),
+      content, message_type: msgType, media_url: mediaUrl || null, created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimistic]);
     const { error } = await supabase.from('direct_messages').insert({
-      conversation_id: selectedConvo.id, sender_id: user.id, content: msg, message_type: 'text',
+      conversation_id: selectedConvo.id, sender_id: user.id, content, message_type: msgType, media_url: mediaUrl || null,
     } as any);
-    if (error) { toast.error('Erro ao enviar'); setMessages(prev => prev.filter(m => m.id !== optimistic.id)); setInput(msg); }
+    if (error) { toast.error('Erro ao enviar'); setMessages(prev => prev.filter(m => m.id !== optimistic.id)); if (!isMedia) setInput(msg); }
     setIsLoading(false);
   };
 
