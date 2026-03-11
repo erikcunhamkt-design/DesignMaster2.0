@@ -77,6 +77,8 @@ const Index = () => {
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
           prompt: genRequest.prompt,
+          lockedPrompt: genRequest.lockedPrompt,
+          expandablePrompt: genRequest.expandablePrompt,
           negativePrompt: genRequest.negative_prompt,
           referenceImages,
           googleApiKey: apiKey,
