@@ -47,7 +47,8 @@ export default function DirectMessagesPage() {
 
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('conversations');
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const profilesRef = useRef<Record<string, Profile>>({});
+  const [profilesVersion, setProfilesVersion] = useState(0);
   const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [input, setInput] = useState('');
