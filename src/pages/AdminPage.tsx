@@ -713,17 +713,26 @@ function ChatModerationPanel() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Input
-                      defaultValue={u.cargo || ''}
-                      placeholder="Ex: Admin"
-                      className="h-7 text-xs w-28 bg-secondary/30 border-border/20"
-                      onBlur={(e) => {
-                        const val = e.target.value.trim() || null;
-                        if (val !== (u.cargo || null)) {
-                          supabase.from('profiles').update({ cargo: val } as any).eq('id', u.id).then(() => toast.success('Cargo atualizado'));
-                        }
+                    <Select
+                      defaultValue={u.cargo || '__none__'}
+                      onValueChange={(val) => {
+                        const newCargo = val === '__none__' ? null : val;
+                        supabase.from('profiles').update({ cargo: newCargo } as any).eq('id', u.id).then(() => toast.success('Cargo atualizado'));
                       }}
-                    />
+                    >
+                      <SelectTrigger className="h-7 text-xs w-36 bg-secondary/30 border-border/20">
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Nenhum</SelectItem>
+                        <SelectItem value="Administrador">🔴 Administrador</SelectItem>
+                        <SelectItem value="Moderador">🟠 Moderador</SelectItem>
+                        <SelectItem value="Suporte">🔵 Suporte</SelectItem>
+                        <SelectItem value="Designer">🟢 Designer</SelectItem>
+                        <SelectItem value="Editor">🟣 Editor</SelectItem>
+                        <SelectItem value="Curador">🟡 Curador</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                   <TableCell>
                     <Select
