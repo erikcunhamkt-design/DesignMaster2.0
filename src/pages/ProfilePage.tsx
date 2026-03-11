@@ -141,10 +141,18 @@ export default function ProfilePage() {
     );
   }
 
-  const roleLabels: Record<string, { label: string; className: string }> = {
-    admin: { label: 'Administrador', className: 'bg-destructive/15 text-destructive border-destructive/20' },
-    moderator: { label: 'Moderador', className: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+  const roleLabels: Record<string, { label: string; icon?: string; className: string }> = {
+    admin: { label: 'Administrador', className: 'bg-destructive/15 text-destructive border-destructive/30' },
+    moderator: { label: 'Moderador', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
     user: { label: 'Usuário', className: 'bg-primary/15 text-primary border-primary/20' },
+  };
+
+  // Special title styles
+  const getTitleStyle = (t: string) => {
+    const lower = t.toLowerCase();
+    if (lower.includes('master')) return 'master';
+    if (lower.includes('fundador') || lower.includes('founder')) return 'founder';
+    return 'default';
   };
 
   return (
