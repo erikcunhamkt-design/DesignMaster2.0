@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle } from 'lucide-react';
+import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 // ScrollArea removed - using native overflow
@@ -37,6 +38,7 @@ export default function CommunityChatPage() {
   const [onlineCount, setOnlineCount] = useState(0);
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -250,6 +252,12 @@ export default function CommunityChatPage() {
             <span>{onlineCount} online</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/studio/direct-messages')}
+              className="flex items-center gap-1.5 text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full hover:bg-primary/20 transition-colors"
+            >
+              <Mail className="h-3 w-3" /> DMs
+            </button>
             {isBanned && (
               <span className="flex items-center gap-1 text-[10px] font-semibold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
                 <Shield className="h-3 w-3" /> Banido

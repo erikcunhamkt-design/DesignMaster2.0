@@ -28,6 +28,7 @@ import EditorialChatPage from "./pages/EditorialChatPage";
 import CalendarChatPage from "./pages/CalendarChatPage";
 import BioChatPage from "./pages/BioChatPage";
 import CommunityChatPage from "./pages/CommunityChatPage";
+import DirectMessagesPage from "./pages/DirectMessagesPage";
 import NotFound from "./pages/NotFound";
 import { SplashIntro, shouldShowIntro } from "./components/SplashIntro";
 import { StudioTopbar } from "./components/layout/StudioTopbar";
@@ -66,6 +67,7 @@ const App = () => {
             <Route path="/studio/calendar" element={<ProtectedRoute><CalendarChatPage /></ProtectedRoute>} />
             <Route path="/studio/bio" element={<ProtectedRoute><BioChatPage /></ProtectedRoute>} />
             <Route path="/studio/community-chat" element={<ProtectedRoute><CommunityChatPage /></ProtectedRoute>} />
+            <Route path="/studio/direct-messages" element={<ProtectedRoute><DirectMessagesPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
