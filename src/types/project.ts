@@ -94,6 +94,7 @@ export const defaultConfig: ProjectConfig = {
   text02: '',
   cta: '',
   textMode: 'camada',
+  textPosition: 'centro',
   niche: '',
   environment: '',
   sceneryPhotosEnabled: false,
