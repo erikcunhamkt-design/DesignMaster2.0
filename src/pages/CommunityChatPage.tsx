@@ -55,6 +55,36 @@ const MessageBubble = memo(function MessageBubble({
   const initials = name.slice(0, 2).toUpperCase();
   const time = new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
+  const getTitleBadge = (t: string) => {
+    const lower = t.toLowerCase();
+    if (lower.includes('master')) {
+      return (
+        <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-amber-400/40 shadow-[0_0_6px_rgba(251,191,36,0.25)]"
+          style={{ backgroundImage: 'linear-gradient(135deg, #92400e22, #f59e0b33, #92400e22)', color: '#fbbf24' }}>
+          👑 {t}
+        </span>
+      );
+    }
+    if (lower.includes('fundador') || lower.includes('founder')) {
+      return (
+        <span className="inline-flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-slate-400/30"
+          style={{ backgroundImage: 'linear-gradient(135deg, #47556922, #94a3b833, #47556922)', color: '#cbd5e1' }}>
+          ⚜️ {t}
+        </span>
+      );
+    }
+    return <span className="text-[8px] font-medium bg-accent/30 text-accent-foreground/70 px-1.5 py-0.5 rounded-full">{t}</span>;
+  };
+
+  const cargoColors: Record<string, string> = {
+    'Administrador': 'bg-destructive/15 text-destructive',
+    'Moderador': 'bg-amber-500/15 text-amber-400',
+    'Suporte': 'bg-blue-500/15 text-blue-400',
+    'Designer': 'bg-emerald-500/15 text-emerald-400',
+    'Editor': 'bg-purple-500/15 text-purple-400',
+    'Curador': 'bg-yellow-500/15 text-yellow-400',
+  };
+
   return (
     <div className={cn('group flex gap-2.5', isOwn ? 'justify-end' : 'justify-start')}>
       {!isOwn && (
@@ -69,19 +99,29 @@ const MessageBubble = memo(function MessageBubble({
         </UserProfilePopover>
       )}
       <div className={cn('max-w-[75%]', isOwn ? 'items-end' : 'items-start')}>
-        {!isOwn && (
-          <UserProfilePopover
-            userId={msg.user_id} displayName={name} username={uname}
-            friendStatus={friendStatus} onAddFriend={onAddFriend}
-            onAcceptFriend={onAcceptFriend} onStartConversation={onStartConversation}
-          >
-            <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors inline-flex items-center gap-1.5 flex-wrap">
-              {name} {uname && <span className="text-muted-foreground/50">@{uname}</span>}
-              {cargo && <span className="text-[8px] font-bold bg-primary/15 text-primary px-1.5 py-0.5 rounded-full">{cargo}</span>}
-              {title && <span className="text-[8px] font-medium bg-accent/30 text-accent-foreground/70 px-1.5 py-0.5 rounded-full">{title}</span>}
-            </button>
-          </UserProfilePopover>
-        )}
+        {/* Name + badges for ALL messages */}
+        <div className={cn('mb-0.5 ml-1 inline-flex items-center gap-1.5 flex-wrap', isOwn && 'justify-end mr-1 ml-0')}>
+          {isOwn ? (
+            <span className="text-[10px] font-semibold text-primary/70">{name}</span>
+          ) : (
+            <UserProfilePopover
+              userId={msg.user_id} displayName={name} username={uname}
+              friendStatus={friendStatus} onAddFriend={onAddFriend}
+              onAcceptFriend={onAcceptFriend} onStartConversation={onStartConversation}
+            >
+              <button className="text-[10px] font-semibold text-primary/70 hover:text-primary cursor-pointer transition-colors">
+                {name} {uname && <span className="text-muted-foreground/50">@{uname}</span>}
+              </button>
+            </UserProfilePopover>
+          )}
+          {cargo && (
+            <span className={cn('text-[8px] font-bold px-1.5 py-0.5 rounded-full', cargoColors[cargo] || 'bg-primary/15 text-primary')}>
+              {cargo}
+            </span>
+          )}
+          {title && getTitleBadge(title)}
+        </div>
+
         <div className={cn(
           'rounded-2xl px-3.5 py-2 text-sm relative',
           isOwn ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md text-foreground'
@@ -94,13 +134,13 @@ const MessageBubble = memo(function MessageBubble({
           <p className={cn('text-[9px] mt-1 text-right', isOwn ? 'text-primary-foreground/60' : 'text-muted-foreground/40')}>{time}</p>
         </div>
       </div>
-      {isAdmin && (
+      {isAdmin && !isOwn && (
         <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-destructive/10 transition-opacity self-center" title="Excluir">
           <Trash2 className="h-3 w-3 text-destructive/60" />
         </button>
       )}
       {isOwn && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">EU</div>
+        <div className="shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">{initials}</div>
       )}
     </div>
   );
