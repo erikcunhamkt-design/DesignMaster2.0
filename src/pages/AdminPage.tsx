@@ -186,6 +186,11 @@ export default function AdminPage() {
             </div>
           </TabsContent>
 
+          {/* Moderation Tab */}
+          <TabsContent value="moderation" className="space-y-4 mt-4">
+            <ChatModerationPanel />
+          </TabsContent>
+
           {/* Content Tab */}
           <TabsContent value="content" className="space-y-4 mt-4">
             <ContentManager />
