@@ -22,7 +22,7 @@ interface DashboardTopbarProps {
 export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, onSectionChange }: DashboardTopbarProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { largeText, lightMode, toggleLargeText, toggleLightMode } = useAccessibility();
+  const { largeText } = useAccessibility();
   const { apiKey, saveKey } = useGoogleApiKey();
   const hasKey = apiKey.length >= 10;
   const navigate = useNavigate();
