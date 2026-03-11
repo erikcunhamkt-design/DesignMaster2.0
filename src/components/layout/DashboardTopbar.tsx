@@ -1,6 +1,8 @@
-import { Search, Bell, LogOut, Shield, Settings, Check, X } from 'lucide-react';
+import { Search, Bell, LogOut, Shield, Settings, Check, X, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { useNotifications } from '@/hooks/useNotifications';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { useAuth } from '@/hooks/useAuth';
