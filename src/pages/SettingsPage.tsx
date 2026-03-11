@@ -1,10 +1,13 @@
-import { Settings, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, ArrowLeft, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AccessibilityPanel } from '@/components/AccessibilityPanel';
 import { ApiKeySection, useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { LicenseCountdown } from '@/components/LicenseCountdown';
 import { useLicense } from '@/hooks/useLicense';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Crown, Clock, AlertTriangle, KeyRound, Glasses } from 'lucide-react';
 
 function LicenseSection() {
@@ -45,6 +48,69 @@ function LicenseSection() {
           <span className="text-xs text-muted-foreground truncate max-w-[180px]">{license.email}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+function ChangePasswordSection() {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('A nova senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('As senhas não coincidem.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success('Senha alterada com sucesso!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao alterar senha.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="text-xs font-semibold text-foreground block mb-1">Nova senha</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="Mínimo 6 caracteres"
+          className="w-full h-9 rounded-lg bg-secondary/50 border border-border/30 px-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-foreground block mb-1">Confirmar nova senha</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Repita a nova senha"
+          className="w-full h-9 rounded-lg bg-secondary/50 border border-border/30 px-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <button
+        onClick={handleChangePassword}
+        disabled={loading || !newPassword || !confirmPassword}
+        className="w-full h-9 rounded-lg bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        {loading ? 'Alterando...' : 'Alterar Senha'}
+      </button>
     </div>
   );
 }
@@ -126,6 +192,21 @@ export default function SettingsPage() {
             </div>
             <div className="h-px bg-border/20" />
             <AccessibilityPanel />
+          </section>
+
+          {/* Trocar Senha */}
+          <section className="rounded-2xl border border-border/30 bg-card/50 backdrop-blur-sm p-6 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+                <Lock className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-foreground">Alterar Senha</h2>
+                <p className="text-[10px] text-muted-foreground">Atualize sua senha de acesso</p>
+              </div>
+            </div>
+            <div className="h-px bg-border/20" />
+            <ChangePasswordSection />
           </section>
 
         </div>
