@@ -46,6 +46,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         {showIntro && <SplashIntro onComplete={() => setShowIntro(false)} />}
+        <PWAInstallPrompt />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><StudiosPage /></ProtectedRoute>} />
