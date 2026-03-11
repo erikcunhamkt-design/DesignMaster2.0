@@ -75,8 +75,10 @@ const MessageBubble = memo(function MessageBubble({
             friendStatus={friendStatus} onAddFriend={onAddFriend}
             onAcceptFriend={onAcceptFriend} onStartConversation={onStartConversation}
           >
-            <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors">
+            <button className="text-[10px] font-semibold text-primary/70 hover:text-primary mb-0.5 ml-1 cursor-pointer transition-colors inline-flex items-center gap-1.5 flex-wrap">
               {name} {uname && <span className="text-muted-foreground/50">@{uname}</span>}
+              {cargo && <span className="text-[8px] font-bold bg-primary/15 text-primary px-1.5 py-0.5 rounded-full">{cargo}</span>}
+              {title && <span className="text-[8px] font-medium bg-accent/30 text-accent-foreground/70 px-1.5 py-0.5 rounded-full">{title}</span>}
             </button>
           </UserProfilePopover>
         )}
