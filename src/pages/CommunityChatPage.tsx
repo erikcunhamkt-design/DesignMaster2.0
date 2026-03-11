@@ -38,6 +38,7 @@ export default function CommunityChatPage() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Ensure profile exists
   const ensureProfile = useCallback(async () => {
