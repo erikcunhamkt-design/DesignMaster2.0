@@ -1,0 +1,1 @@
+ALTER TABLE public.chat_conversations ADD COLUMN IF NOT EXISTS agent_id TEXT NOT NULL DEFAULT 'design-master';

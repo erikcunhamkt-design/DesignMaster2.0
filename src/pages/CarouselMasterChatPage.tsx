@@ -56,6 +56,7 @@ export default function CarouselMasterChatPage() {
       .from('chat_conversations')
       .select('*')
       .eq('user_id', user.id)
+      .eq('agent_id', 'carousel-master')
       .order('updated_at', { ascending: false });
     if (data) setConversations(data as Conversation[]);
   }, [user]);
@@ -89,7 +90,7 @@ export default function CarouselMasterChatPage() {
       : 'Nova conversa';
     const { data, error } = await supabase
       .from('chat_conversations')
-      .insert({ user_id: user.id, title })
+      .insert({ user_id: user.id, title, agent_id: 'carousel-master' } as any)
       .select()
       .single();
     if (error || !data) { toast.error('Erro ao criar conversa'); return null; }
