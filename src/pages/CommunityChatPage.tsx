@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Trash2, Loader2, Users, MessageCircle, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
+// ScrollArea removed - using native overflow
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,6 +38,7 @@ export default function CommunityChatPage() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Ensure profile exists
   const ensureProfile = useCallback(async () => {
@@ -52,7 +53,7 @@ export default function CommunityChatPage() {
   // Load chat status
   const loadChatStatus = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).single();
+    const { data, error } = await supabase.from('chat_user_status').select('*').eq('user_id', user.id).maybeSingle();
     if (data) {
       const status = data as any;
       if (status.status === 'muted' && status.muted_until && new Date(status.muted_until) < new Date()) {
@@ -95,12 +96,13 @@ export default function CommunityChatPage() {
   }, [messages.length]);
 
   // Scroll to bottom
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
-    if (scrollRef.current) {
-      const el = scrollRef.current;
-      el.scrollTop = el.scrollHeight;
-    }
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   // Realtime subscription
   useEffect(() => {
@@ -108,7 +110,18 @@ export default function CommunityChatPage() {
       .channel('community-chat')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_messages' }, (payload) => {
         const newMsg = payload.new as CommunityMessage;
-        setMessages(prev => [...prev, newMsg]);
+        // Avoid duplicates from optimistic updates (own messages)
+        setMessages(prev => {
+          if (prev.some(m => m.id === newMsg.id)) return prev;
+          // Remove optimistic message if exists (same user, same content within 5s)
+          const filtered = prev.filter(m => !(
+            m.user_id === newMsg.user_id && 
+            m.content === newMsg.content && 
+            Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 5000 &&
+            !m.id.includes('-') === false // optimistic IDs from crypto.randomUUID
+          ));
+          return [...filtered, newMsg];
+        });
         // Load profile if needed
         if (!profiles[newMsg.user_id]) {
           supabase.from('profiles').select('*').eq('id', newMsg.user_id).single().then(({ data }) => {
@@ -159,6 +172,17 @@ export default function CommunityChatPage() {
     setInput('');
     setIsLoading(true);
 
+    // Optimistic update
+    const optimisticMsg: CommunityMessage = {
+      id: crypto.randomUUID(),
+      user_id: user.id,
+      content: msg,
+      message_type: 'text',
+      media_url: null,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
     const { error } = await supabase.from('community_messages').insert({
       user_id: user.id,
       content: msg,
@@ -167,6 +191,7 @@ export default function CommunityChatPage() {
 
     if (error) {
       toast.error('Erro ao enviar mensagem. Verifique seu status.');
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
       setInput(msg);
     }
     setIsLoading(false);
@@ -239,7 +264,7 @@ export default function CommunityChatPage() {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto px-4 py-4" ref={scrollRef}>
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4 animate-fade-up">
               <div className="text-5xl">💬</div>
@@ -309,7 +334,8 @@ export default function CommunityChatPage() {
               ))}
             </div>
           )}
-        </ScrollArea>
+          <div ref={messagesEndRef} />
+        </div>
 
         {/* Input */}
         <div className="border-t border-border/15 bg-card/20 backdrop-blur-sm p-3 md:p-4">
