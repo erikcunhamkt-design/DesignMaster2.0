@@ -132,7 +132,129 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
   return <span ref={ref}>{count.toLocaleString("pt-BR")}{suffix}</span>;
 }
 
-/* ─── DATA ─── */
+/* ─── TYPING DEMO ─── */
+function TypingDemo() {
+  const text = "Empresário confiante em escritório moderno, iluminação cinematográfica, estilo editorial premium";
+  const [displayed, setDisplayed] = useState("");
+  const [charIndex, setCharIndex] = useState(0);
+
+  useEffect(() => {
+    if (charIndex >= text.length) {
+      const reset = setTimeout(() => { setDisplayed(""); setCharIndex(0); }, 3000);
+      return () => clearTimeout(reset);
+    }
+    const timeout = setTimeout(() => {
+      setDisplayed(text.slice(0, charIndex + 1));
+      setCharIndex((i) => i + 1);
+    }, 40);
+    return () => clearTimeout(timeout);
+  }, [charIndex, text]);
+
+  return (
+    <div className="text-sm text-foreground min-h-[20px]">
+      {displayed}
+      <motion.span
+        className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 0.6, repeat: Infinity }}
+      />
+    </div>
+  );
+}
+
+/* ─── GENERATING DEMO ─── */
+function GeneratingDemo() {
+  const [phase, setPhase] = useState<"idle" | "generating" | "done">("idle");
+
+  useEffect(() => {
+    const loop = () => {
+      setPhase("idle");
+      const t1 = setTimeout(() => setPhase("generating"), 2000);
+      const t2 = setTimeout(() => setPhase("done"), 5000);
+      const t3 = setTimeout(loop, 9000);
+      return [t1, t2, t3];
+    };
+    const timers = loop();
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center h-full min-h-[180px] relative">
+      <AnimatePresence mode="wait">
+        {phase === "idle" && (
+          <motion.p
+            key="idle"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            className="text-xs text-muted-foreground"
+          >
+            Aguardando prompt...
+          </motion.p>
+        )}
+        {phase === "generating" && (
+          <motion.div
+            key="gen"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <motion.div
+              className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <p className="text-xs text-primary font-medium">Gerando imagem com IA...</p>
+            <motion.div className="w-48 h-1.5 bg-card rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-primary rounded-full"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 3, ease: "easeInOut" }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+        {phase === "done" && (
+          <motion.div
+            key="done"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <motion.div
+              className="w-40 h-40 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 border border-primary/20 flex items-center justify-center"
+              animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="text-center">
+                <motion.span className="text-5xl block mb-2" animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+                  ✨
+                </motion.span>
+                <p className="text-xs text-primary font-medium">Imagem Gerada!</p>
+                <p className="text-[10px] text-muted-foreground mt-1">4K • Alta Qualidade</p>
+              </div>
+            </motion.div>
+            <motion.div
+              className="flex gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download</span>
+              <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+
 const cubicEase: Easing = [0.22, 1, 0.36, 1];
 
 const fadeUp = {
@@ -374,6 +496,62 @@ export default function LandingPage() {
                 <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
+          </motion.div>
+
+          {/* ─── ANIMATED MOCKUP DEMO ─── */}
+          <motion.div
+            initial="hidden" animate="visible" variants={fadeUp} custom={5}
+            className="mt-16 max-w-3xl mx-auto"
+          >
+            <TiltCard>
+              <div className="relative rounded-2xl border border-border/20 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl shadow-primary/5">
+                {/* Window chrome */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-card/50">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                  </div>
+                  <div className="flex-1 flex justify-center">
+                    <div className="px-4 py-1 rounded-md bg-background/50 text-xs text-muted-foreground">
+                      Design Master Studio
+                    </div>
+                  </div>
+                </div>
+
+                {/* App content mockup */}
+                <div className="p-6 flex gap-5 min-h-[320px]">
+                  {/* Sidebar */}
+                  <div className="hidden md:flex flex-col gap-3 w-44 shrink-0">
+                    {["🎨 Design Master", "🧠 Creator", "🎠 Carrossel", "📦 Mockups", "🖼️ Restaurador"].map((item, idx) => (
+                      <motion.div
+                        key={item}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium truncate ${idx === 0 ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:bg-card/60"}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1 + idx * 0.15 }}
+                      >
+                        {item}
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Main area */}
+                  <div className="flex-1 flex flex-col gap-4">
+                    {/* Prompt input with typing effect */}
+                    <div className="rounded-xl border border-border/20 bg-background/40 p-4">
+                      <p className="text-xs text-muted-foreground mb-2">Descreva sua imagem:</p>
+                      <TypingDemo />
+                    </div>
+
+                    {/* Generated result */}
+                    <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative">
+                      <GeneratingDemo />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TiltCard>
           </motion.div>
         </motion.div>
       </section>
