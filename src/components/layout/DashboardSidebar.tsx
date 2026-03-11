@@ -12,11 +12,14 @@ import {
   ChevronRight,
   Menu,
   X,
+  MessageCircle,
+  Mail,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUnreadDMs } from '@/hooks/useUnreadDMs';
 
 interface SidebarItem {
   id: string;
@@ -24,6 +27,7 @@ interface SidebarItem {
   icon: React.ElementType;
   route?: string;
   section?: string;
+  badge?: number;
 }
 
 const mainItems: SidebarItem[] = [
