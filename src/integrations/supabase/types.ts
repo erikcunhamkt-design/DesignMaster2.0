@@ -359,6 +359,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_allowed_ips: {
+        Row: {
+          id: string
+          ip_address: string
+          is_active: boolean
+          registered_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address: string
+          is_active?: boolean
+          registered_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string
+          is_active?: boolean
+          registered_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
