@@ -46,9 +46,10 @@ OUTPUT FORMAT: Single continuous prompt line following order: [Subject] [Action/
 RULES:
 - Output ONLY the expanded prompt as a single continuous line
 - No commentary, no explanation, no labels
-- Preserve ALL specific details from the user's original prompt
-- Enhance and expand, never remove or contradict user intent
-- If the user specified colors, lighting, style — honor them and enhance
+- ABSOLUTE RULE: Preserve EVERY specific detail from the user's original prompt — clothing items, colors, accessories, materials, textures MUST appear word-for-word in the output
+- If the user says "camisa social arremangada verde musgo" you MUST include "rolled-up sleeves moss green dress shirt" — NEVER replace, omit or generalize these details
+- Enhance and expand around the user's specifics, never remove or contradict user intent
+- If the user specified colors, lighting, style, clothing, accessories — honor them EXACTLY and enhance the surrounding context
 - Write in English only`;
 
 async function expandPromptWithAI(rawPrompt: string, negativePrompt: string, googleApiKey: string): Promise<{ expandedPrompt: string; expandedNegative: string }> {
