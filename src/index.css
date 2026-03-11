@@ -187,39 +187,36 @@
 }
 
 /* ── Accessibility: Large Text Mode ── */
+/* Use CSS zoom on content areas for clean 150% scaling without layout breakage */
 .accessible-large-text {
-  font-size: 137% !important;
-  line-height: 1.6 !important;
-  word-spacing: 0.05em;
+  --a11y-zoom: 1.5;
 }
-.accessible-large-text button,
-.accessible-large-text input,
-.accessible-large-text textarea,
-.accessible-large-text select,
-.accessible-large-text label {
-  font-size: inherit !important;
+
+/* Scale only the main scrollable content, not nav/sidebar/topbar */
+.accessible-large-text main,
+.accessible-large-text [role="main"],
+.accessible-large-text .dashboard-content {
+  zoom: var(--a11y-zoom, 1);
+}
+
+/* Boost sidebar & topbar text slightly for readability without breaking layout */
+.accessible-large-text nav,
+.accessible-large-text header,
+.accessible-large-text aside {
   letter-spacing: 0.02em;
-  line-height: 1.5 !important;
+  word-spacing: 0.03em;
 }
-.accessible-large-text p,
-.accessible-large-text span,
-.accessible-large-text li,
-.accessible-large-text td,
-.accessible-large-text th {
-  font-size: inherit !important;
-  letter-spacing: 0.02em;
-  line-height: 1.65 !important;
-}
-.accessible-large-text h1 { font-size: 2rem !important; }
-.accessible-large-text h2 { font-size: 1.65rem !important; }
-.accessible-large-text h3 { font-size: 1.4rem !important; }
-.accessible-large-text h4 { font-size: 1.2rem !important; }
+
+/* Ensure very small text stays readable everywhere */
 .accessible-large-text .text-\[8px\],
-.accessible-large-text .text-\[10px\],
-.accessible-large-text .text-\[11px\],
+.accessible-large-text .text-\[10px\] {
+  font-size: 11px !important;
+}
+.accessible-large-text .text-\[11px\] {
+  font-size: 12px !important;
+}
 .accessible-large-text .text-xs {
-  font-size: 0.85rem !important;
-  line-height: 1.5 !important;
+  font-size: 13px !important;
 }
 
 /* ── Accessibility: Light / High-Contrast Mode ── */
