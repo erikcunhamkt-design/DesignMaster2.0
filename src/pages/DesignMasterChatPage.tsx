@@ -143,6 +143,7 @@ export default function DesignMasterChatPage() {
     setActiveConvoId(null);
     setMessages([]);
     toast.success('Todas as conversas foram excluídas');
+  };
 
   const handleRenameConvo = async (id: string, newTitle: string) => {
     if (!newTitle.trim()) return;
