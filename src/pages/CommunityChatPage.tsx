@@ -38,6 +38,7 @@ export default function CommunityChatPage() {
   const [onlineCount, setOnlineCount] = useState(0);
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
