@@ -140,4 +140,14 @@ export const studios: Studio[] = [
     gradient: 'from-orange-500/15 to-amber-500/10',
     isNew: true,
   },
+  {
+    id: 'restore-photo',
+    name: 'Restaurador de Fotos',
+    tagline: 'Restaure fotografias antigas danificadas com IA.',
+    description: 'Restauração profissional de fotos antigas — remove riscos, manchas, desbotamento e ruído preservando a identidade original. Opção de colorização de fotos P&B.',
+    icon: '🖼️',
+    route: '/studio/restore-photo',
+    gradient: 'from-amber-500/15 to-yellow-500/10',
+    isNew: true,
+  },
 ];

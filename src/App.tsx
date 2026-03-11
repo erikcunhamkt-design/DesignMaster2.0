@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import ExtractorPage from "./pages/ExtractorPage";
 import PromptBuilderPage from "./pages/PromptBuilderPage";
 import UpscalePage from "./pages/UpscalePage";
+import RestorePhotoPage from "./pages/RestorePhotoPage";
 import MarkdownGeneratorPage from "./pages/MarkdownGeneratorPage";
 import ProductsStudioPage from "./pages/ProductsStudioPage";
 import MagneticCoversPage from "./pages/MagneticCoversPage";
@@ -56,6 +57,7 @@ const App = () => {
             <Route path="/studio/mockup-studio" element={<ProtectedRoute><MockupStudioPage /></ProtectedRoute>} />
             <Route path="/studio/hero-studio" element={<ProtectedRoute><HeroStudioPage /></ProtectedRoute>} />
             <Route path="/studio/carousel-master" element={<ProtectedRoute><CarouselMasterChatPage /></ProtectedRoute>} />
+            <Route path="/studio/restore-photo" element={<ProtectedRoute><RestorePhotoPage /></ProtectedRoute>} />
             <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
