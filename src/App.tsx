@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import ExtractorPage from "./pages/ExtractorPage";
 import PromptBuilderPage from "./pages/PromptBuilderPage";
 import UpscalePage from "./pages/UpscalePage";
+import RestorePhotoPage from "./pages/RestorePhotoPage";
 import MarkdownGeneratorPage from "./pages/MarkdownGeneratorPage";
 import ProductsStudioPage from "./pages/ProductsStudioPage";
 import MagneticCoversPage from "./pages/MagneticCoversPage";
