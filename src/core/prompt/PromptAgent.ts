@@ -9,6 +9,8 @@ import { ProjectConfig } from '@/types/project';
 
 export interface GenerationRequest {
   prompt: string;
+  lockedPrompt: string;   // Sidebar selections — NEVER rewritten by Architect
+  expandablePrompt: string; // Context the Architect CAN enhance
   negative_prompt: string;
   width: number;
   height: number;
