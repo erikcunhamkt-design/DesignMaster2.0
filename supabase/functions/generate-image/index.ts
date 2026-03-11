@@ -134,7 +134,7 @@ serve(async (req) => {
     }
 
     // Model selection
-    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
+    const model = "gemini-3.1-flash-image-preview";
 
     // ── PROMPT ARCHITECT PRO expansion ──
     let finalPrompt = prompt;
