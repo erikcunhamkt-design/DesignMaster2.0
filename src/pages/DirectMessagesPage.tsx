@@ -56,6 +56,7 @@ export default function DirectMessagesPage() {
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
+  const [usernameInput, setUsernameInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Ensure own profile
