@@ -260,12 +260,20 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
         )}
 
         {state === 'concluido' && imageUrl && (
-          <div className="relative inline-block group" style={{ maxWidth: `${zoom}%`, maxHeight: `${zoom}%` }}>
+          <div
+            className="relative group flex items-center justify-center"
+            style={{
+              width: `${zoom}%`,
+              height: `${zoom}%`,
+              minWidth: zoom >= 100 ? '100%' : undefined,
+              minHeight: zoom >= 100 ? '100%' : undefined,
+            }}
+          >
             <img
               ref={imgRef}
               src={imageUrl}
               alt="Imagem gerada"
-              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 w-full h-full ring-1 ring-white/[0.03]"
+              className="object-contain rounded-xl shadow-cinematic transition-all duration-500 max-w-full max-h-full w-full h-full ring-1 ring-white/[0.03]"
             />
 
             {/* Watermark overlay (visual only, CSS-based) */}
