@@ -48,18 +48,10 @@ function ParticleField() {
   );
 }
 
-/* ─── FLOATING ORB ─── */
-function FloatingOrb({ className, delay = 0 }: { className: string; delay?: number }) {
+/* ─── FLOATING ORB (CSS-only animation) ─── */
+function FloatingOrb({ className }: { className: string }) {
   return (
-    <motion.div
-      className={`absolute rounded-full blur-[80px] pointer-events-none ${className}`}
-      animate={{
-        scale: [1, 1.3, 0.9, 1.15, 1],
-        x: [0, 40, -20, 30, 0],
-        y: [0, -30, 20, -15, 0],
-      }}
-      transition={{ duration: 15, repeat: Infinity, delay, ease: "easeInOut" }}
-    />
+    <div className={`absolute rounded-full blur-[60px] pointer-events-none animate-breathe ${className}`} />
   );
 }
 
