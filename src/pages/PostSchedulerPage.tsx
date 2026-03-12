@@ -434,13 +434,43 @@ export default function PostSchedulerPage() {
                 <Input type="time" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} />
               </div>
             </div>
+            {/* Image upload */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Imagem do post</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              {mediaPreview ? (
+                <div className="relative mt-1 rounded-lg overflow-hidden border border-border">
+                  <img src={mediaPreview} alt="Preview" className="w-full h-32 object-cover" />
+                  <button
+                    onClick={removeMedia}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-background/80 hover:bg-background text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-1 w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border p-4 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Adicionar imagem
+                </button>
+              )}
+            </div>
             {selectedDate && (
               <p className="text-xs text-muted-foreground">
                 📅 {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} às {scheduledTime}
               </p>
             )}
-            <Button onClick={handleSave} className="w-full">
-              {editingPost ? 'Atualizar' : 'Agendar Post'} 🚀
+            <Button onClick={handleSave} disabled={uploading} className="w-full">
+              {uploading ? 'Enviando imagem...' : (editingPost ? 'Atualizar' : 'Agendar Post')} 🚀
             </Button>
           </div>
         </DialogContent>
