@@ -235,9 +235,13 @@ export default function PostSchedulerPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         mode: 'no-cors',
+        // Build full caption with hashtags
+        const fullCaption = post.content + (post.content ? '\n\n' : '') + (parseHashtags(post));
         body: JSON.stringify({
           title: post.title,
-          content: post.content,
+          content: fullCaption,
+          caption: fullCaption,
+          hashtags: parseHashtags(post),
           platform: 'instagram',
           post_type: images.length > 1 ? 'carousel' : 'single',
           scheduled_at: post.scheduled_at,
