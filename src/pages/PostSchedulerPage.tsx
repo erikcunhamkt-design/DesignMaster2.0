@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, Facebook, Twitter, Linkedin, Globe } from 'lucide-react';
+import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, Facebook, Twitter, Linkedin, Globe, ImagePlus, X } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
