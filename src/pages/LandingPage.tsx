@@ -452,7 +452,7 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <motion.a
-              href="https://pay.kiwify.com.br/7b1lH1a"
+              href="https://pay.kiwify.com.br/XrNF9qi"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg overflow-hidden"
