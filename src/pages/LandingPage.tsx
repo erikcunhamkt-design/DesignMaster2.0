@@ -274,10 +274,10 @@ const features = [
 ];
 
 const testimonials = [
-  { name: "Lucas M.", role: "Designer Freelancer", text: "Reduziu meu tempo de criação em 80%. Consigo entregar 3x mais projetos por semana.", stars: 5 },
-  { name: "Amanda R.", role: "Social Media Manager", text: "Os carrosséis ficam incríveis. Meus clientes adoram e os resultados de engajamento dobraram.", stars: 5 },
-  { name: "Rafael S.", role: "Dono de Agência", text: "A qualidade das imagens é impressionante. Parece que contratamos um fotógrafo profissional.", stars: 5 },
-  { name: "Juliana P.", role: "Criadora de Conteúdo", text: "Bio Master e Calendário Master me economizam horas de planejamento toda semana.", stars: 5 },
+  { name: "Lucas M.", role: "Designer Freelancer", text: "Larguei o Photoshop. Em 1 mês triplicei minha carteira de clientes. Design Master mudou minha vida profissional.", stars: 5 },
+  { name: "Amanda R.", role: "Social Media Manager", text: "Meus clientes acham que contratei uma equipe. São só eu e o Design Master. O engajamento explodiu 300%.", stars: 5 },
+  { name: "Rafael S.", role: "Dono de Agência", text: "Demitir o time de design não foi fácil. Mas entregar 10x mais rápido com qualidade superior? Não teve como competir.", stars: 5 },
+  { name: "Juliana P.", role: "Criadora de Conteúdo", text: "De 3 posts por semana para 3 por dia. Faturei R$12K a mais no primeiro mês usando os agentes de IA.", stars: 5 },
 ];
 
 const plans = [
