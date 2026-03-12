@@ -373,6 +373,9 @@ export default function FootballCreatorPage() {
         ) : (
           <FootballGuidedWizard apiKey={apiKey} />
         )}
+        {activeTab === 'avancado' && (
+          <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Arte ⚽" />
+        )}
       </div>
     </div>
   );

@@ -341,6 +341,7 @@ export default function HeroStudioPage() {
             onModelChange={setAiModel}
           />
         </div>
+        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Hero ✨" />
       </div>
     </div>
   );

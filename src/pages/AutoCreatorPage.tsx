@@ -342,6 +342,7 @@ export default function AutoCreatorPage() {
             onModelChange={setAiModel}
           />
         </div>
+        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Arte 🏎️" />
       </div>
     </div>
   );

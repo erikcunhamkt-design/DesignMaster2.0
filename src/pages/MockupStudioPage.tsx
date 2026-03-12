@@ -324,6 +324,7 @@ export default function MockupStudioPage() {
             onModelChange={setAiModel}
           />
         </div>
+        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Mockup ✨" />
       </div>
     </div>
   );

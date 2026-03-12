@@ -255,6 +255,9 @@ const Index = () => {
             </>
           )
         )}
+        {mode === 'avancado' && activeProject && (
+          <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Imagem ✨" />
+        )}
       </div>
     </div>
   );
