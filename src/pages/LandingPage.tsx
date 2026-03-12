@@ -251,7 +251,7 @@ const plans = [
     features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
     cta: "GARANTIR MEU ACESSO AGORA",
     popular: true,
-    url: "https://pay.kiwify.com.br/7b1lH1a",
+    url: "https://pay.kiwify.com.br/XrNF9qi",
   },
 ];
 
