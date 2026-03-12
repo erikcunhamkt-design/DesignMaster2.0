@@ -330,7 +330,7 @@ export default function HeroStudioPage() {
             onModelChange={setAiModel}
           />
           {previewState !== 'aguardando' && (
-            <div className="min-h-[400px]">
+            <div ref={mobilePreviewRef} className="min-h-[400px]">
               <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
             </div>
           )}

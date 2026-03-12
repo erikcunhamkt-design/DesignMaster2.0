@@ -314,7 +314,7 @@ export default function MockupStudioPage() {
             onModelChange={setAiModel}
           />
           {previewState !== 'aguardando' && (
-            <div className="min-h-[400px]">
+            <div ref={mobilePreviewRef} className="min-h-[400px]">
               <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
             </div>
           )}

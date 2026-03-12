@@ -332,7 +332,7 @@ export default function AutoCreatorPage() {
             onModelChange={setAiModel}
           />
           {previewState !== 'aguardando' && (
-            <div className="min-h-[400px]">
+            <div ref={mobilePreviewRef} className="min-h-[400px]">
               <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
             </div>
           )}

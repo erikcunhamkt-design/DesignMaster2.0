@@ -359,7 +359,7 @@ export default function FootballCreatorPage() {
                 onModelChange={setAiModel}
               />
               {previewState !== 'aguardando' && (
-                <div className="min-h-[400px]">
+                <div ref={mobilePreviewRef} className="min-h-[400px]">
                   <FootballPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
                 </div>
               )}
