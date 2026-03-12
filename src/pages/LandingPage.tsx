@@ -22,30 +22,25 @@ const demoLabels = [
   "Lata de Sprite gelada no balde de gelo com limões frescos",
 ];
 
-/* ─── PARTICLE FIELD ─── */
+/* ─── PARTICLE FIELD (lightweight) ─── */
 function ParticleField() {
-  const particles = Array.from({ length: 50 }, (_, i) => ({
+  const particles = Array.from({ length: 15 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 20 + 10,
+    size: Math.random() * 2 + 1,
+    duration: Math.random() * 25 + 15,
     delay: Math.random() * 5,
   }));
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden md:block">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-primary/30"
+          className="absolute rounded-full bg-primary/20"
           style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
-          animate={{
-            y: [0, -30, 0, 20, 0],
-            x: [0, 15, -10, 5, 0],
-            opacity: [0.2, 0.6, 0.3, 0.7, 0.2],
-            scale: [1, 1.5, 0.8, 1.2, 1],
-          }}
+          animate={{ y: [0, -20, 0], opacity: [0.1, 0.4, 0.1] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
         />
       ))}
