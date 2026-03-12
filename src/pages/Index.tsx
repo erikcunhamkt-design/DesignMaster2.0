@@ -226,7 +226,7 @@ const Index = () => {
                   onDuplicate={duplicateProject}
                 />
                 {(previewState === 'gerando' || previewState === 'concluido') && (
-                  <PreviewPanel
+                  <div ref={mobilePreviewRef}>
                     state={previewState}
                     imageUrl={generatedImage}
                     config={activeProject.config}
