@@ -302,6 +302,63 @@ const faqs = [
   { q: "Quanto tempo leva para gerar uma imagem?", a: "Segundos. Literalmente. Enquanto seu concorrente abre o Photoshop, você já publicou 3 posts." },
 ];
 
+/* ─── COUNTDOWN TIMER ─── */
+function CountdownTimer() {
+  const getEndTime = () => {
+    const stored = localStorage.getItem('dm-promo-end');
+    if (stored) {
+      const end = parseInt(stored, 10);
+      if (end > Date.now()) return end;
+    }
+    const end = Date.now() + 24 * 60 * 60 * 1000;
+    localStorage.setItem('dm-promo-end', end.toString());
+    return end;
+  };
+
+  const [endTime] = useState(getEndTime);
+  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, endTime - Date.now()));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, endTime - Date.now());
+      setTimeLeft(remaining);
+      if (remaining <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [endTime]);
+
+  const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+  const blocks = [
+    { value: hours, label: "Horas" },
+    { value: minutes, label: "Min" },
+    { value: seconds, label: "Seg" },
+  ];
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <p className="text-sm font-semibold text-primary">⏰ Oferta expira em:</p>
+      <div className="flex gap-3">
+        {blocks.map((b) => (
+          <motion.div
+            key={b.label}
+            className="flex flex-col items-center px-4 py-3 rounded-xl bg-card/60 border border-primary/20 min-w-[70px]"
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 1, repeat: Infinity, delay: blocks.indexOf(b) * 0.3 }}
+          >
+            <span className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">
+              {String(b.value).padStart(2, "0")}
+            </span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{b.label}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -748,7 +805,8 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Menos Que Um Cafezinho Por Dia</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-6">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
+            <CountdownTimer />
           </motion.div>
 
           <div className="max-w-md mx-auto">
