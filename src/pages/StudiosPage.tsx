@@ -57,7 +57,7 @@ const sections = [
 { id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat', 'carousel-master', 'editorial', 'calendar', 'bio'] },
 { id: 'prompt-tools', title: 'Laboratório de Prompts', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
 { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale', 'restore-photo'] },
-{ id: 'social', title: 'Social', studioIds: ['community-chat'] }];
+{ id: 'social', title: 'Social', studioIds: ['community-chat', 'post-scheduler'] }];
 
 
 const sectionFilterMap: Record<string, string[]> = {
