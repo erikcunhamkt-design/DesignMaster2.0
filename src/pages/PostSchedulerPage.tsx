@@ -56,6 +56,7 @@ export default function PostSchedulerPage() {
   const [content, setContent] = useState('');
   const [scheduledTime, setScheduledTime] = useState('10:00');
   const [postType, setPostType] = useState<PostType>('single');
+  const [hashtags, setHashtags] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
