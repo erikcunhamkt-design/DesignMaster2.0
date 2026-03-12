@@ -164,11 +164,16 @@ export default function PostSchedulerPage() {
     // Store as JSON array of URLs
     const mediaUrlJson = mediaUrls.length > 0 ? JSON.stringify(mediaUrls) : null;
 
+    // Concatenate hashtags to content for the webhook
+    const fullContent = hashtags.trim()
+      ? `${content}\n\n${hashtags.trim()}`
+      : content;
+
     if (editingPost) {
       const { error } = await supabase
         .from('scheduled_posts')
         .update({
-          title, content, platform: 'instagram',
+          title, content: fullContent, platform: 'instagram',
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
           media_url: mediaUrlJson,
@@ -185,7 +190,7 @@ export default function PostSchedulerPage() {
         .from('scheduled_posts')
         .insert({
           user_id: user.id,
-          title, content, platform: 'instagram',
+          title, content: fullContent, platform: 'instagram',
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
           media_url: mediaUrlJson,
