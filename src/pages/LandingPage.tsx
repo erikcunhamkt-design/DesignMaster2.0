@@ -470,9 +470,9 @@ export default function LandingPage() {
             className="mt-14 grid grid-cols-3 gap-6 max-w-lg mx-auto"
           >
             {[
-              { value: 2500, suffix: "+", label: "Usuários Ativos" },
-              { value: 50000, suffix: "+", label: "Imagens Criadas" },
-              { value: 16, suffix: "+", label: "Ferramentas" },
+              { value: 2500, suffix: "+", label: "Profissionais Dominando" },
+              { value: 50000, suffix: "+", label: "Designs Criados" },
+              { value: 16, suffix: "+", label: "Armas no Arsenal" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <p className="text-2xl md:text-3xl font-bold text-primary">
