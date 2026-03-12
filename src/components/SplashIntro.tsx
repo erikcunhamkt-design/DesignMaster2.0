@@ -80,13 +80,7 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative select-none"
         >
-          <h1
-            className="text-5xl md:text-7xl font-display font-bold tracking-tight"
-            style={{ color: 'hsl(var(--foreground))' }}
-          >
-            Design
-            <span style={{ color: 'hsl(var(--primary))' }}>Master</span>
-          </h1>
+          <img src={logo3d} alt="Design Master" className="h-24 md:h-32 w-auto object-contain" />
 
           {/* Light sweep */}
           {(phase === 'sweep' || phase === 'out') && (

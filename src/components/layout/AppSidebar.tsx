@@ -16,9 +16,7 @@ const navItems = [
 export function AppSidebar({ activePage, onNavigate }: AppSidebarProps) {
   return (
     <aside className="flex h-screen w-[68px] flex-col items-center border-r border-border bg-card py-5 gap-2">
-      <div className="mb-8 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-bold text-sm tracking-tight shadow-lg shadow-primary/20">
-        <Zap className="h-4 w-4" />
-      </div>
+      <img src={logo3d} alt="Design Master" className="mb-8 h-9 w-9 rounded-lg object-contain" />
       {navItems.map((item) => {
         const active = activePage === item.id;
         return (
