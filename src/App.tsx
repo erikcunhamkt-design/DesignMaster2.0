@@ -105,6 +105,7 @@ const App = () => {
               <Route path="/studio/editorial" element={<ProtectedRoute><EditorialChatPage /></ProtectedRoute>} />
               <Route path="/studio/calendar" element={<ProtectedRoute><CalendarChatPage /></ProtectedRoute>} />
               <Route path="/studio/bio" element={<ProtectedRoute><BioChatPage /></ProtectedRoute>} />
+              <Route path="/studio/post-scheduler" element={<ProtectedRoute><PostSchedulerPage /></ProtectedRoute>} />
               <Route path="/studio/community-chat" element={<ProtectedRoute><CommunityChatPage /></ProtectedRoute>} />
               <Route path="/studio/direct-messages" element={<ProtectedRoute><DirectMessagesPage /></ProtectedRoute>} />
               <Route path="/studio/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

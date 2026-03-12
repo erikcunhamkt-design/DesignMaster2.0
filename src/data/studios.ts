@@ -181,6 +181,16 @@ export const studios: Studio[] = [
     isNew: true,
   },
   {
+    id: 'post-scheduler',
+    name: 'Agendador de Posts',
+    tagline: 'Agende posts para redes sociais com Make/Zapier.',
+    description: 'Calendário visual de agendamento de posts — crie, organize e dispare publicações automáticas para Instagram, Facebook, Twitter e LinkedIn via webhook.',
+    icon: '📆',
+    route: '/studio/post-scheduler',
+    gradient: 'from-green-500/15 to-emerald-500/10',
+    isNew: true,
+  },
+  {
     id: 'community-chat',
     name: 'Arena Social',
     tagline: 'Chat da comunidade em tempo real.',
