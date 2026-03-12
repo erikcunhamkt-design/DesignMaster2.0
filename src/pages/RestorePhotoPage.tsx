@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { Button } from '@/components/ui/button';
 import { Upload, Loader2, ImageIcon, Palette } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
