@@ -238,6 +238,13 @@ export default function FootballCreatorPage() {
   const [activeTab, setActiveTab] = useState<'avancado' | 'guiado'>('avancado');
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
+  const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (previewState === 'gerando' && mobilePreviewRef.current) {
+      setTimeout(() => mobilePreviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }, [previewState]);
 
   const updateConfig = useCallback((patch: Partial<FootballConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
