@@ -207,9 +207,22 @@ Deno.serve(async (req) => {
   const { data: usersData, error: usersErr } = await admin.auth.admin.listUsers();
   if (usersErr) return json({ error: "cannot_list_users", details: usersErr }, 500, corsHeaders);
 
-  const user = usersData.users.find((u) => (u.email || "").toLowerCase() === email);
+  let user = usersData.users.find((u) => (u.email || "").toLowerCase() === email);
+
+  // Auto-create account if buyer doesn't have one yet
   if (!user) {
-    return json({ ok: true, pending_user: true, email }, 200, corsHeaders);
+    const tempPassword = crypto.randomUUID();
+    const { data: newUserData, error: createErr } = await admin.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+    });
+    if (createErr || !newUserData?.user) {
+      console.error("Failed to auto-create user:", createErr);
+      return json({ error: "auto_create_failed", details: createErr }, 500, corsHeaders);
+    }
+    user = newUserData.user;
+    console.log("Auto-created user for buyer:", email, user.id);
   }
 
   // Determine plan
