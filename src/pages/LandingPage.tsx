@@ -765,7 +765,7 @@ export default function LandingPage() {
                       animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      ✨ Mais Popular
+                      🔥 53% OFF — Últimas Vagas
                     </motion.span>
                     <h3 className="font-bold text-xl mb-3 mt-2">{plan.name}</h3>
                     <div className="mb-6">
