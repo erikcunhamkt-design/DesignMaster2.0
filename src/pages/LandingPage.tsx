@@ -760,14 +760,16 @@ export default function LandingPage() {
                 >
                   {/* Animated border glow */}
                   <div className="relative z-10">
-                    <motion.span
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
-                      animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      🔥 53% OFF — Últimas Vagas
-                    </motion.span>
-                    <h3 className="font-bold text-xl mb-3 mt-2">{plan.name}</h3>
+                    <div className="flex justify-center mb-5">
+                      <motion.span
+                        className="px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
+                        animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        🔥 53% OFF — Vagas Limitadas
+                      </motion.span>
+                    </div>
+                    <h3 className="font-bold text-xl mb-3">{plan.name}</h3>
                     <div className="mb-6">
                       {plan.originalPrice && (
                         <span className="text-muted-foreground text-lg line-through mr-2">{plan.originalPrice}</span>
