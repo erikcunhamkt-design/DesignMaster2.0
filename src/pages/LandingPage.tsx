@@ -532,17 +532,72 @@ export default function LandingPage() {
 
                 {/* App content mockup */}
                 <div className="p-3 md:p-6 flex gap-5 min-h-[240px] md:min-h-[320px]">
-                  {/* Sidebar */}
-                  <div className="hidden md:flex flex-col gap-3 w-44 shrink-0">
-                    {["🎨 Design Master", "🧠 Creator", "🎠 Carrossel", "📦 Mockups", "🖼️ Restaurador"].map((item, idx) => (
+                  {/* Sidebar - replica do app real */}
+                  <div className="hidden md:flex flex-col w-48 shrink-0 border-r border-border/15 pr-4">
+                    {/* Logo */}
+                    <div className="flex items-center gap-2 mb-5">
+                      <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <span className="text-primary text-sm">◆</span>
+                      </div>
+                      <span className="text-xs font-bold tracking-wide text-foreground">DesignMaster</span>
+                    </div>
+
+                    {/* Principal */}
+                    <p className="text-[9px] font-semibold text-muted-foreground/60 tracking-[0.15em] uppercase mb-2">Principal</p>
+                    {[
+                      { icon: "🏠", name: "Home", active: false },
+                      { icon: "✨", name: "Geradores", active: false },
+                      { icon: "🤖", name: "Agentes", active: false },
+                      { icon: "📝", name: "Prompt Lab", active: false },
+                      { icon: "🔧", name: "Ferramentas", active: false },
+                    ].map((item, idx) => (
                       <motion.div
-                        key={item}
-                        className={`px-3 py-2 rounded-lg text-xs font-medium truncate ${idx === 0 ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:bg-card/60"}`}
-                        initial={{ opacity: 0, x: -20 }}
+                        key={item.name}
+                        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium mb-0.5 ${idx === 0 ? "bg-primary/15 text-primary border-l-2 border-primary" : "text-muted-foreground"}`}
+                        initial={{ opacity: 0, x: -15 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 1 + idx * 0.15 }}
+                        transition={{ delay: 1 + idx * 0.1 }}
                       >
-                        {item}
+                        <span className="text-xs">{item.icon}</span>
+                        {item.name}
+                      </motion.div>
+                    ))}
+
+                    {/* Atalhos */}
+                    <p className="text-[9px] font-semibold text-muted-foreground/60 tracking-[0.15em] uppercase mt-4 mb-2">Atalhos</p>
+                    {[
+                      { icon: "⭐", name: "Favoritos" },
+                      { icon: "🕐", name: "Recentes" },
+                      { icon: "👤", name: "Meu Perfil" },
+                      { icon: "⚙️", name: "Configurações" },
+                    ].map((item, idx) => (
+                      <motion.div
+                        key={item.name}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-muted-foreground mb-0.5"
+                        initial={{ opacity: 0, x: -15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.6 + idx * 0.1 }}
+                      >
+                        <span className="text-xs">{item.icon}</span>
+                        {item.name}
+                      </motion.div>
+                    ))}
+
+                    {/* Social */}
+                    <p className="text-[9px] font-semibold text-muted-foreground/60 tracking-[0.15em] uppercase mt-4 mb-2">Social</p>
+                    {[
+                      { icon: "💬", name: "Comunidade" },
+                      { icon: "✉️", name: "DMs" },
+                    ].map((item, idx) => (
+                      <motion.div
+                        key={item.name}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-muted-foreground mb-0.5"
+                        initial={{ opacity: 0, x: -15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 2.1 + idx * 0.1 }}
+                      >
+                        <span className="text-xs">{item.icon}</span>
+                        {item.name}
                       </motion.div>
                     ))}
                   </div>
