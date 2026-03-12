@@ -654,9 +654,9 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
             {[
-              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Escreva o que quer ou escolha um preset. A IA entende linguagem natural." },
-              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "A IA cria sua imagem em segundos com qualidade profissional." },
-              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Refine", desc: "Ajuste cores, estilo e composição até ficar perfeito." },
+              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Diga o que quer em português mesmo. A IA entende você melhor que designer freelancer." },
+              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "Em segundos, não horas. Qualidade que faria qualquer agência cobrar R$500+." },
+              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Domine", desc: "Refine, ajuste e publique. Seu conteúdo, suas regras, seu lucro." },
             ].map((s, i) => (
               <motion.div
                 key={s.step}
