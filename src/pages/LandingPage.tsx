@@ -296,7 +296,7 @@ const plans = [
 const faqs = [
   { q: "Preciso saber design para usar?", a: "Absolutamente NÃO. Se você sabe digitar, sabe usar. A IA faz todo o trabalho pesado — você só precisa dizer o que quer. É como ter um designer sênior 24/7 ao seu lado." },
   { q: "E se eu não gostar?", a: "Impossível. Mas se acontecer, cancele quando quiser. Sem multa, sem burocracia, sem letras miúdas. Confiamos tanto no produto que não precisamos te prender." },
-  { q: "Quais modelos de IA são usados?", a: "Os mais avançados e caros do mercado — Gemini e GPT de última geração. Você tem acesso a tecnologia que custa milhares de dólares por mês, incluída no seu plano." },
+  { q: "Quais modelos de IA são usados?", a: "Os mais avançados do mercado — Gemini de última geração do Google. Você tem acesso a tecnologia de ponta incluída no seu plano, sem custo extra." },
   { q: "As imagens são minhas para uso comercial?", a: "100% suas. Use em posts, anúncios, sites, impressão — onde quiser, como quiser, para sempre. Zero restrições." },
   { q: "Funciona no celular?", a: "Funciona em qualquer lugar. Celular, tablet, computador. Instale como app nativo e crie conteúdo profissional até no ônibus." },
   { q: "Quanto tempo leva para gerar uma imagem?", a: "Segundos. Literalmente. Enquanto seu concorrente abre o Photoshop, você já publicou 3 posts." },
