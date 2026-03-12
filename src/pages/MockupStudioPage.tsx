@@ -294,21 +294,35 @@ export default function MockupStudioPage() {
       </div>
 
       {/* Main */}
-      <div className="flex flex-1 overflow-hidden relative">
-        <MockupPreviewPanel
-          state={previewState}
-          imageUrl={generatedImage}
-          config={config}
-        />
-        <MockupConfigPanel
-          config={config}
-          onUpdate={updateConfig}
-          onGenerate={handleGenerate}
-          isGenerating={isGenerating}
-          apiKey={apiKey}
-          aiModel={aiModel}
-          onModelChange={setAiModel}
-        />
+      <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
+        <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+          <MockupConfigPanel
+            config={config}
+            onUpdate={updateConfig}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
+            apiKey={apiKey}
+            aiModel={aiModel}
+            onModelChange={setAiModel}
+          />
+          {previewState !== 'aguardando' && (
+            <div className="min-h-[400px]">
+              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+            </div>
+          )}
+        </div>
+        <div className="hidden md:flex flex-1 overflow-hidden">
+          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+          <MockupConfigPanel
+            config={config}
+            onUpdate={updateConfig}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
+            apiKey={apiKey}
+            aiModel={aiModel}
+            onModelChange={setAiModel}
+          />
+        </div>
       </div>
     </div>
   );

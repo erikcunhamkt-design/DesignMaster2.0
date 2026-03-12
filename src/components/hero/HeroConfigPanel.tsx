@@ -449,7 +449,7 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
   const canGenerate = !!apiKey && apiKey.length >= 10 && !isGenerating;
 
   return (
-    <div className="flex h-full w-[300px] shrink-0 flex-col border-l border-border/10 bg-background/95 backdrop-blur-xl">
+    <div className="flex h-full w-full md:w-[300px] shrink-0 flex-col border-l border-border/10 bg-background/95 backdrop-blur-xl">
       {/* Header */}
       <div className="shrink-0 border-b border-border/10 px-4 py-3">
         <div className="flex items-center gap-2 mb-1">

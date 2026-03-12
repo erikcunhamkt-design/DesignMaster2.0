@@ -432,7 +432,7 @@ export function MockupConfigPanel({ config, onUpdate, onGenerate, isGenerating, 
   };
 
   return (
-    <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
+    <div className="flex w-full md:w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
         {/* Prompt Livre */}
         <FreePromptBlock
