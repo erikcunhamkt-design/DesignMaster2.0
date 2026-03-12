@@ -341,7 +341,7 @@ export default function FootballCreatorPage() {
       <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
         {activeTab === 'avancado' ? (
           <>
-            <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+            <div className="md:hidden flex flex-col flex-1 overflow-y-auto pb-20">
               <FootballConfigPanel
                 config={config}
                 onUpdate={updateConfig}

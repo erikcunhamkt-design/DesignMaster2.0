@@ -312,7 +312,7 @@ export default function HeroStudioPage() {
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
         {/* Mobile: config top, preview below */}
-        <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+        <div className="md:hidden flex flex-col flex-1 overflow-y-auto pb-20">
           <HeroConfigPanel
             config={config}
             onUpdate={updateConfig}
