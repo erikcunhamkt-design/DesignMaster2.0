@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { AutoConfigPanel } from '@/components/auto/AutoConfigPanel';
 import { AutoConfig, defaultAutoConfig } from '@/types/autoConfig';
 import { buildAutoRequest } from '@/core/prompt/AutoPromptAgent';
@@ -341,6 +342,7 @@ export default function AutoCreatorPage() {
             onModelChange={setAiModel}
           />
         </div>
+        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Arte 🏎️" />
       </div>
     </div>
   );

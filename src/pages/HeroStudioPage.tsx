@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { HeroConfigPanel } from '@/components/hero/HeroConfigPanel';
 import { HeroConfig, defaultHeroConfig } from '@/types/heroConfig';
 import { buildHeroRequest } from '@/core/prompt/HeroPromptAgent';
@@ -340,6 +341,7 @@ export default function HeroStudioPage() {
             onModelChange={setAiModel}
           />
         </div>
+        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Hero ✨" />
       </div>
     </div>
   );
