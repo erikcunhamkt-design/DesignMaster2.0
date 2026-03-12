@@ -29,6 +29,7 @@ import editorialHero from '@/assets/editorial-hero.png';
 import calendarHero from '@/assets/calendar-hero.png';
 import bioHero from '@/assets/bio-hero.png';
 import communityChatHero from '@/assets/community-chat-hero.png';
+import postSchedulerHero from '@/assets/post-scheduler-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
