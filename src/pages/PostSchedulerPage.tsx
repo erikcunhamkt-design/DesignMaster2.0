@@ -266,6 +266,7 @@ export default function PostSchedulerPage() {
   const resetForm = () => {
     setTitle('');
     setContent('');
+    setHashtags('');
     setScheduledTime('10:00');
     setPostType('single');
     setEditingPost(null);
@@ -277,7 +278,15 @@ export default function PostSchedulerPage() {
   const openEdit = (post: ScheduledPost) => {
     setEditingPost(post);
     setTitle(post.title);
-    setContent(post.content);
+    // Split content and hashtags
+    const parts = post.content.split(/\n\n(#)/);
+    if (parts.length > 1) {
+      setContent(parts[0]);
+      setHashtags('#' + parts.slice(1).join(''));
+    } else {
+      setContent(post.content);
+      setHashtags('');
+    }
     setMediaFiles([]);
     const urls = parseMediaUrls(post.media_url);
     setMediaPreviews(urls);
