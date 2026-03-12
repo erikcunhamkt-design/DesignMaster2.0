@@ -230,6 +230,9 @@ export default function PostSchedulerPage() {
     setPlatform('instagram');
     setScheduledTime('10:00');
     setEditingPost(null);
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const openEdit = (post: ScheduledPost) => {
