@@ -1,6 +1,6 @@
 import { creators } from '@/data/creators';
 import { CreatorCard } from '@/components/CreatorCard';
-import { Zap } from 'lucide-react';
+import logo3d from '@/assets/logo-3d.png';
 
 export default function CreatorSelectPage() {
   return (
