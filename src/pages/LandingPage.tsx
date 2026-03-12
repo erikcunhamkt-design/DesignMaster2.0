@@ -259,47 +259,47 @@ const scaleIn = {
 };
 
 const features = [
-  { icon: "🎨", name: "Design Master", desc: "Gerador principal com controles avançados de composição, iluminação e estilo." },
-  { icon: "🧠", name: "Creator Master", desc: "Chat especialista em design, viralização e ideias magnéticas para Instagram." },
-  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis de alto impacto com headlines magnéticas e estrutura AIDA." },
-  { icon: "📰", name: "Estrategista Editorial", desc: "Linhas editoriais estratégicas com pilares de conteúdo e posicionamento." },
-  { icon: "📅", name: "Calendário Master", desc: "Calendários de conteúdo quinzenais com organização e ideias de posts." },
-  { icon: "🖥️", name: "Liga dos Heróis", desc: "Hero sections premium para landing pages comparáveis às melhores marcas." },
-  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups realistas de produtos, embalagens e dispositivos." },
-  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes de futebol profissionais — matchday, jogador destaque e flyers." },
-  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas de alta performance com IA." },
-  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens com animais em alta resolução e acabamento premium." },
-  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Restaure fotos antigas com IA — riscos, manchas e colorização." },
-  { icon: "🔍", name: "Ultra Upscale", desc: "Ampliação inteligente com preservação total da qualidade." },
+  { icon: "🎨", name: "Design Master", desc: "Sua arma principal. Gere qualquer imagem profissional em segundos — sem Photoshop, sem Canva, sem desculpas." },
+  { icon: "🧠", name: "Creator Master", desc: "Um estrategista de conteúdo que nunca dorme. Ideias que viralizam enquanto sua concorrência ainda planeja." },
+  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis que prendem, vendem e convertem. Estrutura AIDA que transforma seguidores em clientes." },
+  { icon: "📰", name: "Estrategista Editorial", desc: "Pare de postar sem rumo. Linhas editoriais estratégicas que posicionam você como autoridade." },
+  { icon: "📅", name: "Calendário Master", desc: "15 dias de conteúdo planejado em 30 segundos. Nunca mais fique sem saber o que postar." },
+  { icon: "🖥️", name: "Liga dos Heróis", desc: "Landing pages que convertem. Hero sections de nível internacional que impressionam até os mais exigentes." },
+  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups fotorrealistas que fazem seu produto parecer de um milhão de reais." },
+  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes esportivas que inflamam torcidas. Matchday, destaques e flyers de tirar o fôlego." },
+  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas brutais. O tipo de conteúdo que para o feed e gera compartilhamentos." },
+  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens selvagens em resolução absurda. Capas e posts que hipnotizam qualquer audiência." },
+  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Ressuscite fotos destruídas pelo tempo. IA que recria detalhes como se a foto fosse tirada ontem." },
+  { icon: "🔍", name: "Ultra Upscale", desc: "Amplie sem perder um pixel. Transforme imagens borradas em obras de arte em 4K." },
 ];
 
 const testimonials = [
-  { name: "Lucas M.", role: "Designer Freelancer", text: "Reduziu meu tempo de criação em 80%. Consigo entregar 3x mais projetos por semana.", stars: 5 },
-  { name: "Amanda R.", role: "Social Media Manager", text: "Os carrosséis ficam incríveis. Meus clientes adoram e os resultados de engajamento dobraram.", stars: 5 },
-  { name: "Rafael S.", role: "Dono de Agência", text: "A qualidade das imagens é impressionante. Parece que contratamos um fotógrafo profissional.", stars: 5 },
-  { name: "Juliana P.", role: "Criadora de Conteúdo", text: "Bio Master e Calendário Master me economizam horas de planejamento toda semana.", stars: 5 },
+  { name: "Lucas M.", role: "Designer Freelancer", text: "Larguei o Photoshop. Em 1 mês triplicei minha carteira de clientes. Design Master mudou minha vida profissional.", stars: 5 },
+  { name: "Amanda R.", role: "Social Media Manager", text: "Meus clientes acham que contratei uma equipe. São só eu e o Design Master. O engajamento explodiu 300%.", stars: 5 },
+  { name: "Rafael S.", role: "Dono de Agência", text: "Demitir o time de design não foi fácil. Mas entregar 10x mais rápido com qualidade superior? Não teve como competir.", stars: 5 },
+  { name: "Juliana P.", role: "Criadora de Conteúdo", text: "De 3 posts por semana para 3 por dia. Faturei R$12K a mais no primeiro mês usando os agentes de IA.", stars: 5 },
 ];
 
 const plans = [
   {
-    name: "Plano Mensal",
+    name: "Acesso Vitalício*",
     price: "R$ 69,99",
     originalPrice: "R$ 149,90",
     period: "/mês",
-    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro", "Cancele quando quiser"],
-    cta: "Assinar Agora",
+    features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
+    cta: "GARANTIR MEU ACESSO AGORA",
     popular: true,
     url: "https://pay.kiwify.com.br/7b1lH1a",
   },
 ];
 
 const faqs = [
-  { q: "Preciso saber design para usar?", a: "Não! O Design Master foi feito para qualquer pessoa. Os agentes de IA guiam você passo a passo — basta descrever o que quer e a IA cria para você." },
-  { q: "Quais modelos de IA são usados?", a: "Utilizamos os modelos mais avançados do mercado, incluindo Gemini e GPT, para garantir a máxima qualidade em todas as gerações." },
-  { q: "Posso cancelar a qualquer momento?", a: "Sim, sem compromisso. Cancele quando quiser diretamente nas configurações da sua conta, sem burocracia." },
-  { q: "As imagens geradas têm direitos autorais?", a: "Sim, todas as imagens geradas são suas. Você pode usar comercialmente sem restrições em qualquer plataforma." },
-  { q: "Funciona no celular?", a: "Sim! O Design Master é totalmente responsivo e funciona como PWA — instale no seu celular como um app nativo." },
-  { q: "Quantas ferramentas estão disponíveis?", a: "Atualmente temos 16+ ferramentas especializadas: geradores de imagem, agentes de conteúdo, restauração, upscale, mockups e muito mais." },
+  { q: "Preciso saber design para usar?", a: "Absolutamente NÃO. Se você sabe digitar, sabe usar. A IA faz todo o trabalho pesado — você só precisa dizer o que quer. É como ter um designer sênior 24/7 ao seu lado." },
+  { q: "E se eu não gostar?", a: "Impossível. Mas se acontecer, cancele quando quiser. Sem multa, sem burocracia, sem letras miúdas. Confiamos tanto no produto que não precisamos te prender." },
+  { q: "Quais modelos de IA são usados?", a: "Os mais avançados e caros do mercado — Gemini e GPT de última geração. Você tem acesso a tecnologia que custa milhares de dólares por mês, incluída no seu plano." },
+  { q: "As imagens são minhas para uso comercial?", a: "100% suas. Use em posts, anúncios, sites, impressão — onde quiser, como quiser, para sempre. Zero restrições." },
+  { q: "Funciona no celular?", a: "Funciona em qualquer lugar. Celular, tablet, computador. Instale como app nativo e crie conteúdo profissional até no ônibus." },
+  { q: "Quanto tempo leva para gerar uma imagem?", a: "Segundos. Literalmente. Enquanto seu concorrente abre o Photoshop, você já publicou 3 posts." },
 ];
 
 /* ─── MAIN ─── */
@@ -414,23 +414,23 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
           >
-            Crie Designs{" "}
+            Enquanto Você Hesita,{" "}
             <motion.span
               className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0% center", "200% center"] }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             >
-              Profissionais
+              Seu Concorrente
             </motion.span>{" "}
-            em Segundos
+            Já Está Criando
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Studio completo com 16+ ferramentas de IA para gerar imagens, mockups, carrosséis,
-            capas e conteúdo estratégico — sem precisar saber design.
+            Você ainda paga R$500+ por design ou perde horas tentando fazer sozinho?
+            Com o Design Master, você cria conteúdo de nível agência em segundos — mesmo sem saber nada de design.
           </motion.p>
 
           <motion.div
@@ -451,7 +451,7 @@ export default function LandingPage() {
                 animate={{ x: ["-200%", "200%"] }}
                 transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
               />
-              <span className="relative z-10">Assinar Agora</span>
+              <span className="relative z-10">Quero Dominar Agora →</span>
               <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
             </motion.a>
             <motion.a
@@ -460,7 +460,7 @@ export default function LandingPage() {
               whileHover={{ scale: 1.03, borderColor: "hsl(var(--primary) / 0.3)" }}
               whileTap={{ scale: 0.97 }}
             >
-              Ver Ferramentas
+              Ver o Arsenal Completo
             </motion.a>
           </motion.div>
 
@@ -470,9 +470,9 @@ export default function LandingPage() {
             className="mt-14 grid grid-cols-3 gap-6 max-w-lg mx-auto"
           >
             {[
-              { value: 2500, suffix: "+", label: "Usuários Ativos" },
-              { value: 50000, suffix: "+", label: "Imagens Criadas" },
-              { value: 16, suffix: "+", label: "Ferramentas" },
+              { value: 2500, suffix: "+", label: "Profissionais Dominando" },
+              { value: 50000, suffix: "+", label: "Designs Criados" },
+              { value: 16, suffix: "+", label: "Armas no Arsenal" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <p className="text-2xl md:text-3xl font-bold text-primary">
@@ -596,17 +596,17 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              16+ Ferramentas em{" "}
+              Seu Arsenal de{" "}
               <motion.span
                 className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
                 animate={{ backgroundPosition: ["0% center", "200% center"] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
               >
-                Um Só Lugar
+                Dominação
               </motion.span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Tudo que você precisa para criar conteúdo visual profissional.
+              Cada ferramenta é uma vantagem injusta sobre quem ainda faz design do jeito antigo.
             </p>
           </motion.div>
 
@@ -645,8 +645,8 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Como Funciona</h2>
-            <p className="text-muted-foreground text-lg">Três passos para resultados profissionais.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Tão Simples que Dói</h2>
+            <p className="text-muted-foreground text-lg">Enquanto outros complicam, você cria. Em 3 passos.</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
@@ -654,9 +654,9 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
             {[
-              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Escreva o que quer ou escolha um preset. A IA entende linguagem natural." },
-              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "A IA cria sua imagem em segundos com qualidade profissional." },
-              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Refine", desc: "Ajuste cores, estilo e composição até ficar perfeito." },
+              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Diga o que quer em português mesmo. A IA entende você melhor que designer freelancer." },
+              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "Em segundos, não horas. Qualidade que faria qualquer agência cobrar R$500+." },
+              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Domine", desc: "Refine, ajuste e publique. Seu conteúdo, suas regras, seu lucro." },
             ].map((s, i) => (
               <motion.div
                 key={s.step}
@@ -697,15 +697,16 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              O Que Nossos Usuários{" "}
+              Resultados Reais de{" "}
               <motion.span
                 className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
                 animate={{ backgroundPosition: ["0% center", "200% center"] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
               >
-                Dizem
+                Pessoas Reais
               </motion.span>
             </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Não acredite em nós. Acredite em quem já está faturando com o Design Master.</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -745,8 +746,8 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Invista no Seu Conteúdo</h2>
-            <p className="text-muted-foreground text-lg">Acesso completo a todas as ferramentas por um preço único.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Menos Que Um Cafezinho Por Dia</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
           </motion.div>
 
           <div className="max-w-md mx-auto">
@@ -764,7 +765,7 @@ export default function LandingPage() {
                       animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      ✨ Mais Popular
+                      🔥 53% OFF — Últimas Vagas
                     </motion.span>
                     <h3 className="font-bold text-xl mb-3 mt-2">{plan.name}</h3>
                     <div className="mb-6">
@@ -826,10 +827,10 @@ export default function LandingPage() {
           className="mx-auto max-w-2xl text-center"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Fique por Dentro das Novidades
+            A Última Chance é Agora
           </h2>
           <p className="text-muted-foreground mb-8">
-            Receba dicas, tutoriais e novos recursos antes de todo mundo.
+            O preço promocional não vai durar para sempre. Entre antes que suba.
           </p>
           <form
             onSubmit={(e) => {
@@ -869,7 +870,7 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Perguntas Frequentes</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Ainda Tem Dúvidas?</h2>
           </motion.div>
 
           <div className="space-y-3">
