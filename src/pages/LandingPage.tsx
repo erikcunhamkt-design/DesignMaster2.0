@@ -294,12 +294,12 @@ const plans = [
 ];
 
 const faqs = [
-  { q: "Preciso saber design para usar?", a: "Não! O Design Master foi feito para qualquer pessoa. Os agentes de IA guiam você passo a passo — basta descrever o que quer e a IA cria para você." },
-  { q: "Quais modelos de IA são usados?", a: "Utilizamos os modelos mais avançados do mercado, incluindo Gemini e GPT, para garantir a máxima qualidade em todas as gerações." },
-  { q: "Posso cancelar a qualquer momento?", a: "Sim, sem compromisso. Cancele quando quiser diretamente nas configurações da sua conta, sem burocracia." },
-  { q: "As imagens geradas têm direitos autorais?", a: "Sim, todas as imagens geradas são suas. Você pode usar comercialmente sem restrições em qualquer plataforma." },
-  { q: "Funciona no celular?", a: "Sim! O Design Master é totalmente responsivo e funciona como PWA — instale no seu celular como um app nativo." },
-  { q: "Quantas ferramentas estão disponíveis?", a: "Atualmente temos 16+ ferramentas especializadas: geradores de imagem, agentes de conteúdo, restauração, upscale, mockups e muito mais." },
+  { q: "Preciso saber design para usar?", a: "Absolutamente NÃO. Se você sabe digitar, sabe usar. A IA faz todo o trabalho pesado — você só precisa dizer o que quer. É como ter um designer sênior 24/7 ao seu lado." },
+  { q: "E se eu não gostar?", a: "Impossível. Mas se acontecer, cancele quando quiser. Sem multa, sem burocracia, sem letras miúdas. Confiamos tanto no produto que não precisamos te prender." },
+  { q: "Quais modelos de IA são usados?", a: "Os mais avançados e caros do mercado — Gemini e GPT de última geração. Você tem acesso a tecnologia que custa milhares de dólares por mês, incluída no seu plano." },
+  { q: "As imagens são minhas para uso comercial?", a: "100% suas. Use em posts, anúncios, sites, impressão — onde quiser, como quiser, para sempre. Zero restrições." },
+  { q: "Funciona no celular?", a: "Funciona em qualquer lugar. Celular, tablet, computador. Instale como app nativo e crie conteúdo profissional até no ônibus." },
+  { q: "Quanto tempo leva para gerar uma imagem?", a: "Segundos. Literalmente. Enquanto seu concorrente abre o Photoshop, você já publicou 3 posts." },
 ];
 
 /* ─── MAIN ─── */
