@@ -697,15 +697,16 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              O Que Nossos Usuários{" "}
+              Resultados Reais de{" "}
               <motion.span
                 className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
                 animate={{ backgroundPosition: ["0% center", "200% center"] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
               >
-                Dizem
+                Pessoas Reais
               </motion.span>
             </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Não acredite em nós. Acredite em quem já está faturando com o Design Master.</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
