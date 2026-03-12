@@ -427,7 +427,8 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
           >
-            O Futuro do Design{" "}
+            O Futuro do Design
+            <br />
             <motion.span
               className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0% center", "200% center"] }}
