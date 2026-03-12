@@ -282,12 +282,12 @@ const testimonials = [
 
 const plans = [
   {
-    name: "Plano Mensal",
+    name: "Acesso Vitalício*",
     price: "R$ 69,99",
     originalPrice: "R$ 149,90",
     period: "/mês",
-    features: ["Gerações ilimitadas", "Todas as 16+ ferramentas", "Qualidade máxima (4K)", "Suporte prioritário", "Acesso à comunidade", "Novos recursos primeiro", "Cancele quando quiser"],
-    cta: "Assinar Agora",
+    features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
+    cta: "GARANTIR MEU ACESSO AGORA",
     popular: true,
     url: "https://pay.kiwify.com.br/7b1lH1a",
   },
