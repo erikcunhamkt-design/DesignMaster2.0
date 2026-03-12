@@ -357,12 +357,10 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <motion.img
+            <img
               src={logo3d}
               alt="Design Master"
               className="h-9 w-9 rounded-lg object-contain"
-              animate={{ rotateY: [0, 360] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
             />
             <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
               Design Master
