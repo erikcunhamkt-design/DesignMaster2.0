@@ -336,16 +336,12 @@ export default function LandingPage() {
       <ParticleField />
 
       {/* ─── ANIMATED GRADIENT MESH BG ─── */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <FloatingOrb className="w-[500px] h-[500px] bg-primary/10 top-[10%] left-[10%]" delay={0} />
-        <FloatingOrb className="w-[400px] h-[400px] bg-accent/8 top-[40%] right-[5%]" delay={3} />
-        <FloatingOrb className="w-[350px] h-[350px] bg-primary/6 bottom-[10%] left-[30%]" delay={6} />
-        {/* Scan line overlay */}
-        <motion.div
-          className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,hsl(var(--foreground)/0.015)_2px,hsl(var(--foreground)/0.015)_4px)]"
-          animate={{ backgroundPositionY: ["0px", "4px"] }}
-          transition={{ duration: 0.3, repeat: Infinity, ease: "linear" }}
-        />
+      <div className="fixed inset-0 pointer-events-none z-0 hidden md:block">
+        <FloatingOrb className="w-[400px] h-[400px] bg-primary/8 top-[10%] left-[10%]" />
+        <FloatingOrb className="w-[300px] h-[300px] bg-accent/6 top-[40%] right-[5%]" />
+        <FloatingOrb className="w-[250px] h-[250px] bg-primary/5 bottom-[10%] left-[30%]" />
+        {/* Static scan line overlay */}
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,hsl(var(--foreground)/0.01)_2px,hsl(var(--foreground)/0.01)_4px)]" />
       </div>
 
       {/* ─── NAVBAR ─── */}
