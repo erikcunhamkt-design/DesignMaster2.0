@@ -827,10 +827,10 @@ export default function LandingPage() {
           className="mx-auto max-w-2xl text-center"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Fique por Dentro das Novidades
+            A Última Chance é Agora
           </h2>
           <p className="text-muted-foreground mb-8">
-            Receba dicas, tutoriais e novos recursos antes de todo mundo.
+            O preço promocional não vai durar para sempre. Entre antes que suba.
           </p>
           <form
             onSubmit={(e) => {
