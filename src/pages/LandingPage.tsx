@@ -596,17 +596,17 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              16+ Ferramentas em{" "}
+              Seu Arsenal de{" "}
               <motion.span
                 className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
                 animate={{ backgroundPosition: ["0% center", "200% center"] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
               >
-                Um Só Lugar
+                Dominação
               </motion.span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Tudo que você precisa para criar conteúdo visual profissional.
+              Cada ferramenta é uma vantagem injusta sobre quem ainda faz design do jeito antigo.
             </p>
           </motion.div>
 
