@@ -283,8 +283,8 @@ const testimonials = [
 const plans = [
   {
     name: "Acesso Completo",
-    price: "R$ 14,99",
-    originalPrice: "R$ 69,99",
+    price: "R$ 69,99",
+    originalPrice: "R$ 149,90",
     period: "/mês",
     features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
     cta: "GARANTIR MEU ACESSO AGORA",

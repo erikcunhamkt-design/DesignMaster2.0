@@ -12,7 +12,7 @@ const plans = [
   {
     id: 'monthly',
     name: 'Mensal',
-    price: 'R$ 14,99/mês',
+    price: 'R$ 69,99/mês',
     url: 'https://pay.kiwify.com.br/7b1lH1a',
     highlight: true,
   },
@@ -149,8 +149,8 @@ const PaywallPage = () => {
             
             <div className="relative z-10 space-y-3">
               <h3 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">Assinatura Mensal</h3>
-              <p className="text-sm text-muted-foreground line-through">R$ 69,99/mês</p>
-              <p className="text-4xl font-extrabold text-primary font-['Space_Grotesk']">R$ 14,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
+              <p className="text-sm text-muted-foreground line-through">R$ 149,90/mês</p>
+              <p className="text-4xl font-extrabold text-primary font-['Space_Grotesk']">R$ 69,99<span className="text-sm font-normal text-muted-foreground">/mês</span></p>
               <div className="inline-block px-3 py-1 rounded-full bg-destructive/15 text-destructive text-xs font-semibold animate-pulse">
                 🔥 Oferta de Lançamento
               </div>
