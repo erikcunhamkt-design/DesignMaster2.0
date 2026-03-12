@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, Facebook, Twitter, Linkedin, Globe } from 'lucide-react';
+import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, Facebook, Twitter, Linkedin, Globe, ImagePlus, X } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -71,6 +71,10 @@ export default function PostSchedulerPage() {
   const [content, setContent] = useState('');
   const [platform, setPlatform] = useState('instagram');
   const [scheduledTime, setScheduledTime] = useState('10:00');
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -102,6 +106,34 @@ export default function PostSchedulerPage() {
     setLoading(false);
   };
 
+  const uploadMedia = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('scheduled-media').upload(path, file);
+    setUploading(false);
+    if (error) {
+      toast({ title: 'Erro no upload da imagem', variant: 'destructive' });
+      return null;
+    }
+    const { data: urlData } = supabase.storage.from('scheduled-media').getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaFile(file);
+    setMediaPreview(URL.createObjectURL(file));
+  };
+
+  const removeMedia = () => {
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSave = async () => {
     if (!user || !selectedDate) return;
     if (!title.trim()) {
@@ -113,6 +145,12 @@ export default function PostSchedulerPage() {
     const scheduledAt = new Date(selectedDate);
     scheduledAt.setHours(h, m, 0, 0);
 
+    let mediaUrl: string | null = editingPost?.media_url || null;
+    if (mediaFile) {
+      mediaUrl = await uploadMedia(mediaFile);
+      if (!mediaUrl && mediaFile) return; // upload failed
+    }
+
     if (editingPost) {
       const { error } = await supabase
         .from('scheduled_posts')
@@ -120,6 +158,7 @@ export default function PostSchedulerPage() {
           title, content, platform,
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
+          media_url: mediaUrl,
         })
         .eq('id', editingPost.id);
 
@@ -135,6 +174,7 @@ export default function PostSchedulerPage() {
           title, content, platform,
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
+          media_url: mediaUrl,
         });
 
       if (error) {
@@ -172,6 +212,7 @@ export default function PostSchedulerPage() {
           content: post.content,
           platform: post.platform,
           scheduled_at: post.scheduled_at,
+          media_url: post.media_url,
           timestamp: new Date().toISOString(),
         }),
       });
@@ -190,6 +231,9 @@ export default function PostSchedulerPage() {
     setPlatform('instagram');
     setScheduledTime('10:00');
     setEditingPost(null);
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const openEdit = (post: ScheduledPost) => {
@@ -197,6 +241,8 @@ export default function PostSchedulerPage() {
     setTitle(post.title);
     setContent(post.content);
     setPlatform(post.platform);
+    setMediaFile(null);
+    setMediaPreview(post.media_url || null);
     const d = new Date(post.scheduled_at);
     setScheduledTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
     setSelectedDate(d);
@@ -388,13 +434,43 @@ export default function PostSchedulerPage() {
                 <Input type="time" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} />
               </div>
             </div>
+            {/* Image upload */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Imagem do post</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              {mediaPreview ? (
+                <div className="relative mt-1 rounded-lg overflow-hidden border border-border">
+                  <img src={mediaPreview} alt="Preview" className="w-full h-32 object-cover" />
+                  <button
+                    onClick={removeMedia}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-background/80 hover:bg-background text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-1 w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border p-4 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Adicionar imagem
+                </button>
+              )}
+            </div>
             {selectedDate && (
               <p className="text-xs text-muted-foreground">
                 📅 {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} às {scheduledTime}
               </p>
             )}
-            <Button onClick={handleSave} className="w-full">
-              {editingPost ? 'Atualizar' : 'Agendar Post'} 🚀
+            <Button onClick={handleSave} disabled={uploading} className="w-full">
+              {uploading ? 'Enviando imagem...' : (editingPost ? 'Atualizar' : 'Agendar Post')} 🚀
             </Button>
           </div>
         </DialogContent>
