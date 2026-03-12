@@ -69,7 +69,7 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
           />
         </div>
 
-        {/* Logo */}
+        {/* App Name with sweep */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98, filter: 'blur(8px)' }}
           animate={{
@@ -78,15 +78,15 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
             filter: phase === 'in' ? 'blur(8px)' : 'blur(0px)',
           }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative select-none flex flex-col items-center gap-4"
+          className="relative select-none flex flex-col items-center gap-2"
         >
-          <img src={logo3d} alt="Design Master" className="h-24 md:h-32 w-auto object-contain" />
-
-          {/* Text with light sweep */}
           <div className="relative overflow-hidden">
             <h1
-              className="text-2xl md:text-3xl font-bold tracking-wider"
-              style={{ color: 'hsl(var(--primary))' }}
+              className="text-6xl md:text-8xl font-black tracking-tight"
+              style={{
+                color: 'hsl(var(--primary))',
+                textShadow: '0 0 40px hsl(var(--primary) / 0.4), 0 0 80px hsl(var(--primary) / 0.2)',
+              }}
             >
               Design Master
             </h1>
@@ -94,11 +94,11 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
               <motion.div
                 initial={{ left: '-30%' }}
                 animate={{ left: '130%' }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
                 className="absolute inset-y-0 w-[40%] pointer-events-none"
                 style={{
                   background:
-                    'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), transparent)',
+                    'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent)',
                 }}
               />
             )}
