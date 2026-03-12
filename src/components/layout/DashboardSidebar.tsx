@@ -229,7 +229,7 @@ export function MobileSidebarTrigger({
       </SheetTrigger>
       <SheetContent side="left" className="w-[260px] p-0 bg-sidebar border-r border-border/40">
         <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border/30">
-          <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
+          <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-full object-cover" />
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
             Design<span className="text-gradient">Master</span>
           </span>
