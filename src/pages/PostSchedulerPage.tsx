@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, ImagePlus, X, Images, Image as ImageIcon } from 'lucide-react';
+import { CalendarDays, Plus, Clock, Trash2, Edit2, Send, Link2, Instagram, ImagePlus, X, Images, Image as ImageIcon, Hash } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -56,6 +56,7 @@ export default function PostSchedulerPage() {
   const [content, setContent] = useState('');
   const [scheduledTime, setScheduledTime] = useState('10:00');
   const [postType, setPostType] = useState<PostType>('single');
+  const [hashtags, setHashtags] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -163,11 +164,16 @@ export default function PostSchedulerPage() {
     // Store as JSON array of URLs
     const mediaUrlJson = mediaUrls.length > 0 ? JSON.stringify(mediaUrls) : null;
 
+    // Concatenate hashtags to content for the webhook
+    const fullContent = hashtags.trim()
+      ? `${content}\n\n${hashtags.trim()}`
+      : content;
+
     if (editingPost) {
       const { error } = await supabase
         .from('scheduled_posts')
         .update({
-          title, content, platform: 'instagram',
+          title, content: fullContent, platform: 'instagram',
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
           media_url: mediaUrlJson,
@@ -184,7 +190,7 @@ export default function PostSchedulerPage() {
         .from('scheduled_posts')
         .insert({
           user_id: user.id,
-          title, content, platform: 'instagram',
+          title, content: fullContent, platform: 'instagram',
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
           media_url: mediaUrlJson,
@@ -230,6 +236,7 @@ export default function PostSchedulerPage() {
     const images = parseMediaUrls(post.media_url);
 
     try {
+      // Content already has hashtags concatenated when saved
       await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -237,6 +244,7 @@ export default function PostSchedulerPage() {
         body: JSON.stringify({
           title: post.title,
           content: post.content,
+          caption: post.content,
           platform: 'instagram',
           post_type: images.length > 1 ? 'carousel' : 'single',
           scheduled_at: post.scheduled_at,
@@ -258,6 +266,7 @@ export default function PostSchedulerPage() {
   const resetForm = () => {
     setTitle('');
     setContent('');
+    setHashtags('');
     setScheduledTime('10:00');
     setPostType('single');
     setEditingPost(null);
@@ -269,7 +278,15 @@ export default function PostSchedulerPage() {
   const openEdit = (post: ScheduledPost) => {
     setEditingPost(post);
     setTitle(post.title);
-    setContent(post.content);
+    // Split content and hashtags
+    const parts = post.content.split(/\n\n(#)/);
+    if (parts.length > 1) {
+      setContent(parts[0]);
+      setHashtags('#' + parts.slice(1).join(''));
+    } else {
+      setContent(post.content);
+      setHashtags('');
+    }
     setMediaFiles([]);
     const urls = parseMediaUrls(post.media_url);
     setMediaPreviews(urls);
@@ -506,6 +523,17 @@ export default function PostSchedulerPage() {
             <div>
               <label className="text-xs font-medium text-muted-foreground">Legenda</label>
               <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Escreva a legenda do post..." rows={3} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Hash className="h-3 w-3" /> Hashtags
+              </label>
+              <Input
+                value={hashtags}
+                onChange={(e) => setHashtags(e.target.value)}
+                placeholder="#design #instagram #marketing"
+              />
+              <p className="text-[10px] text-muted-foreground mt-0.5">Separadas por espaço. Serão adicionadas ao final da legenda.</p>
             </div>
 
             <div>
