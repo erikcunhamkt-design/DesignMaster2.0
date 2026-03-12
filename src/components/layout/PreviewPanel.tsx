@@ -134,7 +134,7 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
   const DownloadIcon = downloadState === 'loading' ? Loader2 : downloadState === 'done' ? Check : Download;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-background relative">
+    <div className="flex flex-1 flex-col overflow-hidden bg-background relative min-h-[400px] md:min-h-0">
       {/* Cinematic ambient — subtle */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="ambient-glow w-[500px] h-[500px] bg-primary -top-60 left-1/4" style={{ opacity: 0.04 }} />
@@ -343,8 +343,8 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
               </>
             )}
 
-            {/* Download button(s) */}
-            <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ zIndex: 10 }}>
+            {/* Download button(s) — always visible on mobile, hover on desktop */}
+            <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" style={{ zIndex: 10 }}>
               {/* Download without watermark */}
               <button
                 onClick={() => handleDownload(false)}
