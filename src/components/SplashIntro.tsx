@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logo3d from '@/assets/logo-3d.png';
 
 const SESSION_KEY = 'ss_intro_seen';
 
