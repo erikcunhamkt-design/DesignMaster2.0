@@ -746,8 +746,8 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Invista no Seu Conteúdo</h2>
-            <p className="text-muted-foreground text-lg">Acesso completo a todas as ferramentas por um preço único.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Menos Que Um Cafezinho Por Dia</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
           </motion.div>
 
           <div className="max-w-md mx-auto">
