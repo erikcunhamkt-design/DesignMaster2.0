@@ -13,7 +13,7 @@ const plans = [
     id: 'monthly',
     name: 'Mensal',
     price: 'R$ 69,99/mês',
-    url: 'https://pay.kiwify.com.br/7b1lH1a',
+    url: 'https://pay.kiwify.com.br/XrNF9qi',
     highlight: true,
   },
 ];
