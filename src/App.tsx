@@ -35,7 +35,6 @@ const CarouselMasterChatPage = lazy(() => import("./pages/CarouselMasterChatPage
 const EditorialChatPage = lazy(() => import("./pages/EditorialChatPage"));
 const CalendarChatPage = lazy(() => import("./pages/CalendarChatPage"));
 const BioChatPage = lazy(() => import("./pages/BioChatPage"));
-const PostSchedulerPage = lazy(() => import("./pages/PostSchedulerPage"));
 const CommunityChatPage = lazy(() => import("./pages/CommunityChatPage"));
 const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -105,7 +104,6 @@ const App = () => {
               <Route path="/studio/editorial" element={<ProtectedRoute><EditorialChatPage /></ProtectedRoute>} />
               <Route path="/studio/calendar" element={<ProtectedRoute><CalendarChatPage /></ProtectedRoute>} />
               <Route path="/studio/bio" element={<ProtectedRoute><BioChatPage /></ProtectedRoute>} />
-              <Route path="/studio/post-scheduler" element={<ProtectedRoute><PostSchedulerPage /></ProtectedRoute>} />
               <Route path="/studio/community-chat" element={<ProtectedRoute><CommunityChatPage /></ProtectedRoute>} />
               <Route path="/studio/direct-messages" element={<ProtectedRoute><DirectMessagesPage /></ProtectedRoute>} />
               <Route path="/studio/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

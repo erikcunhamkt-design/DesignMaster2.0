@@ -44,9 +44,3 @@ verify_jwt = false
 
 [functions.chat-bio]
 verify_jwt = false
-
-[functions.dispatch-posts]
-verify_jwt = false
-
-[functions.test-webhook]
-verify_jwt = false
