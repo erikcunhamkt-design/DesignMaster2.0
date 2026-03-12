@@ -524,6 +524,17 @@ export default function PostSchedulerPage() {
               <label className="text-xs font-medium text-muted-foreground">Legenda</label>
               <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Escreva a legenda do post..." rows={3} />
             </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Hash className="h-3 w-3" /> Hashtags
+              </label>
+              <Input
+                value={hashtags}
+                onChange={(e) => setHashtags(e.target.value)}
+                placeholder="#design #instagram #marketing"
+              />
+              <p className="text-[10px] text-muted-foreground mt-0.5">Separadas por espaço. Serão adicionadas ao final da legenda.</p>
+            </div>
 
             <div>
               <label className="text-xs font-medium text-muted-foreground">Horário</label>
