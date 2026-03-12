@@ -396,7 +396,7 @@ export default function LandingPage() {
             <motion.a
               whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(var(--primary) / 0.4)" }}
               whileTap={{ scale: 0.95 }}
-              href="https://pay.kiwify.com.br/7b1lH1a"
+              href="https://pay.kiwify.com.br/XrNF9qi"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground transition-all"
