@@ -71,6 +71,10 @@ export default function PostSchedulerPage() {
   const [content, setContent] = useState('');
   const [platform, setPlatform] = useState('instagram');
   const [scheduledTime, setScheduledTime] = useState('10:00');
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
