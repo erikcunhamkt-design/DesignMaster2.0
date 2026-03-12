@@ -414,23 +414,23 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
           >
-            Crie Designs{" "}
+            Enquanto Você Hesita,{" "}
             <motion.span
               className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0% center", "200% center"] }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             >
-              Profissionais
+              Seu Concorrente
             </motion.span>{" "}
-            em Segundos
+            Já Está Criando
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Studio completo com 16+ ferramentas de IA para gerar imagens, mockups, carrosséis,
-            capas e conteúdo estratégico — sem precisar saber design.
+            Você ainda paga R$500+ por design ou perde horas tentando fazer sozinho?
+            Com o Design Master, você cria conteúdo de nível agência em segundos — mesmo sem saber nada de design.
           </motion.p>
 
           <motion.div
