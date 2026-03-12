@@ -748,7 +748,8 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Menos Que Um Cafezinho Por Dia</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-6">Você gasta mais com delivery do que com a ferramenta que vai transformar seu negócio.</p>
+            <CountdownTimer />
           </motion.div>
 
           <div className="max-w-md mx-auto">
