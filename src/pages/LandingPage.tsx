@@ -259,32 +259,32 @@ const scaleIn = {
 };
 
 const features = [
-  { icon: "🎨", name: "Design Master", desc: "Sua arma principal. Gere qualquer imagem profissional em segundos — sem Photoshop, sem Canva, sem desculpas." },
-  { icon: "🧠", name: "Creator Master", desc: "Um estrategista de conteúdo que nunca dorme. Ideias que viralizam enquanto sua concorrência ainda planeja." },
-  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis que prendem, vendem e convertem. Estrutura AIDA que transforma seguidores em clientes." },
-  { icon: "📰", name: "Estrategista Editorial", desc: "Pare de postar sem rumo. Linhas editoriais estratégicas que posicionam você como autoridade." },
+  { icon: "🎨", name: "Design Master", desc: "Sua ferramenta principal. Gere qualquer imagem profissional em segundos — sem Photoshop, sem Canva, sem complicação." },
+  { icon: "🧠", name: "Creator Master", desc: "Um estrategista de conteúdo que nunca dorme. Ideias que viralizam e posicionam você como referência." },
+  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis que prendem, educam e convertem. Estrutura AIDA que transforma seguidores em clientes." },
+  { icon: "📰", name: "Estrategista Editorial", desc: "Pare de postar sem rumo. Linhas editoriais estratégicas que posicionam você como autoridade no seu nicho." },
   { icon: "📅", name: "Calendário Master", desc: "15 dias de conteúdo planejado em 30 segundos. Nunca mais fique sem saber o que postar." },
   { icon: "🖥️", name: "Liga dos Heróis", desc: "Landing pages que convertem. Hero sections de nível internacional que impressionam até os mais exigentes." },
-  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups fotorrealistas que fazem seu produto parecer de um milhão de reais." },
-  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes esportivas que inflamam torcidas. Matchday, destaques e flyers de tirar o fôlego." },
-  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas brutais. O tipo de conteúdo que para o feed e gera compartilhamentos." },
-  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens selvagens em resolução absurda. Capas e posts que hipnotizam qualquer audiência." },
-  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Ressuscite fotos destruídas pelo tempo. IA que recria detalhes como se a foto fosse tirada ontem." },
-  { icon: "🔍", name: "Ultra Upscale", desc: "Amplie sem perder um pixel. Transforme imagens borradas em obras de arte em 4K." },
+  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups fotorrealistas que elevam a percepção de valor do seu produto instantaneamente." },
+  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes esportivas que inflamam torcidas. Matchday, destaques e flyers profissionais." },
+  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas de alto impacto. O tipo de conteúdo que para o feed e gera compartilhamentos." },
+  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens em resolução absurda que hipnotizam qualquer audiência. Perfeitas para capas e posts." },
+  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Ressuscite fotos danificadas pelo tempo. IA que recria detalhes como se a foto fosse tirada ontem." },
+  { icon: "🔍", name: "Ultra Upscale", desc: "Amplie sem perder qualidade. Transforme imagens comuns em obras de arte em 4K." },
 ];
 
 const testimonials = [
-  { name: "Lucas M.", role: "Designer Freelancer", text: "Larguei o Photoshop. Em 1 mês triplicei minha carteira de clientes. Design Master mudou minha vida profissional.", stars: 5 },
-  { name: "Amanda R.", role: "Social Media Manager", text: "Meus clientes acham que contratei uma equipe. São só eu e o Design Master. O engajamento explodiu 300%.", stars: 5 },
-  { name: "Rafael S.", role: "Dono de Agência", text: "Demitir o time de design não foi fácil. Mas entregar 10x mais rápido com qualidade superior? Não teve como competir.", stars: 5 },
+  { name: "Lucas M.", role: "Designer Freelancer", text: "Triplicei minha carteira de clientes em 1 mês. O Design Master me deu superpoderes que eu não sabia que existiam.", stars: 5 },
+  { name: "Amanda R.", role: "Social Media Manager", text: "Meus clientes acham que tenho uma equipe inteira. São só eu e o Design Master. O engajamento subiu 300%.", stars: 5 },
+  { name: "Rafael S.", role: "Dono de Agência", text: "Entregamos 10x mais rápido com qualidade superior. O ROI foi absurdo já no primeiro mês.", stars: 5 },
   { name: "Juliana P.", role: "Criadora de Conteúdo", text: "De 3 posts por semana para 3 por dia. Faturei R$12K a mais no primeiro mês usando os agentes de IA.", stars: 5 },
 ];
 
 const plans = [
   {
-    name: "Acesso Vitalício*",
-    price: "R$ 69,99",
-    originalPrice: "R$ 149,90",
+    name: "Acesso Completo",
+    price: "R$ 14,99",
+    originalPrice: "R$ 69,99",
     period: "/mês",
     features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
     cta: "GARANTIR MEU ACESSO AGORA",
@@ -414,23 +414,24 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
           >
-            Enquanto Você Hesita,{" "}
+            O Futuro do Design{" "}
             <motion.span
               className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0% center", "200% center"] }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             >
-              Seu Concorrente
-            </motion.span>{" "}
-            Já Está Criando
+              Já Chegou
+            </motion.span>
+            <br />
+            <span className="text-2xl md:text-4xl lg:text-5xl text-muted-foreground font-medium">E quem não se adaptar, fica para trás.</span>
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Você ainda paga R$500+ por design ou perde horas tentando fazer sozinho?
-            Com o Design Master, você cria conteúdo de nível agência em segundos — mesmo sem saber nada de design.
+            Imagine criar conteúdo de nível agência em segundos — sem depender de ninguém, sem ferramentas complicadas,
+            sem gastar uma fortuna. Isso não é futuro. São 2.500+ profissionais já fazendo isso agora.
           </motion.p>
 
           <motion.div
@@ -654,9 +655,9 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
             {[
-              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Diga o que quer em português mesmo. A IA entende você melhor que designer freelancer." },
-              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "Em segundos, não horas. Qualidade que faria qualquer agência cobrar R$500+." },
-              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Domine", desc: "Refine, ajuste e publique. Seu conteúdo, suas regras, seu lucro." },
+              { step: "01", icon: <PenTool className="h-6 w-6" />, title: "Descreva", desc: "Diga o que quer em português simples. A IA entende exatamente o que você precisa." },
+              { step: "02", icon: <Wand2 className="h-6 w-6" />, title: "Gere", desc: "Em segundos, não horas. Qualidade que rivalizaria com qualquer agência profissional." },
+              { step: "03", icon: <Zap className="h-6 w-6" />, title: "Publique", desc: "Refine, ajuste e publique. Seu conteúdo, suas regras, seus resultados." },
             ].map((s, i) => (
               <motion.div
                 key={s.step}
@@ -760,14 +761,16 @@ export default function LandingPage() {
                 >
                   {/* Animated border glow */}
                   <div className="relative z-10">
-                    <motion.span
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
-                      animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      🔥 53% OFF — Últimas Vagas
-                    </motion.span>
-                    <h3 className="font-bold text-xl mb-3 mt-2">{plan.name}</h3>
+                    <div className="flex justify-center mb-5">
+                      <motion.span
+                        className="px-5 py-1.5 text-xs font-bold bg-primary text-primary-foreground rounded-full"
+                        animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 25px hsl(var(--primary)/0.5)", "0 0 0px hsl(var(--primary)/0)"] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        🔥 53% OFF — Vagas Limitadas
+                      </motion.span>
+                    </div>
+                    <h3 className="font-bold text-xl mb-3">{plan.name}</h3>
                     <div className="mb-6">
                       {plan.originalPrice && (
                         <span className="text-muted-foreground text-lg line-through mr-2">{plan.originalPrice}</span>
