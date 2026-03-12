@@ -212,6 +212,7 @@ export default function PostSchedulerPage() {
           content: post.content,
           platform: post.platform,
           scheduled_at: post.scheduled_at,
+          media_url: post.media_url,
           timestamp: new Date().toISOString(),
         }),
       });
