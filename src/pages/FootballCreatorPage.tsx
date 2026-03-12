@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { FootballConfigPanel } from '@/components/football/FootballConfigPanel';
 import { FootballConfig, defaultFootballConfig } from '@/types/footballConfig';
 import { buildFootballRequest } from '@/core/prompt/FootballPromptAgent';
