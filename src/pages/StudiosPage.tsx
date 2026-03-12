@@ -49,6 +49,7 @@ const studioImages: Record<string, string> = {
   'calendar': calendarHero,
   'bio': bioHero,
   'community-chat': communityChatHero,
+  'post-scheduler': postSchedulerHero,
 };
 
 const sections = [
