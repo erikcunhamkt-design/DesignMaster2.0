@@ -106,6 +106,34 @@ export default function PostSchedulerPage() {
     setLoading(false);
   };
 
+  const uploadMedia = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('scheduled-media').upload(path, file);
+    setUploading(false);
+    if (error) {
+      toast({ title: 'Erro no upload da imagem', variant: 'destructive' });
+      return null;
+    }
+    const { data: urlData } = supabase.storage.from('scheduled-media').getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaFile(file);
+    setMediaPreview(URL.createObjectURL(file));
+  };
+
+  const removeMedia = () => {
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSave = async () => {
     if (!user || !selectedDate) return;
     if (!title.trim()) {
@@ -117,6 +145,12 @@ export default function PostSchedulerPage() {
     const scheduledAt = new Date(selectedDate);
     scheduledAt.setHours(h, m, 0, 0);
 
+    let mediaUrl: string | null = editingPost?.media_url || null;
+    if (mediaFile) {
+      mediaUrl = await uploadMedia(mediaFile);
+      if (!mediaUrl && mediaFile) return; // upload failed
+    }
+
     if (editingPost) {
       const { error } = await supabase
         .from('scheduled_posts')
@@ -124,6 +158,7 @@ export default function PostSchedulerPage() {
           title, content, platform,
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
+          media_url: mediaUrl,
         })
         .eq('id', editingPost.id);
 
@@ -139,6 +174,7 @@ export default function PostSchedulerPage() {
           title, content, platform,
           scheduled_at: scheduledAt.toISOString(),
           webhook_url: webhookUrl || null,
+          media_url: mediaUrl,
         });
 
       if (error) {
