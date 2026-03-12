@@ -199,31 +199,58 @@ const Index = () => {
         )}
       </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
         {mode === 'guiado' ? (
           <GuidedWizard />
         ) : (
           activeProject && (
             <>
-              <PreviewPanel
-                state={previewState}
-                imageUrl={generatedImage}
-                config={activeProject.config}
-                elapsedSeconds={elapsedSeconds}
-                estimatedSeconds={ESTIMATED_SECONDS}
-                onRefine={handleRefine}
-                isRefining={isRefining}
-              />
-              <ConfiguratorPanel
-                config={activeProject.config}
-                onUpdate={updateConfig}
-                onGenerate={handleGenerate}
-                isGenerating={isGenerating}
-                apiKey={apiKey}
-                aiModel={aiModel}
-                onModelChange={setAiModel}
-                onDuplicate={duplicateProject}
-              />
+              {/* On mobile: config first, then preview below */}
+              <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+                <ConfiguratorPanel
+                  config={activeProject.config}
+                  onUpdate={updateConfig}
+                  onGenerate={handleGenerate}
+                  isGenerating={isGenerating}
+                  apiKey={apiKey}
+                  aiModel={aiModel}
+                  onModelChange={setAiModel}
+                  onDuplicate={duplicateProject}
+                />
+                {(previewState === 'gerando' || previewState === 'concluido') && (
+                  <PreviewPanel
+                    state={previewState}
+                    imageUrl={generatedImage}
+                    config={activeProject.config}
+                    elapsedSeconds={elapsedSeconds}
+                    estimatedSeconds={ESTIMATED_SECONDS}
+                    onRefine={handleRefine}
+                    isRefining={isRefining}
+                  />
+                )}
+              </div>
+              {/* Desktop: side by side */}
+              <div className="hidden md:flex flex-1 overflow-hidden">
+                <PreviewPanel
+                  state={previewState}
+                  imageUrl={generatedImage}
+                  config={activeProject.config}
+                  elapsedSeconds={elapsedSeconds}
+                  estimatedSeconds={ESTIMATED_SECONDS}
+                  onRefine={handleRefine}
+                  isRefining={isRefining}
+                />
+                <ConfiguratorPanel
+                  config={activeProject.config}
+                  onUpdate={updateConfig}
+                  onGenerate={handleGenerate}
+                  isGenerating={isGenerating}
+                  apiKey={apiKey}
+                  aiModel={aiModel}
+                  onModelChange={setAiModel}
+                  onDuplicate={duplicateProject}
+                />
+              </div>
             </>
           )
         )}

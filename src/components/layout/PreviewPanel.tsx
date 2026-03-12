@@ -343,8 +343,8 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
               </>
             )}
 
-            {/* Download button(s) */}
-            <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ zIndex: 10 }}>
+            {/* Download button(s) — always visible on mobile, hover on desktop */}
+            <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" style={{ zIndex: 10 }}>
               {/* Download without watermark */}
               <button
                 onClick={() => handleDownload(false)}

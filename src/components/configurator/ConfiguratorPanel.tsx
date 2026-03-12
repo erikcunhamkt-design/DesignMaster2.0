@@ -154,7 +154,7 @@ export function ConfiguratorPanel({ config, onUpdate, onGenerate, isGenerating, 
   const scenarioSubtitle = config.niche ? config.niche : 'Nicho não definido';
 
   return (
-    <div className="flex w-[400px] shrink-0 flex-col border-l border-border/10 bg-background/50">
+    <div className="flex w-full md:w-[400px] shrink-0 flex-col md:border-l border-border/10 bg-background/50">
       {/* Blocks */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
 
