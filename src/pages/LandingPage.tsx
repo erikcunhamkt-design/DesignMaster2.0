@@ -451,7 +451,7 @@ export default function LandingPage() {
                 animate={{ x: ["-200%", "200%"] }}
                 transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
               />
-              <span className="relative z-10">Assinar Agora</span>
+              <span className="relative z-10">Quero Dominar Agora →</span>
               <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
             </motion.a>
             <motion.a
@@ -460,7 +460,7 @@ export default function LandingPage() {
               whileHover={{ scale: 1.03, borderColor: "hsl(var(--primary) / 0.3)" }}
               whileTap={{ scale: 0.97 }}
             >
-              Ver Ferramentas
+              Ver o Arsenal Completo
             </motion.a>
           </motion.div>
 
