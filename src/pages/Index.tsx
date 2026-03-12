@@ -227,14 +227,16 @@ const Index = () => {
                 />
                 {(previewState === 'gerando' || previewState === 'concluido') && (
                   <div ref={mobilePreviewRef}>
-                    state={previewState}
-                    imageUrl={generatedImage}
-                    config={activeProject.config}
-                    elapsedSeconds={elapsedSeconds}
-                    estimatedSeconds={ESTIMATED_SECONDS}
-                    onRefine={handleRefine}
-                    isRefining={isRefining}
-                  />
+                    <PreviewPanel
+                      state={previewState}
+                      imageUrl={generatedImage}
+                      config={activeProject.config}
+                      elapsedSeconds={elapsedSeconds}
+                      estimatedSeconds={ESTIMATED_SECONDS}
+                      onRefine={handleRefine}
+                      isRefining={isRefining}
+                    />
+                  </div>
                 )}
               </div>
               {/* Desktop: side by side */}
