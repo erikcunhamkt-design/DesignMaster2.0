@@ -870,7 +870,7 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Perguntas Frequentes</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Ainda Tem Dúvidas?</h2>
           </motion.div>
 
           <div className="space-y-3">
