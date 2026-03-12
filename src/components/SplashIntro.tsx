@@ -84,11 +84,11 @@ export const SplashIntro = ({ onComplete }: { onComplete: () => void }) => {
             <h1
               className="text-6xl md:text-8xl font-black tracking-tight"
               style={{
-                color: 'hsl(var(--primary))',
                 textShadow: '0 0 40px hsl(var(--primary) / 0.4), 0 0 80px hsl(var(--primary) / 0.2)',
               }}
             >
-              Design Master
+              <span style={{ color: 'hsl(var(--foreground))' }}>Design</span>
+              <span style={{ color: 'hsl(var(--primary))' }}>Master</span>
             </h1>
             {(phase === 'sweep' || phase === 'out') && (
               <motion.div
