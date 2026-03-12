@@ -360,7 +360,7 @@ export default function LandingPage() {
             <img
               src={logo3d}
               alt="Design Master"
-              className="h-9 w-9 rounded-lg object-contain"
+              className="h-9 w-9 rounded-full object-cover"
             />
             <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
               Design Master
@@ -933,7 +933,7 @@ export default function LandingPage() {
       <footer className="border-t border-border/10 py-12 px-6 relative z-10">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
           <motion.div className="flex items-center gap-3" whileHover={{ scale: 1.05 }}>
-            <img src={logo3d} alt="Design Master" className="h-8 w-8 rounded-lg object-contain" />
+            <img src={logo3d} alt="Design Master" className="h-8 w-8 rounded-full object-cover" />
             <span className="font-bold">Design Master</span>
           </motion.div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
