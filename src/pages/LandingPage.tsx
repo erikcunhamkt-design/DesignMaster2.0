@@ -251,7 +251,7 @@ const plans = [
     features: ["Gerações ILIMITADAS (sim, ilimitadas)", "16+ ferramentas premium liberadas", "Qualidade 4K — nível profissional", "Suporte VIP prioritário", "Comunidade exclusiva de criadores", "Novos recursos antes de todo mundo", "Cancele quando quiser, sem burocracia"],
     cta: "GARANTIR MEU ACESSO AGORA",
     popular: true,
-    url: "https://pay.kiwify.com.br/7b1lH1a",
+    url: "https://pay.kiwify.com.br/XrNF9qi",
   },
 ];
 
@@ -396,7 +396,7 @@ export default function LandingPage() {
             <motion.a
               whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(var(--primary) / 0.4)" }}
               whileTap={{ scale: 0.95 }}
-              href="https://pay.kiwify.com.br/7b1lH1a"
+              href="https://pay.kiwify.com.br/XrNF9qi"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground transition-all"
@@ -452,7 +452,7 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <motion.a
-              href="https://pay.kiwify.com.br/7b1lH1a"
+              href="https://pay.kiwify.com.br/XrNF9qi"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg overflow-hidden"
