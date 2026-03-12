@@ -244,10 +244,6 @@ function MockupDemo() {
     </>
   );
 }
-      </AnimatePresence>
-    </div>
-  );
-}
 
 
 const cubicEase: Easing = [0.22, 1, 0.36, 1];
