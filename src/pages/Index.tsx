@@ -207,7 +207,7 @@ const Index = () => {
           activeProject && (
             <>
               {/* On mobile: config first, then preview below */}
-              <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+              <div className="md:hidden flex flex-col flex-1 overflow-y-auto pb-20">
                 <ConfiguratorPanel
                   config={activeProject.config}
                   onUpdate={updateConfig}

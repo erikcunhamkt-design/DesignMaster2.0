@@ -296,7 +296,7 @@ export default function MockupStudioPage() {
 
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
-        <div className="md:hidden flex flex-col flex-1 overflow-y-auto">
+        <div className="md:hidden flex flex-col flex-1 overflow-y-auto pb-20">
           <MockupConfigPanel
             config={config}
             onUpdate={updateConfig}
