@@ -645,8 +645,8 @@ export default function LandingPage() {
             variants={fadeUp} custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Como Funciona</h2>
-            <p className="text-muted-foreground text-lg">Três passos para resultados profissionais.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Tão Simples que Dói</h2>
+            <p className="text-muted-foreground text-lg">Enquanto outros complicam, você cria. Em 3 passos.</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
