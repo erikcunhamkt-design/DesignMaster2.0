@@ -148,13 +148,18 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 
 /* ─── TYPING DEMO ─── */
 function TypingDemo() {
-  const text = "Empresário confiante em escritório moderno, iluminação cinematográfica, estilo editorial premium";
+  const [textIndex, setTextIndex] = useState(0);
+  const text = demoLabels[textIndex];
   const [displayed, setDisplayed] = useState("");
   const [charIndex, setCharIndex] = useState(0);
 
   useEffect(() => {
     if (charIndex >= text.length) {
-      const reset = setTimeout(() => { setDisplayed(""); setCharIndex(0); }, 3000);
+      const reset = setTimeout(() => {
+        setDisplayed("");
+        setCharIndex(0);
+        setTextIndex((prev) => (prev + 1) % demoLabels.length);
+      }, 3000);
       return () => clearTimeout(reset);
     }
     const timeout = setTimeout(() => {
@@ -165,7 +170,7 @@ function TypingDemo() {
   }, [charIndex, text]);
 
   return (
-    <div className="text-sm text-foreground min-h-[20px]">
+    <div className="text-xs md:text-sm text-foreground min-h-[20px]">
       {displayed}
       <motion.span
         className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
