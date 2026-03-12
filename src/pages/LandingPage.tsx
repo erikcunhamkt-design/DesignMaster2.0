@@ -221,21 +221,15 @@ function MockupDemo() {
               </motion.div>
             )}
             {phase === "done" && (
-              <motion.div key={`done-${imageIndex}`} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }} className="flex flex-col items-center gap-3">
-                <motion.div
-                  className="w-28 h-28 md:w-48 md:h-48 rounded-xl overflow-hidden border border-primary/20 relative"
-                  animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" />
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/80 to-transparent p-2">
-                    <p className="text-[10px] text-foreground font-medium text-center">{demoLabels[imageIndex]}</p>
+              <motion.div key={`done-${imageIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }} className="absolute inset-0">
+                <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/90 to-transparent p-3 flex items-end justify-between">
+                  <p className="text-[10px] md:text-xs text-foreground font-medium">{demoLabels[imageIndex]}</p>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download 4K</span>
+                    <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
                   </div>
-                </motion.div>
-                <motion.div className="flex gap-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                  <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download 4K</span>
-                  <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
-                </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
