@@ -1,5 +1,6 @@
-import { Compass, PenTool, Image, Zap } from 'lucide-react';
+import { Compass, PenTool, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import logo3d from '@/assets/logo-3d.png';
 
 interface AppSidebarProps {
   activePage: 'explorar' | 'criar' | 'galeria';
