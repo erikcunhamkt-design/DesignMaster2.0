@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import type { Easing } from "framer-motion";
 import {
@@ -22,30 +22,25 @@ const demoLabels = [
   "Lata de Sprite gelada no balde de gelo com limões frescos",
 ];
 
-/* ─── PARTICLE FIELD ─── */
+/* ─── PARTICLE FIELD (lightweight) ─── */
 function ParticleField() {
-  const particles = Array.from({ length: 50 }, (_, i) => ({
+  const particles = Array.from({ length: 15 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 20 + 10,
+    size: Math.random() * 2 + 1,
+    duration: Math.random() * 25 + 15,
     delay: Math.random() * 5,
   }));
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden md:block">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-primary/30"
+          className="absolute rounded-full bg-primary/20"
           style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
-          animate={{
-            y: [0, -30, 0, 20, 0],
-            x: [0, 15, -10, 5, 0],
-            opacity: [0.2, 0.6, 0.3, 0.7, 0.2],
-            scale: [1, 1.5, 0.8, 1.2, 1],
-          }}
+          animate={{ y: [0, -20, 0], opacity: [0.1, 0.4, 0.1] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
         />
       ))}
@@ -53,18 +48,10 @@ function ParticleField() {
   );
 }
 
-/* ─── FLOATING ORB ─── */
-function FloatingOrb({ className, delay = 0 }: { className: string; delay?: number }) {
+/* ─── FLOATING ORB (CSS-only animation) ─── */
+function FloatingOrb({ className }: { className: string }) {
   return (
-    <motion.div
-      className={`absolute rounded-full blur-[80px] pointer-events-none ${className}`}
-      animate={{
-        scale: [1, 1.3, 0.9, 1.15, 1],
-        x: [0, 40, -20, 30, 0],
-        y: [0, -30, 20, -15, 0],
-      }}
-      transition={{ duration: 15, repeat: Infinity, delay, ease: "easeInOut" }}
-    />
+    <div className={`absolute rounded-full blur-[60px] pointer-events-none animate-breathe ${className}`} />
   );
 }
 
@@ -85,34 +72,9 @@ function GlitchText({ children, className }: { children: string; className?: str
   );
 }
 
-/* ─── TILT CARD ─── */
+/* ─── TILT CARD (desktop only, simplified) ─── */
 function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 200, damping: 20 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 200, damping: 20 });
-
-  const handleMouse = (e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleLeave = () => { x.set(0); y.set(0); };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={handleLeave}
-      style={{ rotateX, rotateY, transformPerspective: 800 }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 /* ─── COUNTER ─── */
@@ -222,7 +184,7 @@ function MockupDemo() {
             )}
             {phase === "done" && (
               <motion.div key={`done-${imageIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }} className="absolute inset-0">
-                <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" />
+                <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" loading="lazy" />
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/90 to-transparent p-3 flex items-end justify-between">
                   <p className="text-[10px] md:text-xs text-foreground font-medium">{demoLabels[imageIndex]}</p>
                   <div className="flex gap-2">
@@ -374,16 +336,12 @@ export default function LandingPage() {
       <ParticleField />
 
       {/* ─── ANIMATED GRADIENT MESH BG ─── */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <FloatingOrb className="w-[500px] h-[500px] bg-primary/10 top-[10%] left-[10%]" delay={0} />
-        <FloatingOrb className="w-[400px] h-[400px] bg-accent/8 top-[40%] right-[5%]" delay={3} />
-        <FloatingOrb className="w-[350px] h-[350px] bg-primary/6 bottom-[10%] left-[30%]" delay={6} />
-        {/* Scan line overlay */}
-        <motion.div
-          className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,hsl(var(--foreground)/0.015)_2px,hsl(var(--foreground)/0.015)_4px)]"
-          animate={{ backgroundPositionY: ["0px", "4px"] }}
-          transition={{ duration: 0.3, repeat: Infinity, ease: "linear" }}
-        />
+      <div className="fixed inset-0 pointer-events-none z-0 hidden md:block">
+        <FloatingOrb className="w-[400px] h-[400px] bg-primary/8 top-[10%] left-[10%]" />
+        <FloatingOrb className="w-[300px] h-[300px] bg-accent/6 top-[40%] right-[5%]" />
+        <FloatingOrb className="w-[250px] h-[250px] bg-primary/5 bottom-[10%] left-[30%]" />
+        {/* Static scan line overlay */}
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,hsl(var(--foreground)/0.01)_2px,hsl(var(--foreground)/0.01)_4px)]" />
       </div>
 
       {/* ─── NAVBAR ─── */}
@@ -399,12 +357,10 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <motion.img
+            <img
               src={logo3d}
               alt="Design Master"
               className="h-9 w-9 rounded-lg object-contain"
-              animate={{ rotateY: [0, 360] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
             />
             <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
               Design Master
