@@ -35,6 +35,7 @@ const CarouselMasterChatPage = lazy(() => import("./pages/CarouselMasterChatPage
 const EditorialChatPage = lazy(() => import("./pages/EditorialChatPage"));
 const CalendarChatPage = lazy(() => import("./pages/CalendarChatPage"));
 const BioChatPage = lazy(() => import("./pages/BioChatPage"));
+const PostSchedulerPage = lazy(() => import("./pages/PostSchedulerPage"));
 const CommunityChatPage = lazy(() => import("./pages/CommunityChatPage"));
 const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
