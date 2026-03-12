@@ -17,7 +17,14 @@ export default function RestorePhotoPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [colorize, setColorize] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const mobileResultRef = useRef<HTMLDivElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'restored-photo');
+
+  useEffect(() => {
+    if (isProcessing && mobileResultRef.current) {
+      setTimeout(() => mobileResultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }, [isProcessing]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
