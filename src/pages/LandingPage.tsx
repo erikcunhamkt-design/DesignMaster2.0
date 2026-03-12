@@ -7,12 +7,20 @@ import {
   Star, ArrowRight, Check, PenTool,
 } from "lucide-react";
 import logo3d from "@/assets/logo-3d.png";
-import demoResult1 from "@/assets/demo/demo-result-1.jpg";
-import demoResult2 from "@/assets/demo/demo-result-2.jpg";
-import demoResult3 from "@/assets/demo/demo-result-3.jpg";
+import demoMockup1 from "@/assets/demo/demo-mockup-1.png";
+import demoMockup2 from "@/assets/demo/demo-mockup-2.png";
+import demoMockup3 from "@/assets/demo/demo-mockup-3.png";
+import demoMockup4 from "@/assets/demo/demo-mockup-4.png";
+import demoMockup5 from "@/assets/demo/demo-mockup-5.png";
 
-const demoImages = [demoResult1, demoResult2, demoResult3];
-const demoLabels = ["Retrato Editorial", "Mockup de Produto", "Post para Instagram"];
+const demoImages = [demoMockup1, demoMockup2, demoMockup3, demoMockup4, demoMockup5];
+const demoLabels = [
+  "Empresário futurista com óculos neon e notas em chamas",
+  "Retrato cinematográfico com espelhos quebrados e arame farpado",
+  "Homem na praia com coco, pôr do sol e arranha-céus ao fundo",
+  "Filhote de tigre bebendo água na selva com beija-flores",
+  "Lata de Sprite gelada no balde de gelo com limões frescos",
+];
 
 /* ─── PARTICLE FIELD ─── */
 function ParticleField() {
