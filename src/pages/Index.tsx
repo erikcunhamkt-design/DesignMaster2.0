@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
