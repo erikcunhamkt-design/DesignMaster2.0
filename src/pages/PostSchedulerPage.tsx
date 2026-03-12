@@ -240,6 +240,8 @@ export default function PostSchedulerPage() {
     setTitle(post.title);
     setContent(post.content);
     setPlatform(post.platform);
+    setMediaFile(null);
+    setMediaPreview(post.media_url || null);
     const d = new Date(post.scheduled_at);
     setScheduledTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
     setSelectedDate(d);
