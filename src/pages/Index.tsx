@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
 import { PreviewPanel } from '@/components/layout/PreviewPanel';
 import { ConfiguratorPanel } from '@/components/configurator/ConfiguratorPanel';
