@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import logoImg from '@/assets/logo.png';
+import logo3d from '@/assets/logo-3d.png';
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +23,7 @@ const AuthPage = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success('Login realizado com sucesso!');
+        navigate('/');
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -41,7 +44,7 @@ const AuthPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-4">
-          <img src={logoImg} alt="Design Master" className="h-12 w-12 rounded-full object-cover" />
+          <img src={logo3d} alt="Design Master" className="h-12 w-12 rounded-full object-cover" />
           <h1 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">
             {isLogin ? 'Entrar' : 'Criar Conta'}
           </h1>
