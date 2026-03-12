@@ -261,7 +261,7 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
       )}
     >
       <div className={cn('flex items-center gap-2.5 px-4 h-16 border-b border-border/30', collapsed && 'justify-center px-0')}>
-        <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
+        <img src={logo3d} alt="DesignMaster" className="h-8 w-8 shrink-0 rounded-full object-cover" />
         {!collapsed && (
           <span className="font-display text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
             Design<span className="text-gradient">Master</span>
