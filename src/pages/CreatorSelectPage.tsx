@@ -1,6 +1,6 @@
 import { creators } from '@/data/creators';
 import { CreatorCard } from '@/components/CreatorCard';
-import { Zap } from 'lucide-react';
+import logo3d from '@/assets/logo-3d.png';
 
 export default function CreatorSelectPage() {
   return (
@@ -19,9 +19,7 @@ export default function CreatorSelectPage() {
       {/* Top bar */}
       <header className="relative z-10 flex h-16 w-full items-center px-8 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow-sm">
-            <Zap className="h-5 w-5" />
-          </div>
+          <img src={logo3d} alt="Design Master" className="h-10 w-10 rounded-lg object-contain" />
           <span className="font-display text-lg font-bold tracking-tight text-foreground">
             Spark<span className="text-gradient">Snap</span>
           </span>
