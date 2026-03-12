@@ -165,8 +165,8 @@ function MockupDemo() {
       </div>
 
       {/* Result area */}
-      <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative">
-        <div className="flex items-center justify-center h-full min-h-[140px] md:min-h-[180px] relative">
+      <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative aspect-[16/10]">
+        <div className="flex items-center justify-center h-full w-full relative">
           <AnimatePresence mode="wait">
             {phase === "typing" && (
               <motion.p key="idle" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} className="text-xs text-muted-foreground">
