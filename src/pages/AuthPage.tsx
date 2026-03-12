@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import logo3d from '@/assets/logo-3d.png';
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
