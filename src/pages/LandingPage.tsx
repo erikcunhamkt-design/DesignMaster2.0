@@ -259,18 +259,18 @@ const scaleIn = {
 };
 
 const features = [
-  { icon: "🎨", name: "Design Master", desc: "Gerador principal com controles avançados de composição, iluminação e estilo." },
-  { icon: "🧠", name: "Creator Master", desc: "Chat especialista em design, viralização e ideias magnéticas para Instagram." },
-  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis de alto impacto com headlines magnéticas e estrutura AIDA." },
-  { icon: "📰", name: "Estrategista Editorial", desc: "Linhas editoriais estratégicas com pilares de conteúdo e posicionamento." },
-  { icon: "📅", name: "Calendário Master", desc: "Calendários de conteúdo quinzenais com organização e ideias de posts." },
-  { icon: "🖥️", name: "Liga dos Heróis", desc: "Hero sections premium para landing pages comparáveis às melhores marcas." },
-  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups realistas de produtos, embalagens e dispositivos." },
-  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes de futebol profissionais — matchday, jogador destaque e flyers." },
-  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas de alta performance com IA." },
-  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens com animais em alta resolução e acabamento premium." },
-  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Restaure fotos antigas com IA — riscos, manchas e colorização." },
-  { icon: "🔍", name: "Ultra Upscale", desc: "Ampliação inteligente com preservação total da qualidade." },
+  { icon: "🎨", name: "Design Master", desc: "Sua arma principal. Gere qualquer imagem profissional em segundos — sem Photoshop, sem Canva, sem desculpas." },
+  { icon: "🧠", name: "Creator Master", desc: "Um estrategista de conteúdo que nunca dorme. Ideias que viralizam enquanto sua concorrência ainda planeja." },
+  { icon: "🎠", name: "Carrossel Master", desc: "Carrosséis que prendem, vendem e convertem. Estrutura AIDA que transforma seguidores em clientes." },
+  { icon: "📰", name: "Estrategista Editorial", desc: "Pare de postar sem rumo. Linhas editoriais estratégicas que posicionam você como autoridade." },
+  { icon: "📅", name: "Calendário Master", desc: "15 dias de conteúdo planejado em 30 segundos. Nunca mais fique sem saber o que postar." },
+  { icon: "🖥️", name: "Liga dos Heróis", desc: "Landing pages que convertem. Hero sections de nível internacional que impressionam até os mais exigentes." },
+  { icon: "📦", name: "Laboratório de Mockups", desc: "Mockups fotorrealistas que fazem seu produto parecer de um milhão de reais." },
+  { icon: "🏟️", name: "Clube das Lendas", desc: "Artes esportivas que inflamam torcidas. Matchday, destaques e flyers de tirar o fôlego." },
+  { icon: "🏎️", name: "Velozes & Imortais", desc: "Artes automotivas brutais. O tipo de conteúdo que para o feed e gera compartilhamentos." },
+  { icon: "🦁", name: "Animais Fantásticos", desc: "Imagens selvagens em resolução absurda. Capas e posts que hipnotizam qualquer audiência." },
+  { icon: "🖼️", name: "Restaurador de Fotos", desc: "Ressuscite fotos destruídas pelo tempo. IA que recria detalhes como se a foto fosse tirada ontem." },
+  { icon: "🔍", name: "Ultra Upscale", desc: "Amplie sem perder um pixel. Transforme imagens borradas em obras de arte em 4K." },
 ];
 
 const testimonials = [
