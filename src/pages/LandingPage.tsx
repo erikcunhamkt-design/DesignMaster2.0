@@ -146,133 +146,104 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
   return <span ref={ref}>{count.toLocaleString("pt-BR")}{suffix}</span>;
 }
 
-/* ─── TYPING DEMO ─── */
-function TypingDemo() {
-  const [textIndex, setTextIndex] = useState(0);
-  const text = demoLabels[textIndex];
+/* ─── UNIFIED MOCKUP DEMO ─── */
+function MockupDemo() {
+  const [imageIndex, setImageIndex] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "generating" | "done">("typing");
   const [displayed, setDisplayed] = useState("");
   const [charIndex, setCharIndex] = useState(0);
+  const text = demoLabels[imageIndex];
 
+  // Typing phase
   useEffect(() => {
+    if (phase !== "typing") return;
     if (charIndex >= text.length) {
-      const reset = setTimeout(() => {
-        setDisplayed("");
-        setCharIndex(0);
-        setTextIndex((prev) => (prev + 1) % demoLabels.length);
-      }, 3000);
-      return () => clearTimeout(reset);
+      const t = setTimeout(() => setPhase("generating"), 1200);
+      return () => clearTimeout(t);
     }
-    const timeout = setTimeout(() => {
+    const t = setTimeout(() => {
       setDisplayed(text.slice(0, charIndex + 1));
       setCharIndex((i) => i + 1);
-    }, 40);
-    return () => clearTimeout(timeout);
-  }, [charIndex, text]);
+    }, 35);
+    return () => clearTimeout(t);
+  }, [charIndex, text, phase]);
+
+  // Generating → done
+  useEffect(() => {
+    if (phase !== "generating") return;
+    const t = setTimeout(() => setPhase("done"), 3500);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // Done → next cycle
+  useEffect(() => {
+    if (phase !== "done") return;
+    const t = setTimeout(() => {
+      setImageIndex((prev) => (prev + 1) % demoImages.length);
+      setCharIndex(0);
+      setDisplayed("");
+      setPhase("typing");
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [phase]);
 
   return (
-    <div className="text-xs md:text-sm text-foreground min-h-[20px]">
-      {displayed}
-      <motion.span
-        className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-        animate={{ opacity: [1, 0] }}
-        transition={{ duration: 0.6, repeat: Infinity }}
-      />
-    </div>
+    <>
+      {/* Typing area */}
+      <div className="rounded-lg md:rounded-xl border border-border/20 bg-background/40 p-3 md:p-4">
+        <p className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2">Descreva sua imagem:</p>
+        <div className="text-xs md:text-sm text-foreground min-h-[20px]">
+          {displayed}
+          <motion.span
+            className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+            animate={{ opacity: [1, 0] }}
+            transition={{ duration: 0.6, repeat: Infinity }}
+          />
+        </div>
+      </div>
+
+      {/* Result area */}
+      <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative">
+        <div className="flex items-center justify-center h-full min-h-[140px] md:min-h-[180px] relative">
+          <AnimatePresence mode="wait">
+            {phase === "typing" && (
+              <motion.p key="idle" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} className="text-xs text-muted-foreground">
+                Aguardando prompt...
+              </motion.p>
+            )}
+            {phase === "generating" && (
+              <motion.div key="gen" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-col items-center gap-3">
+                <motion.div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
+                <p className="text-xs text-primary font-medium">Gerando imagem com IA...</p>
+                <motion.div className="w-48 h-1.5 bg-card rounded-full overflow-hidden">
+                  <motion.div className="h-full bg-primary rounded-full" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 3, ease: "easeInOut" }} />
+                </motion.div>
+              </motion.div>
+            )}
+            {phase === "done" && (
+              <motion.div key={`done-${imageIndex}`} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }} className="flex flex-col items-center gap-3">
+                <motion.div
+                  className="w-28 h-28 md:w-48 md:h-48 rounded-xl overflow-hidden border border-primary/20 relative"
+                  animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" />
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/80 to-transparent p-2">
+                    <p className="text-[10px] text-foreground font-medium text-center">{demoLabels[imageIndex]}</p>
+                  </div>
+                </motion.div>
+                <motion.div className="flex gap-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                  <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download 4K</span>
+                  <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }
-
-/* ─── GENERATING DEMO ─── */
-function GeneratingDemo() {
-  const [phase, setPhase] = useState<"idle" | "generating" | "done">("idle");
-  const [imageIndex, setImageIndex] = useState(0);
-
-  useEffect(() => {
-    let t1: ReturnType<typeof setTimeout>, t2: ReturnType<typeof setTimeout>, t3: ReturnType<typeof setTimeout>;
-    const loop = () => {
-      setPhase("idle");
-      t1 = setTimeout(() => setPhase("generating"), 2000);
-      t2 = setTimeout(() => setPhase("done"), 5000);
-      t3 = setTimeout(() => {
-        setImageIndex((prev) => (prev + 1) % demoImages.length);
-        loop();
-      }, 9000);
-    };
-    loop();
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, []);
-
-  return (
-    <div className="flex items-center justify-center h-full min-h-[140px] md:min-h-[180px] relative">
-      <AnimatePresence mode="wait">
-        {phase === "idle" && (
-          <motion.p
-            key="idle"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            exit={{ opacity: 0 }}
-            className="text-xs text-muted-foreground"
-          >
-            Aguardando prompt...
-          </motion.p>
-        )}
-        {phase === "generating" && (
-          <motion.div
-            key="gen"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center gap-3"
-          >
-            <motion.div
-              className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
-            <p className="text-xs text-primary font-medium">Gerando imagem com IA...</p>
-            <motion.div className="w-48 h-1.5 bg-card rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-primary rounded-full"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 3, ease: "easeInOut" }}
-              />
-            </motion.div>
-          </motion.div>
-        )}
-        {phase === "done" && (
-          <motion.div
-            key={`done-${imageIndex}`}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="flex flex-col items-center gap-3"
-          >
-            <motion.div
-              className="w-28 h-28 md:w-48 md:h-48 rounded-xl overflow-hidden border border-primary/20 relative"
-              animate={{ boxShadow: ["0 0 0px hsl(var(--primary)/0)", "0 0 30px hsl(var(--primary)/0.3)", "0 0 0px hsl(var(--primary)/0)"] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <img
-                src={demoImages[imageIndex]}
-                alt={demoLabels[imageIndex]}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/80 to-transparent p-2">
-                <p className="text-[10px] text-foreground font-medium text-center">{demoLabels[imageIndex]}</p>
-              </div>
-            </motion.div>
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <span className="px-3 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-medium">Download 4K</span>
-              <span className="px-3 py-1 rounded-md bg-card border border-border/20 text-muted-foreground text-[10px]">Refinar</span>
-            </motion.div>
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   );
