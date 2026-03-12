@@ -584,16 +584,7 @@ export default function LandingPage() {
 
                   {/* Main area */}
                   <div className="flex-1 flex flex-col gap-4">
-                    {/* Prompt input with typing effect */}
-                    <div className="rounded-lg md:rounded-xl border border-border/20 bg-background/40 p-3 md:p-4">
-                      <p className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2">Descreva sua imagem:</p>
-                      <TypingDemo />
-                    </div>
-
-                    {/* Generated result */}
-                    <div className="flex-1 rounded-xl border border-border/15 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5 overflow-hidden relative">
-                      <GeneratingDemo />
-                    </div>
+                    <MockupDemo />
                   </div>
                 </div>
               </div>
