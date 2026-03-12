@@ -184,7 +184,7 @@ function MockupDemo() {
             )}
             {phase === "done" && (
               <motion.div key={`done-${imageIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }} className="absolute inset-0">
-                <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" />
+                <img src={demoImages[imageIndex]} alt={demoLabels[imageIndex]} className="w-full h-full object-cover" loading="lazy" />
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/90 to-transparent p-3 flex items-end justify-between">
                   <p className="text-[10px] md:text-xs text-foreground font-medium">{demoLabels[imageIndex]}</p>
                   <div className="flex gap-2">
