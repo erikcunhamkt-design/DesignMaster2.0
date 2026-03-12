@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { HeroConfigPanel } from '@/components/hero/HeroConfigPanel';
@@ -232,6 +232,13 @@ export default function HeroStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
+  const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (previewState === 'gerando' && mobilePreviewRef.current) {
+      setTimeout(() => mobilePreviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }, [previewState]);
 
   const updateConfig = useCallback((patch: Partial<HeroConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
@@ -323,7 +330,7 @@ export default function HeroStudioPage() {
             onModelChange={setAiModel}
           />
           {previewState !== 'aguardando' && (
-            <div className="min-h-[400px]">
+            <div ref={mobilePreviewRef} className="min-h-[400px]">
               <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
             </div>
           )}

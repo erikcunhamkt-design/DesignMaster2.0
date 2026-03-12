@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { ProjectTabs } from '@/components/layout/ProjectTabs';
@@ -27,6 +27,13 @@ const Index = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
+  const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (previewState === 'gerando' && mobilePreviewRef.current) {
+      setTimeout(() => mobilePreviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }, [previewState]);
 
   const {
     projects,
@@ -219,15 +226,17 @@ const Index = () => {
                   onDuplicate={duplicateProject}
                 />
                 {(previewState === 'gerando' || previewState === 'concluido') && (
-                  <PreviewPanel
-                    state={previewState}
-                    imageUrl={generatedImage}
-                    config={activeProject.config}
-                    elapsedSeconds={elapsedSeconds}
-                    estimatedSeconds={ESTIMATED_SECONDS}
-                    onRefine={handleRefine}
-                    isRefining={isRefining}
-                  />
+                  <div ref={mobilePreviewRef}>
+                    <PreviewPanel
+                      state={previewState}
+                      imageUrl={generatedImage}
+                      config={activeProject.config}
+                      elapsedSeconds={elapsedSeconds}
+                      estimatedSeconds={ESTIMATED_SECONDS}
+                      onRefine={handleRefine}
+                      isRefining={isRefining}
+                    />
+                  </div>
                 )}
               </div>
               {/* Desktop: side by side */}

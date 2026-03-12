@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { AutoConfigPanel } from '@/components/auto/AutoConfigPanel';
@@ -235,6 +235,13 @@ export default function AutoCreatorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
+  const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (previewState === 'gerando' && mobilePreviewRef.current) {
+      setTimeout(() => mobilePreviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }, [previewState]);
 
   const updateConfig = useCallback((patch: Partial<AutoConfig>) => {
     setConfig(prev => ({ ...prev, ...patch }));
@@ -325,7 +332,7 @@ export default function AutoCreatorPage() {
             onModelChange={setAiModel}
           />
           {previewState !== 'aguardando' && (
-            <div className="min-h-[400px]">
+            <div ref={mobilePreviewRef} className="min-h-[400px]">
               <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
             </div>
           )}
