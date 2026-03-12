@@ -231,17 +231,15 @@ export default function PostSchedulerPage() {
     const images = parseMediaUrls(post.media_url);
 
     try {
+      // Content already has hashtags concatenated when saved
       await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         mode: 'no-cors',
-        // Build full caption with hashtags
-        const fullCaption = post.content + (post.content ? '\n\n' : '') + (parseHashtags(post));
         body: JSON.stringify({
           title: post.title,
-          content: fullCaption,
-          caption: fullCaption,
-          hashtags: parseHashtags(post),
+          content: post.content,
+          caption: post.content,
           platform: 'instagram',
           post_type: images.length > 1 ? 'carousel' : 'single',
           scheduled_at: post.scheduled_at,
