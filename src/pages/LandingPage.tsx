@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef, lazy } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import type { Easing } from "framer-motion";
 import {
