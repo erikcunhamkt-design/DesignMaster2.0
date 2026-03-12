@@ -52,6 +52,15 @@ serve(async (req) => {
       }
 
       try {
+        // Parse media URLs (stored as JSON array)
+        let mediaUrls: string[] = [];
+        try {
+          mediaUrls = post.media_url ? JSON.parse(post.media_url) : [];
+          if (!Array.isArray(mediaUrls)) mediaUrls = post.media_url ? [post.media_url] : [];
+        } catch {
+          mediaUrls = post.media_url ? [post.media_url] : [];
+        }
+
         const response = await fetch(post.webhook_url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -59,8 +68,11 @@ serve(async (req) => {
             title: post.title,
             content: post.content,
             platform: post.platform,
+            post_type: mediaUrls.length > 1 ? "carousel" : "single",
             scheduled_at: post.scheduled_at,
-            media_url: post.media_url,
+            media_urls: mediaUrls,
+            media_url: mediaUrls[0] || null,
+            image_count: mediaUrls.length,
             post_id: post.id,
             timestamp: new Date().toISOString(),
           }),
