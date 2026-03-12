@@ -414,23 +414,24 @@ export default function LandingPage() {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
           >
-            Enquanto Você Hesita,{" "}
+            O Futuro do Design{" "}
             <motion.span
               className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0% center", "200% center"] }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             >
-              Seu Concorrente
-            </motion.span>{" "}
-            Já Está Criando
+              Já Chegou
+            </motion.span>
+            <br />
+            <span className="text-2xl md:text-4xl lg:text-5xl text-muted-foreground font-medium">E quem não se adaptar, fica para trás.</span>
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Você ainda paga R$500+ por design ou perde horas tentando fazer sozinho?
-            Com o Design Master, você cria conteúdo de nível agência em segundos — mesmo sem saber nada de design.
+            Imagine criar conteúdo de nível agência em segundos — sem depender de ninguém, sem ferramentas complicadas,
+            sem gastar uma fortuna. Isso não é futuro. São 2.500+ profissionais já fazendo isso agora.
           </motion.p>
 
           <motion.div
