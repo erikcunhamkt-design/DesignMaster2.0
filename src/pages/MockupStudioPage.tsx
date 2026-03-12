@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { MockupConfigPanel } from '@/components/mockup/MockupConfigPanel';
 import { MockupConfig, defaultMockupConfig } from '@/types/mockupConfig';
 import { buildMockupRequest } from '@/core/prompt/MockupPromptAgent';
