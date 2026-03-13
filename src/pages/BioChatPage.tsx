@@ -104,8 +104,12 @@ export default function BioChatPage() {
     await supabase.from('chat_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convoId);
   };
 
-  const send = async (text?: string) => {
-    const msg = (text || input).trim();
+  const send = async (text?: string, attachments?: { url: string; type: string; name: string }[]) => {
+    let msg = (text || input).trim();
+    if (attachments?.length) {
+      const lines = attachments.map(a => a.type === 'image' ? `[Imagem: ${a.url}]` : a.type === 'audio' ? `[Áudio: ${a.url}]` : `[Documento "${a.name}": ${a.url}]`).join('\n');
+      msg = msg ? `${msg}\n\n${lines}` : lines;
+    }
     if (!msg || isLoading) return;
     if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google no botão API no topo.'); return; }
 
