@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent } from '@/components/chat/MessageContent';
+import { TypingDots } from '@/components/chat/TypingDots';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
@@ -490,8 +491,8 @@ export default function DesignMasterChatPage() {
                       <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🧠</div>
                       <div className="rounded-2xl bg-card/60 border border-border/20 px-4 py-3 rounded-bl-md">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          {hasImage ? <Eye className="h-3.5 w-3.5 animate-pulse text-primary" /> : <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                          {hasImage ? 'Analisando imagem...' : 'Pensando...'}
+                          {hasImage ? <Eye className="h-3.5 w-3.5 animate-pulse text-primary" /> : null}
+                          {hasImage ? 'Analisando imagem...' : <TypingDots />}
                         </div>
                       </div>
                     </div>

@@ -40,6 +40,7 @@ const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 
@@ -109,6 +110,7 @@ const App = () => {
               <Route path="/studio/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/studio/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/studio/changelog" element={<ProtectedRoute><ChangelogPage /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
