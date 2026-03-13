@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
+import { UserMessageContent } from '@/components/chat/MessageContent';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -401,7 +402,7 @@ export default function EditorialChatPage() {
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
-                        <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                        <UserMessageContent content={msg.content} />
                       )}
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}

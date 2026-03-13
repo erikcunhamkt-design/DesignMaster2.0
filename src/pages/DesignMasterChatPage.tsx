@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
+import { UserMessageContent } from '@/components/chat/MessageContent';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
@@ -475,7 +476,7 @@ export default function DesignMasterChatPage() {
                   <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div> :
-                  <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                  <UserMessageContent content={msg.content} />
                   }
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
