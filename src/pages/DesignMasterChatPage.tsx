@@ -494,34 +494,14 @@ export default function DesignMasterChatPage() {
           </ScrollArea>
 
           {/* Input */}
-          <div className="border-t border-border/20 bg-background/95 backdrop-blur-xl px-4 py-3">
-            <div className="max-w-3xl mx-auto flex items-end gap-2">
-              {messages.length > 0 &&
-              <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10 text-muted-foreground hover:text-destructive" onClick={clearChat}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              }
-              <div className="relative flex-1">
-                <Textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Pergunte ao Design Master..."
-                  className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/30 bg-card/50 text-sm"
-                  rows={1} />
-                
-                <Button
-                  size="icon"
-                  className="absolute right-1.5 bottom-1.5 h-8 w-8 rounded-lg"
-                  onClick={() => send()}
-                  disabled={!input.trim() || isLoading}>
-                  
-                  {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                </Button>
-              </div>
-            </div>
-          </div>
+          <AgentChatInput
+            input={input}
+            onInputChange={setInput}
+            onSend={send}
+            isLoading={isLoading}
+            placeholder="Pergunte ao Design Master..."
+            textareaRef={textareaRef}
+          />
         </div>
       </div>
     </div>);

@@ -423,34 +423,14 @@ export default function EditorialChatPage() {
           </ScrollArea>
 
           {/* Input */}
-          <div className="border-t border-border/15 bg-card/20 backdrop-blur-sm p-3 md:p-4">
-            <div className="max-w-3xl mx-auto flex gap-2">
-              <Textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Descreva seu negócio, nicho, público e objetivos..."
-                className="flex-1 min-h-[44px] max-h-32 resize-none rounded-xl border-border/20 bg-secondary/30 text-sm placeholder:text-muted-foreground/40 focus:border-primary/30 focus:ring-primary/20"
-                rows={1}
-              />
-              <div className="flex flex-col gap-1.5">
-                <Button
-                  onClick={() => send()}
-                  disabled={isLoading || !input.trim()}
-                  size="icon"
-                  className="h-[44px] w-[44px] rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.3)] disabled:opacity-30 disabled:shadow-none"
-                >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                </Button>
-                {messages.length > 0 && (
-                  <Button onClick={clearChat} size="icon" variant="ghost" className="h-7 w-[44px] rounded-lg text-muted-foreground/40 hover:text-destructive">
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+          <AgentChatInput
+            input={input}
+            onInputChange={setInput}
+            onSend={send}
+            isLoading={isLoading}
+            placeholder="Descreva seu negócio, nicho, público e objetivos..."
+            textareaRef={textareaRef}
+          />
         </div>
       </div>
     </div>
