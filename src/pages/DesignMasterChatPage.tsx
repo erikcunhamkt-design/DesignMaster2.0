@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
