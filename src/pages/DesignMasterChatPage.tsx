@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Sparkles, Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { AgentChatInput } from '@/components/chat/AgentChatInput';
+import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
@@ -164,8 +165,12 @@ export default function DesignMasterChatPage() {
     await supabase.from('chat_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convoId);
   };
 
-  const send = async (text?: string) => {
-    const msg = (text || input).trim();
+  const send = async (text?: string, attachments?: { url: string; type: string; name: string }[]) => {
+    let msg = (text || input).trim();
+    if (attachments?.length) {
+      const lines = attachments.map(a => a.type === 'image' ? `[Imagem: ${a.url}]` : a.type === 'audio' ? `[Áudio: ${a.url}]` : `[Documento "${a.name}": ${a.url}]`).join('\n');
+      msg = msg ? `${msg}\n\n${lines}` : lines;
+    }
     if (!msg || isLoading) return;
 
     if (!apiKey || apiKey.length < 10) {
@@ -461,35 +466,24 @@ export default function DesignMasterChatPage() {
 
             <div className="max-w-3xl mx-auto space-y-6">
                 {messages.map((msg, i) =>
-              <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+              <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'assistant' &&
-                <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                        🧠
-                      </div>
+                <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🧠</div>
                 }
-                    <div
-                  className={cn(
-                    'rounded-2xl px-4 py-3 max-w-[85%] text-sm',
-                    msg.role === 'user' ?
-                    'bg-primary text-primary-foreground rounded-br-md' :
-                    'bg-card/60 border border-border/20 rounded-bl-md'
-                  )}>
-                  
+                    <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ?
                   <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div> :
-
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap select-text">{msg.content}</p>
                   }
                     </div>
+                    {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
                   </div>
               )}
                 {isLoading && messages[messages.length - 1]?.role !== 'assistant' &&
               <div className="flex gap-3">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                      🧠
-                    </div>
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🧠</div>
                     <div className="rounded-2xl bg-card/60 border border-border/20 px-4 py-3 rounded-bl-md">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                     </div>
@@ -500,34 +494,14 @@ export default function DesignMasterChatPage() {
           </ScrollArea>
 
           {/* Input */}
-          <div className="border-t border-border/20 bg-background/95 backdrop-blur-xl px-4 py-3">
-            <div className="max-w-3xl mx-auto flex items-end gap-2">
-              {messages.length > 0 &&
-              <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10 text-muted-foreground hover:text-destructive" onClick={clearChat}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              }
-              <div className="relative flex-1">
-                <Textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Pergunte ao Design Master..."
-                  className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/30 bg-card/50 text-sm"
-                  rows={1} />
-                
-                <Button
-                  size="icon"
-                  className="absolute right-1.5 bottom-1.5 h-8 w-8 rounded-lg"
-                  onClick={() => send()}
-                  disabled={!input.trim() || isLoading}>
-                  
-                  {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                </Button>
-              </div>
-            </div>
-          </div>
+          <AgentChatInput
+            input={input}
+            onInputChange={setInput}
+            onSend={send}
+            isLoading={isLoading}
+            placeholder="Pergunte ao Design Master..."
+            textareaRef={textareaRef}
+          />
         </div>
       </div>
     </div>);

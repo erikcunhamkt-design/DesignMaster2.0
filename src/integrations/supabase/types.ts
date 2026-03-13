@@ -359,6 +359,51 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          media_url: string | null
+          platform: string
+          scheduled_at: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          webhook_response: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          platform?: string
+          scheduled_at: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+          webhook_response?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          platform?: string
+          scheduled_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          webhook_response?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       user_allowed_ips: {
         Row: {
           id: string
