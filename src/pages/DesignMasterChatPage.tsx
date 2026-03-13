@@ -476,7 +476,7 @@ export default function DesignMasterChatPage() {
                   <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div> :
-                  <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                  <UserMessageContent content={msg.content} />
                   }
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}

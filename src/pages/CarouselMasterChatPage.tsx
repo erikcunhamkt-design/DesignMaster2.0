@@ -401,7 +401,7 @@ export default function CarouselMasterChatPage() {
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
-                        <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                        <UserMessageContent content={msg.content} />
                       )}
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
