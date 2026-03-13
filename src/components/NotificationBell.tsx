@@ -78,8 +78,8 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
                 onClick={() => {
                   if (!n.read) markAsRead(n.id);
                   if (isChangelogNotification(n.title)) {
-                    setOpen(false);
                     navigate('/studio/changelog');
+                    setTimeout(() => setOpen(false), 0);
                   }
                 }}
                 className={cn(
