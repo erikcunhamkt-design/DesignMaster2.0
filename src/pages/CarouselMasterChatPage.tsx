@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
@@ -407,14 +407,21 @@ export default function CarouselMasterChatPage() {
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
                   </div>
                 ))}
-                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-                  <div className="flex gap-3">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🎠</div>
-                    <div className="rounded-2xl bg-card/60 border border-border/20 px-4 py-3 rounded-bl-md">
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (() => {
+                  const lastMsg = messages[messages.length - 1]?.content || '';
+                  const hasImage = /\[Imagem:/.test(lastMsg);
+                  return (
+                    <div className="flex gap-3">
+                      <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🎠</div>
+                      <div className="rounded-2xl bg-card/60 border border-border/20 px-4 py-3 rounded-bl-md">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {hasImage ? <Eye className="h-3.5 w-3.5 animate-pulse text-primary" /> : <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {hasImage ? 'Analisando imagem...' : 'Pensando...'}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             )}
           </ScrollArea>
