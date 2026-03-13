@@ -289,15 +289,16 @@ export default function BioChatPage() {
             ) : (
               <div className="max-w-3xl mx-auto space-y-6">
                 {messages.map((msg, i) => (
-                  <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                  <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'assistant' && <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">✍️</div>}
                     <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ? (
                         <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h2]:mt-6 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:text-base [&>h2]:font-bold [&>hr]:my-5 [&>hr]:border-border/30 [&>p]:mb-3 [&>ul]:mb-3 [&>blockquote]:border-l-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:py-1 [&>blockquote]:px-3">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
-                      ) : <p className="whitespace-pre-wrap">{msg.content}</p>}
+                      ) : <p className="whitespace-pre-wrap select-text">{msg.content}</p>}
                     </div>
+                    {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
                     {msg.role === 'user' && <div className="shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">EU</div>}
                   </div>
                 ))}
