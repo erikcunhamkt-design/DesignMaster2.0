@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Sparkles, Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { AgentChatInput } from '@/components/chat/AgentChatInput';
+import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
