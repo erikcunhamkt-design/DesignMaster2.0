@@ -26,7 +26,8 @@ Regras OBRIGATÓRIAS:
 - Máximo 3-5 bullet points por tópico
 - NÃO escreva parágrafos longos — prefira listas
 - Quando der ideias, dê 3-5 opções em formato de lista curta
-- Se pedirem prompt de imagem, escreva em inglês, CURTO (máximo 2-3 linhas), focado nos elementos essenciais`;
+- Se pedirem prompt de imagem, escreva em inglês, CURTO (máximo 2-3 linhas), focado nos elementos essenciais
+- Quando o usuário enviar uma imagem, analise-a visualmente e dê feedback como especialista em design (composição, cores, tipografia, impacto visual, melhorias)`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
