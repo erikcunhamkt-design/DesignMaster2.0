@@ -57,9 +57,44 @@ serve(async (req) => {
     });
 
     for (const msg of messages) {
+      const parts: any[] = [];
+      let textContent = msg.content;
+
+      // Extract image URLs for multimodal support
+      const imageRegex = /\[Imagem:\s*(https?:\/\/[^\]]+)\]/g;
+      const imageUrls: string[] = [];
+      let match;
+      while ((match = imageRegex.exec(textContent)) !== null) {
+        imageUrls.push(match[1]);
+      }
+      // Remove image tags from text
+      textContent = textContent.replace(imageRegex, '').trim();
+
+      // Fetch images and add as inlineData (before text per Gemini spec)
+      for (const imageUrl of imageUrls) {
+        try {
+          const imgResp = await fetch(imageUrl);
+          if (imgResp.ok) {
+            const arrayBuf = await imgResp.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)));
+            const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
+            const mimeType = contentType.split(';')[0].trim();
+            parts.push({ inlineData: { mimeType, data: base64 } });
+          }
+        } catch (e) {
+          console.error("Failed to fetch image:", imageUrl, e);
+        }
+      }
+
+      if (textContent) {
+        parts.push({ text: textContent });
+      } else if (imageUrls.length > 0) {
+        parts.push({ text: "Analise esta imagem e me dê sua opinião como especialista." });
+      }
+
       geminiContents.push({
         role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }]
+        parts
       });
     }
 

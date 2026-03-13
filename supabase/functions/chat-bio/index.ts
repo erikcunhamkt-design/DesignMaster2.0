@@ -79,9 +79,41 @@ serve(async (req) => {
     geminiContents.push({ role: "model", parts: [{ text: "Entendido! Sou o Bio Master, especialista exclusivo em criação de biografias para Instagram. Vou te ajudar a criar uma bio estratégica e atrativa. Me conte: o que você faz, para quem faz, qual seu nicho e diferencial? Quanto mais contexto, melhor será o resultado!" }] });
 
     for (const msg of messages) {
+      const parts: any[] = [];
+      let textContent = msg.content;
+
+      const imageRegex = /\[Imagem:\s*(https?:\/\/[^\]]+)\]/g;
+      const imageUrls: string[] = [];
+      let match;
+      while ((match = imageRegex.exec(textContent)) !== null) {
+        imageUrls.push(match[1]);
+      }
+      textContent = textContent.replace(imageRegex, '').trim();
+
+      for (const imageUrl of imageUrls) {
+        try {
+          const imgResp = await fetch(imageUrl);
+          if (imgResp.ok) {
+            const arrayBuf = await imgResp.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)));
+            const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
+            const mimeType = contentType.split(';')[0].trim();
+            parts.push({ inlineData: { mimeType, data: base64 } });
+          }
+        } catch (e) {
+          console.error("Failed to fetch image:", imageUrl, e);
+        }
+      }
+
+      if (textContent) {
+        parts.push({ text: textContent });
+      } else if (imageUrls.length > 0) {
+        parts.push({ text: "Analise esta imagem e me ajude a criar uma bio baseada nela." });
+      }
+
       geminiContents.push({
         role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }]
+        parts
       });
     }
 
