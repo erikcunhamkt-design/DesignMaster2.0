@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
+import { UserMessageContent } from '@/components/chat/MessageContent';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
