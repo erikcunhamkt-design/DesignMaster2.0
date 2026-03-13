@@ -75,7 +75,13 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
             notifications.map(n => (
               <button
                 key={n.id}
-                onClick={() => { if (!n.read) markAsRead(n.id); }}
+                onClick={() => {
+                  if (!n.read) markAsRead(n.id);
+                  if (isChangelogNotification(n.title)) {
+                    setOpen(false);
+                    navigate('/studio/changelog');
+                  }
+                }}
                 className={cn(
                   'w-full text-left px-4 py-3 border-b border-border/20 transition-colors hover:bg-secondary/30',
                   !n.read && 'bg-primary/5'
@@ -88,6 +94,12 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
                   <div className={cn('flex-1', n.read && 'pl-4')}>
                     <p className="text-xs font-semibold text-foreground">{n.title}</p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
+                    {isChangelogNotification(n.title) && (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-primary font-semibold mt-1">
+                        <Sparkles className="h-2.5 w-2.5" />
+                        Ver novidades
+                      </span>
+                    )}
                     <p className="text-[10px] text-muted-foreground/60 mt-1">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
                     </p>
