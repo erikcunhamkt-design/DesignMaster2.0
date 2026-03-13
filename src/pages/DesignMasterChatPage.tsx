@@ -466,35 +466,24 @@ export default function DesignMasterChatPage() {
 
             <div className="max-w-3xl mx-auto space-y-6">
                 {messages.map((msg, i) =>
-              <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+              <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'assistant' &&
-                <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                        🧠
-                      </div>
+                <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🧠</div>
                 }
-                    <div
-                  className={cn(
-                    'rounded-2xl px-4 py-3 max-w-[85%] text-sm',
-                    msg.role === 'user' ?
-                    'bg-primary text-primary-foreground rounded-br-md' :
-                    'bg-card/60 border border-border/20 rounded-bl-md'
-                  )}>
-                  
+                    <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ?
                   <div className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div> :
-
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap select-text">{msg.content}</p>
                   }
                     </div>
+                    {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
                   </div>
               )}
                 {isLoading && messages[messages.length - 1]?.role !== 'assistant' &&
               <div className="flex gap-3">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                      🧠
-                    </div>
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">🧠</div>
                     <div className="rounded-2xl bg-card/60 border border-border/20 px-4 py-3 rounded-bl-md">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                     </div>
