@@ -411,14 +411,21 @@ export default function EditorialChatPage() {
                     )}
                   </div>
                 ))}
-                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-                  <div className="flex gap-3 justify-start">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">📰</div>
-                    <div className="rounded-2xl px-4 py-3 bg-card/60 border border-border/20 rounded-bl-md">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" />Pensando...</div>
+                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (() => {
+                  const lastMsg = messages[messages.length - 1]?.content || '';
+                  const hasImage = /\[Imagem:/.test(lastMsg);
+                  return (
+                    <div className="flex gap-3 justify-start">
+                      <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">📰</div>
+                      <div className="rounded-2xl px-4 py-3 bg-card/60 border border-border/20 rounded-bl-md">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {hasImage ? <Eye className="h-3.5 w-3.5 animate-pulse text-primary" /> : <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {hasImage ? 'Analisando imagem...' : 'Pensando...'}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             )}
           </ScrollArea>
