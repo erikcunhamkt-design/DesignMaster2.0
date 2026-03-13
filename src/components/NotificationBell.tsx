@@ -18,6 +18,10 @@ interface NotificationBellProps {
 export function NotificationBell({ collapsed = false }: NotificationBellProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const isChangelogNotification = (title: string) =>
+    /atualiza|novidad|patch|changelog|v\d+\.\d+/i.test(title);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
