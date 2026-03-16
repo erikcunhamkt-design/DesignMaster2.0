@@ -14,12 +14,6 @@ import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 interface Conversation { id: string; title: string; created_at: string; updated_at: string; }
