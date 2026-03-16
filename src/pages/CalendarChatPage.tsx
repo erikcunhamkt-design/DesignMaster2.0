@@ -13,6 +13,7 @@ import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
+import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
