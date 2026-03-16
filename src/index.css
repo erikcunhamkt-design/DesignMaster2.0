@@ -316,3 +316,15 @@
   5% { transform: scale(1.08); }
   12%, 100% { transform: scale(1); }
 }
+
+/* Enable text selection inside chat prose blocks */
+.prose.select-text,
+.prose.select-text * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+[data-radix-scroll-area-viewport] {
+  -webkit-user-select: text;
+  user-select: text;
+}
