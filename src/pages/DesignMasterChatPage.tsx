@@ -456,7 +456,7 @@ export default function DesignMasterChatPage() {
                     <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ?
                   <AssistantMessageContent content={msg.content} /> :
-                  <UserMessageContent content={msg.content} />}
+                  <UserMessageContent content={msg.content} />
                   }
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
