@@ -391,7 +391,8 @@ export default function CarouselMasterChatPage() {
                 </div>
               </div>
             ) : (
-              <div className="max-w-3xl mx-auto space-y-6">
+              <div className="max-w-3xl mx-auto space-y-6 relative" ref={messagesContainerRef}>
+                <SelectionCopyTooltip containerRef={messagesContainerRef} />
                 {messages.map((msg, i) => (
                   <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'assistant' && (
