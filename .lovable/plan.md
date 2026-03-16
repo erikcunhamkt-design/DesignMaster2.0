@@ -1,108 +1,84 @@
 
+Objetivo: fazer o tooltip “Copiar” ter animação suave de entrada/saída e, principalmente, corrigir o fluxo de seleção parcial nas respostas dos agentes para que copiar por seleção funcione de verdade.
 
-# Design Builder — Plano de Implementação
+O que encontrei
+- O tooltip atual depende de `selectionchange` + `window.getSelection()`, mas ele só valida `anchorNode` dentro do container. Isso é frágil quando a seleção cruza nós do markdown, quando o navegador muda foco, ou quando o clique no próprio botão interfere na seleção.
+- O botão atual copia usando `selection.toString()` no momento do clique. Se a seleção colapsar ao interagir com o tooltip, o texto some e nada é copiado.
+- As páginas dos agentes renderizam o markdown inline em vários lugares, repetindo a mesma estrutura. Isso dificulta corrigir o comportamento de forma consistente.
+- Já existe CSS liberando `user-select`, então o problema principal agora parece ser a lógica do tooltip/cópia, não só estilo.
+- O replay indica interação na tela, mas não há evidência de um fluxo confiável de “selecionar texto → tooltip aparece → copiar seleção preservada”.
 
-## Visão Geral
-App web para geração de imagens para redes sociais, com tema escuro e acentos roxos, usando Nano Banana Pro (google/gemini-3-pro-image-preview) como engine de IA. Layout fiel aos screenshots: sidebar + topbar + painel configurador à esquerda + preview à direita.
+Solução proposta
+1. Tornar a seleção estável
+- No `SelectionCopyTooltip`, salvar o texto selecionado e o `Range` válido em estado/ref assim que a seleção mudar.
+- Validar tanto `anchorNode` quanto `focusNode`, e usar `range.commonAncestorContainer` para garantir que a seleção inteira está dentro do container correto.
+- Ignorar seleções vazias, muito pequenas, ou fora de mensagens do assistente.
 
----
+2. Evitar que o clique destrua a seleção
+- No clique do tooltip, copiar o texto salvo em estado/ref, não `window.getSelection()` ao vivo.
+- Continuar usando `onMouseDown={preventDefault}`, mas também proteger com `pointerdown`/`mousedown` para impedir perda de foco antes da cópia.
+- Manter a seleção visual por um instante após copiar e só depois limpar.
 
-## Fase 1 — Layout Base & Tema
-- **Tema escuro** com acentos roxos (#8B5CF6), bordas suaves, cards escuros
-- **Sidebar fixa** à esquerda: Explorar, Criar (ativo), Minha Galeria
-- **Topbar**: campo de busca, badge "API OK", ícone de usuário, botão "+ Novo"
-- **Tabs de projeto** no topo (ex: "Projeto Alpha" com X para fechar e + para novo)
-- **Layout split**: painel esquerdo com scroll (configurador) + painel direito grande (preview com estado "AGUARDANDO CRIAÇÃO")
+3. Posicionamento mais robusto do tooltip
+- Calcular posição com base no `Range.getBoundingClientRect()`, mas prender dentro dos limites do container para não ficar cortado.
+- Se não houver espaço acima, mostrar abaixo da seleção.
+- Renderizar o tooltip apenas quando existir uma seleção válida dentro de conteúdo do assistente.
 
-## Fase 2 — Painel Configurador (Todas as Seções)
-Todas as seções exatamente como nos screenshots, na ordem correta:
+4. Entrada e saída suaves
+- Trocar o comportamento “mount/unmount imediato” por estado visual:
+  - `visible`: há seleção válida
+  - `closing`: após copiar ou desfazer seleção, anima saída antes de desmontar
+- Usar classes dedicadas de animação no tooltip, com fade + scale leves para entrada e saída.
+- Respeitar o modo de acessibilidade com movimento reduzido.
 
-### A) Sujeito Principal
-- Upload de fotos do sujeito (box com + e "UPLOAD")
-- Quantidade: seleção 1–5 (pills, roxo quando ativo)
-- Gênero: Masculino / Feminino (botões)
-- Textarea: "Descrição da pose ou roupa (opcional)..."
-- Posição do sujeito: ESQUERDA / CENTRO / DIREITA (cards visuais)
+5. Unificar o conteúdo de mensagem do assistente
+- Parar de renderizar o markdown inline nas páginas dos agentes e passar a usar `AssistantMessageContent`.
+- Isso centraliza:
+  - classes de seleção
+  - estilo do markdown
+  - possíveis `data-attributes` como `data-assistant-message`
+- Com isso, o tooltip pode mirar especificamente mensagens do assistente.
 
-### B) Dimensões
-- Grid com 4 opções: STORIES (9:16), HORIZONTAL (16:9), FEED QUADRADO (1:1), FEED RETRATO (4:5)
-- Destaque roxo na seleção ativa
+6. Restringir a seleção ao que faz sentido
+- Adicionar um wrapper/atributo nas respostas do assistente, por exemplo `data-assistant-message="true"`.
+- O tooltip só aparece quando a seleção estiver dentro desse wrapper, evitando conflito com input, sidebar e mensagens do usuário.
 
-### C) Texto
-- Toggle switch para ativar/desativar
-- Campos condicionais: Texto 01 (headline), Texto 02 (subheadline), CTA
-- Modo: "Texto como camada no app" ou "Texto dentro da imagem (IA)"
+Arquivos que eu mexeria
+- `src/components/chat/SelectionCopyTooltip.tsx`
+  - reescrever a lógica de seleção, persistência do texto copiado, posicionamento e animações
+- `src/components/chat/MessageContent.tsx`
+  - fortalecer `AssistantMessageContent` com wrapper/atributos e classes reutilizáveis
+- `src/pages/DesignMasterChatPage.tsx`
+- `src/pages/BioChatPage.tsx`
+- `src/pages/CalendarChatPage.tsx`
+- `src/pages/EditorialChatPage.tsx`
+- `src/pages/CarouselMasterChatPage.tsx`
+  - substituir markdown inline por `AssistantMessageContent`
+- `src/index.css`
+  - adicionar animações de entrada/saída do tooltip e, se necessário, regras extras para seleção em conteúdo markdown do assistente
 
-### D) Projeto & Cenário
-- Campo nicho/projeto com chips rápidos (Futebol, Social Media, Rap, Trap, Gamer, etc.)
-- Campo ambiente (texto livre)
-- Toggle "Usar fotos de cenário?" com upload condicional
+Resultado esperado
+- Selecionar qualquer trecho da resposta do agente passa a funcionar de modo confiável.
+- O tooltip “Copiar” aparece no local certo, sem sumir ao tentar clicar.
+- O texto parcial é copiado mesmo que a seleção visual colapse no clique.
+- A entrada e a saída do tooltip ficam suaves e consistentes em todos os chats de agentes.
 
-### E) Cores & Iluminação
-- 3 barras de cor com picker: Cor do Ambiente, Luz de Recorte, Luz Complementar
-- Salvamento de paleta por projeto
+Detalhes técnicos
+```text
+Fluxo novo:
+1. user seleciona texto
+2. selectionchange detecta range válido
+3. componente salva:
+   - selectedText
+   - selectedRangeRect
+   - selectionInsideAssistant = true
+4. tooltip aparece com animação de entrada
+5. user clica em "Copiar"
+6. clipboard recebe selectedText salvo
+7. estado muda para "Copiado"
+8. tooltip anima saída
+9. limpeza final da seleção/estado
+```
 
-### F) Composição
-- Cards: Close-up (Rosto), Plano Médio (Busto), Plano Americano
-- Toggle "Elementos Flutuantes?" com campo de texto condicional
-- Posição vertical do sujeito: Mais pra cima / Centralizado / Mais pra baixo
-
-### G) Referências de Estilo
-- Área de upload para até 4 referências adicionais com "ADICIONAR REFERÊNCIA"
-
-### H) Atributos Visuais & Estilo
-- Slider "SOBRIEDADE" (Criativo ↔ Profissional)
-- Toggle "ATIVAR ESTILO VISUAL" com grade de estilos (Clássico, Formal, Elegante, Sexy, Institucional, Tecnológico, Glassmorphism, Interface UI, Minimalista, Lúdico, Cartoon, Infoproduto, Jovial, Gamer, Retrato Profissional, Ultra Realista, Glow)
-- Toggles: Desfoque (Blur), Degradê Lateral
-- "PROMPT ADICIONAL" com toggle + textarea
-
-### I) Ações (Rodapé)
-- Botão "Gerar Imagem" (desabilitado até validações)
-- Botão "Duplicar Configuração"
-
-## Fase 3 — Backend (Lovable Cloud)
-- **Edge function para geração**: recebe configurações, monta prompt via PromptComposer, chama Nano Banana Pro
-- **Edge function para upload**: receber e armazenar imagens de referência
-- **Storage**: para imagens de referência e imagens geradas
-- **Banco de dados**: tabelas para Projetos, Gerações, Referências, Paletas
-- **Verificação de API**: endpoint para status "API OK"
-
-## Fase 4 — PromptComposer (Cérebro do App)
-Módulo que monta o prompt final a partir de todas as configurações:
-- Prioridades: dimensão/safe zones → identidade da referência → paleta → composição → estilo → elementos flutuantes
-- Negative prompt automático (mãos ruins, texto deformado, blur excessivo, etc.)
-- Lógica de texto: se "camada no app" → pedir clean background/negative space; se "texto na imagem" → incluir texto no prompt
-- Posição vertical influencia instrução de safe zone no prompt
-
-## Fase 5 — Fluxo de Geração & Preview
-- Estados no preview: "AGUARDANDO CRIAÇÃO" → "GERANDO..." (com skeleton/animação) → "CONCLUÍDO" (imagem renderizada)
-- Overlay de texto no frontend quando modo "camada no app" ativo
-- Download PNG/JPG da imagem final
-- Histórico de gerações por projeto
-
-## Fase 6 — Minha Galeria
-- Grid de imagens geradas com filtros por projeto e dimensão
-- Ao clicar: detalhe com prompt usado, configurações, botões "Regerar" e "Duplicar Config"
-
-## Fase 7 — Explorar
-- Página com templates prontos (Capa, Story, Thumb, Post educativo)
-- Ao selecionar: preenche automaticamente o painel "Criar"
-
-## Fase 8 — Fluxo de Referências
-- Referência Principal (Pessoa): 1 imagem, prioridade máxima para identidade
-- Inspirações adicionais (até 4): com checkboxes para indicar o que aproveitar (Estilo, Iluminação, Paleta, Ambiente, Pose, Composição, Elementos flutuantes, Layout)
-- Inspirações nunca sobrescrevem a identidade da referência principal
-
----
-
-## Validações para "Gerar Imagem"
-- Dimensão obrigatória
-- Nicho/Projeto obrigatório
-- Se texto ativado: Texto 01 mínimo 3 caracteres
-- Máximo 5 referências no total
-
-## UX
-- Skeleton loaders durante carregamento
-- Transições suaves entre estados
-- Todos os textos/labels em português conforme os screenshots
-
+Risco principal
+- Como há 5 páginas com markup parecido, a correção precisa ser aplicada de forma uniforme; por isso a centralização em `AssistantMessageContent` é a parte mais importante para evitar que continue “funcionando em uma página e quebrando em outra”.
