@@ -13,6 +13,7 @@ import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
+import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +53,7 @@ export default function CarouselMasterChatPage() {
   const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const loadConversations = useCallback(async () => {
     if (!user) return;
@@ -390,7 +392,8 @@ export default function CarouselMasterChatPage() {
                 </div>
               </div>
             ) : (
-              <div className="max-w-3xl mx-auto space-y-6">
+              <div className="max-w-3xl mx-auto space-y-6 relative" ref={messagesContainerRef}>
+                <SelectionCopyTooltip containerRef={messagesContainerRef} />
                 {messages.map((msg, i) => (
                   <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'assistant' && (
