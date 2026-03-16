@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Trash, X, Check, Eye } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, Pencil, Trash, X, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
@@ -14,12 +14,6 @@ import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -335,21 +329,14 @@ export default function CarouselMasterChatPage() {
                       )}
                     </div>
                     {editingId !== convo.id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <button className="shrink-0 p-1 rounded-md opacity-40 hover:opacity-100 hover:bg-secondary/60 transition-all">
-                            <MoreHorizontal className="h-3 w-3" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setEditingId(convo.id); setEditTitle(convo.title); }}>
-                            <Pencil className="h-3 w-3 mr-2" /> Renomear
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={(e) => { e.stopPropagation(); handleDeleteConvo(convo.id); }}>
-                            <Trash className="h-3 w-3 mr-2" /> Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeleteConvo(convo.id); }}
+                        className="shrink-0 p-1.5 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
+                        title="Excluir conversa"
+                        aria-label="Excluir conversa"
+                      >
+                        <Trash className="h-3.5 w-3.5" />
+                      </button>
                     )}
                   </div>
                 ))
