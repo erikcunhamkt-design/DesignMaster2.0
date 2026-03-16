@@ -455,10 +455,8 @@ export default function DesignMasterChatPage() {
                 }
                     <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ?
-                  <div className="prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div> :
-                  <UserMessageContent content={msg.content} />
+                  <AssistantMessageContent content={msg.content} /> :
+                  <UserMessageContent content={msg.content} />}
                   }
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
