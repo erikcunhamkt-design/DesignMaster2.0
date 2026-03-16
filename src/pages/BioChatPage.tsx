@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
+
 import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, Pencil, Trash, X, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
 import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
-import { UserMessageContent } from '@/components/chat/MessageContent';
+import { UserMessageContent, AssistantMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
 
@@ -291,9 +291,7 @@ export default function BioChatPage() {
                     {msg.role === 'assistant' && <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">✍️</div>}
                     <div className={cn('rounded-2xl px-4 py-3 max-w-[85%] text-sm', msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card/60 border border-border/20 rounded-bl-md')}>
                       {msg.role === 'assistant' ? (
-                        <div className="prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h2]:mt-6 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:text-base [&>h2]:font-bold [&>hr]:my-5 [&>hr]:border-border/30 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3 [&>blockquote]:border-l-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:py-1 [&>blockquote]:px-3">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div>
+                        <AssistantMessageContent content={msg.content} proseClasses="prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h2]:mt-6 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:text-base [&>h2]:font-bold [&>hr]:my-5 [&>hr]:border-border/30 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3 [&>blockquote]:border-l-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:py-1 [&>blockquote]:px-3" />
                       ) : <UserMessageContent content={msg.content} />}
                     </div>
                     {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}

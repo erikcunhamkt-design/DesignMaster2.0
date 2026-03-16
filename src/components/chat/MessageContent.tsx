@@ -71,7 +71,10 @@ export function UserMessageContent({ content }: { content: string }) {
 /** Renders assistant message with markdown */
 export function AssistantMessageContent({ content, proseClasses }: { content: string; proseClasses?: string }) {
   return (
-    <div className={proseClasses || "prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3 [&>h1]:mb-2 [&>h2]:mb-2 [&>h3]:mb-2 [&>blockquote]:mb-3 [&>pre]:mb-3"}>
+    <div
+      data-assistant-message="true"
+      className={proseClasses || "prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3 [&>h1]:mb-2 [&>h2]:mb-2 [&>h3]:mb-2 [&>blockquote]:mb-3 [&>pre]:mb-3"}
+    >
       <ReactMarkdown>{content}</ReactMarkdown>
     </div>
   );
