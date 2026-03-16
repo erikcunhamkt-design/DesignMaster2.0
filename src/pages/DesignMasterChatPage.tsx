@@ -53,6 +53,7 @@ export default function DesignMasterChatPage() {
   const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Load conversations
   const loadConversations = useCallback(async () => {

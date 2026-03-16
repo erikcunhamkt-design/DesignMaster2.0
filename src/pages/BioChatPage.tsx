@@ -48,6 +48,7 @@ export default function BioChatPage() {
   const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const loadConversations = useCallback(async () => {
     if (!user) return;
