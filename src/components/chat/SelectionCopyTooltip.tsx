@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface Position {
+interface Coords {
   x: number;
   y: number;
 }
@@ -10,23 +11,26 @@ interface Position {
 type VisualState = 'hidden' | 'visible' | 'closing';
 
 export function SelectionCopyTooltip({ containerRef }: { containerRef: React.RefObject<HTMLElement> }) {
-  const [position, setPosition] = useState<Position | null>(null);
+  const [coords, setCoords] = useState<Coords | null>(null);
   const [copied, setCopied] = useState(false);
   const [visualState, setVisualState] = useState<VisualState>('hidden');
+  const visualStateRef = useRef<VisualState>('hidden');
   const savedTextRef = useRef<string>('');
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const dismiss = useCallback(() => {
-    if (visualState === 'hidden') return;
+    if (visualStateRef.current === 'hidden') return;
+    visualStateRef.current = 'closing';
     setVisualState('closing');
     clearTimeout(closeTimerRef.current);
     closeTimerRef.current = setTimeout(() => {
-      setPosition(null);
+      setCoords(null);
       setCopied(false);
+      visualStateRef.current = 'hidden';
       setVisualState('hidden');
       savedTextRef.current = '';
     }, 200);
-  }, [visualState]);
+  }, []);
 
   const handleSelectionChange = useCallback(() => {
     const selection = window.getSelection();
@@ -38,7 +42,6 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
     const container = containerRef.current;
     if (!container) return;
 
-    // Check that selection is inside a [data-assistant-message] element within our container
     const anchorNode = selection.anchorNode;
     const focusNode = selection.focusNode;
     if (!anchorNode || !focusNode) { dismiss(); return; }
@@ -47,7 +50,6 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
     const focusInside = container.contains(focusNode);
     if (!anchorInside && !focusInside) { dismiss(); return; }
 
-    // Check the range's common ancestor is within an assistant message
     const range = selection.getRangeAt(0);
     const ancestor = range.commonAncestorContainer;
     const assistantEl = (ancestor instanceof HTMLElement ? ancestor : ancestor.parentElement)?.closest('[data-assistant-message]');
@@ -56,26 +58,25 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
     const text = selection.toString().trim();
     if (text.length < 2) { dismiss(); return; }
 
-    // Save text immediately so click can use it
     savedTextRef.current = text;
 
+    // Use viewport coordinates for fixed positioning
     const rect = range.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
+    let x = rect.left + rect.width / 2;
+    let y = rect.top - 10;
 
-    let x = rect.left + rect.width / 2 - containerRect.left;
-    let y = rect.top - containerRect.top - 10;
-
-    // Clamp horizontally
-    x = Math.max(40, Math.min(x, containerRect.width - 40));
+    // Clamp horizontally to viewport
+    x = Math.max(60, Math.min(x, window.innerWidth - 60));
 
     // If not enough space above, show below
-    if (y < 10) {
-      y = rect.bottom - containerRect.top + 10;
+    if (y < 50) {
+      y = rect.bottom + 10;
     }
 
     clearTimeout(closeTimerRef.current);
     setCopied(false);
-    setPosition({ x, y });
+    setCoords({ x, y });
+    visualStateRef.current = 'visible';
     setVisualState('visible');
   }, [containerRef, dismiss]);
 
@@ -84,7 +85,6 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
   }, [handleSelectionChange]);
 
-  // Cleanup on unmount
   useEffect(() => () => clearTimeout(closeTimerRef.current), []);
 
   const handleCopy = async () => {
@@ -104,19 +104,19 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
     }
   };
 
-  if (!position || visualState === 'hidden') return null;
+  if (!coords || visualState === 'hidden') return null;
 
-  return (
+  return createPortal(
     <button
       onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => e.preventDefault()}
       onClick={handleCopy}
-      className={`absolute z-50 flex items-center gap-1.5 rounded-lg border border-border/40 bg-card px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg shadow-black/30 backdrop-blur-sm transition-all duration-200 hover:bg-primary hover:text-primary-foreground ${
+      className={`fixed z-[9999] flex items-center gap-1.5 rounded-lg border border-border/40 bg-card px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg shadow-black/30 backdrop-blur-sm transition-all duration-200 hover:bg-primary hover:text-primary-foreground ${
         visualState === 'visible' ? 'animate-scale-in opacity-100' : 'animate-scale-out opacity-0 pointer-events-none'
       }`}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${coords.x}px`,
+        top: `${coords.y}px`,
         transform: 'translate(-50%, -100%)',
       }}
     >
@@ -131,6 +131,7 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
           Copiar
         </>
       )}
-    </button>
+    </button>,
+    document.body
   );
 }
