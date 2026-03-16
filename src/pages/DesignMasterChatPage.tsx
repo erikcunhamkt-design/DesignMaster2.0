@@ -14,12 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger } from
-'@/components/ui/dropdown-menu';
 
 type Msg = {role: 'user' | 'assistant';content: string;};
 
