@@ -338,7 +338,7 @@ export default function EditorialChatPage() {
                     {editingId !== convo.id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <button className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-secondary/60 transition-opacity">
+                          <button className="shrink-0 p-1 rounded-md opacity-40 hover:opacity-100 hover:bg-secondary/60 transition-all">
                             <MoreHorizontal className="h-3 w-3" />
                           </button>
                         </DropdownMenuTrigger>
