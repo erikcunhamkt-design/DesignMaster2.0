@@ -391,35 +391,19 @@ export default function DesignMasterChatPage() {
                         </>
                   }
                     </div>
-                    {editingId !== convo.id &&
-                <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <button className="shrink-0 p-1 rounded-md opacity-40 hover:opacity-100 hover:bg-secondary/60 transition-all">
-                            <MoreHorizontal className="h-3 w-3" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingId(convo.id);
-                      setEditTitle(convo.title);
-                    }}>
-                            <Pencil className="h-3 w-3 mr-2" />
-                            Renomear
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                      className="text-destructive focus:text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteConvo(convo.id);
-                      }}>
-                      
-                            <Trash className="h-3 w-3 mr-2" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                }
+                    {editingId !== convo.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteConvo(convo.id);
+                        }}
+                        className="shrink-0 p-1.5 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
+                        title="Excluir conversa"
+                        aria-label="Excluir conversa"
+                      >
+                        <Trash className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
               )
               }
