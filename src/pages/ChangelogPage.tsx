@@ -13,6 +13,61 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.6.0',
+    date: '17 Mar 2026',
+    title: 'Menu Contextual & Gestão de Conversas',
+    highlights: [
+      'Menu de contexto (botão direito) em todas as conversas de chat',
+      'Fixar conversas importantes no topo da sidebar',
+      'Renomear e excluir conversas com um clique',
+    ],
+    changes: [
+      {
+        icon: <MousePointerClick className="h-4 w-4 text-primary" />,
+        category: 'Menu Contextual',
+        items: [
+          'Clique com botão direito em qualquer conversa para abrir o menu',
+          'Opções: Fixar, Renomear e Excluir',
+          'Disponível em todos os 5 agentes de chat',
+        ],
+      },
+      {
+        icon: <Pin className="h-4 w-4 text-blue-400" />,
+        category: 'Fixar Conversas',
+        items: [
+          'Fixe conversas importantes no topo da lista',
+          'Indicador visual com borda e ícone de pin',
+          'Desafixe a qualquer momento pelo menu',
+        ],
+      },
+      {
+        icon: <Pencil className="h-4 w-4 text-amber-400" />,
+        category: 'Renomear Conversas',
+        items: [
+          'Renomeie qualquer conversa pelo menu contextual',
+          'Edição inline com confirmação por Enter ou botão',
+        ],
+      },
+      {
+        icon: <Trash2 className="h-4 w-4 text-red-400" />,
+        category: 'Excluir Conversas',
+        items: [
+          'Exclua conversas individuais pelo menu contextual',
+          'Botão "Apagar todas" mantido na sidebar',
+        ],
+      },
+      {
+        icon: <Copy className="h-4 w-4 text-emerald-400" />,
+        category: 'Cópia de Texto Liberada',
+        items: [
+          'Seleção de texto das respostas da IA totalmente desbloqueada',
+          'Botão direito do mouse e Ctrl+C funcionam normalmente',
+          'Tooltip de cópia continua disponível como atalho extra',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.5.0',
     date: '13 Mar 2026',
     title: 'Chat dos Agentes — Upgrade Completo de Mídia',
