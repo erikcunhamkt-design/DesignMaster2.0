@@ -87,9 +87,9 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
 
     savedTextRef.current = rawText.trim();
 
-    const nextPlacement: Placement = activeRect.top > 64 ? 'above' : 'below';
-    const nextX = Math.max(64, Math.min(activeRect.left + activeRect.width / 2, window.innerWidth - 64));
-    const nextY = nextPlacement === 'above' ? activeRect.top - 12 : activeRect.bottom + 12;
+    const nextPlacement: Placement = activeRect.top > 44 ? 'above' : 'below';
+    const nextX = Math.max(48, Math.min(activeRect.left + activeRect.width / 2, window.innerWidth - 48));
+    const nextY = nextPlacement === 'above' ? activeRect.top - 6 : activeRect.bottom + 6;
 
     clearTimeout(closeTimerRef.current);
     setCopied(false);
