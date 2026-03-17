@@ -48,7 +48,14 @@ export default function BioChatPage() {
   const loadConversations = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase.from('chat_conversations').select('*').eq('user_id', user.id).eq('agent_id', AGENT_ID).order('updated_at', { ascending: false });
-    if (data) setConversations(data as Conversation[]);
+    if (data) {
+      const sorted = (data as Conversation[]).sort((a, b) => {
+        if (a.is_pinned && !b.is_pinned) return -1;
+        if (!a.is_pinned && b.is_pinned) return 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+      setConversations(sorted);
+    }
   }, [user]);
 
   const loadMessages = useCallback(async (convoId: string) => {
