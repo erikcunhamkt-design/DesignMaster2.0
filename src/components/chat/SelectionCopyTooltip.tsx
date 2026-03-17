@@ -9,83 +9,126 @@ interface Coords {
 }
 
 type VisualState = 'hidden' | 'visible' | 'closing';
+type Placement = 'above' | 'below';
+
+function getClosestAssistantMessage(node: Node | null, container: HTMLElement) {
+  const element = node instanceof HTMLElement ? node : node?.parentElement;
+  const assistantMessage = element?.closest('[data-assistant-message]');
+
+  if (!assistantMessage || !(assistantMessage instanceof HTMLElement)) {
+    return null;
+  }
+
+  return container.contains(assistantMessage) ? assistantMessage : null;
+}
 
 export function SelectionCopyTooltip({ containerRef }: { containerRef: React.RefObject<HTMLElement> }) {
   const [coords, setCoords] = useState<Coords | null>(null);
   const [copied, setCopied] = useState(false);
   const [visualState, setVisualState] = useState<VisualState>('hidden');
+  const [placement, setPlacement] = useState<Placement>('above');
+
   const visualStateRef = useRef<VisualState>('hidden');
-  const savedTextRef = useRef<string>('');
+  const savedTextRef = useRef('');
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rafRef = useRef<number>();
 
   const dismiss = useCallback(() => {
     if (visualStateRef.current === 'hidden') return;
+
     visualStateRef.current = 'closing';
     setVisualState('closing');
     clearTimeout(closeTimerRef.current);
+
     closeTimerRef.current = setTimeout(() => {
       setCoords(null);
       setCopied(false);
+      savedTextRef.current = '';
       visualStateRef.current = 'hidden';
       setVisualState('hidden');
-      savedTextRef.current = '';
     }, 200);
   }, []);
 
-  const handleSelectionChange = useCallback(() => {
+  const updateTooltipFromSelection = useCallback(() => {
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed || !selection.toString().trim()) {
+    const container = containerRef.current;
+
+    if (!container || !selection || selection.rangeCount === 0) {
       dismiss();
       return;
     }
 
-    const container = containerRef.current;
-    if (!container) return;
+    const rawText = selection.toString();
+    const text = rawText.trim();
 
-    const anchorNode = selection.anchorNode;
-    const focusNode = selection.focusNode;
-    if (!anchorNode || !focusNode) { dismiss(); return; }
+    if (selection.isCollapsed || text.length < 2) {
+      dismiss();
+      return;
+    }
 
-    const anchorInside = container.contains(anchorNode);
-    const focusInside = container.contains(focusNode);
-    if (!anchorInside && !focusInside) { dismiss(); return; }
+    const anchorMessage = getClosestAssistantMessage(selection.anchorNode, container);
+    const focusMessage = getClosestAssistantMessage(selection.focusNode, container);
+
+    if (!anchorMessage || !focusMessage || anchorMessage !== focusMessage) {
+      dismiss();
+      return;
+    }
 
     const range = selection.getRangeAt(0);
-    const ancestor = range.commonAncestorContainer;
-    const assistantEl = (ancestor instanceof HTMLElement ? ancestor : ancestor.parentElement)?.closest('[data-assistant-message]');
-    if (!assistantEl || !container.contains(assistantEl)) { dismiss(); return; }
-
-    const text = selection.toString().trim();
-    if (text.length < 2) { dismiss(); return; }
-
-    savedTextRef.current = text;
-
-    // Use viewport coordinates for fixed positioning
     const rect = range.getBoundingClientRect();
-    let x = rect.left + rect.width / 2;
-    let y = rect.top - 10;
+    const rects = Array.from(range.getClientRects()).filter((clientRect) => clientRect.width > 0 || clientRect.height > 0);
+    const fallbackRect = rects[0];
+    const activeRect = rect.width > 0 || rect.height > 0 ? rect : fallbackRect;
 
-    // Clamp horizontally to viewport
-    x = Math.max(60, Math.min(x, window.innerWidth - 60));
-
-    // If not enough space above, show below
-    if (y < 50) {
-      y = rect.bottom + 10;
+    if (!activeRect) {
+      dismiss();
+      return;
     }
+
+    savedTextRef.current = rawText.trim();
+
+    const nextPlacement: Placement = activeRect.top > 64 ? 'above' : 'below';
+    const nextX = Math.max(64, Math.min(activeRect.left + activeRect.width / 2, window.innerWidth - 64));
+    const nextY = nextPlacement === 'above' ? activeRect.top - 12 : activeRect.bottom + 12;
 
     clearTimeout(closeTimerRef.current);
     setCopied(false);
-    setCoords({ x, y });
+    setPlacement(nextPlacement);
+    setCoords({ x: nextX, y: nextY });
     visualStateRef.current = 'visible';
     setVisualState('visible');
   }, [containerRef, dismiss]);
 
-  useEffect(() => {
-    document.addEventListener('selectionchange', handleSelectionChange);
-    return () => document.removeEventListener('selectionchange', handleSelectionChange);
-  }, [handleSelectionChange]);
+  const scheduleSelectionCheck = useCallback(() => {
+    cancelAnimationFrame(rafRef.current ?? 0);
+    rafRef.current = window.requestAnimationFrame(() => {
+      updateTooltipFromSelection();
+    });
+  }, [updateTooltipFromSelection]);
 
-  useEffect(() => () => clearTimeout(closeTimerRef.current), []);
+  useEffect(() => {
+    document.addEventListener('selectionchange', scheduleSelectionCheck);
+    document.addEventListener('mouseup', scheduleSelectionCheck);
+    document.addEventListener('keyup', scheduleSelectionCheck);
+    window.addEventListener('resize', scheduleSelectionCheck);
+    window.addEventListener('scroll', scheduleSelectionCheck, true);
+
+    return () => {
+      document.removeEventListener('selectionchange', scheduleSelectionCheck);
+      document.removeEventListener('mouseup', scheduleSelectionCheck);
+      document.removeEventListener('keyup', scheduleSelectionCheck);
+      window.removeEventListener('resize', scheduleSelectionCheck);
+      window.removeEventListener('scroll', scheduleSelectionCheck, true);
+      cancelAnimationFrame(rafRef.current ?? 0);
+    };
+  }, [scheduleSelectionCheck]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(closeTimerRef.current);
+      cancelAnimationFrame(rafRef.current ?? 0);
+    };
+  }, []);
 
   const handleCopy = async () => {
     const text = savedTextRef.current;
@@ -95,6 +138,7 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
       await navigator.clipboard.writeText(text);
       setCopied(true);
       toast.success('Copiado!');
+
       setTimeout(() => {
         window.getSelection()?.removeAllRanges();
         dismiss();
@@ -108,8 +152,8 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
 
   return createPortal(
     <button
-      onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => e.preventDefault()}
+      onMouseDown={(event) => event.preventDefault()}
+      onPointerDown={(event) => event.preventDefault()}
       onClick={handleCopy}
       className={`fixed z-[9999] flex items-center gap-1.5 rounded-lg border border-border/40 bg-card px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg shadow-black/30 backdrop-blur-sm transition-all duration-200 hover:bg-primary hover:text-primary-foreground ${
         visualState === 'visible' ? 'animate-scale-in opacity-100' : 'animate-scale-out opacity-0 pointer-events-none'
@@ -117,7 +161,7 @@ export function SelectionCopyTooltip({ containerRef }: { containerRef: React.Ref
       style={{
         left: `${coords.x}px`,
         top: `${coords.y}px`,
-        transform: 'translate(-50%, -100%)',
+        transform: placement === 'above' ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
       }}
     >
       {copied ? (
