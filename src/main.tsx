@@ -6,22 +6,12 @@ import "./index.css";
 // SECURITY HARDENING — não afeta funcionalidades do usuário
 // ============================================================
 if (typeof window !== "undefined") {
-  // 1. Disable right-click context menu
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
-
   // 2. Block dev-tools / view-source shortcuts
   document.addEventListener("keydown", (e) => {
     if (e.key === "F12") { e.preventDefault(); return; }
     if (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase())) { e.preventDefault(); return; }
     if (e.ctrlKey && e.key.toUpperCase() === "U") { e.preventDefault(); return; }
     if (e.ctrlKey && e.key.toUpperCase() === "S") { e.preventDefault(); return; }
-  });
-
-  // 3. Disable text selection (except inputs)
-  document.addEventListener("selectstart", (e) => {
-    const t = e.target as HTMLElement;
-    if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable) return;
-    e.preventDefault();
   });
 
   // 4. Disable drag
