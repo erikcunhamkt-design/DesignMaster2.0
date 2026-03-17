@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, Pencil, Trash, X, Check, Eye } from 'lucide-react';
+import { Trash2, Loader2, Plus, MessageSquare, ChevronLeft, ChevronRight, Pencil, Trash, X, Check, Eye, Pin, PinOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AgentChatInput } from '@/components/chat/AgentChatInput';
