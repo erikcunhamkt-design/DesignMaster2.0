@@ -377,74 +377,21 @@ export default function DesignMasterChatPage() {
                 </p> :
 
               conversations.map((convo) =>
-              <div
-                key={convo.id}
-                className={cn(
-                  'group flex items-center gap-1.5 rounded-lg px-2.5 py-2 cursor-pointer transition-all duration-150',
-                  activeConvoId === convo.id ?
-                  'bg-primary/10 text-foreground' :
-                  'hover:bg-secondary/40 text-muted-foreground hover:text-foreground',
-                  convo.is_pinned && 'border-l-2 border-primary/40'
-                )}
-                onClick={() => handleSelectConvo(convo.id)}>
-                
-                    <div className="flex-1 min-w-0">
-                      {editingId === convo.id ?
-                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                          <input
-                      type="text"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleRenameConvo(convo.id, editTitle);
-                        if (e.key === 'Escape') setEditingId(null);
-                      }}
-                      className="flex-1 bg-transparent border-b border-primary/30 text-[11px] outline-none py-0.5"
-                      autoFocus />
-                    
-                          <button onClick={() => handleRenameConvo(convo.id, editTitle)} className="p-0.5">
-                            <Check className="h-3 w-3 text-primary" />
-                          </button>
-                          <button onClick={() => setEditingId(null)} className="p-0.5">
-                            <X className="h-3 w-3 text-muted-foreground" />
-                          </button>
-                        </div> :
-
-                  <>
-                          <div className="flex items-center gap-1">
-                            {convo.is_pinned && <Pin className="h-2.5 w-2.5 text-primary/60 shrink-0" />}
-                            <p className="text-[11px] font-medium truncate leading-tight">{convo.title}</p>
-                          </div>
-                          <p className="text-[9px] text-muted-foreground/40 mt-0.5">{formatDate(convo.updated_at)}</p>
-                        </>
-                  }
-                    </div>
-                    {editingId !== convo.id && (
-                      <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleTogglePin(convo.id); }}
-                          className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-                          title={convo.is_pinned ? 'Desafixar' : 'Fixar conversa'}
-                        >
-                          {convo.is_pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setEditingId(convo.id); setEditTitle(convo.title); }}
-                          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
-                          title="Renomear"
-                        >
-                          <Pencil className="h-3 w-3" />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteConvo(convo.id); }}
-                          className="p-1 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
-                          title="Excluir conversa"
-                        >
-                          <Trash className="h-3 w-3" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                <ConversationItem
+                  key={convo.id}
+                  convo={convo}
+                  isActive={activeConvoId === convo.id}
+                  isEditing={editingId === convo.id}
+                  editTitle={editTitle}
+                  onSelect={handleSelectConvo}
+                  onDelete={handleDeleteConvo}
+                  onStartRename={(id, title) => { setEditingId(id); setEditTitle(title); }}
+                  onConfirmRename={handleRenameConvo}
+                  onCancelRename={() => setEditingId(null)}
+                  onEditTitleChange={setEditTitle}
+                  onTogglePin={handleTogglePin}
+                  formatDate={formatDate}
+                />
               )
               }
             </div>
