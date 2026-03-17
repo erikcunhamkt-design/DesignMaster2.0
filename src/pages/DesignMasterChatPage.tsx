@@ -8,6 +8,7 @@ import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent, AssistantMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
+import { ConversationItem } from '@/components/chat/ConversationItem';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
