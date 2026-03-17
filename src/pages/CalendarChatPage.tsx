@@ -321,50 +321,21 @@ export default function CalendarChatPage() {
                 <p className="text-[10px] text-muted-foreground/40 text-center py-8">Nenhuma conversa ainda</p>
               ) : (
                 conversations.map((convo) => (
-                  <div
+                  <ConversationItem
                     key={convo.id}
-                    className={cn(
-                      'group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150',
-                      activeConvoId === convo.id ? 'bg-primary/10 text-foreground' : 'hover:bg-secondary/40 text-muted-foreground hover:text-foreground'
-                    )}
-                    onClick={() => handleSelectConvo(convo.id)}
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-50" />
-                    <div className="flex-1 min-w-0">
-                      {editingId === convo.id ? (
-                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleRenameConvo(convo.id, editTitle);
-                              if (e.key === 'Escape') setEditingId(null);
-                            }}
-                            className="flex-1 bg-transparent border-b border-primary/30 text-[11px] outline-none py-0.5"
-                            autoFocus
-                          />
-                          <button onClick={() => handleRenameConvo(convo.id, editTitle)} className="p-0.5"><Check className="h-3 w-3 text-primary" /></button>
-                          <button onClick={() => setEditingId(null)} className="p-0.5"><X className="h-3 w-3 text-muted-foreground" /></button>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="text-[11px] font-medium truncate leading-tight">{convo.title}</p>
-                          <p className="text-[9px] text-muted-foreground/40 mt-0.5">{formatDate(convo.updated_at)}</p>
-                        </>
-                      )}
-                    </div>
-                    {editingId !== convo.id && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDeleteConvo(convo.id); }}
-                        className="shrink-0 p-1.5 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
-                        title="Excluir conversa"
-                        aria-label="Excluir conversa"
-                      >
-                        <Trash className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
+                    convo={convo}
+                    isActive={activeConvoId === convo.id}
+                    isEditing={editingId === convo.id}
+                    editTitle={editTitle}
+                    onSelect={handleSelectConvo}
+                    onDelete={handleDeleteConvo}
+                    onStartRename={(id, title) => { setEditingId(id); setEditTitle(title); }}
+                    onConfirmRename={handleRenameConvo}
+                    onCancelRename={() => setEditingId(null)}
+                    onEditTitleChange={setEditTitle}
+                    onTogglePin={handleTogglePin}
+                    formatDate={formatDate}
+                  />
                 ))
               )}
             </div>
