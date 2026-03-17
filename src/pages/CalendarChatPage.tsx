@@ -14,6 +14,7 @@ import { CopyMessageButton } from '@/components/chat/CopyMessageButton';
 import { UserMessageContent, AssistantMessageContent } from '@/components/chat/MessageContent';
 import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
+import { ConversationItem } from '@/components/chat/ConversationItem';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -22,6 +23,7 @@ interface Conversation {
   title: string;
   created_at: string;
   updated_at: string;
+  is_pinned?: boolean;
 }
 
 const AGENT_ID = 'calendar';
