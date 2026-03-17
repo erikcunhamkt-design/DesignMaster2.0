@@ -22,6 +22,7 @@ interface Conversation {
   title: string;
   created_at: string;
   updated_at: string;
+  is_pinned?: boolean;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-design-master`;
