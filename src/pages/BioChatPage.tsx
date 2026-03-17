@@ -105,6 +105,22 @@ export default function BioChatPage() {
     setEditingId(null);
   };
 
+  const handleTogglePin = async (id: string) => {
+    const convo = conversations.find((c) => c.id === id);
+    if (!convo) return;
+    const newPinned = !convo.is_pinned;
+    await supabase.from('chat_conversations').update({ is_pinned: newPinned } as any).eq('id', id);
+    setConversations((prev) => {
+      const updated = prev.map((c) => c.id === id ? { ...c, is_pinned: newPinned } : c);
+      return updated.sort((a, b) => {
+        if (a.is_pinned && !b.is_pinned) return -1;
+        if (!a.is_pinned && b.is_pinned) return 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+    });
+    toast.success(newPinned ? 'Conversa fixada' : 'Conversa desafixada');
+  };
+
   const saveMessage = async (convoId: string, role: 'user' | 'assistant', content: string) => {
     await supabase.from('chat_messages').insert({ conversation_id: convoId, role, content });
     await supabase.from('chat_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convoId);
