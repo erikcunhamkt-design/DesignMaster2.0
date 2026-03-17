@@ -362,7 +362,17 @@ export default function DesignMasterChatPage() {
                 )}
                 onClick={() => handleSelectConvo(convo.id)}>
                 
-                    <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteConvo(convo.id);
+                      }}
+                      className="shrink-0 p-1 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
+                      title="Excluir conversa"
+                      aria-label="Excluir conversa"
+                    >
+                      <Trash className="h-3.5 w-3.5" />
+                    </button>
                     <div className="flex-1 min-w-0">
                       {editingId === convo.id ?
                   <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -391,19 +401,6 @@ export default function DesignMasterChatPage() {
                         </>
                   }
                     </div>
-                    {editingId !== convo.id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteConvo(convo.id);
-                        }}
-                        className="shrink-0 p-1.5 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
-                        title="Excluir conversa"
-                        aria-label="Excluir conversa"
-                      >
-                        <Trash className="h-3.5 w-3.5" />
-                      </button>
-                    )}
                   </div>
               )
               }
