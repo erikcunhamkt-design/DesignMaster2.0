@@ -379,24 +379,14 @@ export default function DesignMasterChatPage() {
               <div
                 key={convo.id}
                 className={cn(
-                  'group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150',
+                  'group flex items-center gap-1.5 rounded-lg px-2.5 py-2 cursor-pointer transition-all duration-150',
                   activeConvoId === convo.id ?
                   'bg-primary/10 text-foreground' :
-                  'hover:bg-secondary/40 text-muted-foreground hover:text-foreground'
+                  'hover:bg-secondary/40 text-muted-foreground hover:text-foreground',
+                  convo.is_pinned && 'border-l-2 border-primary/40'
                 )}
                 onClick={() => handleSelectConvo(convo.id)}>
                 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteConvo(convo.id);
-                      }}
-                      className="shrink-0 p-1 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
-                      title="Excluir conversa"
-                      aria-label="Excluir conversa"
-                    >
-                      <Trash className="h-3.5 w-3.5" />
-                    </button>
                     <div className="flex-1 min-w-0">
                       {editingId === convo.id ?
                   <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -420,11 +410,39 @@ export default function DesignMasterChatPage() {
                         </div> :
 
                   <>
-                          <p className="text-[11px] font-medium truncate leading-tight">{convo.title}</p>
+                          <div className="flex items-center gap-1">
+                            {convo.is_pinned && <Pin className="h-2.5 w-2.5 text-primary/60 shrink-0" />}
+                            <p className="text-[11px] font-medium truncate leading-tight">{convo.title}</p>
+                          </div>
                           <p className="text-[9px] text-muted-foreground/40 mt-0.5">{formatDate(convo.updated_at)}</p>
                         </>
                   }
                     </div>
+                    {editingId !== convo.id && (
+                      <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleTogglePin(convo.id); }}
+                          className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                          title={convo.is_pinned ? 'Desafixar' : 'Fixar conversa'}
+                        >
+                          {convo.is_pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setEditingId(convo.id); setEditTitle(convo.title); }}
+                          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
+                          title="Renomear"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteConvo(convo.id); }}
+                          className="p-1 rounded-md text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
+                          title="Excluir conversa"
+                        >
+                          <Trash className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
               )
               }
