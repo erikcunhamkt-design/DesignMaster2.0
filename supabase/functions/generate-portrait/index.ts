@@ -154,7 +154,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
   });
 
   if (!response.ok) {
-    console.error("Photoshoot agent expansion failed:", response.status);
+    console.error("Fotógrafo Profissional expansion failed:", response.status);
     return configDescription;
   }
 
