@@ -1,5 +1,3 @@
-// Deno.serve used below
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -68,7 +66,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { imageBase64, colorize } = await req.json();
+    const { imageBase64, colorize, googleApiKey } = await req.json();
 
     if (!imageBase64) {
       return new Response(
@@ -77,11 +75,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    if (!googleApiKey) {
       return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY não configurada." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "API Key do Google não fornecida. Configure no botão API." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -90,36 +87,28 @@ Deno.serve(async (req) => {
       prompt += `\n\nADDITIONAL INSTRUCTION: If this is a black and white or sepia photograph, carefully colorize it with historically accurate and natural colors while maintaining the authentic feel. Use realistic skin tones, natural fabric colors, and period-appropriate hues. The colorization must look natural, not artificial or oversaturated.`;
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const model = "gemini-2.5-flash";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image_url",
-                image_url: { url: imageBase64 },
-              },
-              {
-                type: "text",
-                text: prompt,
-              },
-            ],
-          },
-        ],
-        modalities: ["image", "text"],
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: "image/jpeg", data: imageBase64.replace(/^data:image\/\w+;base64,/, "") } },
+            { text: prompt },
+          ],
+        }],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+        },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -127,20 +116,24 @@ Deno.serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       return new Response(
-        JSON.stringify({ error: `Erro no gateway de IA: ${response.status}` }),
+        JSON.stringify({ error: `Erro na API Gemini: ${response.status}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    // Extract image from Gemini native image generation response
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    let imageUrl: string | null = null;
+    
+    for (const part of parts) {
+      if (part.inlineData) {
+        imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        break;
+      }
+    }
 
     if (!imageUrl) {
       return new Response(

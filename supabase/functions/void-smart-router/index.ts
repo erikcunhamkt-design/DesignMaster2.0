@@ -124,31 +124,23 @@ const CLASSIFIER_SYSTEM = `You are a classifier. Given a user's image generation
 
 Reply with ONLY the category name (one word). Nothing else.`;
 
-async function classifyIntent(userPrompt: string): Promise<string> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) return "gab";
-
+async function classifyIntent(userPrompt: string, googleApiKey: string): Promise<string> {
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const model = "gemini-2.5-flash-lite";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: CLASSIFIER_SYSTEM },
-          { role: "user", content: userPrompt },
-        ],
-        max_tokens: 10,
-        temperature: 0,
+        contents: [{ parts: [{ text: `${CLASSIFIER_SYSTEM}\n\nUser request: ${userPrompt}` }] }],
+        generationConfig: { temperature: 0, maxOutputTokens: 10 },
       }),
     });
 
     if (!response.ok) return "gab";
     const data = await response.json();
-    const category = data.choices?.[0]?.message?.content?.trim().toLowerCase() || "gab";
+    const category = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase() || "gab";
     return AGENT_PROFILES[category] ? category : "gab";
   } catch {
     return "gab";
