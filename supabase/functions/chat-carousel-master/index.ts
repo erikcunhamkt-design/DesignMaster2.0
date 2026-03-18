@@ -199,7 +199,7 @@ Definir internamente:
 Gerar 5 headlines investigativas no formato:
 Frase curta (~6 palavras) : tese interpretativa (~11 palavras)
 
-Escolher a melhor automaticamente.
+⚠️ NÃO escolher automaticamente. Apresentar as 5 headlines numeradas ao usuário e perguntar: "Qual headline você escolhe?" — PARAR e aguardar a resposta antes de escrever os slides.
 
 ## SLIDES — CARROSSEL EDITORIAL (10 SLIDES)
 
