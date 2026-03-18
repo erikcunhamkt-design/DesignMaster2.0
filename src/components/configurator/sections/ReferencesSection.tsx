@@ -33,9 +33,24 @@ export function ReferencesSection({ config, onUpdate }: Props) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const file = files[0];
-    if (config.styleReferences.length >= 4) return;
-    const url = URL.createObjectURL(file);
+    const remaining = 5 - config.styleReferences.length;
+    if (remaining <= 0) return;
+    const selected = Array.from(files).slice(0, remaining);
+    // Process one at a time to show note dialog for first new one
+    const url = URL.createObjectURL(selected[0]);
+    // Add remaining files directly (skip note dialog for batch)
+    const extraUrls = selected.slice(1).map(f => URL.createObjectURL(f));
+    if (extraUrls.length > 0) {
+      const newRefs = [...config.styleReferences, ...extraUrls];
+      const attrs = { ...(config.referenceAttributes || {}) };
+      const notes = { ...(config.referenceNotes || {}) };
+      extraUrls.forEach((_, i) => {
+        const idx = config.styleReferences.length + i;
+        attrs[idx] = [];
+        notes[idx] = '';
+      });
+      onUpdate({ styleReferences: newRefs, referenceAttributes: attrs, referenceNotes: notes });
+    }
     setPendingUrl(url);
     setNoteText('');
     e.target.value = '';
@@ -95,7 +110,8 @@ export function ReferencesSection({ config, onUpdate }: Props) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tiff,.tif,.svg"
+        multiple
         className="hidden"
         onChange={handleFileSelect}
       />
@@ -123,7 +139,7 @@ export function ReferencesSection({ config, onUpdate }: Props) {
         </div>
       )}
 
-      {config.styleReferences.length < 4 && (
+      {config.styleReferences.length < 5 && (
         <button
           onClick={() => fileInputRef.current?.click()}
           className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary transition-all duration-200"
@@ -134,7 +150,7 @@ export function ReferencesSection({ config, onUpdate }: Props) {
       )}
 
       <p className="text-[8px] text-muted-foreground/40">
-        {config.styleReferences.length}/4 referências
+        {config.styleReferences.length}/5 referências · JPG, PNG, WEBP, HEIC, AVIF, BMP, TIFF, SVG
       </p>
 
       <Dialog open={!!pendingUrl} onOpenChange={(open) => !open && setPendingUrl(null)}>

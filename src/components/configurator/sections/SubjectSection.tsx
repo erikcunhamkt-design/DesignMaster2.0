@@ -32,11 +32,9 @@ export function SubjectSection({ config, onUpdate }: Props) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const newUrls: string[] = [];
-    Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file);
-      newUrls.push(url);
-    });
+    const remaining = 5 - config.subjectPhotos.length;
+    if (remaining <= 0) return;
+    const newUrls = Array.from(files).slice(0, remaining).map(f => URL.createObjectURL(f));
     onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
     e.target.value = '';
   };
@@ -68,7 +66,7 @@ export function SubjectSection({ config, onUpdate }: Props) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tiff,.tif,.svg"
         multiple
         className="hidden"
         onChange={handleFileSelect}
@@ -92,13 +90,18 @@ export function SubjectSection({ config, onUpdate }: Props) {
           </div>
         )}
 
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span className="text-[10px] font-medium tracking-wide uppercase">Upload</span>
-        </button>
+        {config.subjectPhotos.length < 5 && (
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-medium tracking-wide uppercase">Upload</span>
+          </button>
+        )}
+        <p className="text-[8px] text-muted-foreground/40">
+          {config.subjectPhotos.length}/5 fotos · JPG, PNG, WEBP, HEIC, AVIF, BMP, TIFF
+        </p>
       </div>
 
       {/* Gender row */}
