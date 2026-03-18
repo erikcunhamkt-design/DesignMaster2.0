@@ -35,21 +35,66 @@ STAGE DETAILS:
 11. Realism Tokens — high-definition texture, ultra-sharp details, 8K quality, extreme sharpness, depth of field.
 12. Deep Texture Commands — skin pores visible, fabric fiber detail, extreme realism, volumetric lighting, cinematic grade, HDR.
 
+CONTENT SAFETY RULES (CRITICAL — apply BEFORE outputting):
+- Replace nudity/naked/nude references with artistic classical equivalents: "classical draping", "Renaissance-style minimal garment", "biblical fig leaf covering", "ancient Greek chiton"
+- Replace "topless" with "bare-shouldered with draped fabric"
+- Replace "underwear only" or "lingerie" with "elegant minimal attire"
+- Replace "blood", "gore", "wound" with "battle-worn", "weathered", "marked"  
+- Replace "weapon pointed at viewer" with "weapon held in dramatic pose"
+- Replace explicit violence with dramatic tension
+- Replace drug references with mystical/alchemical equivalents
+- NEVER output: "naked", "nude", "topless", "NSFW", "explicit", "uncensored", "gore", "blood splatter"
+- Always keep the INTENT of the scene while making it safe for AI image generation
+- These replacements must happen silently — do not mention filtering in the output
+
 RULES:
 - Output ONLY the final prompt as a single continuous line in English
 - No commentary, no explanation, no labels, no stage markers
 - When the user idea is vague, complete it creatively with rich cinematic detail
 - NEVER omit MANDATORY INSTRUCTIONS — they have absolute priority
 - Always include stages 10-12 (negative, realism, deep texture) even if not mentioned
-- Do NOT translate to Portuguese — English only`;
+- Do NOT translate to Portuguese — English only
+- Apply CONTENT SAFETY RULES to all output — transform restricted terms into safe artistic alternatives`;
+
+// ── Additional safety filter applied AFTER Architect output ──
+function sanitizePrompt(prompt: string): string {
+  const replacements: [RegExp, string][] = [
+    [/\b(completely |fully |totally )?naked\b/gi, "wearing minimal classical draping"],
+    [/\b(completely |fully |totally )?nude\b/gi, "wearing Renaissance-style minimal garment"],
+    [/\btopless\b/gi, "bare-shouldered with elegant draped fabric"],
+    [/\bnudity\b/gi, "classical artistic form"],
+    [/\bNSFW\b/gi, ""],
+    [/\bexplicit\b/gi, "dramatic"],
+    [/\buncensored\b/gi, ""],
+    [/\bgore\b/gi, "battle-worn detail"],
+    [/\bblood splatter\b/gi, "dramatic red accents"],
+    [/\bblood[- ]?soaked\b/gi, "deeply weathered"],
+    [/\bbleeding\b/gi, "marked"],
+    [/\btotalmente nu\b/gi, "wearing minimal classical draping"],
+    [/\bpelado\b/gi, "wearing classical garment"],
+    [/\bsem roupa\b/gi, "with minimal elegant attire"],
+    [/\bnu\b/gi, "with classical draping"],
+  ];
+  
+  let sanitized = prompt;
+  for (const [pattern, replacement] of replacements) {
+    sanitized = sanitized.replace(pattern, replacement);
+  }
+  // Clean up double spaces
+  return sanitized.replace(/  +/g, " ").trim();
+}
 
 async function createPromptWithArchitect(locked: string, expandable: string, googleApiKey: string): Promise<string> {
-  const userContent = locked.trim() && expandable.trim()
-    ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
-    : locked.trim()
-      ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}`
-      : expandable.trim()
-        ? `--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
+  // Pre-sanitize inputs before sending to Architect
+  const safeLocked = sanitizePrompt(locked);
+  const safeExpandable = sanitizePrompt(expandable);
+  
+  const userContent = safeLocked.trim() && safeExpandable.trim()
+    ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${safeLocked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${safeExpandable}`
+    : safeLocked.trim()
+      ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${safeLocked}`
+      : safeExpandable.trim()
+        ? `--- CREATIVE CONTEXT (enhance freely) ---\n${safeExpandable}`
         : "";
 
   if (!userContent) return "";
@@ -73,11 +118,13 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
 
   if (!response.ok) {
     console.error("Architect prompt creation failed, using raw input:", response.status);
-    return `${locked} ${expandable}`.trim();
+    return sanitizePrompt(`${safeLocked} ${safeExpandable}`.trim());
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `${locked} ${expandable}`.trim();
+  const rawOutput = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `${safeLocked} ${safeExpandable}`.trim();
+  // Post-sanitize Architect output as safety net
+  return sanitizePrompt(rawOutput);
 }
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
