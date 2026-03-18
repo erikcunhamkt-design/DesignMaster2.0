@@ -29,11 +29,11 @@ interface Conversation {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-carousel-master`;
 
 const SUGGESTIONS = [
-  '🎠 Crie um carrossel sobre os 5 erros mais comuns no design de posts',
-  '🔥 Carrossel viral: como criar hooks visuais que param o scroll',
-  '📈 Me faça um carrossel sobre estratégias de crescimento no Instagram',
-  '🎯 Carrossel educativo sobre branding pessoal para designers',
-  '💡 Crie um carrossel sobre tendências de design para 2025',
+  '🔍 Investigar um fenômeno cultural atual',
+  '📰 Transformar um conteúdo existente em narrativa editorial',
+  '🎯 Criar um carrossel investigativo sobre tendências de design',
+  '🧠 Decodificar um comportamento de consumo recente',
+  '🔥 Analisar uma tendência viral e transformar em carrossel',
 ];
 
 export default function CarouselMasterChatPage() {
