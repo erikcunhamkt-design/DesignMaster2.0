@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// GAB — PROMPT CREATOR PRO (replaces PROMPT ARCHITECT PRO)
+// PROMPT ARCHITECT PRO — Hyper-Detailed Prompt Creator
 // Creates hyper-detailed structured prompts from simple ideas.
 // Respects LOCKED parts (sidebar selections) as mandatory.
 // ══════════════════════════════════════════════════════════════
