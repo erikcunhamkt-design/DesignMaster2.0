@@ -179,14 +179,16 @@ serve(async (req) => {
     const locked = lockedPrompt || prompt || "";
     const expandable = expandablePrompt || "";
 
+    let expandedPromptForUI: string | undefined;
     if (useArchitect && (locked.trim() || expandable.trim())) {
       console.log("🧠 PROMPT ARCHITECT PRO: Creating hyper-detailed prompt...");
-      console.log("🔒 LOCKED (mandatory):", locked.substring(0, 300));
-      console.log("🔓 EXPANDABLE (creative):", expandable.substring(0, 300));
-      finalPrompt = await createPromptWithArchitect(locked, expandable, googleApiKey);
-      console.log("✅ ARCHITECT OUTPUT:", finalPrompt.substring(0, 400));
+      console.log("🔒 LOCKED (mandatory — NOT sent to LLM):", locked.substring(0, 300));
+      console.log("🔓 EXPANDABLE (creative — sent to LLM):", expandable.substring(0, 300));
+      const result = await createPromptWithArchitect(locked, expandable, googleApiKey);
+      finalPrompt = result.final;
+      expandedPromptForUI = result.architectOutput || undefined;
+      console.log("✅ FINAL PROMPT:", finalPrompt.substring(0, 400));
     } else {
-      // No Architect — use raw prompt as-is
       finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
     }
 
