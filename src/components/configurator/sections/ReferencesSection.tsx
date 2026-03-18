@@ -139,7 +139,7 @@ export function ReferencesSection({ config, onUpdate }: Props) {
         </div>
       )}
 
-      {config.styleReferences.length < 4 && (
+      {config.styleReferences.length < 5 && (
         <button
           onClick={() => fileInputRef.current?.click()}
           className="flex h-16 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary transition-all duration-200"
@@ -150,7 +150,7 @@ export function ReferencesSection({ config, onUpdate }: Props) {
       )}
 
       <p className="text-[8px] text-muted-foreground/40">
-        {config.styleReferences.length}/4 referências
+        {config.styleReferences.length}/5 referências · JPG, PNG, WEBP, HEIC, AVIF, BMP, TIFF, SVG
       </p>
 
       <Dialog open={!!pendingUrl} onOpenChange={(open) => !open && setPendingUrl(null)}>
