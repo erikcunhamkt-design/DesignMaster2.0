@@ -30,14 +30,15 @@ export function SubjectSection({ config, onUpdate }: Props) {
     { id: 'direita' as const, label: 'Dir', icon: AlignRight },
   ];
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     const remaining = 5 - config.subjectPhotos.length;
     if (remaining <= 0) return;
-    const newUrls = Array.from(files).slice(0, remaining).map(f => URL.createObjectURL(f));
-    onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
     e.target.value = '';
+    const selected = Array.from(files).slice(0, remaining);
+    const newUrls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
+    onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
   };
 
   const removePhoto = (index: number) => {
