@@ -13,6 +13,50 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.7.0',
+    date: '18 Mar 2026',
+    title: 'Portrait Master — Motor Fotográfico Profissional',
+    highlights: [
+      'Photoshoot Agent interno expande configs em prompts fotográficos ultra-detalhados',
+      'Portrait Master agora usa API Google diretamente (como todos os estúdios)',
+      'Seletor de modelo (Nano Banana Pro / Nano Banana 2) no Portrait Master',
+      'Fix: Upload de fotos no criador principal restaurado',
+    ],
+    changes: [
+      {
+        icon: <Camera className="h-4 w-4 text-primary" />,
+        category: 'Photoshoot Agent',
+        items: [
+          'Motor interno com base de conhecimento completa de fotografia profissional',
+          'Câmeras (Canon 5D, Hasselblad H6D, Sony a7R IV, Fujifilm GFX 100...)',
+          'Lentes (85mm f/1.2, 135mm f/2, 50mm f/1.4, 70-200mm f/2.8...)',
+          'Ângulos, composição, iluminação — tudo expandido automaticamente',
+          'O usuário configura, o agente cria o prompt profissional nos bastidores',
+        ],
+      },
+      {
+        icon: <Cpu className="h-4 w-4 text-amber-400" />,
+        category: 'API Google Direta',
+        items: [
+          'Portrait Master migrado de gateway interno para API Google direta',
+          'Mesmo padrão de todos os outros estúdios (API Key do usuário)',
+          'Seletor de modelo: Nano Banana Pro (qualidade) ou Nano Banana 2 (velocidade)',
+          'Retry automático com exponential backoff para erros 429',
+        ],
+      },
+      {
+        icon: <Upload className="h-4 w-4 text-emerald-400" />,
+        category: 'Fix de Upload',
+        items: [
+          'Upload de fotos no criador principal (/studio/criador) restaurado',
+          'Import lazy de heic2any evita quebra silenciosa do módulo',
+          'Arquivos comuns (JPG, PNG, WEBP) usam URL.createObjectURL direto',
+          'Try-catch em todos os handlers de upload com feedback de erro',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.6.0',
     date: '17 Mar 2026',
     title: 'Menu Contextual & Gestão de Conversas',
