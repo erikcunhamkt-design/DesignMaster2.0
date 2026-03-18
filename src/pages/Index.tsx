@@ -82,19 +82,13 @@ const Index = () => {
       const styleReferenceImages: string[] = [];
       const referenceNotes: string[] = [];
       for (const ref of genRequest.references.slice(0, 8)) {
-        try {
-          // Compress each image to max 1024px JPEG 85% before sending
-          const compressed = await compressImageToBase64(ref.url, 1024, 0.85);
-          if (ref.role === 'identity') {
-            subjectImages.push(compressed);
-          } else {
-            styleReferenceImages.push(compressed);
-            if (ref.attributes && ref.attributes.length > 0) {
-              referenceNotes.push(ref.attributes.join(', '));
-            }
+        if (ref.role === 'identity') {
+          subjectImages.push(ref.url);
+        } else {
+          styleReferenceImages.push(ref.url);
+          if (ref.attributes && ref.attributes.length > 0) {
+            referenceNotes.push(ref.attributes.join(', '));
           }
-        } catch {
-          // skip failed references
         }
       }
 
