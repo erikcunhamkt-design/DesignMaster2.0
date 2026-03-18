@@ -7,7 +7,7 @@ import { DownloadButtons } from '@/components/DownloadButtons';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { compressImageToBase64 } from '@/lib/imageUtils';
+
 
 interface PortraitConfig {
   gender: string;
