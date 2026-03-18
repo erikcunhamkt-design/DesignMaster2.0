@@ -43,6 +43,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
+const PortraitStudioPage = lazy(() => import("./pages/PortraitStudioPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,6 +112,7 @@ const App = () => {
               <Route path="/studio/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/studio/changelog" element={<ProtectedRoute><ChangelogPage /></ProtectedRoute>} />
+              <Route path="/studio/portrait" element={<ProtectedRoute><PortraitStudioPage /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
