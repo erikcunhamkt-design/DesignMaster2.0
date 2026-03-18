@@ -1,5 +1,3 @@
-import heic2any from 'heic2any';
-
 const HEIC_EXTENSIONS = ['.heic', '.heif'];
 
 function isHeicFile(file: File): boolean {
@@ -12,14 +10,23 @@ function isHeicFile(file: File): boolean {
 /** Converts HEIC/HEIF files to JPEG blobs; returns other files as-is. */
 export async function normalizeImageFile(file: File): Promise<Blob> {
   if (!isHeicFile(file)) return file;
+  const { default: heic2any } = await import('heic2any');
   const result = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
   return Array.isArray(result) ? result[0] : result;
 }
 
 /** Creates an object URL from a file, converting HEIC first if needed. */
 export async function createNormalizedObjectUrl(file: File): Promise<string> {
-  const blob = await normalizeImageFile(file);
-  return URL.createObjectURL(blob);
+  if (!isHeicFile(file)) {
+    return URL.createObjectURL(file);
+  }
+  try {
+    const blob = await normalizeImageFile(file);
+    return URL.createObjectURL(blob);
+  } catch (e) {
+    console.warn('HEIC conversion failed, using original:', e);
+    return URL.createObjectURL(file);
+  }
 }
 
 /**
@@ -37,7 +44,6 @@ export async function compressImageToBase64(
     img.onload = () => {
       let { width, height } = img;
 
-      // Scale down keeping aspect ratio
       if (width > maxDimension || height > maxDimension) {
         if (width >= height) {
           height = Math.round(height * (maxDimension / width));

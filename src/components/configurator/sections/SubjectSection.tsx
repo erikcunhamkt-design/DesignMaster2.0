@@ -35,10 +35,14 @@ export function SubjectSection({ config, onUpdate }: Props) {
     if (!files) return;
     const remaining = 5 - config.subjectPhotos.length;
     if (remaining <= 0) return;
-    e.target.value = '';
     const selected = Array.from(files).slice(0, remaining);
-    const newUrls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
-    onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
+    e.target.value = '';
+    try {
+      const newUrls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
+      onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
+    } catch (err) {
+      console.error('Erro ao processar foto:', err);
+    }
   };
 
   const removePhoto = (index: number) => {
