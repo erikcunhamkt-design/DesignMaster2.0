@@ -44,6 +44,7 @@ const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const PortraitStudioPage = lazy(() => import("./pages/PortraitStudioPage"));
+const CarouselEditorPage = lazy(() => import("./pages/CarouselEditorPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
