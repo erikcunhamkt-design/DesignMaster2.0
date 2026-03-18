@@ -7,12 +7,12 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// PHOTOSHOOT AGENT — Internal Photography Knowledge Base
+// FOTÓGRAFO PROFISSIONAL — Internal Photography Knowledge Base
 // Silently expands user config into hyper-detailed photographic prompts
 // using professional camera, lens, angle, composition & lighting data.
 // ══════════════════════════════════════════════════════════════
 
-const PHOTOSHOOT_SYSTEM = `You are PHOTOSHOOT AGENT — an elite internal photography prompt engine.
+const PHOTOSHOOT_SYSTEM = `You are FOTÓGRAFO PROFISSIONAL — an elite internal photography prompt engine.
 You receive a portrait configuration and SILENTLY transform it into a hyper-detailed, cinematic, professional photography prompt.
 
 You have deep knowledge of professional photography equipment and techniques:
@@ -137,7 +137,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
-  console.log("📸 PHOTOSHOOT AGENT: Expanding portrait config into detailed prompt...");
+  console.log("📸 FOTÓGRAFO PROFISSIONAL: Expanding portrait config into detailed prompt...");
 
   const response = await fetch(url, {
     method: "POST",
@@ -154,7 +154,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
   });
 
   if (!response.ok) {
-    console.error("Photoshoot agent expansion failed:", response.status);
+    console.error("Fotógrafo Profissional expansion failed:", response.status);
     return configDescription;
   }
 
@@ -162,11 +162,11 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
   const expanded = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
   if (!expanded) {
-    console.warn("Photoshoot agent returned empty, using raw config");
+    console.warn("Fotógrafo Profissional returned empty, using raw config");
     return configDescription;
   }
 
-  console.log("✅ PHOTOSHOOT AGENT expanded:", expanded.substring(0, 400));
+  console.log("✅ FOTÓGRAFO PROFISSIONAL expanded:", expanded.substring(0, 400));
   return expanded;
 }
 
@@ -242,7 +242,7 @@ serve(async (req) => {
     const configDescription = buildConfigDescription(config);
     console.log("📋 Config description:", configDescription.substring(0, 300));
 
-    // Step 2: Silently expand with Photoshoot Agent
+    // Step 2: Silently expand with Fotógrafo Profissional
     const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey);
 
     const genderLabel = config.gender === 'female' ? 'woman/female' : 'man/male';
