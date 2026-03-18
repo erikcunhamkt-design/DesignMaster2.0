@@ -242,7 +242,7 @@ serve(async (req) => {
     const configDescription = buildConfigDescription(config);
     console.log("📋 Config description:", configDescription.substring(0, 300));
 
-    // Step 2: Silently expand with Photoshoot Agent
+    // Step 2: Silently expand with Fotógrafo Profissional
     const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey);
 
     const genderLabel = config.gender === 'female' ? 'woman/female' : 'man/male';

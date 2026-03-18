@@ -15,9 +15,9 @@ const patchNotes: PatchNote[] = [
   {
     version: '2.7.0',
     date: '18 Mar 2026',
-    title: 'Portrait Master — Motor Fotográfico Profissional',
+    title: 'Portrait Master — Fotógrafo Profissional',
     highlights: [
-      'Photoshoot Agent interno expande configs em prompts fotográficos ultra-detalhados',
+      'Fotógrafo Profissional interno expande configs em prompts fotográficos ultra-detalhados',
       'Portrait Master agora usa API Google diretamente (como todos os estúdios)',
       'Seletor de modelo (Nano Banana Pro / Nano Banana 2) no Portrait Master',
       'Fix: Upload de fotos no criador principal restaurado',
@@ -25,7 +25,7 @@ const patchNotes: PatchNote[] = [
     changes: [
       {
         icon: <Camera className="h-4 w-4 text-primary" />,
-        category: 'Photoshoot Agent',
+        category: 'Fotógrafo Profissional',
         items: [
           'Motor interno com base de conhecimento completa de fotografia profissional',
           'Câmeras (Canon 5D, Hasselblad H6D, Sony a7R IV, Fujifilm GFX 100...)',
