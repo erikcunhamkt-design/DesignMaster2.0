@@ -12,7 +12,7 @@ import {
 import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles, Upload,
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown, Paperclip,
-  Mic, MicOff, Image, User, X, ChevronDown
+  Mic, MicOff, Image, User, X, ChevronDown, Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
