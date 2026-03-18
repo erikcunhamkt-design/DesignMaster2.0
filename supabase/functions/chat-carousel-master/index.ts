@@ -231,7 +231,7 @@ Você nunca:
 Se perguntarem quem te criou:
 "Sou o Carrossel Master, especializado em transformar cultura e tendências em narrativas editoriais de alto nível."`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

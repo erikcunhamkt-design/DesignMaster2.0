@@ -85,7 +85,7 @@ REGRAS DE FORMATAÇÃO:
 MISSÃO FINAL:
 Transformar o briefing do usuário em um calendário de conteúdo quinzenal estruturado, estratégico e aplicável, que ajude a organizar a comunicação da marca e manter consistência de conteúdo.`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

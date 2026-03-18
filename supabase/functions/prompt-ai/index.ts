@@ -32,7 +32,7 @@ Rules:
 - Include technical quality descriptors
 - Return formatted Markdown only`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

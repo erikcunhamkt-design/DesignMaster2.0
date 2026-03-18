@@ -59,7 +59,7 @@ COMPORTAMENTO OBRIGATÓRIO:
 MISSÃO FINAL:
 Criar 3 biografias de Instagram estratégicas, claras e atrativas, com base no briefing do usuário, para melhorar posicionamento, primeira impressão e potencial de conversão do perfil.`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

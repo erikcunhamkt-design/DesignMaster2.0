@@ -62,7 +62,7 @@ Render the final result in:
 NEGATIVE INSTRUCTIONS:
 no face morphing, no expression changes, no identity alteration, no background replacement, no new objects, no beauty filters, no oversmoothed skin, no plastic texture, no fake glow, no HDR artifacts, no oversharpening, no dramatic lighting changes, no AI-altered facial structure`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
