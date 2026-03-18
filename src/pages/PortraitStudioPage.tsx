@@ -139,18 +139,12 @@ export default function PortraitStudioPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onloadend = async () => {
+    reader.onloadend = () => {
       const b64 = reader.result as string;
       setSubjectPreview(b64);
-      try {
-        const compressed = await compressImageToBase64(b64, 1024, 0.85);
-        setSubjectImage(compressed);
-        update('hasReference', true);
-        toast.success('Foto carregada!');
-      } catch {
-        setSubjectImage(b64);
-        update('hasReference', true);
-      }
+      setSubjectImage(b64);
+      update('hasReference', true);
+      toast.success('Foto carregada!');
     };
     reader.readAsDataURL(file);
     e.target.value = '';
