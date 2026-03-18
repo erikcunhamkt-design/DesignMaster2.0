@@ -38,6 +38,7 @@ const BioChatPage = lazy(() => import("./pages/BioChatPage"));
 const CommunityChatPage = lazy(() => import("./pages/CommunityChatPage"));
 const DirectMessagesPage = lazy(() => import("./pages/DirectMessagesPage"));
 const CentralChatPage = lazy(() => import("./pages/CentralChatPage"));
+const VoidCanvasPage = lazy(() => import("./pages/VoidCanvasPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -110,6 +111,7 @@ const App = () => {
               <Route path="/studio/community-chat" element={<ProtectedRoute><CommunityChatPage /></ProtectedRoute>} />
               <Route path="/studio/direct-messages" element={<ProtectedRoute><DirectMessagesPage /></ProtectedRoute>} />
               <Route path="/studio/chat-hub" element={<ProtectedRoute><CentralChatPage /></ProtectedRoute>} />
+              <Route path="/studio/void" element={<ProtectedRoute><VoidCanvasPage /></ProtectedRoute>} />
               <Route path="/studio/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/studio/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />

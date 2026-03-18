@@ -23,6 +23,16 @@ export const studios: Studio[] = [
     gradient: 'from-primary/20 to-accent/10',
   },
   {
+    id: 'void',
+    name: 'VOID',
+    tagline: 'Canvas infinito criativo.',
+    description: 'Espaço infinito para gerar, importar, arrastar e conectar suas criações com estilo de buraco negro.',
+    icon: '🕳️',
+    route: '/studio/void',
+    gradient: 'from-primary/20 to-cyan-500/10',
+    isNew: true,
+  },
+  {
     id: 'extrator',
     name: 'Extrator de Prompts',
     tagline: 'Extraia prompts de imagens com IA.',

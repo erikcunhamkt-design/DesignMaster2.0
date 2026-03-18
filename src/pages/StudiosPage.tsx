@@ -30,6 +30,7 @@ import calendarHero from '@/assets/calendar-hero.png';
 import bioHero from '@/assets/bio-hero.png';
 import communityChatHero from '@/assets/community-chat-hero.png';
 import portraitStudioHero from '@/assets/portrait-studio-hero.png';
+import voidHero from '@/assets/void-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
@@ -50,6 +51,7 @@ const studioImages: Record<string, string> = {
   'bio': bioHero,
   'community-chat': communityChatHero,
   'portrait-studio': portraitStudioHero,
+  'void': voidHero,
 };
 
 const sections = [
@@ -72,6 +74,7 @@ const sectionFilterMap: Record<string, string[]> = {
 };
 
 const FEATURED_STUDIO_ID = 'criador';
+const FEATURED_VOID_ID = 'void';
 
 export default function StudiosPage() {
   const navigate = useNavigate();
@@ -82,6 +85,7 @@ export default function StudiosPage() {
   const { recents, trackUsage } = useRecentTools();
 
   const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
+  const featuredVoid = studios.find((s) => s.id === FEATURED_VOID_ID)!;
 
   // Navigate to studio and track usage
   const navigateToStudio = useCallback((route: string, studioId: string) => {
@@ -139,46 +143,89 @@ export default function StudiosPage() {
         <main className="flex-1 overflow-y-auto px-4 md:px-8 pb-16">
           {/* Hero section */}
           {activeSection === 'home' && !searchQuery && (
-            <div className="relative mt-6 md:mt-8 mb-8 md:mb-10 animate-fade-up">
-              <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-primary/50 via-primary/80 to-accent/50 opacity-60 blur-[3px] animate-pulse pointer-events-none" />
-              <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
+            <>
+              <div className="relative mt-6 md:mt-8 mb-6 animate-fade-up">
+                <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-primary/50 via-primary/80 to-accent/50 opacity-60 blur-[3px] animate-pulse pointer-events-none" />
+                <div className="absolute -inset-[1px] rounded-[19px] bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
 
-              <button
-                onClick={() => navigateToStudio(featured.route, featured.id)}
-                className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[160px] md:h-[180px] bg-card/60 backdrop-blur-md"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-                <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-72 h-36 bg-primary/8 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/15 transition-all duration-700" />
+                <button
+                  onClick={() => navigateToStudio(featured.route, featured.id)}
+                  className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[160px] md:h-[180px] bg-card/60 backdrop-blur-md"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/8 pointer-events-none" />
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                  <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-72 h-36 bg-primary/8 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/15 transition-all duration-700" />
 
-                <div className="relative flex items-center justify-between h-full px-5 md:px-10 py-5 md:py-0">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
-                      <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70">Ferramenta principal</span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 md:px-2.5 py-0.5 text-[9px] md:text-[10px] font-bold text-primary border border-primary/25 shadow-[0_0_8px_hsl(var(--primary)/0.3)]">
-                        <Sparkles className="h-2 w-2 md:h-2.5 md:w-2.5" />
-                        Destaque
-                      </span>
+                  <div className="relative flex items-center justify-between h-full px-5 md:px-10 py-5 md:py-0">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
+                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70">Ferramenta principal</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 md:px-2.5 py-0.5 text-[9px] md:text-[10px] font-bold text-primary border border-primary/25 shadow-[0_0_8px_hsl(var(--primary)/0.3)]">
+                          <Sparkles className="h-2 w-2 md:h-2.5 md:w-2.5" />
+                          Destaque
+                        </span>
+                      </div>
+                      <h1 className="text-xl md:text-[28px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 md:mb-2.5 drop-shadow-[0_0_20px_hsl(var(--primary)/0.25)]">
+                        {featured.name}
+                      </h1>
+                      <p className="text-xs md:text-sm text-muted-foreground max-w-lg leading-relaxed line-clamp-2 md:line-clamp-none">
+                        Crie imagens com IA usando controles avançados de estilo, iluminação e composição.
+                      </p>
+                      <div className="mt-3 md:mt-4 inline-flex items-center gap-2 rounded-xl bg-primary/15 border border-primary/25 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                        Abrir o Design Master
+                        <ArrowRight className="h-3 w-3 md:h-3.5 md:w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </div>
                     </div>
-                    <h1 className="text-xl md:text-[28px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 md:mb-2.5 drop-shadow-[0_0_20px_hsl(var(--primary)/0.25)]">
-                      {featured.name}
-                    </h1>
-                    <p className="text-xs md:text-sm text-muted-foreground max-w-lg leading-relaxed line-clamp-2 md:line-clamp-none">
-                      Crie imagens com IA usando controles avançados de estilo, iluminação e composição.
-                    </p>
-                    <div className="mt-3 md:mt-4 inline-flex items-center gap-2 rounded-xl bg-primary/15 border border-primary/25 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                      Abrir o Design Master
-                      <ArrowRight className="h-3 w-3 md:h-3.5 md:w-3.5 transition-transform group-hover:translate-x-0.5" />
+
+                    <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-primary/20 bg-primary/10 group-hover:border-primary/40 group-hover:bg-primary/20 group-hover:shadow-glow-sm transition-all duration-300 shrink-0 ml-8">
+                      <ArrowRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
+                </button>
+              </div>
 
-                  <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-primary/20 bg-primary/10 group-hover:border-primary/40 group-hover:bg-primary/20 group-hover:shadow-glow-sm transition-all duration-300 shrink-0 ml-8">
-                    <ArrowRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-0.5" />
+              {/* VOID Hero */}
+              <div className="relative mb-8 md:mb-10 animate-fade-up" style={{ animationDelay: '100ms' }}>
+                <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-cyan-500/40 via-primary/60 to-cyan-500/40 opacity-50 blur-[3px] pointer-events-none" />
+
+                <button
+                  onClick={() => navigateToStudio(featuredVoid.route, featuredVoid.id)}
+                  className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[140px] md:h-[160px] bg-[#050a0e]"
+                >
+                  <img src={voidHero} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-45 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#050a0e]/90 via-[#050a0e]/60 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+
+                  <div className="relative flex items-center justify-between h-full px-5 md:px-10">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/70">Canvas Infinito</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/15 px-2 py-0.5 text-[9px] font-bold text-cyan-400 border border-cyan-400/25">
+                          <Sparkles className="h-2 w-2" />
+                          Novo
+                        </span>
+                      </div>
+                      <h2 className="text-xl md:text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_rgba(0,255,200,0.2)]">
+                        🕳️ {featuredVoid.name}
+                      </h2>
+                      <p className="text-xs text-muted-foreground max-w-md leading-relaxed line-clamp-2">
+                        {featuredVoid.description}
+                      </p>
+                      <div className="mt-3 inline-flex items-center gap-2 rounded-xl bg-cyan-400/10 border border-cyan-400/20 px-3 py-1.5 text-[10px] font-semibold text-cyan-400 group-hover:bg-cyan-400/20 transition-all duration-300">
+                        Entrar no VOID
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+
+                    <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-cyan-400/20 bg-cyan-400/10 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_rgba(0,255,200,0.15)] transition-all duration-300 shrink-0 ml-8">
+                      <ArrowRight className="h-5 w-5 text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+                    </div>
                   </div>
-                </div>
-              </button>
-            </div>
+                </button>
+              </div>
+            </>
           )}
 
           {/* Section title when filtered */}
