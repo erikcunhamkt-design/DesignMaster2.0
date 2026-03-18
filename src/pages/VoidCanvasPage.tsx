@@ -58,9 +58,8 @@ export default function VoidCanvasPage() {
   const [modelOpen, setModelOpen] = useState(false);
 
   const imageModels = [
-    { id: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro Image', desc: 'Máxima qualidade', badge: 'PRO' },
-    { id: 'gemini-3.1-flash-image-preview', label: 'Gemini 3.1 Flash Image', desc: 'Rápido e preciso', badge: 'NEW' },
-    { id: 'gemini-2.5-flash-image', label: 'Gemini 2.5 Flash Image', desc: 'Equilibrado', badge: '' },
+    { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
+    { id: 'gemini-3.1-flash-image-preview', label: 'Nano Banana 2', desc: 'Rápido · Gemini 3.1', badge: 'NEW' },
   ] as const;
   const chatEndRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
