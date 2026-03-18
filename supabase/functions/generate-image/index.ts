@@ -72,7 +72,7 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
   });
 
   if (!response.ok) {
-    console.error("GAB prompt creation failed, using raw input:", response.status);
+    console.error("Architect prompt creation failed, using raw input:", response.status);
     return `${locked} ${expandable}`.trim();
   }
 
