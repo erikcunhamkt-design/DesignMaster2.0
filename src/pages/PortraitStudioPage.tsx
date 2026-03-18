@@ -162,11 +162,15 @@ export default function PortraitStudioPage() {
   };
 
   const handleGenerate = async () => {
+    if (!hasKey) {
+      toast.error('Configure sua API Key do Google primeiro (botão API na topbar).');
+      return;
+    }
     setIsProcessing(true);
     setResultImage(null);
     try {
       const { data, error } = await supabase.functions.invoke('generate-portrait', {
-        body: { config, subjectImage },
+        body: { config, subjectImage, googleApiKey, aiModel },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
