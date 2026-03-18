@@ -32,11 +32,9 @@ export function SubjectSection({ config, onUpdate }: Props) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const newUrls: string[] = [];
-    Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file);
-      newUrls.push(url);
-    });
+    const remaining = 5 - config.subjectPhotos.length;
+    if (remaining <= 0) return;
+    const newUrls = Array.from(files).slice(0, remaining).map(f => URL.createObjectURL(f));
     onUpdate({ subjectPhotos: [...config.subjectPhotos, ...newUrls] });
     e.target.value = '';
   };
