@@ -1,6 +1,7 @@
 import { Plus, X, Check } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ProjectConfig } from '@/types/project';
+import { createNormalizedObjectUrl } from '@/lib/imageUtils';
 import {
   Dialog,
   DialogContent,
@@ -30,16 +31,19 @@ export function ReferencesSection({ config, onUpdate }: Props) {
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const remaining = 5 - config.styleReferences.length;
     if (remaining <= 0) return;
     const selected = Array.from(files).slice(0, remaining);
-    // Process one at a time to show note dialog for first new one
-    const url = URL.createObjectURL(selected[0]);
-    // Add remaining files directly (skip note dialog for batch)
-    const extraUrls = selected.slice(1).map(f => URL.createObjectURL(f));
+    e.target.value = '';
+
+    // Convert all files (HEIC→JPEG if needed)
+    const urls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
+
+    // First file opens the note dialog
+    const extraUrls = urls.slice(1);
     if (extraUrls.length > 0) {
       const newRefs = [...config.styleReferences, ...extraUrls];
       const attrs = { ...(config.referenceAttributes || {}) };
@@ -51,9 +55,8 @@ export function ReferencesSection({ config, onUpdate }: Props) {
       });
       onUpdate({ styleReferences: newRefs, referenceAttributes: attrs, referenceNotes: notes });
     }
-    setPendingUrl(url);
+    setPendingUrl(urls[0]);
     setNoteText('');
-    e.target.value = '';
   };
 
   const confirmReference = () => {
