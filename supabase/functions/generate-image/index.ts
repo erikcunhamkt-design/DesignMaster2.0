@@ -7,31 +7,52 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// PROMPT ARCHITECT PRO — Cinematic Context Enhancer
-// Only enhances EXPANDABLE context. LOCKED parts pass through untouched.
+// GAB — PROMPT CREATOR PRO (replaces PROMPT ARCHITECT PRO)
+// Creates hyper-detailed structured prompts from simple ideas.
+// Respects LOCKED parts (sidebar selections) as mandatory.
 // ══════════════════════════════════════════════════════════════
-const PROMPT_ARCHITECT_SYSTEM = `You are PROMPT ARCHITECT PRO — a cinematic context enhancer for AI image generation.
+const GAB_SYSTEM = `You are GAB — PROMPT CREATOR PRO, a hyper-detailed prompt engineer for AI image generation.
 
-You will receive an EXPANDABLE CONTEXT section. Your job is to ENHANCE it with cinematic quality — better lighting descriptions, richer environment details, texture realism, and quality tokens.
+You receive TWO sections:
+1. MANDATORY INSTRUCTIONS — sidebar selections (pose, clothing, expression, text, accessories, format, colors). Preserve these EXACTLY as provided. Never omit, rephrase, or generalize any detail.
+2. CREATIVE CONTEXT — the user's idea or scene description. Enhance this freely with cinematic detail.
 
-IMPORTANT: You are NOT rewriting the full prompt. You are ONLY enhancing the expandable context section. The user's specific choices (clothing, pose, expression, text, accessories) are handled separately and will NOT be passed to you.
+YOUR JOB: Merge both into ONE hyper-detailed continuous prompt following this MANDATORY 12-STAGE STRUCTURE (no line breaks, no labels, no brackets in output):
 
-ENHANCEMENT STAGES:
-- Environment: Enrich spatial context, atmosphere, background depth
-- Lighting: Layer cinematic key/fill/rim lights, volumetric effects
-- Textures: Add micro-realism (skin pores, fabric fiber, material detail)
-- Quality: Add render tokens (8K, sharp focus, HDR, cinematic grade)
-- Color: Enhance color harmony and grading
+[Main Subject] [Pose or Action] [Environment] [Camera Angle] [Image Style] [Physical Details] [Texture and Lighting] [Color Palette] [Art Style / Era] [Negative Commands] [Realism Tokens] [Deep Texture Commands]
+
+STAGE DETAILS:
+1. Main Subject — Who/what is the subject. Use MANDATORY details first, then enrich.
+2. Pose or Action — Body position, gesture, movement. Use MANDATORY pose if provided.
+3. Environment — Setting, background, atmosphere, spatial depth, weather.
+4. Camera Angle — Lens, shot type, perspective. Use MANDATORY if provided, else choose cinematically.
+5. Image Style — Photorealistic, illustration, 3D render, etc.
+6. Physical Details — Skin, hair, fabric, material textures, accessories. MANDATORY items go here verbatim.
+7. Texture and Lighting — Cinematic key/fill/rim lights, volumetric effects, shadow quality, ambient occlusion.
+8. Color Palette — Dominant and accent colors, color grading, harmony.
+9. Art Style / Era — Visual inspiration, artistic movement, era reference.
+10. Negative Commands — Always append: no text, no watermark, no logo, no signature, no border.
+11. Realism Tokens — high-definition texture, ultra-sharp details, 8K quality, extreme sharpness, depth of field.
+12. Deep Texture Commands — skin pores visible, fabric fiber detail, extreme realism, volumetric lighting, cinematic grade, HDR.
 
 RULES:
-- Output ONLY the enhanced context as a single continuous line
-- No commentary, no explanation, no labels
-- Do NOT invent new subject details, clothing, poses, or expressions
-- Only enhance atmosphere, lighting, textures, and quality
-- Write in English only`;
+- Output ONLY the final prompt as a single continuous line in English
+- No commentary, no explanation, no labels, no stage markers
+- When the user idea is vague, complete it creatively with rich cinematic detail
+- NEVER omit MANDATORY INSTRUCTIONS — they have absolute priority
+- Always include stages 10-12 (negative, realism, deep texture) even if not mentioned
+- Do NOT translate to Portuguese — English only`;
 
-async function expandContextWithAI(expandablePrompt: string, googleApiKey: string): Promise<string> {
-  if (!expandablePrompt?.trim()) return "";
+async function createPromptWithGAB(locked: string, expandable: string, googleApiKey: string): Promise<string> {
+  const userContent = locked.trim() && expandable.trim()
+    ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
+    : locked.trim()
+      ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}`
+      : expandable.trim()
+        ? `--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
+        : "";
+
+  if (!userContent) return "";
   
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
@@ -41,22 +62,22 @@ async function expandContextWithAI(expandablePrompt: string, googleApiKey: strin
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n--- EXPANDABLE CONTEXT TO ENHANCE ---\n${expandablePrompt}` }]
+        parts: [{ text: `${GAB_SYSTEM}\n\n${userContent}` }]
       }],
       generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 800,
+        temperature: 0.4,
+        maxOutputTokens: 1200,
       },
     }),
   });
 
   if (!response.ok) {
-    console.error("Context expansion failed, using raw context:", response.status);
-    return expandablePrompt;
+    console.error("GAB prompt creation failed, using raw input:", response.status);
+    return `${locked} ${expandable}`.trim();
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || expandablePrompt;
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `${locked} ${expandable}`.trim();
 }
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
@@ -112,21 +133,19 @@ serve(async (req) => {
     // Model selection
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
-    // ── Build final prompt with LOCKED + EXPANDED approach ──
+    // ── Build final prompt with GAB - PROMPT CREATOR PRO ──
     let finalPrompt: string;
     const locked = lockedPrompt || prompt || "";
     const expandable = expandablePrompt || "";
 
-    if (useArchitect && expandable.trim()) {
-      console.log("🧠 PROMPT ARCHITECT PRO: Enhancing expandable context...");
-      console.log("🔒 LOCKED (untouched):", locked.substring(0, 300));
-      console.log("🔓 EXPANDABLE (to enhance):", expandable.substring(0, 300));
-      const enhancedContext = await expandContextWithAI(expandable, googleApiKey);
-      console.log("✅ ENHANCED CONTEXT:", enhancedContext.substring(0, 300));
-      // Locked parts FIRST (highest priority), then enhanced context
-      finalPrompt = `${locked}\n\n${enhancedContext}`;
+    if (useArchitect && (locked.trim() || expandable.trim())) {
+      console.log("🧠 GAB - PROMPT CREATOR PRO: Creating hyper-detailed prompt...");
+      console.log("🔒 LOCKED (mandatory):", locked.substring(0, 300));
+      console.log("🔓 EXPANDABLE (creative):", expandable.substring(0, 300));
+      finalPrompt = await createPromptWithGAB(locked, expandable, googleApiKey);
+      console.log("✅ GAB OUTPUT:", finalPrompt.substring(0, 400));
     } else {
-      // No Architect or no expandable — use full prompt as-is
+      // No GAB — use raw prompt as-is
       finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
     }
 
