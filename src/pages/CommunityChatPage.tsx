@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
 import { UsernameSetupDialog } from '@/components/chat/UsernameSetupDialog';
 import { UserProfilePopover } from '@/components/chat/UserProfilePopover';
+import { DashboardSidebar, MobileSidebarTrigger } from '@/components/layout/DashboardSidebar';
 
 interface CommunityMessage {
   id: string;
