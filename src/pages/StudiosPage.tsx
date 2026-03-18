@@ -183,6 +183,48 @@ export default function StudiosPage() {
                 </div>
               </button>
             </div>
+
+            {/* VOID Hero */}
+            <div className="relative mb-8 md:mb-10 animate-fade-up" style={{ animationDelay: '100ms' }}>
+              <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-cyan-500/40 via-primary/60 to-cyan-500/40 opacity-50 blur-[3px] pointer-events-none" />
+
+              <button
+                onClick={() => navigateToStudio(featuredVoid.route, featuredVoid.id)}
+                className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[140px] md:h-[160px] bg-[#050a0e]"
+              >
+                {/* Void background image */}
+                <img src={voidHero} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-45 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#050a0e]/90 via-[#050a0e]/60 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+
+                <div className="relative flex items-center justify-between h-full px-5 md:px-10">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/70">Canvas Infinito</span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/15 px-2 py-0.5 text-[9px] font-bold text-cyan-400 border border-cyan-400/25">
+                        <Sparkles className="h-2 w-2" />
+                        Novo
+                      </span>
+                    </div>
+                    <h2 className="text-xl md:text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_rgba(0,255,200,0.2)]">
+                      🕳️ {featuredVoid.name}
+                    </h2>
+                    <p className="text-xs text-muted-foreground max-w-md leading-relaxed line-clamp-2">
+                      {featuredVoid.description}
+                    </p>
+                    <div className="mt-3 inline-flex items-center gap-2 rounded-xl bg-cyan-400/10 border border-cyan-400/20 px-3 py-1.5 text-[10px] font-semibold text-cyan-400 group-hover:bg-cyan-400/20 transition-all duration-300">
+                      Entrar no VOID
+                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+
+                  <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-cyan-400/20 bg-cyan-400/10 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_rgba(0,255,200,0.15)] transition-all duration-300 shrink-0 ml-8">
+                    <ArrowRight className="h-5 w-5 text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </div>
+              </button>
+            </div>
           )}
 
           {/* Section title when filtered */}

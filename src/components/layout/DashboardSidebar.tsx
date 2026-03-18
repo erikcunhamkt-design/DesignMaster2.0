@@ -38,6 +38,7 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { id: 'home', label: 'Home', icon: Home },
+  { id: 'void', label: 'VOID', icon: Sparkles, route: '/studio/void' },
   { id: 'chat-hub', label: 'Chat IA', icon: MessagesSquare, route: '/studio/chat-hub' },
   { id: 'image-creators', label: 'Geradores', icon: Wand2, section: 'image-creators' },
   { id: 'creative-assistant', label: 'Agentes', icon: Brain, section: 'creative-assistant' },
