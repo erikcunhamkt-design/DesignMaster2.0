@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Plus, Trash2, ChevronLeft, ChevronRight, Eye, Search, Bot, ChevronDown, Sparkles } from 'lucide-react';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,7 @@ import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
 import { ConversationItem } from '@/components/chat/ConversationItem';
 import { DashboardSidebar, MobileSidebarTrigger } from '@/components/layout/DashboardSidebar';
+import { ApiKeyDialog } from '@/components/ApiKeyDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,13 +30,13 @@ interface Conversation { id: string; title: string; created_at: string; updated_
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 const AGENT_ID = 'hub';
 
-// Available Gemini models via Lovable AI
+// Available Gemini models (Google API direct)
 const MODELS = [
-  { id: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado' },
-  { id: 'google/gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado' },
-  { id: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo' },
-  { id: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício' },
-  { id: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido' },
+  { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado' },
+  { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado' },
+  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo' },
+  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício' },
+  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido' },
 ];
 
 const AGENTS = [
@@ -58,6 +60,7 @@ export default function CentralChatPage() {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [selectedAgent, setSelectedAgent] = useState(AGENTS[0]);
   const { user } = useAuth();
+  const { apiKey } = useGoogleApiKey();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -150,6 +153,7 @@ export default function CentralChatPage() {
       msg = msg ? `${msg}\n\n${lines}` : lines;
     }
     if (!msg || isLoading) return;
+    if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google no botão API no topo.'); return; }
 
     let convoId = activeConvoId;
     if (!convoId) { convoId = await createConversation(msg); if (!convoId) return; }
@@ -167,7 +171,7 @@ export default function CentralChatPage() {
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: allMessages, model: selectedModel.id, agentId: selectedAgent.id }),
+        body: JSON.stringify({ messages: allMessages, model: selectedModel.id, agentId: selectedAgent.id, googleApiKey: apiKey }),
       });
 
       if (!resp.ok) {
@@ -205,7 +209,7 @@ export default function CentralChatPage() {
           if (jsonStr === '[DONE]') { streamDone = true; break; }
           try {
             const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined;
             if (content) upsertAssistant(content);
           } catch { textBuffer = line + '\n' + textBuffer; break; }
         }
@@ -219,7 +223,7 @@ export default function CentralChatPage() {
           if (!raw.startsWith('data: ')) continue;
           const jsonStr = raw.slice(6).trim();
           if (jsonStr === '[DONE]') continue;
-          try { const parsed = JSON.parse(jsonStr); const content = parsed.choices?.[0]?.delta?.content as string | undefined; if (content) upsertAssistant(content); } catch { /* ignore */ }
+          try { const parsed = JSON.parse(jsonStr); const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined; if (content) upsertAssistant(content); } catch { /* ignore */ }
         }
       }
 
@@ -347,6 +351,10 @@ export default function CentralChatPage() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="ml-auto">
+              <ApiKeyDialog />
+            </div>
           </div>
 
           {/* Messages */}
