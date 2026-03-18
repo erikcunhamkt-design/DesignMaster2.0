@@ -222,6 +222,10 @@ serve(async (req) => {
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image.";
 
+    // ── Extract gender from locked prompt for identity reinforcement ──
+    const isFemale = /female|feminino/i.test(locked);
+    const genderWord = isFemale ? "woman/female" : "man/male";
+
     // ── Build parts with CLEAR SEPARATION of subject vs style references ──
     const parts: any[] = [];
     const hasSubject = subjectImages && subjectImages.length > 0;
@@ -230,7 +234,7 @@ serve(async (req) => {
 
     // 1. Subject photos FIRST with strong identity preservation instruction
     if (hasSubject) {
-      parts.push({ text: `[SUBJECT IDENTITY PHOTOS — You MUST preserve this person's exact face, features, skin tone, hair, and identity. The generated image must look like THIS SPECIFIC PERSON. Do NOT create a different person.]` });
+      parts.push({ text: `[SUBJECT IDENTITY — THIS IS THE ${genderWord.toUpperCase()} who MUST appear in the generated image. You MUST faithfully reproduce this EXACT person: same face shape, same eyes, same nose, same mouth, same skin tone, same hair color and style, same ethnicity. This is a ${genderWord}. Do NOT change the gender. Do NOT generate a different person. The output MUST be recognizable as this specific individual.]` });
       for (const img of subjectImages.slice(0, 5)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
@@ -242,8 +246,8 @@ serve(async (req) => {
     // 2. Style/pose reference photos with clear "reference only" instruction
     if (hasStyleRef) {
       const notesList = (referenceNotes || []).filter((n: string) => n?.trim());
-      const notesText = notesList.length > 0 ? ` Use these references for: ${notesList.join('; ')}.` : '';
-      parts.push({ text: `[STYLE/POSE REFERENCE ONLY — Use these images ONLY as inspiration for pose, composition, lighting, or style. Do NOT copy the person's face or identity from these. The subject must be the person from the SUBJECT IDENTITY PHOTOS above.${notesText}]` });
+      const notesText = notesList.length > 0 ? ` Specifically use for: ${notesList.join('; ')}.` : '';
+      parts.push({ text: `[STYLE/POSE REFERENCE ONLY — These images are ONLY for pose, composition, framing, lighting, and styling inspiration. COMPLETELY IGNORE the person's face and identity in these reference photos. The person in the final image MUST be the ${genderWord} from the SUBJECT IDENTITY photos above, NOT the person in these references.${notesText}]` });
       for (const img of styleReferenceImages.slice(0, 3)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
@@ -262,10 +266,14 @@ serve(async (req) => {
       }
     }
 
-    // 4. Main prompt text AFTER images
-    const identityReminder = hasSubject && hasStyleRef
-      ? "\n\nCRITICAL REMINDER: The person in the generated image MUST be the EXACT same person from the SUBJECT IDENTITY PHOTOS. Use STYLE REFERENCE images only for pose/composition/lighting inspiration — NOT for the person's appearance."
-      : "";
+    // 4. Main prompt text AFTER images with identity reinforcement
+    let identityReminder = "";
+    if (hasSubject) {
+      identityReminder = `\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderWord} from the SUBJECT IDENTITY photos. Same face, same features, same gender (${genderWord}). This is NON-NEGOTIABLE.`;
+      if (hasStyleRef) {
+        identityReminder += ` Style references are ONLY for pose/lighting/composition — NEVER for the person's appearance.`;
+      }
+    }
     const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}${identityReminder}\n\nAvoid: ${finalNegative}`;
     parts.push({ text: fullPrompt });
 
