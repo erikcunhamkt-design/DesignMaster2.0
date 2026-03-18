@@ -321,14 +321,19 @@ export default function PortraitStudioPage() {
               />
             </Section>
 
+            {/* Model selector */}
+            <Section label="Modelo de IA">
+              <ModelSelector value={aiModel} onChange={setAiModel} />
+            </Section>
+
             {/* Generate */}
             <Button
               onClick={handleGenerate}
-              disabled={isProcessing}
+              disabled={isProcessing || !hasKey}
               className="w-full h-12 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-[0_0_32px_-8px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_40px_-6px_hsl(var(--primary)/0.4)] transition-all duration-300"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {isProcessing ? 'Gerando retrato...' : 'Gerar Retrato Profissional'}
+              {isProcessing ? 'Gerando retrato...' : hasKey ? 'Gerar Retrato Profissional' : 'Configure a API Key'}
             </Button>
           </div>
         </div>
