@@ -33,9 +33,24 @@ export function ReferencesSection({ config, onUpdate }: Props) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const file = files[0];
-    if (config.styleReferences.length >= 4) return;
-    const url = URL.createObjectURL(file);
+    const remaining = 5 - config.styleReferences.length;
+    if (remaining <= 0) return;
+    const selected = Array.from(files).slice(0, remaining);
+    // Process one at a time to show note dialog for first new one
+    const url = URL.createObjectURL(selected[0]);
+    // Add remaining files directly (skip note dialog for batch)
+    const extraUrls = selected.slice(1).map(f => URL.createObjectURL(f));
+    if (extraUrls.length > 0) {
+      const newRefs = [...config.styleReferences, ...extraUrls];
+      const attrs = { ...(config.referenceAttributes || {}) };
+      const notes = { ...(config.referenceNotes || {}) };
+      extraUrls.forEach((_, i) => {
+        const idx = config.styleReferences.length + i;
+        attrs[idx] = [];
+        notes[idx] = '';
+      });
+      onUpdate({ styleReferences: newRefs, referenceAttributes: attrs, referenceNotes: notes });
+    }
     setPendingUrl(url);
     setNoteText('');
     e.target.value = '';
