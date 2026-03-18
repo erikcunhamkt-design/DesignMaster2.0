@@ -17,6 +17,7 @@ import {
   User,
   Download,
   Settings,
+  MessagesSquare,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
@@ -37,6 +38,7 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { id: 'home', label: 'Home', icon: Home },
+  { id: 'chat-hub', label: 'Chat IA', icon: MessagesSquare, route: '/studio/chat-hub' },
   { id: 'image-creators', label: 'Geradores', icon: Wand2, section: 'image-creators' },
   { id: 'creative-assistant', label: 'Agentes', icon: Brain, section: 'creative-assistant' },
   { id: 'prompt-tools', label: 'Prompt Lab', icon: PenTool, section: 'prompt-tools' },
