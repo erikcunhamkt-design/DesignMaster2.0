@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// Deno.serve used below
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -182,7 +182,7 @@ async function generateWithGoogle(parts: any[], googleApiKey: string, model: str
   throw { status: 429, message: "Limite de requisições excedido após tentativas automáticas. Aguarde 1 minuto e tente novamente." };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

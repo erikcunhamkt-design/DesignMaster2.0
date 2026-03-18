@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// Deno.serve used below
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,7 +29,7 @@ Regras OBRIGATÓRIAS:
 - Se pedirem prompt de imagem, escreva em inglês, CURTO (máximo 2-3 linhas), focado nos elementos essenciais
 - Quando o usuário enviar uma imagem, analise-a visualmente e dê feedback como especialista em design (composição, cores, tipografia, impacto visual, melhorias)`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

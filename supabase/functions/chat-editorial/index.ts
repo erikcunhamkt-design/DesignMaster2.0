@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// Deno.serve used below
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -107,7 +107,7 @@ REGRAS DE FORMATAÇÃO:
 MISSÃO FINAL:
 Criar linhas editoriais estratégicas, claras e inteligentes, com base no contexto do usuário, organizando a comunicação da marca em pilares que fortaleçam posicionamento, autoridade, conexão e resultado.`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
