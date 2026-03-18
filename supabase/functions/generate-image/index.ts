@@ -7,11 +7,11 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// GAB — PROMPT CREATOR PRO (replaces PROMPT ARCHITECT PRO)
+// PROMPT ARCHITECT PRO — Hyper-Detailed Prompt Creator
 // Creates hyper-detailed structured prompts from simple ideas.
 // Respects LOCKED parts (sidebar selections) as mandatory.
 // ══════════════════════════════════════════════════════════════
-const GAB_SYSTEM = `You are GAB — PROMPT CREATOR PRO, a hyper-detailed prompt engineer for AI image generation.
+const PROMPT_ARCHITECT_SYSTEM = `You are PROMPT ARCHITECT PRO, a hyper-detailed prompt engineer for AI image generation.
 
 You receive TWO sections:
 1. MANDATORY INSTRUCTIONS — sidebar selections (pose, clothing, expression, text, accessories, format, colors). Preserve these EXACTLY as provided. Never omit, rephrase, or generalize any detail.
@@ -43,7 +43,7 @@ RULES:
 - Always include stages 10-12 (negative, realism, deep texture) even if not mentioned
 - Do NOT translate to Portuguese — English only`;
 
-async function createPromptWithGAB(locked: string, expandable: string, googleApiKey: string): Promise<string> {
+async function createPromptWithArchitect(locked: string, expandable: string, googleApiKey: string): Promise<string> {
   const userContent = locked.trim() && expandable.trim()
     ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
     : locked.trim()
@@ -62,7 +62,7 @@ async function createPromptWithGAB(locked: string, expandable: string, googleApi
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${GAB_SYSTEM}\n\n${userContent}` }]
+        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n${userContent}` }]
       }],
       generationConfig: {
         temperature: 0.4,
@@ -72,7 +72,7 @@ async function createPromptWithGAB(locked: string, expandable: string, googleApi
   });
 
   if (!response.ok) {
-    console.error("GAB prompt creation failed, using raw input:", response.status);
+    console.error("Architect prompt creation failed, using raw input:", response.status);
     return `${locked} ${expandable}`.trim();
   }
 
@@ -133,19 +133,19 @@ serve(async (req) => {
     // Model selection
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
-    // ── Build final prompt with GAB - PROMPT CREATOR PRO ──
+    // ── Build final prompt with PROMPT ARCHITECT PRO ──
     let finalPrompt: string;
     const locked = lockedPrompt || prompt || "";
     const expandable = expandablePrompt || "";
 
     if (useArchitect && (locked.trim() || expandable.trim())) {
-      console.log("🧠 GAB - PROMPT CREATOR PRO: Creating hyper-detailed prompt...");
+      console.log("🧠 PROMPT ARCHITECT PRO: Creating hyper-detailed prompt...");
       console.log("🔒 LOCKED (mandatory):", locked.substring(0, 300));
       console.log("🔓 EXPANDABLE (creative):", expandable.substring(0, 300));
-      finalPrompt = await createPromptWithGAB(locked, expandable, googleApiKey);
-      console.log("✅ GAB OUTPUT:", finalPrompt.substring(0, 400));
+      finalPrompt = await createPromptWithArchitect(locked, expandable, googleApiKey);
+      console.log("✅ ARCHITECT OUTPUT:", finalPrompt.substring(0, 400));
     } else {
-      // No GAB — use raw prompt as-is
+      // No Architect — use raw prompt as-is
       finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
     }
 
