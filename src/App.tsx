@@ -43,6 +43,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
+const PortraitStudioPage = lazy(() => import("./pages/PortraitStudioPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
