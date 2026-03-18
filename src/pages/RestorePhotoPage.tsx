@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 
 export default function RestorePhotoPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export default function RestorePhotoPage() {
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [colorize, setColorize] = useState(false);
+  const { apiKey } = useGoogleApiKey();
   const fileRef = useRef<HTMLInputElement>(null);
   const mobileResultRef = useRef<HTMLDivElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'restored-photo');
