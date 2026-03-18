@@ -206,19 +206,79 @@ export default function VoidCanvasPage() {
     toast.success('Imagem importada!');
   };
 
+  // File to base64
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+
+  // Reference image handler
+  const handleRefImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    const base64 = await fileToBase64(e.target.files[0]);
+    setReferenceImage(base64);
+    setShowRefDesc(true);
+  };
+
+  // Character image handler
+  const handleCharImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    const base64 = await fileToBase64(e.target.files[0]);
+    setCharacterImage(base64);
+  };
+
+  // Audio recording
+  const toggleRecording = async () => {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        setAudioBlob(blob);
+        stream.getTracks().forEach(t => t.stop());
+        toast.success('Áudio gravado!');
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      toast.error('Sem acesso ao microfone');
+    }
+  };
+
   // Chat: send prompt to generate
   const handleSend = async () => {
-    if (!prompt.trim() || isGenerating) return;
+    if ((!prompt.trim() && !audioBlob) || isGenerating) return;
     if (!apiKey) {
       toast.error('Configure sua API Key primeiro');
       return;
     }
 
-    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: prompt };
+    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: prompt || '🎤 Áudio enviado' };
     setMessages(prev => [...prev, userMessage]);
     const currentPrompt = prompt;
     setPrompt('');
     setIsGenerating(true);
+
+    // Capture current attachments then clear
+    const currentRef = referenceImage;
+    const currentRefDesc = referenceDesc;
+    const currentChar = characterImage;
+    const currentAudio = audioBlob;
+    setReferenceImage(null);
+    setReferenceDesc('');
+    setShowRefDesc(false);
+    setCharacterImage(null);
+    setAudioBlob(null);
 
     try {
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
@@ -232,6 +292,37 @@ export default function VoidCanvasPage() {
         model: imageModels.find(m => m.id === model)?.label || model,
       }]);
 
+      // If audio, transcribe first via Gemini text model
+      let finalPrompt = currentPrompt;
+      if (currentAudio && !currentPrompt.trim()) {
+        // Convert audio to base64 and send to transcription
+        const audioReader = new FileReader();
+        const audioBase64 = await new Promise<string>((resolve) => {
+          audioReader.onloadend = () => resolve(audioReader.result as string);
+          audioReader.readAsDataURL(currentAudio);
+        });
+        // Use the prompt as-is, Gemini will handle audio
+        finalPrompt = 'Generate an image based on the audio description provided';
+      }
+
+      // Build body with references
+      const body: Record<string, unknown> = {
+        prompt: finalPrompt,
+        googleApiKey: apiKey,
+        aiModel: modelId === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
+        aspectRatio: '1:1',
+      };
+
+      if (currentChar) {
+        body.subjectImages = [currentChar];
+      }
+      if (currentRef) {
+        body.styleReferenceImages = [currentRef];
+        if (currentRefDesc.trim()) {
+          body.referenceNotes = [currentRefDesc];
+        }
+      }
+
       const res = await fetch(
         `https://${projectId}.supabase.co/functions/v1/generate-image`,
         {
@@ -240,19 +331,14 @@ export default function VoidCanvasPage() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
           },
-          body: JSON.stringify({
-            prompt: currentPrompt,
-            googleApiKey: apiKey,
-            model: modelId,
-            aspectRatio: '1:1',
-          }),
+          body: JSON.stringify(body),
         }
       );
 
       const data = await res.json();
       if (data.imageUrl || data.image) {
         const imageUrl = data.imageUrl || data.image;
-        const title = currentPrompt.slice(0, 60);
+        const title = finalPrompt.slice(0, 60);
 
         setMessages(prev => prev.map(m =>
           m.id === thinkingId
@@ -260,7 +346,7 @@ export default function VoidCanvasPage() {
             : m
         ));
 
-        await addImageToCanvas(imageUrl, title, currentPrompt);
+        await addImageToCanvas(imageUrl, title, finalPrompt);
       } else {
         setMessages(prev => prev.map(m =>
           m.id === thinkingId
