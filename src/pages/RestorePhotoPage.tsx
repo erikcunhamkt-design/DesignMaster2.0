@@ -44,11 +44,15 @@ export default function RestorePhotoPage() {
 
   const handleRestore = async () => {
     if (!imageBase64) return;
+    if (!apiKey || apiKey.length < 10) {
+      toast.error('Configure sua API Key do Google primeiro (botão API no topo).');
+      return;
+    }
     setIsProcessing(true);
     setResultImage(null);
     try {
       const { data, error } = await supabase.functions.invoke('restore-photo', {
-        body: { imageBase64, colorize },
+        body: { imageBase64, colorize, googleApiKey: apiKey },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
