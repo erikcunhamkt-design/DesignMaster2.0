@@ -219,7 +219,7 @@ serve(async (req) => {
     }
     parts.push({ text: fullPrompt });
 
-    const result = await generateWithGoogle(parts, googleApiKey, model);
+    const result = await generateWithGoogle(parts, googleApiKey, model, aspectRatio);
 
     if (!result.imageUrl) {
       return new Response(
