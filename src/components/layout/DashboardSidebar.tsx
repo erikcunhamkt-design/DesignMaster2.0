@@ -14,6 +14,7 @@ import {
   X,
   MessageCircle,
   Mail,
+  Sparkles,
   User,
   Download,
   Settings,
