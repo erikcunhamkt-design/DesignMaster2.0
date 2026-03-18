@@ -145,7 +145,7 @@ serve(async (req) => {
       finalPrompt = await createPromptWithArchitect(locked, expandable, googleApiKey);
       console.log("✅ ARCHITECT OUTPUT:", finalPrompt.substring(0, 400));
     } else {
-      // No GAB — use raw prompt as-is
+      // No Architect — use raw prompt as-is
       finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
     }
 
