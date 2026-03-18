@@ -254,7 +254,7 @@ serve(async (req) => {
     });
     geminiContents.push({
       role: "model",
-      parts: [{ text: "Entendido! Sou o Carrossel Master, especialista em criar carrosséis magnéticos e virais. Me diga o tema e eu crio um carrossel completo, slide a slide, com headlines impossíveis de ignorar. Como posso ajudar?" }]
+      parts: [{ text: "Você quer:\n1) Transformar um conteúdo existente em narrativa, ou\n2) Investigar um tema ou fenômeno atual?" }]
     });
 
     for (const msg of messages) {
