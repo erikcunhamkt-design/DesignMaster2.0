@@ -85,12 +85,16 @@ function sanitizePrompt(prompt: string): string {
 }
 
 async function createPromptWithArchitect(locked: string, expandable: string, googleApiKey: string): Promise<string> {
-  const userContent = locked.trim() && expandable.trim()
-    ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
-    : locked.trim()
-      ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}`
-      : expandable.trim()
-        ? `--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
+  // Pre-sanitize inputs before sending to Architect
+  const safeLocked = sanitizePrompt(locked);
+  const safeExpandable = sanitizePrompt(expandable);
+  
+  const userContent = safeLocked.trim() && safeExpandable.trim()
+    ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${safeLocked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${safeExpandable}`
+    : safeLocked.trim()
+      ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${safeLocked}`
+      : safeExpandable.trim()
+        ? `--- CREATIVE CONTEXT (enhance freely) ---\n${safeExpandable}`
         : "";
 
   if (!userContent) return "";
