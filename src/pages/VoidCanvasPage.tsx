@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/popover';
 import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles, Upload,
-  Loader2, Send, Trash2, ThumbsUp, ThumbsDown, Paperclip
+  Loader2, Send, Trash2, ThumbsUp, ThumbsDown, Paperclip,
+  Mic, MicOff, Image, User, X, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
