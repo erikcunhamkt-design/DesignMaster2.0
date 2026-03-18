@@ -31,18 +31,27 @@ export function AgentChatInput({ input, onInputChange, onSend, isLoading, placeh
   const audioChunksRef = useRef<Blob[]>([]);
 
   const uploadFile = useCallback(async (file: File, type: 'image' | 'document' | 'audio'): Promise<string | null> => {
-    const ext = file.name.split('.').pop() || 'bin';
-    const path = `${type}s/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('chat-media').upload(path, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
-    if (error) {
-      toast.error(`Erro ao enviar arquivo`);
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const path = `${type}s/${crypto.randomUUID()}.${ext}`;
+      console.log('[Upload] Uploading file:', file.name, 'type:', type, 'size:', file.size, 'path:', path);
+      const { error } = await supabase.storage.from('chat-media').upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+      if (error) {
+        console.error('[Upload] Storage error:', error);
+        toast.error(`Erro ao enviar arquivo: ${error.message}`);
+        return null;
+      }
+      const { data: urlData } = supabase.storage.from('chat-media').getPublicUrl(path);
+      console.log('[Upload] Success, URL:', urlData.publicUrl);
+      return urlData.publicUrl;
+    } catch (err: any) {
+      console.error('[Upload] Unexpected error:', err);
+      toast.error(`Erro inesperado no upload: ${err.message}`);
       return null;
     }
-    const { data: urlData } = supabase.storage.from('chat-media').getPublicUrl(path);
-    return urlData.publicUrl;
   }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
