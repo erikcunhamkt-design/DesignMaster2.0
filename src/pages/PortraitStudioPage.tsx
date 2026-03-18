@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Upload, Loader2, Camera, X, Sparkles, User } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -113,6 +115,8 @@ function Chip({ selected, onClick, children, className = '' }: ChipProps) {
 }
 
 export default function PortraitStudioPage() {
+  const { apiKey: googleApiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
   const [config, setConfig] = useState<PortraitConfig>({
     gender: 'male',
     lighting: 'rembrandt',
@@ -130,6 +134,7 @@ export default function PortraitStudioPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
+  const hasKey = googleApiKey.length >= 10;
 
   const update = <K extends keyof PortraitConfig>(key: K, value: PortraitConfig[K]) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -157,11 +162,15 @@ export default function PortraitStudioPage() {
   };
 
   const handleGenerate = async () => {
+    if (!hasKey) {
+      toast.error('Configure sua API Key do Google primeiro (botão API na topbar).');
+      return;
+    }
     setIsProcessing(true);
     setResultImage(null);
     try {
       const { data, error } = await supabase.functions.invoke('generate-portrait', {
-        body: { config, subjectImage },
+        body: { config, subjectImage, googleApiKey, aiModel },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
@@ -179,7 +188,7 @@ export default function PortraitStudioPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Portrait Master" showApiKey={false} />
+      <StudioTopbar title="Portrait Master" showApiKey={true} />
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <div className="w-[380px] shrink-0 border-r border-border/15 bg-card/20 flex flex-col overflow-y-auto">
@@ -312,14 +321,19 @@ export default function PortraitStudioPage() {
               />
             </Section>
 
+            {/* Model selector */}
+            <Section label="Modelo de IA">
+              <ModelSelector value={aiModel} onChange={setAiModel} />
+            </Section>
+
             {/* Generate */}
             <Button
               onClick={handleGenerate}
-              disabled={isProcessing}
+              disabled={isProcessing || !hasKey}
               className="w-full h-12 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-[0_0_32px_-8px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_40px_-6px_hsl(var(--primary)/0.4)] transition-all duration-300"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {isProcessing ? 'Gerando retrato...' : 'Gerar Retrato Profissional'}
+              {isProcessing ? 'Gerando retrato...' : hasKey ? 'Gerar Retrato Profissional' : 'Configure a API Key'}
             </Button>
           </div>
         </div>
