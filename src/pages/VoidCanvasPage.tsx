@@ -54,7 +54,14 @@ export default function VoidCanvasPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [model, setModel] = useState<AiModel>('pro');
+  const [model, setModel] = useState('gemini-3-pro-image-preview');
+  const [modelOpen, setModelOpen] = useState(false);
+
+  const imageModels = [
+    { id: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro Image', desc: 'Máxima qualidade', badge: 'PRO' },
+    { id: 'gemini-3.1-flash-image-preview', label: 'Gemini 3.1 Flash Image', desc: 'Rápido e preciso', badge: 'NEW' },
+    { id: 'gemini-2.5-flash-image', label: 'Gemini 2.5 Flash Image', desc: 'Equilibrado', badge: '' },
+  ] as const;
   const chatEndRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
