@@ -69,7 +69,7 @@ export default function RestorePhotoPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Restaurador de Fotos" />
+      <StudioTopbar title="Restaurador de Fotos" showApiKey={true} />
       {/* Desktop layout */}
       <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left panel */}
