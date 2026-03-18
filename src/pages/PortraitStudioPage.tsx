@@ -115,6 +115,8 @@ function Chip({ selected, onClick, children, className = '' }: ChipProps) {
 }
 
 export default function PortraitStudioPage() {
+  const { apiKey: googleApiKey } = useGoogleApiKey();
+  const [aiModel, setAiModel] = useState<AiModel>('pro');
   const [config, setConfig] = useState<PortraitConfig>({
     gender: 'male',
     lighting: 'rembrandt',
@@ -132,6 +134,7 @@ export default function PortraitStudioPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
+  const hasKey = googleApiKey.length >= 10;
 
   const update = <K extends keyof PortraitConfig>(key: K, value: PortraitConfig[K]) => {
     setConfig(prev => ({ ...prev, [key]: value }));
