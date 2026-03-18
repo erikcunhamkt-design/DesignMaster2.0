@@ -188,7 +188,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, aspectRatio, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
+    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, aspectRatio, subjectImages, styleReferenceImages, referenceNotes, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
       return new Response(
@@ -222,11 +222,38 @@ serve(async (req) => {
 
     const edgeFillInstruction = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. There must be ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO padding, ZERO blank areas at top, bottom, left or right. The subject and background must extend fully to every single edge of the image.";
 
-    const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}\n\nAvoid: ${finalNegative}`;
-
-    // Build parts for Google direct API
+    // ── Build parts with CLEAR SEPARATION of subject vs style references ──
     const parts: any[] = [];
-    if (referenceImages && referenceImages.length > 0) {
+    const hasSubject = subjectImages && subjectImages.length > 0;
+    const hasStyleRef = styleReferenceImages && styleReferenceImages.length > 0;
+    const hasLegacyRef = referenceImages && referenceImages.length > 0;
+
+    // 1. Subject photos FIRST with strong identity preservation instruction
+    if (hasSubject) {
+      parts.push({ text: `[SUBJECT IDENTITY PHOTOS — You MUST preserve this person's exact face, features, skin tone, hair, and identity. The generated image must look like THIS SPECIFIC PERSON. Do NOT create a different person.]` });
+      for (const img of subjectImages.slice(0, 5)) {
+        const match = img.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+        }
+      }
+    }
+
+    // 2. Style/pose reference photos with clear "reference only" instruction
+    if (hasStyleRef) {
+      const notesList = (referenceNotes || []).filter((n: string) => n?.trim());
+      const notesText = notesList.length > 0 ? ` Use these references for: ${notesList.join('; ')}.` : '';
+      parts.push({ text: `[STYLE/POSE REFERENCE ONLY — Use these images ONLY as inspiration for pose, composition, lighting, or style. Do NOT copy the person's face or identity from these. The subject must be the person from the SUBJECT IDENTITY PHOTOS above.${notesText}]` });
+      for (const img of styleReferenceImages.slice(0, 3)) {
+        const match = img.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+        }
+      }
+    }
+
+    // 3. Legacy fallback (old format without separation)
+    if (!hasSubject && !hasStyleRef && hasLegacyRef) {
       for (const refImg of referenceImages.slice(0, 3)) {
         const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
@@ -234,6 +261,12 @@ serve(async (req) => {
         }
       }
     }
+
+    // 4. Main prompt text AFTER images
+    const identityReminder = hasSubject && hasStyleRef
+      ? "\n\nCRITICAL REMINDER: The person in the generated image MUST be the EXACT same person from the SUBJECT IDENTITY PHOTOS. Use STYLE REFERENCE images only for pose/composition/lighting inspiration — NOT for the person's appearance."
+      : "";
+    const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}${identityReminder}\n\nAvoid: ${finalNegative}`;
     parts.push({ text: fullPrompt });
 
     const result = await generateWithGoogle(parts, googleApiKey, model, aspectRatio);

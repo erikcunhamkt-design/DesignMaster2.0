@@ -76,13 +76,23 @@ const Index = () => {
         : 'Quadrado 1:1';
       toast.info(`Gerando em ${dimLabel} · Aspect Ratio: ${genRequest.aspectRatio}`, { duration: 3000 });
 
-      const referenceImages: string[] = [];
-      for (const ref of genRequest.references.slice(0, 5)) {
+      // Separate subject (identity) images from style/pose references
+      const subjectImages: string[] = [];
+      const styleReferenceImages: string[] = [];
+      const referenceNotes: string[] = [];
+      for (const ref of genRequest.references.slice(0, 8)) {
         try {
           const resp = await fetch(ref.url);
           const blob = await resp.blob();
           const base64 = await blobToBase64(blob);
-          referenceImages.push(base64);
+          if (ref.role === 'identity') {
+            subjectImages.push(base64);
+          } else {
+            styleReferenceImages.push(base64);
+            if (ref.attributes && ref.attributes.length > 0) {
+              referenceNotes.push(ref.attributes.join(', '));
+            }
+          }
         } catch {
           // skip failed references
         }
@@ -95,7 +105,11 @@ const Index = () => {
           expandablePrompt: genRequest.expandablePrompt,
           negativePrompt: genRequest.negative_prompt,
           aspectRatio: genRequest.aspectRatio,
-          referenceImages,
+          subjectImages,
+          styleReferenceImages,
+          referenceNotes,
+          // Legacy fallback
+          referenceImages: [],
           googleApiKey: apiKey,
           aiModel,
         },
