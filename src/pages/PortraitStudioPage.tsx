@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Upload, Loader2, Camera, X, Sparkles, User } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
+import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';

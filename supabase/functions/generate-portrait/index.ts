@@ -123,92 +123,101 @@ function buildPortraitPrompt(config: {
   return prompt;
 }
 
+async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
+  console.log(`📸 Calling Google Gemini ${model} for portrait generation...`);
+
+  const requestBody = JSON.stringify({
+    contents: [{ parts }],
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+  });
+
+  const MAX_RETRIES = 2;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: requestBody,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      let imageUrl: string | null = null;
+      let textResponse = "";
+      const candidates = data.candidates;
+      if (candidates && candidates.length > 0) {
+        for (const part of (candidates[0]?.content?.parts || [])) {
+          if (part.inlineData) imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          if (part.text) textResponse += part.text;
+        }
+      }
+      return { imageUrl, textResponse };
+    }
+
+    const errorText = await response.text();
+
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      const retryMatch = errorText.match(/"retryDelay":\s*"(\d+)s"/);
+      const waitSec = retryMatch ? Math.min(parseInt(retryMatch[1], 10), 30) : 15;
+      console.warn(`⏳ Rate limited (429). Retrying in ${waitSec}s... (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      await new Promise(r => setTimeout(r, waitSec * 1000));
+      continue;
+    }
+
+    console.error("Google API error:", response.status, errorText);
+    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido na API do Google. Aguarde até 1 minuto e tente novamente." };
+    if (response.status === 400) throw { status: 400, message: "Requisição inválida. Verifique o prompt e tente novamente." };
+    if (response.status === 403) throw { status: 403, message: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." };
+    throw { status: 500, message: `Erro na API do Google: ${response.status}. Tente novamente.` };
+  }
+
+  throw { status: 429, message: "Limite de requisições excedido após tentativas automáticas. Aguarde 1 minuto e tente novamente." };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { config, subjectImage } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const { config, subjectImage, googleApiKey, aiModel } = await req.json();
+
+    if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256) {
       return new Response(
-        JSON.stringify({ error: "API Key não configurada. Contate o administrador." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "API Key do Google não fornecida ou inválida." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
     const prompt = buildPortraitPrompt(config);
     console.log("📸 Portrait prompt:", prompt.substring(0, 500));
 
     const genderLabel = config.gender === 'female' ? 'woman/female' : 'man/male';
 
-    // Build messages for the AI gateway
-    const userContent: any[] = [];
+    // Build parts for Google Gemini API
+    const parts: any[] = [];
 
-    // Subject photo first with identity lock
     if (subjectImage) {
-      userContent.push({
-        type: "text",
-        text: `[SUBJECT IDENTITY — THIS IS THE ${genderLabel.toUpperCase()} who MUST appear in the generated portrait. You MUST faithfully reproduce this EXACT person: same face shape, same eyes, same nose, same mouth, same skin tone, same hair color and style, same ethnicity. This is a ${genderLabel}. Do NOT change the gender. Do NOT generate a different person. The output MUST be recognizable as this specific individual.]`
-      });
-      userContent.push({
-        type: "image_url",
-        image_url: { url: subjectImage }
-      });
+      parts.push({ text: `[SUBJECT IDENTITY — THIS IS THE ${genderLabel.toUpperCase()} who MUST appear in the generated portrait. You MUST faithfully reproduce this EXACT person: same face shape, same eyes, same nose, same mouth, same skin tone, same hair color and style, same ethnicity. This is a ${genderLabel}. Do NOT change the gender. Do NOT generate a different person. The output MUST be recognizable as this specific individual.]` });
+
+      if (subjectImage.startsWith("data:")) {
+        const match = subjectImage.match(/^data:(.*?);base64,(.*)$/);
+        if (match) {
+          parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+        }
+      }
     }
 
-    // Main prompt
-    userContent.push({
-      type: "text",
-      text: subjectImage
-        ? `${prompt}\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderLabel} from the SUBJECT IDENTITY photo. Same face, same features, same gender (${genderLabel}). This is NON-NEGOTIABLE.`
-        : prompt
-    });
+    const finalText = subjectImage
+      ? `${PORTRAIT_SYSTEM_PROMPT}\n\n${prompt}\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderLabel} from the SUBJECT IDENTITY photo. Same face, same features, same gender (${genderLabel}). This is NON-NEGOTIABLE.`
+      : `${PORTRAIT_SYSTEM_PROMPT}\n\n${prompt}`;
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          { role: "system", content: PORTRAIT_SYSTEM_PROMPT },
-          { role: "user", content: userContent.length === 1 ? userContent[0].text : userContent },
-        ],
-        modalities: ["image", "text"],
-      }),
-    });
+    parts.push({ text: finalText });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error("AI gateway error:", aiResponse.status, errorText);
+    const result = await generateWithGoogle(parts, googleApiKey, model);
 
-      if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace para continuar." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      return new Response(
-        JSON.stringify({ error: `Erro na geração: ${aiResponse.status}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await aiResponse.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    const textResponse = data.choices?.[0]?.message?.content || "";
-
-    if (!imageUrl) {
+    if (!result.imageUrl) {
       return new Response(
         JSON.stringify({ error: "Nenhuma imagem foi gerada. Tente novamente com configurações diferentes." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -216,14 +225,16 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ imageUrl, text: textResponse }),
+      JSON.stringify({ imageUrl: result.imageUrl, text: result.textResponse }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("generate-portrait error:", error);
+    const status = error?.status || 500;
+    const message = error?.message || "Erro desconhecido na geração do retrato.";
     return new Response(
-      JSON.stringify({ error: error?.message || "Erro desconhecido na geração do retrato." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: message }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
