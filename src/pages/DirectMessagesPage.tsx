@@ -668,6 +668,7 @@ export default function DirectMessagesPage() {
           )}
         </div>
       </div>
+      </div>
     </div>
   );
 }
