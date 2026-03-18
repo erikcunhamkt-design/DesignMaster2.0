@@ -218,7 +218,7 @@ export default function VoidCanvasPage() {
         id: thinkingId,
         role: 'assistant',
         content: 'Gerando sua criação...',
-        model: model === 'pro' ? 'Nano Banana Pro' : 'Nano Banana 2',
+        model: imageModels.find(m => m.id === model)?.label || model,
       }]);
 
       const res = await fetch(
