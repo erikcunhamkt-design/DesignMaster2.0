@@ -14,6 +14,7 @@ import { TypingDots } from '@/components/chat/TypingDots';
 import { SelectionCopyTooltip } from '@/components/chat/SelectionCopyTooltip';
 import { ConversationItem } from '@/components/chat/ConversationItem';
 import { DashboardSidebar, MobileSidebarTrigger } from '@/components/layout/DashboardSidebar';
+import { ApiKeyDialog } from '@/components/ApiKeyDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
