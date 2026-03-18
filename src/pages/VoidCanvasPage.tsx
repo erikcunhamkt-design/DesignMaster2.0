@@ -495,22 +495,51 @@ export default function VoidCanvasPage() {
                     <Paperclip className="h-4 w-4" />
                   </div>
                 </label>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
-                  <Sparkles className="h-3 w-3" />
-                  Agent
-                </button>
+                <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
+                      <Sparkles className="h-3 w-3" />
+                      {imageModels.find(m => m.id === model)?.label.split(' ').slice(-2).join(' ') || 'Modelo'}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[280px] p-1.5 bg-[#111820] border-border/20" side="top" align="start">
+                    <div className="space-y-0.5">
+                      {imageModels.map(m => (
+                        <button
+                          key={m.id}
+                          onClick={() => { setModel(m.id); setModelOpen(false); }}
+                          className={cn(
+                            'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors',
+                            model === m.id
+                              ? 'bg-primary/15 text-primary'
+                              : 'text-foreground/70 hover:bg-secondary/20 hover:text-foreground'
+                          )}
+                        >
+                          <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] font-medium truncate">{m.label}</span>
+                              {m.badge && (
+                                <span className={cn(
+                                  'rounded-full px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wider leading-none',
+                                  m.badge === 'PRO' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                                )}>
+                                  {m.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[9px] text-muted-foreground/40 truncate">{m.desc}</p>
+                          </div>
+                          {model === m.id && <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              {/* Right: icon row + send */}
+              {/* Right: send */}
               <div className="flex items-center gap-0.5">
-                {/* Model indicator icons (decorative, matching Lovart style) */}
-                <button
-                  onClick={() => setModel(model === 'pro' ? 'flash' : 'pro')}
-                  className="p-2 rounded-lg text-muted-foreground/30 hover:text-foreground/60 hover:bg-secondary/20 transition-colors"
-                  title={model === 'pro' ? 'Nano Banana Pro' : 'Nano Banana 2'}
-                >
-                  <Sparkles className="h-4 w-4" />
-                </button>
                 <button
                   onClick={handleSend}
                   disabled={isGenerating || !prompt.trim() || !apiKey}
@@ -526,9 +555,6 @@ export default function VoidCanvasPage() {
               </div>
             </div>
           </div>
-
-          {/* Model selector chips below */}
-          <ModelSelector value={model} onChange={setModel} />
         </div>
       </div>
     </div>
