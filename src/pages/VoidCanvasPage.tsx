@@ -58,12 +58,23 @@ export default function VoidCanvasPage() {
   const [model, setModel] = useState('gemini-3-pro-image-preview');
   const [modelOpen, setModelOpen] = useState(false);
 
+  // Multimedia attachments
+  const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  const [referenceDesc, setReferenceDesc] = useState('');
+  const [showRefDesc, setShowRefDesc] = useState(false);
+  const [characterImage, setCharacterImage] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const imageModels = [
     { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
     { id: 'gemini-3.1-flash-image-preview', label: 'Nano Banana 2', desc: 'Rápido · Gemini 3.1', badge: 'NEW' },
   ] as const;
   const chatEndRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const refInputRef = useRef<HTMLInputElement>(null);
+  const charInputRef = useRef<HTMLInputElement>(null);
 
   // Load images from DB (using void_canvas_nodes table, but only image type)
   useEffect(() => {
