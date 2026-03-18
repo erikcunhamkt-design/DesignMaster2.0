@@ -1,6 +1,7 @@
 import { Plus, X, Check } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ProjectConfig } from '@/types/project';
+import { createNormalizedObjectUrl } from '@/lib/imageUtils';
 import {
   Dialog,
   DialogContent,
