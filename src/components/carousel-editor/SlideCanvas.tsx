@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import type { SlideData, SlideTextBlock } from '@/types/carouselEditor';
 
 const SLIDE_W = 1080;
-const SLIDE_H = 1080;
+const SLIDE_H = 1350;
 
 interface SlideCanvasProps {
   slide: SlideData;
