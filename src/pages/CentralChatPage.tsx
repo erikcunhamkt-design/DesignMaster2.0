@@ -351,6 +351,10 @@ export default function CentralChatPage() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="ml-auto">
+              <ApiKeyDialog />
+            </div>
           </div>
 
           {/* Messages */}
