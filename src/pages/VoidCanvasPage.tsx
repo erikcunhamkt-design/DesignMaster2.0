@@ -4,9 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { ApiKeyDialog } from '@/components/ApiKeyDialog';
-import { ModelSelector, AiModel } from '@/components/configurator/ModelSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  Popover, PopoverContent, PopoverTrigger
+} from '@/components/ui/popover';
 import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles, Upload,
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown, Paperclip
