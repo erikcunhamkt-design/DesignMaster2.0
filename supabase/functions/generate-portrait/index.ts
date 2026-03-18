@@ -6,34 +6,107 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ══════════════════════════════════════════════════════════════
+// PHOTOSHOOT AGENT — Internal Photography Knowledge Base
+// Silently expands user config into hyper-detailed photographic prompts
+// using professional camera, lens, angle, composition & lighting data.
+// ══════════════════════════════════════════════════════════════
+
+const PHOTOSHOOT_SYSTEM = `You are PHOTOSHOOT AGENT — an elite internal photography prompt engine.
+You receive a portrait configuration and SILENTLY transform it into a hyper-detailed, cinematic, professional photography prompt.
+
+You have deep knowledge of professional photography equipment and techniques:
+
+═══ CAMERAS ═══
+- Canon EOS 5D Mark IV: DSLR full frame, fidelidade de cor, ótima performance em ISO alto — retratos, moda, estúdio.
+- Nikon D850: Altíssima resolução, amplo alcance dinâmico — editoriais, produtos, texturas.
+- Sony Alpha a7R IV: Mirrorless full-frame, nitidez extrema, cores consistentes — ensaios externos.
+- Fujifilm GFX 100: Médio formato 102MP — campanhas publicitárias, fine art, profundidade tonal.
+- Leica M10-R: Visual minimalista, look analógico sofisticado — documental, estilo refinado.
+- Hasselblad H6D-100c: Médio formato top — moda de luxo, precisão em tons, contraste, nitidez.
+- Canon EOS R5: Mirrorless, foco ultrarrápido — retratos contemporâneos, campanhas modernas.
+- Sony FX3: Atmosfera cinematográfica — direção de arte experimental.
+- Nikon Z7 II: Mirrorless full-frame, reprodução de cor precisa — leveza e qualidade premium.
+- Panasonic Lumix S1R: Alta resolução — moda, arquitetura, fine art.
+
+═══ LENSES ═══
+- 50mm f/1.4: Clássica versátil, campo de visão natural, desfoque suave — retratos, lifestyle.
+- 85mm f/1.2: Separação de fundo extrema, bokeh cremoso — closes com emoção, estética cinematográfica.
+- 35mm f/1.4: Grande angular com distorção natural — moda urbana, documentário.
+- 24mm f/1.4: Ampla cobertura — cenas abertas, interiores, arquitetura.
+- 70-200mm f/2.8: Zoom telefoto — eventos, editoriais à distância, retratos comprimidos.
+- 100mm f/2.8 Macro: Detalhes e closes extremos — produtos, joias, texturas.
+- 135mm f/2.0: Compressão suave, separação excelente — retratos editoriais, campanhas.
+- 24-70mm f/2.8: Zoom equilibrado — estúdios, moda, produtos.
+
+═══ ANGLES ═══
+- Eye-level: Altura dos olhos, igualdade e naturalidade, conexão direta.
+- High angle: De cima, sujeito menor, vulnerabilidade.
+- Low angle: De baixo, autoridade, imponência, poder.
+- Overhead: Vista vertical aérea, padrões gráficos.
+- Worm's-eye view: Do chão, dramaticidade extrema.
+- Dutch angle: Inclinado, desequilíbrio, tensão psicológica.
+- Side view: Perfil, linhas, formas, silhuetas.
+- Close-up: Rosto, emoções, detalhes.
+- Extreme close-up: Olhos, dedos, textura, elementos sensoriais.
+- Wide shot: Cena completa, contexto, espaço.
+- Medium long shot (Americano): Joelhos para cima, moda, expressão corporal.
+
+═══ COMPOSITION ═══
+- Rule of thirds: Elementos nas interseções, equilíbrio visual.
+- Centered: Estabilidade, simetria, destaque imediato.
+- Symmetry: Elementos espelhados, ordem, perfeição.
+- Layered depth: Múltiplos planos, profundidade narrativa.
+- Leading lines: Linhas naturais conduzem o olhar.
+- Full frame fill: Objeto ocupa todo quadro, textura e expressividade.
+- Negative space: Área vazia valoriza foco, leveza ou isolamento.
+- Natural framing: Portas, janelas como moldura interna.
+- Depth perspective: Sensação tridimensional.
+- Intentional asymmetry: Tensão visual, impacto estético moderno.
+
+═══ LIGHTING ═══
+- Soft light: Dispersa, sem sombras marcadas — retratos delicados, clean.
+- Hard light: Direta e intensa, sombras nítidas — formas, texturas, drama.
+- Backlight: Atrás do sujeito, brilhos, silhuetas, etéreo.
+- Rim light: Bordas iluminadas, separação do fundo.
+- Split lighting: Meia luz, contraste intenso, cinematográfico.
+- Rembrandt (triangular): Triângulo de luz sob olho oposto — retratos expressivos.
+- Butterfly: De cima frontal, sombra sob nariz — beleza, traços simétricos.
+- Natural ambient: Luz disponível, sol, janelas — autêntico, orgânico.
+- Studio setup: Luzes artificiais, softboxes, refletores — controle total.
+- Cinematic: Sombras dramáticas, cores específicas, narrativa visual.
+- Creative colored: Filtros coloridos — artístico, futurista, conceitual.
+
+YOUR TASK:
+Given the user's portrait configuration, create a SINGLE continuous prompt in English that:
+1. Describes the subject with vivid physical and emotional detail
+2. Selects the BEST camera + lens combination for this specific portrait style
+3. Defines precise lighting setup with modifiers and ratios
+4. Specifies camera angle, composition technique and framing
+5. Adds deep texture commands: skin pores, hair strands, fabric fiber, volumetric lighting
+6. Adds realism tokens: 8K, HDR, extreme sharpness, depth of field
+7. Ends with negative commands: no text, no watermark, no distortion, no cartoon
+
+RULES:
+- Output ONLY the expanded prompt as a single continuous paragraph in English
+- Be ULTRA specific about camera model, exact lens, and aperture
+- Match lighting to the mood (dramatic = hard light setups, gentle = soft diffused)
+- Choose composition that enhances the portrait style
+- NO commentary, NO labels, NO explanations
+- Include the clothing/outfit details if provided
+- Always include deep texture and realism commands`;
+
 const PORTRAIT_SYSTEM_PROMPT = `You are PORTRAIT MASTER — the world's most elite portrait photography AI.
-
-You generate ULTRA-REALISTIC professional studio portraits that are indistinguishable from photographs taken by master photographers like Annie Leibovitz, Peter Lindbergh, Mario Testino, and Helmut Newton.
-
-ABSOLUTE QUALITY STANDARDS:
-- Skin texture: visible pores, natural micro-imperfections, subsurface scattering, NO plastic/waxy/airbrushed look
-- Hair: individual strands visible, natural flow and volume, realistic highlights and shadows
-- Eyes: perfectly symmetrical, natural catchlights, realistic iris detail, correct pupil size
-- Mouth/Lips: natural lip texture, correct proportions, no distortion
-- Facial features: anatomically correct proportions, natural asymmetry, realistic bone structure
-- Lighting: professional 3-point studio lighting (key, fill, rim), natural falloff, volumetric quality
-- Depth of field: professional bokeh, sharp focus on eyes, natural focus falloff
-- Color science: cinema-grade color grading, natural skin tones, no oversaturation
-
-PHOTOGRAPHY TECHNICAL STANDARDS:
-- Shot as if with a Phase One IQ4 150MP or Hasselblad X2D
-- Professional studio lighting with modifiers (softboxes, beauty dishes, strip lights)
-- Tethered shooting quality — maximum sharpness and dynamic range
-- Print-ready resolution and detail
+You generate ULTRA-REALISTIC professional studio portraits indistinguishable from master photographers.
 
 CRITICAL RULES:
 - NEVER generate cartoon, illustration, or AI-looking images
 - NEVER produce plastic skin, waxy appearance, or uncanny valley effects
 - ALWAYS maintain anatomical correctness
 - ALWAYS produce catchlights in eyes
-- ALWAYS ensure natural skin texture with visible pores at close range`;
+- ALWAYS ensure natural skin texture with visible pores`;
 
-function buildPortraitPrompt(config: {
+function buildConfigDescription(config: {
   gender: string;
   lighting: string;
   background: string;
@@ -42,90 +115,64 @@ function buildPortraitPrompt(config: {
   lens: string;
   clothing: string;
   freePrompt: string;
-  hasReference: boolean;
 }): string {
   const genderLabel = config.gender === 'female' ? 'woman' : 'man';
 
-  const lightingMap: Record<string, string> = {
-    'rembrandt': 'Rembrandt lighting with dramatic triangular shadow on one cheek, deep chiaroscuro, warm key light at 45 degrees with minimal fill',
-    'butterfly': 'Butterfly/Paramount lighting with key light directly above and in front, creating a butterfly-shaped shadow under the nose, glamorous Hollywood style',
-    'split': 'Split lighting with one half of the face illuminated and the other in deep shadow, dramatic and mysterious mood',
-    'loop': 'Loop lighting with key light slightly above and to the side creating a small shadow loop beside the nose, flattering and natural',
-    'broad': 'Broad lighting illuminating the wider side of the face, creating a bright open look with soft fill light',
-    'natural': 'Natural window light with soft diffusion, gentle shadows, organic and authentic feel',
-    'dramatic': 'Dramatic low-key lighting with deep shadows, single hard key light, cinematic noir atmosphere',
-    'high-key': 'High-key lighting with bright even illumination, minimal shadows, clean and modern fashion editorial style',
-  };
+  const parts = [
+    `Professional studio portrait of a ${genderLabel}`,
+    `Expression: ${config.expression}`,
+    `Lighting style: ${config.lighting}`,
+    `Background: ${config.background}`,
+    `Camera angle: ${config.cameraAngle}`,
+    `Preferred lens: ${config.lens}`,
+  ];
 
-  const backgroundMap: Record<string, string> = {
-    'seamless-white': 'pure white seamless paper background, clean and professional',
-    'seamless-black': 'deep black seamless background, dramatic and elegant',
-    'seamless-gray': 'medium gray seamless background, neutral and classic',
-    'studio-gradient': 'smooth gradient studio backdrop transitioning from dark to light',
-    'textured-wall': 'textured concrete or stone wall background with depth and character',
-    'bokeh': 'completely blurred background with beautiful circular bokeh lights',
-    'outdoor-golden': 'outdoor golden hour with warm backlight and natural bokeh',
-    'urban': 'urban environment with architectural elements and natural depth',
-  };
+  if (config.clothing?.trim()) parts.push(`Wearing: ${config.clothing.trim()}`);
+  if (config.freePrompt?.trim()) parts.push(`Additional instructions (HIGHEST PRIORITY): ${config.freePrompt.trim()}`);
 
-  const expressionMap: Record<string, string> = {
-    'confident': 'confident and powerful expression with direct gaze into camera, subtle self-assured smile',
-    'serious': 'serious and intense expression with piercing focused eyes, strong jaw set',
-    'gentle-smile': 'gentle natural smile with warmth reaching the eyes, approachable and authentic',
-    'contemplative': 'contemplative and thoughtful expression with soft distant gaze, intellectual mood',
-    'powerful': 'powerful commanding expression radiating authority and strength, unbreakable gaze',
-    'mysterious': 'mysterious and enigmatic expression with subtle Mona Lisa smile, captivating ambiguity',
-    'joyful': 'genuinely joyful expression with bright natural smile showing teeth, authentic happiness',
-    'neutral': 'neutral composed expression with calm steady gaze, editorial model pose',
-  };
+  return parts.join('. ') + '.';
+}
 
-  const cameraMap: Record<string, string> = {
-    'eye-level': 'shot at eye level for natural and direct connection',
-    'slightly-above': 'camera slightly above eye level for flattering downward angle',
-    'slightly-below': 'camera slightly below eye level for powerful and imposing feel',
-    'three-quarter': 'three-quarter view with face turned 30-45 degrees from camera',
-    'profile': 'profile view showing the elegant silhouette of the face',
-    'close-up': 'extreme close-up focusing on eyes and upper face',
-  };
+async function expandWithPhotoshootAgent(configDescription: string, googleApiKey: string): Promise<string> {
+  const model = "gemini-3.1-pro-preview";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
-  const lensMap: Record<string, string> = {
-    '85mm': '85mm f/1.4 — classic portrait lens with beautiful bokeh and natural compression',
-    '105mm': '105mm f/2 — medium telephoto with elegant background separation and flattering compression',
-    '135mm': '135mm f/2 — long portrait lens with maximum background blur and cinematic compression',
-    '50mm': '50mm f/1.2 — environmental portrait with context and natural perspective',
-    '70-200mm': '70-200mm f/2.8 at 135mm — versatile zoom at portrait sweet spot',
-  };
+  console.log("📸 PHOTOSHOOT AGENT: Expanding portrait config into detailed prompt...");
 
-  const lighting = lightingMap[config.lighting] || lightingMap['rembrandt'];
-  const background = backgroundMap[config.background] || backgroundMap['seamless-gray'];
-  const expression = expressionMap[config.expression] || expressionMap['confident'];
-  const camera = cameraMap[config.cameraAngle] || cameraMap['eye-level'];
-  const lens = lensMap[config.lens] || lensMap['85mm'];
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{ text: `${PHOTOSHOOT_SYSTEM}\n\nPORTRAIT CONFIGURATION:\n${configDescription}` }]
+      }],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1500,
+      },
+    }),
+  });
 
-  let prompt = `Ultra-realistic professional studio portrait photograph of a ${genderLabel}`;
-
-  if (config.clothing?.trim()) {
-    prompt += `, wearing ${config.clothing.trim()}`;
+  if (!response.ok) {
+    console.error("Photoshoot agent expansion failed:", response.status);
+    return configDescription;
   }
 
-  prompt += `. ${expression}. ${camera}. Shot with ${lens}. ${lighting}. ${background}.`;
+  const data = await response.json();
+  const expanded = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-  prompt += ` Hyper-detailed skin texture with visible pores and natural micro-imperfections, individual hair strands visible with natural highlights, perfectly detailed eyes with realistic iris patterns and natural catchlights, natural lip texture. Professional retouching preserving all natural skin detail — NO airbrushing, NO plastic skin, NO waxy appearance. Cinematic color grading with natural skin tones. Shot on Phase One IQ4 150MP equivalent, tethered studio quality. 8K resolution, extreme sharpness, HDR, volumetric lighting.`;
-
-  prompt += ` CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. ZERO empty space, ZERO solid color bars, ZERO letterboxing.`;
-
-  prompt += ` Avoid: distorted anatomy, blurry areas, compression artifacts, plastic skin, waxy appearance, low quality, watermark, text, cartoon, illustration, AI-looking, uncanny valley, extra fingers, deformed hands.`;
-
-  if (config.freePrompt?.trim()) {
-    prompt = `MANDATORY USER INSTRUCTIONS (HIGHEST PRIORITY — do NOT omit any detail): ${config.freePrompt.trim()}\n\n${prompt}`;
+  if (!expanded) {
+    console.warn("Photoshoot agent returned empty, using raw config");
+    return configDescription;
   }
 
-  return prompt;
+  console.log("✅ PHOTOSHOOT AGENT expanded:", expanded.substring(0, 400));
+  return expanded;
 }
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
-  console.log(`📸 Calling Google Gemini ${model} for portrait generation...`);
+  console.log(`🎨 Calling Google Gemini ${model} for portrait generation...`);
 
   const requestBody = JSON.stringify({
     contents: [{ parts }],
@@ -190,12 +237,17 @@ serve(async (req) => {
     }
 
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
-    const prompt = buildPortraitPrompt(config);
-    console.log("📸 Portrait prompt:", prompt.substring(0, 500));
+
+    // Step 1: Build config description from user selections
+    const configDescription = buildConfigDescription(config);
+    console.log("📋 Config description:", configDescription.substring(0, 300));
+
+    // Step 2: Silently expand with Photoshoot Agent
+    const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey);
 
     const genderLabel = config.gender === 'female' ? 'woman/female' : 'man/male';
 
-    // Build parts for Google Gemini API
+    // Step 3: Build parts for Google Gemini image generation
     const parts: any[] = [];
 
     if (subjectImage) {
@@ -209,12 +261,15 @@ serve(async (req) => {
       }
     }
 
+    const edgeFill = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. ZERO empty space, ZERO solid color bars, ZERO letterboxing.";
+
     const finalText = subjectImage
-      ? `${PORTRAIT_SYSTEM_PROMPT}\n\n${prompt}\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderLabel} from the SUBJECT IDENTITY photo. Same face, same features, same gender (${genderLabel}). This is NON-NEGOTIABLE.`
-      : `${PORTRAIT_SYSTEM_PROMPT}\n\n${prompt}`;
+      ? `${PORTRAIT_SYSTEM_PROMPT}\n\n${expandedPrompt}\n\n${edgeFill}\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderLabel} from the SUBJECT IDENTITY photo. Same face, same features, same gender (${genderLabel}). This is NON-NEGOTIABLE.`
+      : `${PORTRAIT_SYSTEM_PROMPT}\n\n${expandedPrompt}\n\n${edgeFill}`;
 
     parts.push({ text: finalText });
 
+    // Step 4: Generate
     const result = await generateWithGoogle(parts, googleApiKey, model);
 
     if (!result.imageUrl) {
