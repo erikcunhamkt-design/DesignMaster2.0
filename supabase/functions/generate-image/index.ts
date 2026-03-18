@@ -79,13 +79,14 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
   const safeLocked = sanitizePrompt(locked);
   const safeExpandable = sanitizePrompt(expandable);
 
-  // If no expandable content, skip LLM — use locked directly
+  // Preserve ALL app instructions mechanically in the final prompt.
+  // The LLM only enriches the creative context, but sidebar selections must remain literal.
+  const preservedInstructions = [safeLocked.trim(), safeExpandable.trim()].filter(Boolean).join(", ");
+
   if (!safeExpandable.trim()) {
-    return { final: safeLocked, architectOutput: "" };
+    return { final: preservedInstructions, architectOutput: "" };
   }
 
-  // If no locked content, send expandable to Architect and return its output
-  // If both exist, send ONLY expandable to Architect, then concatenate locked + output
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
@@ -105,18 +106,13 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
 
   if (!response.ok) {
     console.error("Architect prompt creation failed, using raw input:", response.status);
-    const fallback = `${safeLocked} ${safeExpandable}`.trim();
-    return { final: sanitizePrompt(fallback), architectOutput: "" };
+    return { final: preservedInstructions, architectOutput: "" };
   }
 
   const data = await response.json();
   const rawOutput = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || safeExpandable;
   const sanitizedArchitect = sanitizePrompt(rawOutput);
-
-  // Mechanical concatenation: locked params + architect creative expansion
-  const finalPrompt = safeLocked.trim()
-    ? `${safeLocked}, ${sanitizedArchitect}`
-    : sanitizedArchitect;
+  const finalPrompt = [preservedInstructions, sanitizedArchitect].filter(Boolean).join(", ");
 
   return { final: finalPrompt, architectOutput: sanitizedArchitect };
 }
