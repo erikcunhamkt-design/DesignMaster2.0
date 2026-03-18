@@ -9,29 +9,19 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles, Upload,
-  GripVertical, Link2, MousePointer2, X, Loader2, Send,
-  Trash2, ThumbsUp, ThumbsDown, Paperclip, Plus
+  Loader2, Send, Trash2, ThumbsUp, ThumbsDown, Paperclip
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
-interface CanvasNode {
+interface CanvasImage {
   id: string;
+  image_url: string;
   label: string;
-  node_type: string;
-  image_url: string | null;
-  prompt: string | null;
   position_x: number;
   position_y: number;
   width: number;
   height: number;
-  z_index: number;
-}
-
-interface CanvasConnection {
-  id: string;
-  source_node_id: string;
-  target_node_id: string;
 }
 
 interface ChatMessage {
@@ -48,18 +38,15 @@ export default function VoidCanvasPage() {
   const { user } = useAuth();
   const { apiKey } = useGoogleApiKey();
 
-  // Canvas state
-  const [nodes, setNodes] = useState<CanvasNode[]>([]);
-  const [connections, setConnections] = useState<CanvasConnection[]>([]);
+  // Canvas state — simple images, no nodes/connections
+  const [images, setImages] = useState<CanvasImage[]>([]);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [tool, setTool] = useState<'select' | 'connect'>('select');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -68,70 +55,71 @@ export default function VoidCanvasPage() {
   const [model, setModel] = useState<AiModel>('pro');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load nodes & connections
+  // Load images from DB (using void_canvas_nodes table, but only image type)
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [nodesRes, connsRes] = await Promise.all([
-        supabase.from('void_canvas_nodes').select('*').eq('user_id', user.id).order('z_index'),
-        supabase.from('void_canvas_connections').select('*').eq('user_id', user.id),
-      ]);
-      if (nodesRes.data) setNodes(nodesRes.data);
-      if (connsRes.data) setConnections(connsRes.data);
+      const { data } = await supabase
+        .from('void_canvas_nodes')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('node_type', 'image')
+        .order('z_index');
+      if (data) {
+        setImages(data.filter(d => d.image_url).map(d => ({
+          id: d.id,
+          image_url: d.image_url!,
+          label: d.label,
+          position_x: d.position_x,
+          position_y: d.position_y,
+          width: d.width,
+          height: d.height,
+        })));
+      }
     };
     load();
   }, [user]);
 
-  // Scroll chat to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Save node position
-  const saveNodePosition = useCallback(async (node: CanvasNode) => {
+  // Save position
+  const savePosition = useCallback(async (img: CanvasImage) => {
     await supabase.from('void_canvas_nodes').update({
-      position_x: node.position_x,
-      position_y: node.position_y,
-    }).eq('id', node.id);
+      position_x: img.position_x,
+      position_y: img.position_y,
+    }).eq('id', img.id);
   }, []);
 
-  // Mouse handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent, nodeId?: string) => {
-    if (nodeId && tool === 'select') {
-      const node = nodes.find(n => n.id === nodeId);
-      if (!node) return;
-      setDragging(nodeId);
-      setSelectedNode(nodeId);
+  // Mouse handlers — simple drag & pan, no nodes/connections
+  const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
+    if (imgId) {
+      const img = images.find(i => i.id === imgId);
+      if (!img) return;
+      setDragging(imgId);
+      setSelectedImage(imgId);
       setDragOffset({
-        x: e.clientX / zoom - node.position_x,
-        y: e.clientY / zoom - node.position_y,
+        x: e.clientX / zoom - img.position_x,
+        y: e.clientY / zoom - img.position_y,
       });
       e.stopPropagation();
-    } else if (nodeId && tool === 'connect') {
-      if (connecting) {
-        if (connecting !== nodeId) createConnection(connecting, nodeId);
-        setConnecting(null);
-      } else {
-        setConnecting(nodeId);
-      }
-      e.stopPropagation();
-    } else if (!nodeId) {
+    } else {
       setIsPanning(true);
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-      setSelectedNode(null);
+      setSelectedImage(null);
     }
-  }, [nodes, zoom, pan, tool, connecting]);
+  }, [images, zoom, pan]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (dragging) {
-      setNodes(prev => prev.map(n =>
-        n.id === dragging ? {
-          ...n,
+      setImages(prev => prev.map(i =>
+        i.id === dragging ? {
+          ...i,
           position_x: e.clientX / zoom - dragOffset.x,
           position_y: e.clientY / zoom - dragOffset.y,
-        } : n
+        } : i
       ));
     } else if (isPanning) {
       setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
@@ -140,50 +128,31 @@ export default function VoidCanvasPage() {
 
   const handleMouseUp = useCallback(() => {
     if (dragging) {
-      const node = nodes.find(n => n.id === dragging);
-      if (node) saveNodePosition(node);
+      const img = images.find(i => i.id === dragging);
+      if (img) savePosition(img);
       setDragging(null);
     }
     setIsPanning(false);
-  }, [dragging, nodes, saveNodePosition]);
+  }, [dragging, images, savePosition]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
     setZoom(z => Math.max(0.1, Math.min(3, z - e.deltaY * 0.001)));
   }, []);
 
-  // Connections
-  const createConnection = async (sourceId: string, targetId: string) => {
-    if (!user) return;
-    const { data } = await supabase.from('void_canvas_connections').insert({
-      user_id: user.id,
-      source_node_id: sourceId,
-      target_node_id: targetId,
-    }).select().single();
-    if (data) setConnections(prev => [...prev, data]);
+  const deleteImage = async (id: string) => {
+    await supabase.from('void_canvas_nodes').delete().eq('id', id);
+    setImages(prev => prev.filter(i => i.id !== id));
+    setSelectedImage(null);
   };
 
-  const deleteNode = async (nodeId: string) => {
-    await supabase.from('void_canvas_nodes').delete().eq('id', nodeId);
-    setNodes(prev => prev.filter(n => n.id !== nodeId));
-    setConnections(prev => prev.filter(c => c.source_node_id !== nodeId && c.target_node_id !== nodeId));
-    setSelectedNode(null);
-  };
-
-  const getNodeCenter = (nodeId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return { x: 0, y: 0 };
-    return { x: node.position_x + node.width / 2, y: node.position_y + node.height / 2 };
-  };
-
-  // Add node to canvas from generated image
+  // Add image to canvas
   const addImageToCanvas = async (imageUrl: string, label: string, promptText: string) => {
     if (!user) return;
-    // Scatter nodes in a column-like pattern with some randomness
-    const baseX = 100 + Math.random() * 300;
-    const baseY = 100 + nodes.length * 150 + Math.random() * 80;
+    const baseX = 80 + Math.random() * 400;
+    const baseY = 80 + images.length * 140 + Math.random() * 60;
 
-    const { data: newNode } = await supabase.from('void_canvas_nodes').insert({
+    const { data: newRow } = await supabase.from('void_canvas_nodes').insert({
       user_id: user.id,
       label: label.slice(0, 50),
       node_type: 'image',
@@ -193,19 +162,28 @@ export default function VoidCanvasPage() {
       position_y: baseY,
       width: 200,
       height: 200,
-      z_index: nodes.length,
+      z_index: images.length,
     }).select().single();
 
-    if (newNode) setNodes(prev => [...prev, newNode]);
+    if (newRow && newRow.image_url) {
+      setImages(prev => [...prev, {
+        id: newRow.id,
+        image_url: newRow.image_url!,
+        label: newRow.label,
+        position_x: newRow.position_x,
+        position_y: newRow.position_y,
+        width: newRow.width,
+        height: newRow.height,
+      }]);
+    }
   };
 
-  // Handle image upload to canvas
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !e.target.files?.[0]) return;
     const file = e.target.files[0];
     const objectUrl = URL.createObjectURL(file);
     await addImageToCanvas(objectUrl, file.name, '');
-    toast.success('Imagem importada ao canvas!');
+    toast.success('Imagem importada!');
   };
 
   // Chat: send prompt to generate
@@ -216,11 +194,7 @@ export default function VoidCanvasPage() {
       return;
     }
 
-    const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: prompt,
-    };
+    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: prompt };
     setMessages(prev => [...prev, userMessage]);
     const currentPrompt = prompt;
     setPrompt('');
@@ -230,12 +204,11 @@ export default function VoidCanvasPage() {
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const modelId = model === 'pro' ? 'gemini-3-pro-image-preview' : 'gemini-3.1-flash-image-preview';
 
-      // Add thinking message
       const thinkingId = crypto.randomUUID();
       setMessages(prev => [...prev, {
         id: thinkingId,
         role: 'assistant',
-        content: `I'll create this image for you with the composition and atmosphere you described.`,
+        content: 'Gerando sua criação...',
         model: model === 'pro' ? 'Nano Banana Pro' : 'Nano Banana 2',
       }]);
 
@@ -261,19 +234,12 @@ export default function VoidCanvasPage() {
         const imageUrl = data.imageUrl || data.image;
         const title = currentPrompt.slice(0, 60);
 
-        // Update thinking message with image
         setMessages(prev => prev.map(m =>
           m.id === thinkingId
-            ? {
-                ...m,
-                content: `Perfect! I've created your image based on the prompt you provided.`,
-                imageUrl,
-                title,
-              }
+            ? { ...m, content: 'Pronto! Sua imagem foi criada e adicionada ao canvas.', imageUrl, title }
             : m
         ));
 
-        // Add to canvas
         await addImageToCanvas(imageUrl, title, currentPrompt);
       } else {
         setMessages(prev => prev.map(m =>
@@ -330,41 +296,20 @@ export default function VoidCanvasPage() {
           </div>
 
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => { setTool('select'); setConnecting(null); }}
-              className={cn('p-1.5 rounded-lg transition-colors', tool === 'select' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground')}
-            >
-              <MousePointer2 className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setTool('connect')}
-              className={cn('p-1.5 rounded-lg transition-colors', tool === 'connect' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground')}
-            >
-              <Link2 className="h-3.5 w-3.5" />
-            </button>
-            <div className="w-px h-5 bg-border/20 mx-1" />
-            <button onClick={() => setZoom(z => Math.min(3, z + 0.2))} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground">
+            <button onClick={() => setZoom(z => Math.min(3, z + 0.2))} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <ZoomIn className="h-3.5 w-3.5" />
             </button>
             <span className="text-[9px] text-muted-foreground font-mono min-w-[32px] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => setZoom(z => Math.max(0.1, z - 0.2))} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground">
+            <button onClick={() => setZoom(z => Math.max(0.1, z - 0.2))} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <ZoomOut className="h-3.5 w-3.5" />
             </button>
-            <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground">
+            <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Connecting indicator */}
-        {connecting && (
-          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-xl bg-primary/20 border border-primary/40 backdrop-blur-xl text-primary text-[10px] font-medium animate-pulse">
-            Clique no nó de destino
-            <button onClick={() => setConnecting(null)} className="ml-2"><X className="h-3 w-3 inline" /></button>
-          </div>
-        )}
-
-        {/* Canvas */}
+        {/* Canvas area */}
         <div
           ref={canvasRef}
           className="absolute inset-0 pt-12 cursor-grab active:cursor-grabbing"
@@ -381,77 +326,46 @@ export default function VoidCanvasPage() {
             }}
             className="absolute inset-0"
           >
-            {/* SVG connections */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
-              {connections.map(conn => {
-                const src = getNodeCenter(conn.source_node_id);
-                const tgt = getNodeCenter(conn.target_node_id);
-                return (
-                  <g key={conn.id}>
-                    <line
-                      x1={src.x} y1={src.y} x2={tgt.x} y2={tgt.y}
-                      stroke="hsl(var(--primary) / 0.4)"
-                      strokeWidth={2 / zoom}
-                      strokeDasharray={`${6 / zoom} ${4 / zoom}`}
-                    />
-                    <circle cx={src.x} cy={src.y} r={4 / zoom} fill="hsl(var(--primary) / 0.6)" />
-                    <circle cx={tgt.x} cy={tgt.y} r={4 / zoom} fill="hsl(var(--primary) / 0.6)" />
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Nodes */}
-            {nodes.map(node => (
+            {/* Images on canvas */}
+            {images.map(img => (
               <div
-                key={node.id}
-                onMouseDown={(e) => handleMouseDown(e, node.id)}
+                key={img.id}
+                onMouseDown={(e) => handleMouseDown(e, img.id)}
                 className={cn(
-                  'absolute rounded-xl border transition-shadow duration-200 cursor-grab active:cursor-grabbing group overflow-hidden',
-                  selectedNode === node.id
-                    ? 'border-primary/60 shadow-glow-md ring-1 ring-primary/30'
-                    : 'border-border/30 hover:border-primary/30 hover:shadow-glow-sm',
-                  connecting === node.id && 'border-primary ring-2 ring-primary/40 animate-pulse',
+                  'absolute rounded-lg overflow-hidden cursor-grab active:cursor-grabbing group transition-shadow duration-200',
+                  selectedImage === img.id
+                    ? 'ring-2 ring-primary/50 shadow-glow-md'
+                    : 'hover:shadow-glow-sm',
                 )}
                 style={{
-                  left: node.position_x,
-                  top: node.position_y,
-                  width: node.width,
-                  height: node.height,
-                  zIndex: node.z_index,
+                  left: img.position_x,
+                  top: img.position_y,
+                  width: img.width,
+                  height: img.height,
                 }}
               >
-                {node.image_url ? (
-                  <img src={node.image_url} alt={node.label} className="w-full h-full object-cover" draggable={false} />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-card/40 backdrop-blur-sm">
-                    <Plus className="h-5 w-5 text-muted-foreground/40" />
-                    <span className="text-[8px] text-muted-foreground/40 mt-1">{node.label}</span>
-                  </div>
-                )}
-                {node.label && node.image_url && (
-                  <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-[8px] text-white/80 truncate">{node.label}</p>
-                  </div>
-                )}
-                {/* Delete button on hover */}
-                {selectedNode === node.id && (
+                <img src={img.image_url} alt={img.label} className="w-full h-full object-cover" draggable={false} />
+                
+                {/* Label overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-[8px] text-white/80 truncate">{img.label}</p>
+                </div>
+
+                {/* Delete on hover when selected */}
+                {selectedImage === img.id && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); deleteNode(node.id); }}
+                    onClick={(e) => { e.stopPropagation(); deleteImage(img.id); }}
                     className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
                 )}
-                <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <GripVertical className="h-3 w-3 text-white/40" />
-                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom bar - import */}
+        {/* Bottom bar */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3 py-2 rounded-2xl bg-background/60 backdrop-blur-xl border border-border/30">
           <label className="cursor-pointer">
             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -459,11 +373,11 @@ export default function VoidCanvasPage() {
               <span><Upload className="h-3 w-3" /> Importar</span>
             </Button>
           </label>
-          <span className="text-[9px] text-muted-foreground/40">{nodes.length} itens</span>
+          <span className="text-[9px] text-muted-foreground/40">{images.length} itens</span>
         </div>
 
         {/* Empty state */}
-        {nodes.length === 0 && (
+        {images.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="text-center space-y-2 animate-fade-up">
               <div className="text-3xl">🕳️</div>
@@ -480,13 +394,11 @@ export default function VoidCanvasPage() {
       <div className="w-[420px] flex flex-col border-l border-border/20 bg-background/80 backdrop-blur-xl">
         {/* Chat header */}
         <div className="flex items-center justify-between px-4 h-12 border-b border-border/20 shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-foreground">VOID Chat</span>
-          </div>
+          <span className="text-xs font-semibold text-foreground">VOID Chat</span>
           <ApiKeyDialog />
         </div>
 
-        {/* Messages area */}
+        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
@@ -506,24 +418,18 @@ export default function VoidCanvasPage() {
               ) : (
                 <div className="max-w-[90%] space-y-2">
                   <p className="text-[11px] text-foreground/80 leading-relaxed">{msg.content}</p>
-
                   {msg.model && (
                     <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50">
                       <Sparkles className="h-2.5 w-2.5" />
                       <span>{msg.model}</span>
                     </div>
                   )}
-
-                  {msg.title && (
-                    <p className="text-[11px] font-semibold text-foreground">{msg.title}</p>
-                  )}
-
+                  {msg.title && <p className="text-[11px] font-semibold text-foreground">{msg.title}</p>}
                   {msg.imageUrl && (
                     <div className="rounded-xl overflow-hidden border border-border/30 shadow-cinematic max-w-[300px]">
                       <img src={msg.imageUrl} alt={msg.title || 'Generated'} className="w-full h-auto" />
                     </div>
                   )}
-
                   {msg.imageUrl && (
                     <div className="flex items-center gap-1 pt-1">
                       <button className="p-1 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
@@ -545,19 +451,14 @@ export default function VoidCanvasPage() {
               <span>Gerando imagem...</span>
             </div>
           )}
-
           <div ref={chatEndRef} />
         </div>
 
         {/* Input area */}
         <div className="shrink-0 border-t border-border/20 p-3 space-y-2.5">
-          {/* Model selector */}
           <ModelSelector value={model} onChange={setModel} />
-
-          {/* Input box */}
           <div className="relative rounded-xl border border-border/30 bg-secondary/20 focus-within:border-primary/30 transition-colors">
             <Textarea
-              ref={textareaRef}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -566,14 +467,12 @@ export default function VoidCanvasPage() {
               disabled={isGenerating}
             />
             <div className="flex items-center justify-between px-2 pb-2">
-              <div className="flex items-center gap-1">
-                <label className="cursor-pointer">
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                  <div className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
-                    <Paperclip className="h-3.5 w-3.5" />
-                  </div>
-                </label>
-              </div>
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <div className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
+                  <Paperclip className="h-3.5 w-3.5" />
+                </div>
+              </label>
               <button
                 onClick={handleSend}
                 disabled={isGenerating || !prompt.trim() || !apiKey}
