@@ -30,6 +30,7 @@ import calendarHero from '@/assets/calendar-hero.png';
 import bioHero from '@/assets/bio-hero.png';
 import communityChatHero from '@/assets/community-chat-hero.png';
 import portraitStudioHero from '@/assets/portrait-studio-hero.png';
+import voidHero from '@/assets/void-hero.png';
 const studioImages: Record<string, string> = {
   extrator: extratorHero,
   'prompt-builder': promptBuilderHero,
@@ -50,6 +51,7 @@ const studioImages: Record<string, string> = {
   'bio': bioHero,
   'community-chat': communityChatHero,
   'portrait-studio': portraitStudioHero,
+  'void': voidHero,
 };
 
 const sections = [
