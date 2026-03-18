@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Plus, Trash2, ChevronLeft, ChevronRight, Eye, Search, Bot, ChevronDown, Sparkles } from 'lucide-react';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
