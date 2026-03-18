@@ -125,6 +125,7 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
       negative_prompt: BASE_NEGATIVE,
       width: dim.width,
       height: dim.height,
+      aspectRatio: dim.ratio.split(' ')[0],
       references: [],
       quality: 'high',
       reserved_text_area: null,
