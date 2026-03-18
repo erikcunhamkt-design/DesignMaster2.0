@@ -390,53 +390,63 @@ export default function VoidCanvasPage() {
         )}
       </div>
 
-      {/* ========== RIGHT: CHAT SIDEBAR ========== */}
-      <div className="w-[420px] flex flex-col border-l border-border/20 bg-background/80 backdrop-blur-xl">
+      {/* ========== RIGHT: CHAT SIDEBAR (Lovart-style, dark) ========== */}
+      <div className="w-[440px] flex flex-col border-l border-border/15 bg-[#0a0f14]">
         {/* Chat header */}
-        <div className="flex items-center justify-between px-4 h-12 border-b border-border/20 shrink-0">
-          <span className="text-xs font-semibold text-foreground">VOID Chat</span>
-          <ApiKeyDialog />
+        <div className="flex items-center justify-between px-5 h-12 border-b border-border/10 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <span className="text-[8px]">🕳️</span>
+            </div>
+            <span className="text-[13px] font-semibold text-foreground/90">VOID</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ApiKeyDialog />
+          </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {/* Messages area */}
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
-              <Sparkles className="h-8 w-8 text-primary/40" />
-              <p className="text-xs text-muted-foreground max-w-[240px]">
-                Descreva o que quer criar e a imagem aparecerá no canvas ao lado.
-              </p>
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-50">
+              <Sparkles className="h-10 w-10 text-primary/30" />
+              <div className="space-y-1.5">
+                <p className="text-sm font-medium text-foreground/60">Comece a criar</p>
+                <p className="text-[11px] text-muted-foreground/50 max-w-[260px]">
+                  Descreva o que quer criar e a imagem aparecerá no canvas ao lado.
+                </p>
+              </div>
             </div>
           )}
 
           {messages.map((msg) => (
             <div key={msg.id} className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
               {msg.role === 'user' ? (
-                <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-br-md bg-primary/15 border border-primary/20 text-foreground text-[11px] leading-relaxed">
+                <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-br-sm bg-[#151c24] border border-border/15 text-foreground/90 text-[12px] leading-relaxed">
                   {msg.content}
                 </div>
               ) : (
-                <div className="max-w-[90%] space-y-2">
-                  <p className="text-[11px] text-foreground/80 leading-relaxed">{msg.content}</p>
+                <div className="max-w-[95%] space-y-2.5">
+                  <p className="text-[12px] text-foreground/75 leading-relaxed">{msg.content}</p>
                   {msg.model && (
-                    <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50">
+                    <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground/40">
                       <Sparkles className="h-2.5 w-2.5" />
                       <span>{msg.model}</span>
                     </div>
                   )}
-                  {msg.title && <p className="text-[11px] font-semibold text-foreground">{msg.title}</p>}
+                  {msg.title && <p className="text-[12px] font-semibold text-foreground/90">{msg.title}</p>}
                   {msg.imageUrl && (
-                    <div className="rounded-xl overflow-hidden border border-border/30 shadow-cinematic max-w-[300px]">
+                    <div className="rounded-xl overflow-hidden border border-border/15 shadow-cinematic max-w-[320px]">
                       <img src={msg.imageUrl} alt={msg.title || 'Generated'} className="w-full h-auto" />
                     </div>
                   )}
                   {msg.imageUrl && (
-                    <div className="flex items-center gap-1 pt-1">
-                      <button className="p-1 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
-                        <ThumbsUp className="h-3 w-3" />
+                    <div className="flex items-center gap-1 pt-0.5">
+                      <button className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-foreground/70 hover:bg-secondary/30 transition-colors">
+                        <ThumbsUp className="h-3.5 w-3.5" />
                       </button>
-                      <button className="p-1 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
-                        <ThumbsDown className="h-3 w-3" />
+                      <button className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-foreground/70 hover:bg-secondary/30 transition-colors">
+                        <ThumbsDown className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   )}
@@ -446,47 +456,70 @@ export default function VoidCanvasPage() {
           ))}
 
           {isGenerating && (
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
-              <Loader2 className="h-3 w-3 animate-spin text-primary" />
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground/50">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
               <span>Gerando imagem...</span>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input area */}
-        <div className="shrink-0 border-t border-border/20 p-3 space-y-2.5">
-          <ModelSelector value={model} onChange={setModel} />
-          <div className="relative rounded-xl border border-border/30 bg-secondary/20 focus-within:border-primary/30 transition-colors">
+        {/* ===== INPUT AREA (Lovart-style) ===== */}
+        <div className="shrink-0 p-4 space-y-3">
+          {/* Textarea card */}
+          <div className="rounded-2xl border border-border/15 bg-[#111820] focus-within:border-primary/25 transition-colors overflow-hidden">
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Descreva sua criação..."
-              className="min-h-[60px] max-h-[120px] resize-none bg-transparent border-none text-[11px] pr-10 focus-visible:ring-0 placeholder:text-muted-foreground/40"
+              placeholder="Start with an idea, or type &quot;@&quot; to mention"
+              className="min-h-[70px] max-h-[140px] resize-none bg-transparent border-none text-[12px] text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-4 pt-3"
               disabled={isGenerating}
             />
-            <div className="flex items-center justify-between px-2 pb-2">
-              <label className="cursor-pointer">
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                <div className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-secondary/50 transition-colors">
-                  <Paperclip className="h-3.5 w-3.5" />
-                </div>
-              </label>
-              <button
-                onClick={handleSend}
-                disabled={isGenerating || !prompt.trim() || !apiKey}
-                className={cn(
-                  'p-2 rounded-full transition-all',
-                  prompt.trim() && apiKey
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-sm'
-                    : 'bg-secondary/40 text-muted-foreground/30 cursor-not-allowed'
-                )}
-              >
-                <Send className="h-3.5 w-3.5" />
-              </button>
+            {/* Bottom toolbar inside textarea card */}
+            <div className="flex items-center justify-between px-3 py-2">
+              {/* Left: attach + agent */}
+              <div className="flex items-center gap-1">
+                <label className="cursor-pointer">
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                  <div className="p-2 rounded-lg text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-colors">
+                    <Paperclip className="h-4 w-4" />
+                  </div>
+                </label>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
+                  <Sparkles className="h-3 w-3" />
+                  Agent
+                </button>
+              </div>
+
+              {/* Right: icon row + send */}
+              <div className="flex items-center gap-0.5">
+                {/* Model indicator icons (decorative, matching Lovart style) */}
+                <button
+                  onClick={() => setModel(model === 'pro' ? 'flash' : 'pro')}
+                  className="p-2 rounded-lg text-muted-foreground/30 hover:text-foreground/60 hover:bg-secondary/20 transition-colors"
+                  title={model === 'pro' ? 'Nano Banana Pro' : 'Nano Banana 2'}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={handleSend}
+                  disabled={isGenerating || !prompt.trim() || !apiKey}
+                  className={cn(
+                    'p-2 rounded-full transition-all ml-1',
+                    prompt.trim() && apiKey
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-sm'
+                      : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed'
+                  )}
+                >
+                  {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Model selector chips below */}
+          <ModelSelector value={model} onChange={setModel} />
         </div>
       </div>
     </div>
