@@ -273,7 +273,9 @@ export default function DirectMessagesPage() {
     f.requester_id === user?.id ? f.addressee_id : f.requester_id;
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <DashboardSidebar activeSection="direct-messages" onSectionChange={() => {}} />
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
       <StudioTopbar title="Mensagens Diretas" showApiKey={false} />
 
       <div className="flex flex-1 overflow-hidden">
