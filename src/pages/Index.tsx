@@ -88,6 +88,7 @@ const Index = () => {
           lockedPrompt: genRequest.lockedPrompt,
           expandablePrompt: genRequest.expandablePrompt,
           negativePrompt: genRequest.negative_prompt,
+          aspectRatio: genRequest.aspectRatio,
           referenceImages,
           googleApiKey: apiKey,
           aiModel,

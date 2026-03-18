@@ -117,16 +117,29 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
   return { final: finalPrompt, architectOutput: sanitizedArchitect };
 }
 
-async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
+function normalizeAspectRatio(aspectRatio?: string): string | undefined {
+  if (!aspectRatio) return undefined;
+  const normalized = aspectRatio.trim();
+  const allowed = new Set(["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]);
+  return allowed.has(normalized) ? normalized : undefined;
+}
+
+async function generateWithGoogle(parts: any[], googleApiKey: string, model: string, aspectRatio?: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
-  console.log(`Calling Google Gemini ${model} for image generation...`);
+  const normalizedAspectRatio = normalizeAspectRatio(aspectRatio);
+  console.log(`Calling Google Gemini ${model} for image generation... aspectRatio=${normalizedAspectRatio || "default"}`);
+
+  const generationConfig: Record<string, unknown> = { responseModalities: ["TEXT", "IMAGE"] };
+  if (normalizedAspectRatio) {
+    generationConfig.imageConfig = { aspectRatio: normalizedAspectRatio };
+  }
 
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ parts }],
-      generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+      generationConfig,
     }),
   });
 
@@ -158,7 +171,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
+    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, aspectRatio, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
       return new Response(
@@ -206,7 +219,7 @@ serve(async (req) => {
     }
     parts.push({ text: fullPrompt });
 
-    const result = await generateWithGoogle(parts, googleApiKey, model);
+    const result = await generateWithGoogle(parts, googleApiKey, model, aspectRatio);
 
     if (!result.imageUrl) {
       return new Response(
