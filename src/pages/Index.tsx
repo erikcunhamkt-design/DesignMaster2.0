@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SlidersHorizontal, Wand2 } from 'lucide-react';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
+import { compressImageToBase64 } from '@/lib/imageUtils';
 
 // Estimated generation time in seconds
 const ESTIMATED_SECONDS = 35;
@@ -82,13 +83,12 @@ const Index = () => {
       const referenceNotes: string[] = [];
       for (const ref of genRequest.references.slice(0, 8)) {
         try {
-          const resp = await fetch(ref.url);
-          const blob = await resp.blob();
-          const base64 = await blobToBase64(blob);
+          // Compress each image to max 1024px JPEG 85% before sending
+          const compressed = await compressImageToBase64(ref.url, 1024, 0.85);
           if (ref.role === 'identity') {
-            subjectImages.push(base64);
+            subjectImages.push(compressed);
           } else {
-            styleReferenceImages.push(base64);
+            styleReferenceImages.push(compressed);
             if (ref.attributes && ref.attributes.length > 0) {
               referenceNotes.push(ref.attributes.join(', '));
             }
@@ -97,6 +97,8 @@ const Index = () => {
           // skip failed references
         }
       }
+
+      console.log(`📸 Sending ${subjectImages.length} subject (identity) images, ${styleReferenceImages.length} style references`);
 
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
