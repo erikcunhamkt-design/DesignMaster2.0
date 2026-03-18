@@ -220,7 +220,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ imageUrl: result.imageUrl, text: result.textResponse, expandedPrompt: useArchitect ? finalPrompt : undefined }),
+      JSON.stringify({ imageUrl: result.imageUrl, text: result.textResponse, expandedPrompt: expandedPromptForUI }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
