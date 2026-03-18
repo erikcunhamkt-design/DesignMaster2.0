@@ -43,7 +43,7 @@ RULES:
 - Always include stages 10-12 (negative, realism, deep texture) even if not mentioned
 - Do NOT translate to Portuguese — English only`;
 
-async function createPromptWithGAB(locked: string, expandable: string, googleApiKey: string): Promise<string> {
+async function createPromptWithArchitect(locked: string, expandable: string, googleApiKey: string): Promise<string> {
   const userContent = locked.trim() && expandable.trim()
     ? `--- MANDATORY INSTRUCTIONS (preserve exactly) ---\n${locked}\n\n--- CREATIVE CONTEXT (enhance freely) ---\n${expandable}`
     : locked.trim()
