@@ -29,11 +29,11 @@ interface Conversation {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-carousel-master`;
 
 const SUGGESTIONS = [
-  '🔍 Investigar um fenômeno cultural atual',
-  '📰 Transformar um conteúdo existente em narrativa editorial',
-  '🎯 Criar um carrossel investigativo sobre tendências de design',
-  '🧠 Decodificar um comportamento de consumo recente',
-  '🔥 Analisar uma tendência viral e transformar em carrossel',
+  '🔍 Existe "estilo brasileiro" no design, ou existe um método brasileiro?',
+  '📰 A IA está substituindo criativos ou revelando quem nunca foi criativo?',
+  '🎯 Por que marcas de luxo estão adotando estética brutalista?',
+  '🧠 O que a obsessão por produtividade esconde sobre o medo de parar?',
+  '🔥 Design sustentável é movimento real ou greenwashing visual?',
 ];
 
 export default function CarouselMasterChatPage() {
