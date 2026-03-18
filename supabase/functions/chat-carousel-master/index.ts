@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
     });
     geminiContents.push({
       role: "model",
-      parts: [{ text: "Entendido. Envie o tema ou conteúdo e eu entrego os 18 blocos editoriais prontos." }]
+      parts: [{ text: "Envie o tema ou conteúdo. Vou apresentar 10 headlines para você escolher antes de gerar os 18 blocos." }]
     });
 
     for (const msg of messages) {
