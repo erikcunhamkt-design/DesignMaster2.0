@@ -210,7 +210,14 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   if (config.framing === 'closeup') {
     locked.push('close-up shot focusing on face and shoulders');
   } else if (config.framing === 'plano-medio') {
-    locked.push('medium shot from waist up');
+    // When text is at bottom (rodapé) or subject is at top, preserve more space below
+    const needsBottomSpace = config.textEnabled && config.textMode === 'imagem' && config.textPosition === 'rodape';
+    const subjectAtTop = config.verticalPosition === 'cima';
+    if (needsBottomSpace || subjectAtTop) {
+      locked.push('medium shot from waist up, subject placed in the upper portion of the frame, generous empty space below the waist for text placement');
+    } else {
+      locked.push('medium shot from waist up, full body framing with comfortable margins above and below');
+    }
   } else {
     locked.push('american shot from knees up');
   }
