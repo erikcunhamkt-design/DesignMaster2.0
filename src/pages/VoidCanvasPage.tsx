@@ -211,7 +211,7 @@ export default function VoidCanvasPage() {
 
     try {
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const modelId = model === 'pro' ? 'gemini-3-pro-image-preview' : 'gemini-3.1-flash-image-preview';
+      const modelId = model;
 
       const thinkingId = crypto.randomUUID();
       setMessages(prev => [...prev, {
