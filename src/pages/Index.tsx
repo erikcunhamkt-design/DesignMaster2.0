@@ -70,6 +70,12 @@ const Index = () => {
     try {
       const genRequest = buildGenerationRequest(activeProject.config);
 
+      // Show format validation toast before generating
+      const dimLabel = activeProject.config.dimension
+        ? { stories: 'Stories 9:16', horizontal: 'Horizontal 16:9', 'feed-quadrado': 'Quadrado 1:1', 'feed-retrato': 'Retrato 4:5' }[activeProject.config.dimension]
+        : 'Quadrado 1:1';
+      toast.info(`Gerando em ${dimLabel} · Aspect Ratio: ${genRequest.aspectRatio}`, { duration: 3000 });
+
       const referenceImages: string[] = [];
       for (const ref of genRequest.references.slice(0, 5)) {
         try {
