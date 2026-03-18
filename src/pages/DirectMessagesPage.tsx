@@ -10,6 +10,7 @@ import { useFriendships } from '@/hooks/useFriendships';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
+import { DashboardSidebar, MobileSidebarTrigger } from '@/components/layout/DashboardSidebar';
 
 interface DirectMessage {
   id: string;
