@@ -51,7 +51,7 @@ const studioImages: Record<string, string> = {
 };
 
 const sections = [
-{ id: 'image-creators', title: 'Geradores Especializados', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator'] },
+{ id: 'image-creators', title: 'Geradores Especializados', studioIds: ['capas', 'hero-studio', 'produtos', 'mockup-studio', 'football-creator', 'auto-creator', 'portrait-studio'] },
 { id: 'creative-assistant', title: 'Agentes de IA ', studioIds: ['chat', 'carousel-master', 'editorial', 'calendar', 'bio'] },
 { id: 'prompt-tools', title: 'Laboratório de Prompts', studioIds: ['prompt-builder', 'extrator', 'markdown'] },
 { id: 'image-tools', title: 'Ferramentas de Imagem', studioIds: ['upscale', 'restore-photo'] },
