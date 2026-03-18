@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.generate-portrait]
 verify_jwt = false
+
+[functions.void-smart-router]
+verify_jwt = false
