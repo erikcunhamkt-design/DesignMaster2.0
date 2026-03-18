@@ -134,35 +134,52 @@ async function generateWithGoogle(parts: any[], googleApiKey: string, model: str
     generationConfig.imageConfig = { aspectRatio: normalizedAspectRatio };
   }
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts }],
-      generationConfig,
-    }),
+  const requestBody = JSON.stringify({
+    contents: [{ parts }],
+    generationConfig,
   });
 
-  if (!response.ok) {
+  const MAX_RETRIES = 2;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: requestBody,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      let imageUrl: string | null = null;
+      let textResponse = "";
+      const candidates = data.candidates;
+      if (candidates && candidates.length > 0) {
+        for (const part of (candidates[0]?.content?.parts || [])) {
+          if (part.inlineData) imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          if (part.text) textResponse += part.text;
+        }
+      }
+      return { imageUrl, textResponse };
+    }
+
     const errorText = await response.text();
+
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      // Extract retry delay from response, default to 15s
+      const retryMatch = errorText.match(/"retryDelay":\s*"(\d+)s"/);
+      const waitSec = retryMatch ? Math.min(parseInt(retryMatch[1], 10), 30) : 15;
+      console.warn(`⏳ Rate limited (429). Retrying in ${waitSec}s... (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      await new Promise(r => setTimeout(r, waitSec * 1000));
+      continue;
+    }
+
     console.error("Google API error:", response.status, errorText);
-    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido na API do Google. Aguarde e tente novamente." };
+    if (response.status === 429) throw { status: 429, message: "Limite de requisições excedido na API do Google. Aguarde até 1 minuto e tente novamente." };
     if (response.status === 400) throw { status: 400, message: "Requisição inválida. Verifique o prompt e tente novamente." };
     if (response.status === 403) throw { status: 403, message: "API Key sem permissão. Verifique se a key tem acesso à API Gemini." };
     throw { status: 500, message: `Erro na API do Google: ${response.status}. Tente novamente.` };
   }
 
-  const data = await response.json();
-  let imageUrl: string | null = null;
-  let textResponse = "";
-  const candidates = data.candidates;
-  if (candidates && candidates.length > 0) {
-    for (const part of (candidates[0]?.content?.parts || [])) {
-      if (part.inlineData) imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-      if (part.text) textResponse += part.text;
-    }
-  }
-  return { imageUrl, textResponse };
+  throw { status: 429, message: "Limite de requisições excedido após tentativas automáticas. Aguarde 1 minuto e tente novamente." };
 }
 
 serve(async (req) => {
