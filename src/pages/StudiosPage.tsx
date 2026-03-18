@@ -85,6 +85,7 @@ export default function StudiosPage() {
   const { recents, trackUsage } = useRecentTools();
 
   const featured = studios.find((s) => s.id === FEATURED_STUDIO_ID)!;
+  const featuredVoid = studios.find((s) => s.id === FEATURED_VOID_ID)!;
 
   // Navigate to studio and track usage
   const navigateToStudio = useCallback((route: string, studioId: string) => {
