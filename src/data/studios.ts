@@ -192,7 +192,7 @@ export const studios: Studio[] = [
   },
   {
     id: 'portrait-studio',
-    name: 'Portrait Master',
+    name: 'Fotógrafo Profissional',
     tagline: 'Retratos profissionais ultra-realistas com IA.',
     description: 'Gere retratos de estúdio dignos de Annie Leibovitz — com ou sem referência, textura de pele, cabelo fio a fio, olhos perfeitos, 100% fiel.',
     icon: '📸',

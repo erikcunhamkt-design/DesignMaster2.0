@@ -188,7 +188,7 @@ export default function PortraitStudioPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Portrait Master" showApiKey={true} />
+      <StudioTopbar title="Fotógrafo Profissional" showApiKey={true} />
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <div className="w-[380px] shrink-0 border-r border-border/15 bg-card/20 flex flex-col overflow-y-auto">

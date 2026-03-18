@@ -38,7 +38,7 @@ const patchNotes: PatchNote[] = [
         icon: <Cpu className="h-4 w-4 text-amber-400" />,
         category: 'API Google Direta',
         items: [
-          'Portrait Master migrado de gateway interno para API Google direta',
+          'Fotógrafo Profissional migrado de gateway interno para API Google direta',
           'Mesmo padrão de todos os outros estúdios (API Key do usuário)',
           'Seletor de modelo: Nano Banana Pro (qualidade) ou Nano Banana 2 (velocidade)',
           'Retry automático com exponential backoff para erros 429',
