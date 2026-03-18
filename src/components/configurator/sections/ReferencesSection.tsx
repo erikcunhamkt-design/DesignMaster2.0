@@ -39,24 +39,26 @@ export function ReferencesSection({ config, onUpdate }: Props) {
     const selected = Array.from(files).slice(0, remaining);
     e.target.value = '';
 
-    // Convert all files (HEIC→JPEG if needed)
-    const urls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
+    try {
+      const urls = await Promise.all(selected.map(f => createNormalizedObjectUrl(f)));
 
-    // First file opens the note dialog
-    const extraUrls = urls.slice(1);
-    if (extraUrls.length > 0) {
-      const newRefs = [...config.styleReferences, ...extraUrls];
-      const attrs = { ...(config.referenceAttributes || {}) };
-      const notes = { ...(config.referenceNotes || {}) };
-      extraUrls.forEach((_, i) => {
-        const idx = config.styleReferences.length + i;
-        attrs[idx] = [];
-        notes[idx] = '';
-      });
-      onUpdate({ styleReferences: newRefs, referenceAttributes: attrs, referenceNotes: notes });
+      const extraUrls = urls.slice(1);
+      if (extraUrls.length > 0) {
+        const newRefs = [...config.styleReferences, ...extraUrls];
+        const attrs = { ...(config.referenceAttributes || {}) };
+        const notes = { ...(config.referenceNotes || {}) };
+        extraUrls.forEach((_, i) => {
+          const idx = config.styleReferences.length + i;
+          attrs[idx] = [];
+          notes[idx] = '';
+        });
+        onUpdate({ styleReferences: newRefs, referenceAttributes: attrs, referenceNotes: notes });
+      }
+      setPendingUrl(urls[0]);
+      setNoteText('');
+    } catch (err) {
+      console.error('Erro ao processar referência:', err);
     }
-    setPendingUrl(urls[0]);
-    setNoteText('');
   };
 
   const confirmReference = () => {
