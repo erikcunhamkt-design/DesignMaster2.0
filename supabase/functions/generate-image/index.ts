@@ -133,7 +133,7 @@ serve(async (req) => {
     // Model selection
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
-    // ── Build final prompt with GAB - PROMPT CREATOR PRO ──
+    // ── Build final prompt with PROMPT ARCHITECT PRO ──
     let finalPrompt: string;
     const locked = lockedPrompt || prompt || "";
     const expandable = expandablePrompt || "";
