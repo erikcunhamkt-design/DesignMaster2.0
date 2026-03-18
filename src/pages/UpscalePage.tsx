@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Upload, Loader2, ArrowUpCircle, ScanSearch, Sparkles, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
