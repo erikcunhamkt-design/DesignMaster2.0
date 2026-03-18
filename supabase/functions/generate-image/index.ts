@@ -62,7 +62,7 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${GAB_SYSTEM}\n\n${userContent}` }]
+        parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\n${userContent}` }]
       }],
       generationConfig: {
         temperature: 0.4,
