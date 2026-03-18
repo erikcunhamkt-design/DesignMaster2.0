@@ -284,33 +284,75 @@ export default function VoidCanvasPage() {
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const modelId = model;
 
-      const thinkingId = crypto.randomUUID();
-      setMessages(prev => [...prev, {
-        id: thinkingId,
-        role: 'assistant',
-        content: 'Gerando sua criação...',
-        model: imageModels.find(m => m.id === model)?.label || model,
-      }]);
-
-      // If audio, transcribe first via Gemini text model
+      // If audio, transcribe first
       let finalPrompt = currentPrompt;
       if (currentAudio && !currentPrompt.trim()) {
-        // Convert audio to base64 and send to transcription
         const audioReader = new FileReader();
         const audioBase64 = await new Promise<string>((resolve) => {
           audioReader.onloadend = () => resolve(audioReader.result as string);
           audioReader.readAsDataURL(currentAudio);
         });
-        // Use the prompt as-is, Gemini will handle audio
         finalPrompt = 'Generate an image based on the audio description provided';
       }
 
+      // ── SMART ROUTER: classify & expand prompt ──
+      const routerId = crypto.randomUUID();
+      setMessages(prev => [...prev, {
+        id: routerId,
+        role: 'assistant',
+        content: '🧭 Analisando seu pedido...',
+        model: 'Smart Router',
+      }]);
+
+      let expandedPrompt = finalPrompt;
+      let agentName = '';
+      let agentEmoji = '';
+
+      try {
+        const routerRes = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/void-smart-router`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            },
+            body: JSON.stringify({ prompt: finalPrompt, googleApiKey: apiKey }),
+          }
+        );
+        const routerData = await routerRes.json();
+        if (routerData.expandedPrompt) {
+          expandedPrompt = routerData.expandedPrompt;
+          agentName = routerData.agentName || '';
+          agentEmoji = routerData.agentEmoji || '';
+        }
+      } catch {
+        // Fallback: use original prompt
+        console.warn('Smart router failed, using original prompt');
+      }
+
+      // Update router message with agent info
+      setMessages(prev => prev.map(m =>
+        m.id === routerId
+          ? { ...m, content: agentName ? `${agentEmoji} Agente: **${agentName}** · Prompt expandido internamente` : '🧠 Prompt processado' }
+          : m
+      ));
+
+      const thinkingId = crypto.randomUUID();
+      setMessages(prev => [...prev, {
+        id: thinkingId,
+        role: 'assistant',
+        content: `Gerando com ${imageModels.find(m => m.id === model)?.label || model}...`,
+        model: imageModels.find(m => m.id === model)?.label || model,
+      }]);
+
       // Build body with references
       const body: Record<string, unknown> = {
-        prompt: finalPrompt,
+        prompt: expandedPrompt,
         googleApiKey: apiKey,
         aiModel: modelId === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
         aspectRatio: '1:1',
+        useArchitect: false, // Already expanded by smart router
       };
 
       if (currentChar) {
