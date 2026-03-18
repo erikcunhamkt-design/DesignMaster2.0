@@ -373,6 +373,7 @@ export default function CommunityChatPage() {
           )}
         </div>
       </div>
+      </div>
     </div>
   );
 }
