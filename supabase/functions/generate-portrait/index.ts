@@ -162,7 +162,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
   const expanded = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
   if (!expanded) {
-    console.warn("Photoshoot agent returned empty, using raw config");
+    console.warn("Fotógrafo Profissional returned empty, using raw config");
     return configDescription;
   }
 
