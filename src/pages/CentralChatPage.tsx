@@ -170,7 +170,7 @@ export default function CentralChatPage() {
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: allMessages, model: selectedModel.id, agentId: selectedAgent.id }),
+        body: JSON.stringify({ messages: allMessages, model: selectedModel.id, agentId: selectedAgent.id, googleApiKey: apiKey }),
       });
 
       if (!resp.ok) {
