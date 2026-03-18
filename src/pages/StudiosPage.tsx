@@ -74,6 +74,7 @@ const sectionFilterMap: Record<string, string[]> = {
 };
 
 const FEATURED_STUDIO_ID = 'criador';
+const FEATURED_VOID_ID = 'void';
 
 export default function StudiosPage() {
   const navigate = useNavigate();
