@@ -14,6 +14,7 @@ export interface GenerationRequest {
   negative_prompt: string;
   width: number;
   height: number;
+  aspectRatio: string;
   references: ReferenceEntry[];
   quality: 'high' | 'ultra';
   reserved_text_area: ReservedArea | null;
