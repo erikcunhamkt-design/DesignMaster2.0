@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { ProjectConfig } from '@/types/project';
+import { createNormalizedObjectUrl } from '@/lib/imageUtils';
 
 const POSES = [
   { id: 'bracos_cruzados', label: 'Braços cruzados', emoji: '💪' },
