@@ -110,7 +110,8 @@ export function ReferencesSection({ config, onUpdate }: Props) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tiff,.tif,.svg"
+        multiple
         className="hidden"
         onChange={handleFileSelect}
       />
