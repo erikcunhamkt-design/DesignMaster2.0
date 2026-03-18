@@ -166,7 +166,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
     return configDescription;
   }
 
-  console.log("✅ PHOTOSHOOT AGENT expanded:", expanded.substring(0, 400));
+  console.log("✅ FOTÓGRAFO PROFISSIONAL expanded:", expanded.substring(0, 400));
   return expanded;
 }
 
