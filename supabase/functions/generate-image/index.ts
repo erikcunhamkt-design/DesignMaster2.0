@@ -139,11 +139,11 @@ serve(async (req) => {
     const expandable = expandablePrompt || "";
 
     if (useArchitect && (locked.trim() || expandable.trim())) {
-      console.log("🧠 GAB - PROMPT CREATOR PRO: Creating hyper-detailed prompt...");
+      console.log("🧠 PROMPT ARCHITECT PRO: Creating hyper-detailed prompt...");
       console.log("🔒 LOCKED (mandatory):", locked.substring(0, 300));
       console.log("🔓 EXPANDABLE (creative):", expandable.substring(0, 300));
-      finalPrompt = await createPromptWithGAB(locked, expandable, googleApiKey);
-      console.log("✅ GAB OUTPUT:", finalPrompt.substring(0, 400));
+      finalPrompt = await createPromptWithArchitect(locked, expandable, googleApiKey);
+      console.log("✅ ARCHITECT OUTPUT:", finalPrompt.substring(0, 400));
     } else {
       // No GAB — use raw prompt as-is
       finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
