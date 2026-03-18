@@ -118,11 +118,13 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
 
   if (!response.ok) {
     console.error("Architect prompt creation failed, using raw input:", response.status);
-    return `${locked} ${expandable}`.trim();
+    return sanitizePrompt(`${safeLocked} ${safeExpandable}`.trim());
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `${locked} ${expandable}`.trim();
+  const rawOutput = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `${safeLocked} ${safeExpandable}`.trim();
+  // Post-sanitize Architect output as safety net
+  return sanitizePrompt(rawOutput);
 }
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
