@@ -171,7 +171,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
+    const { prompt, lockedPrompt, expandablePrompt, negativePrompt, aspectRatio, referenceImages, googleApiKey, aiModel, useArchitect = true } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256 || googleApiKey.split(' ').length > 5) {
       return new Response(
