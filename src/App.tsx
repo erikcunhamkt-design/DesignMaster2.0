@@ -112,6 +112,7 @@ const App = () => {
               <Route path="/studio/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/criar/:creatorId" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/studio/changelog" element={<ProtectedRoute><ChangelogPage /></ProtectedRoute>} />
+              <Route path="/studio/portrait" element={<ProtectedRoute><PortraitStudioPage /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

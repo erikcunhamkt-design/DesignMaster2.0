@@ -190,4 +190,14 @@ export const studios: Studio[] = [
     gradient: 'from-cyan-500/15 to-blue-500/10',
     isNew: true,
   },
+  {
+    id: 'portrait-studio',
+    name: 'Portrait Master',
+    tagline: 'Retratos profissionais ultra-realistas com IA.',
+    description: 'Gere retratos de estúdio dignos de Annie Leibovitz — com ou sem referência, textura de pele, cabelo fio a fio, olhos perfeitos, 100% fiel.',
+    icon: '📸',
+    route: '/studio/portrait',
+    gradient: 'from-amber-500/15 to-rose-500/10',
+    isNew: true,
+  },
 ];
