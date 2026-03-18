@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 
 export default function RestorePhotoPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export default function RestorePhotoPage() {
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [colorize, setColorize] = useState(false);
+  const { apiKey } = useGoogleApiKey();
   const fileRef = useRef<HTMLInputElement>(null);
   const mobileResultRef = useRef<HTMLDivElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'restored-photo');
@@ -42,11 +44,15 @@ export default function RestorePhotoPage() {
 
   const handleRestore = async () => {
     if (!imageBase64) return;
+    if (!apiKey || apiKey.length < 10) {
+      toast.error('Configure sua API Key do Google primeiro (botão API no topo).');
+      return;
+    }
     setIsProcessing(true);
     setResultImage(null);
     try {
       const { data, error } = await supabase.functions.invoke('restore-photo', {
-        body: { imageBase64, colorize },
+        body: { imageBase64, colorize, googleApiKey: apiKey },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
@@ -63,7 +69,7 @@ export default function RestorePhotoPage() {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Restaurador de Fotos" />
+      <StudioTopbar title="Restaurador de Fotos" showApiKey={true} />
       {/* Desktop layout */}
       <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left panel */}
