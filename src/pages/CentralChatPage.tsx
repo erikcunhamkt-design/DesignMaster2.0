@@ -29,13 +29,13 @@ interface Conversation { id: string; title: string; created_at: string; updated_
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 const AGENT_ID = 'hub';
 
-// Available Gemini models via Lovable AI
+// Available Gemini models (Google API direct)
 const MODELS = [
-  { id: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado' },
-  { id: 'google/gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado' },
-  { id: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo' },
-  { id: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício' },
-  { id: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido' },
+  { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado' },
+  { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado' },
+  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo' },
+  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício' },
+  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido' },
 ];
 
 const AGENTS = [
