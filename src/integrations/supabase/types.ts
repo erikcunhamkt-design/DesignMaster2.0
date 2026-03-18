@@ -494,6 +494,93 @@ export type Database = {
         }
         Relationships: []
       }
+      void_canvas_connections: {
+        Row: {
+          created_at: string
+          id: string
+          source_node_id: string
+          target_node_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          source_node_id: string
+          target_node_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          source_node_id?: string
+          target_node_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "void_canvas_connections_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "void_canvas_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "void_canvas_connections_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "void_canvas_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      void_canvas_nodes: {
+        Row: {
+          created_at: string
+          height: number
+          id: string
+          image_url: string | null
+          label: string
+          node_type: string
+          position_x: number
+          position_y: number
+          prompt: string | null
+          updated_at: string
+          user_id: string
+          width: number
+          z_index: number
+        }
+        Insert: {
+          created_at?: string
+          height?: number
+          id?: string
+          image_url?: string | null
+          label?: string
+          node_type?: string
+          position_x?: number
+          position_y?: number
+          prompt?: string | null
+          updated_at?: string
+          user_id: string
+          width?: number
+          z_index?: number
+        }
+        Update: {
+          created_at?: string
+          height?: number
+          id?: string
+          image_url?: string | null
+          label?: string
+          node_type?: string
+          position_x?: number
+          position_y?: number
+          prompt?: string | null
+          updated_at?: string
+          user_id?: string
+          width?: number
+          z_index?: number
+        }
+        Relationships: []
+      }
       webhook_events: {
         Row: {
           created_at: string
