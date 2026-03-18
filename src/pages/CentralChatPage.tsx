@@ -59,6 +59,7 @@ export default function CentralChatPage() {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [selectedAgent, setSelectedAgent] = useState(AGENTS[0]);
   const { user } = useAuth();
+  const { apiKey } = useGoogleApiKey();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
