@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { ChatMediaInput, MediaMessageContent } from '@/components/chat/ChatMediaInput';
 import { UsernameSetupDialog } from '@/components/chat/UsernameSetupDialog';
 import { UserProfilePopover } from '@/components/chat/UserProfilePopover';
+import { DashboardSidebar, MobileSidebarTrigger } from '@/components/layout/DashboardSidebar';
 
 interface CommunityMessage {
   id: string;
@@ -295,7 +296,9 @@ export default function CommunityChatPage() {
   if (checkingUsername) return null;
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <DashboardSidebar activeSection="social" onSectionChange={() => {}} />
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
       {needsUsername && user && (
         <UsernameSetupDialog userId={user.id} onComplete={() => setNeedsUsername(false)} />
       )}
@@ -369,6 +372,7 @@ export default function CommunityChatPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
