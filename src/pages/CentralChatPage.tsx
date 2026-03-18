@@ -152,6 +152,7 @@ export default function CentralChatPage() {
       msg = msg ? `${msg}\n\n${lines}` : lines;
     }
     if (!msg || isLoading) return;
+    if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google no botão API no topo.'); return; }
 
     let convoId = activeConvoId;
     if (!convoId) { convoId = await createConversation(msg); if (!convoId) return; }
