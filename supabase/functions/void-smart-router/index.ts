@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
 
     // Step 1: Classify intent
     console.log("🧭 Classifying user intent...");
-    const agentId = await classifyIntent(prompt);
+    const agentId = await classifyIntent(prompt, googleApiKey);
     const agent = AGENT_PROFILES[agentId];
     console.log(`✅ Classified as: ${agentId} (${agent.name})`);
 
