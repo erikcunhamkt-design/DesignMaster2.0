@@ -7,12 +7,12 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// PHOTOSHOOT AGENT — Internal Photography Knowledge Base
+// FOTÓGRAFO PROFISSIONAL — Internal Photography Knowledge Base
 // Silently expands user config into hyper-detailed photographic prompts
 // using professional camera, lens, angle, composition & lighting data.
 // ══════════════════════════════════════════════════════════════
 
-const PHOTOSHOOT_SYSTEM = `You are PHOTOSHOOT AGENT — an elite internal photography prompt engine.
+const PHOTOSHOOT_SYSTEM = `You are FOTÓGRAFO PROFISSIONAL — an elite internal photography prompt engine.
 You receive a portrait configuration and SILENTLY transform it into a hyper-detailed, cinematic, professional photography prompt.
 
 You have deep knowledge of professional photography equipment and techniques:
