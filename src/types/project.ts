@@ -16,6 +16,7 @@ export interface ProjectConfig {
   cta: string;
   textMode: 'camada' | 'imagem';
   textPosition: 'topo' | 'centro' | 'rodape';
+  fontStyle: string;
 
   // Projeto & Cenário
   niche: string;
@@ -95,6 +96,7 @@ export const defaultConfig: ProjectConfig = {
   cta: '',
   textMode: 'camada',
   textPosition: 'centro',
+  fontStyle: '',
   niche: '',
   environment: '',
   sceneryPhotosEnabled: false,
