@@ -130,9 +130,11 @@ export default function PortraitStudioPage() {
   });
   const [subjectImage, setSubjectImage] = useState<string | null>(null);
   const [subjectPreview, setSubjectPreview] = useState<string | null>(null);
+  const [referenceImages, setReferenceImages] = useState<{ url: string; note: string }[]>([]);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const refFileRef = useRef<HTMLInputElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
   const hasKey = googleApiKey.length >= 10;
 
