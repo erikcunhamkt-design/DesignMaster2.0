@@ -23,6 +23,9 @@ export interface ProjectConfig {
   textColorHeadline: string;
   textColorSubheadline: string;
   textColorCta: string;
+  textSizeHeadline: '' | 'pequeno' | 'medio' | 'grande';
+  textSizeSubheadline: '' | 'pequeno' | 'medio' | 'grande';
+  textSizeCta: '' | 'pequeno' | 'medio' | 'grande';
 
   // Projeto & Cenário
   niche: string;
@@ -109,6 +112,9 @@ export const defaultConfig: ProjectConfig = {
   textColorHeadline: '',
   textColorSubheadline: '',
   textColorCta: '',
+  textSizeHeadline: '',
+  textSizeSubheadline: '',
+  textSizeCta: '',
   niche: '',
   environment: '',
   sceneryPhotosEnabled: false,

@@ -3,7 +3,13 @@ import { Switch } from '@/components/ui/switch';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
-import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown, Palette } from 'lucide-react';
+import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown, Palette, Type } from 'lucide-react';
+
+const TEXT_SIZES = [
+  { value: 'pequeno' as const, label: 'P', promptHint: 'small subtle text size' },
+  { value: 'medio' as const, label: 'M', promptHint: 'medium standard text size' },
+  { value: 'grande' as const, label: 'G', promptHint: 'large bold prominent text size' },
+];
 
 interface Props {
   config: ProjectConfig;
@@ -184,6 +190,38 @@ function ColorPicker({
   );
 }
 
+/** Inline text size selector */
+function SizePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {TEXT_SIZES.map((s) => {
+        const active = value === s.value;
+        return (
+          <button
+            key={s.value}
+            type="button"
+            onClick={() => onChange(active ? '' : s.value)}
+            className={cn(
+              'px-1.5 py-0.5 rounded text-[8px] font-bold transition-all border',
+              active
+                ? 'bg-primary/10 text-primary border-primary/30'
+                : 'text-muted-foreground/40 hover:text-muted-foreground/60 border-transparent'
+            )}
+          >
+            {s.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
@@ -191,12 +229,16 @@ function FontPicker({
   label,
   colorValue,
   onColorChange,
+  sizeValue,
+  onSizeChange,
 }: {
   value: string;
   onChange: (v: string) => void;
   label: string;
   colorValue: string;
   onColorChange: (v: string) => void;
+  sizeValue: string;
+  onSizeChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
@@ -221,6 +263,7 @@ function FontPicker({
           )}
           <ChevronDown className={cn('h-2 w-2 ml-auto transition-transform', open && 'rotate-180')} />
         </button>
+        <SizePicker value={sizeValue} onChange={onSizeChange} />
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
 
@@ -280,6 +323,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="headline"
               colorValue={config.textColorHeadline}
               onColorChange={(v) => onUpdate({ textColorHeadline: v })}
+              sizeValue={config.textSizeHeadline}
+              onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
             />
           </div>
 
@@ -297,6 +342,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="sub"
               colorValue={config.textColorSubheadline}
               onColorChange={(v) => onUpdate({ textColorSubheadline: v })}
+              sizeValue={config.textSizeSubheadline}
+              onSizeChange={(v) => onUpdate({ textSizeSubheadline: v as any })}
             />
           </div>
 
@@ -314,6 +361,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="CTA"
               colorValue={config.textColorCta}
               onColorChange={(v) => onUpdate({ textColorCta: v })}
+              sizeValue={config.textSizeCta}
+              onSizeChange={(v) => onUpdate({ textSizeCta: v as any })}
             />
           </div>
 
@@ -369,4 +418,9 @@ export function TextSection({ config, onUpdate }: Props) {
 /** Helper to get the prompt hint for a given fontStyle value */
 export function getFontStylePromptHint(fontStyle: string): string {
   return FONT_STYLES.find((f) => f.value === fontStyle)?.promptHint ?? '';
+}
+
+/** Helper to get the prompt hint for a given text size value */
+export function getTextSizePromptHint(size: string): string {
+  return TEXT_SIZES.find((s) => s.value === size)?.promptHint ?? '';
 }
