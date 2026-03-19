@@ -543,6 +543,7 @@ export type Database = {
           node_type: string
           position_x: number
           position_y: number
+          project_id: string | null
           prompt: string | null
           updated_at: string
           user_id: string
@@ -558,6 +559,7 @@ export type Database = {
           node_type?: string
           position_x?: number
           position_y?: number
+          project_id?: string | null
           prompt?: string | null
           updated_at?: string
           user_id: string
@@ -573,11 +575,47 @@ export type Database = {
           node_type?: string
           position_x?: number
           position_y?: number
+          project_id?: string | null
           prompt?: string | null
           updated_at?: string
           user_id?: string
           width?: number
           z_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "void_canvas_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "void_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      void_projects: {
+        Row: {
+          created_at: string
+          id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
