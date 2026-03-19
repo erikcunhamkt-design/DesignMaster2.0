@@ -339,7 +339,7 @@ export default function PortraitStudioPage() {
             <Section label="Ângulo de Câmera">
               <div className="flex flex-wrap gap-1.5">
                 {CAMERA_ANGLES.map(c => (
-                  <Chip key={c.value} selected={config.cameraAngle === c.value} onClick={() => update('cameraAngle', c.value)}>
+                  <Chip key={c.value} selected={config.cameraAngle === c.value} onClick={() => update('cameraAngle', config.cameraAngle === c.value ? '' : c.value)}>
                     {c.label}
                   </Chip>
                 ))}
