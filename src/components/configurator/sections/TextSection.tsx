@@ -263,6 +263,7 @@ function FontPicker({
           )}
           <ChevronDown className={cn('h-2 w-2 ml-auto transition-transform', open && 'rotate-180')} />
         </button>
+        <SizePicker value={sizeValue} onChange={onSizeChange} />
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
 
