@@ -158,7 +158,7 @@ export default function PortraitStudioPage() {
       if (error) throw new Error(error.message || 'Erro no refinamento');
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setResultImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada no refinamento');
