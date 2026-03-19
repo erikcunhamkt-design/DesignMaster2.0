@@ -439,6 +439,16 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
           isRefining={isRefining}
         />
       )}
+
+      {/* Image History Bar */}
+      {state === 'concluido' && onSelectHistory && (
+        <ImageHistoryBar
+          images={historyImages}
+          activeIndex={historyIndex}
+          onSelect={onSelectHistory}
+          onClear={onClearHistory}
+        />
+      )}
     </div>
   );
 }
