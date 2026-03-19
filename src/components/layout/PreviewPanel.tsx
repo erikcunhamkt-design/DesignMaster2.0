@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useState, useCallback, useRef } from 'react';
 import { ProjectConfig } from '@/types/project';
 import { RefinementChat } from './RefinementChat';
+import { ImageHistoryBar } from './ImageHistoryBar';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 
