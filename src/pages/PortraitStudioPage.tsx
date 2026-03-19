@@ -134,7 +134,7 @@ export default function PortraitStudioPage() {
   const [subjectImage, setSubjectImage] = useState<string | null>(null);
   const [subjectPreview, setSubjectPreview] = useState<string | null>(null);
   const [referenceImages, setReferenceImages] = useState<{ url: string; note: string }[]>([]);
-  const [resultImage, setResultImage] = useState<string | null>(null);
+  const { images: historyImages, currentImage: resultImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('portrait-studio');
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
