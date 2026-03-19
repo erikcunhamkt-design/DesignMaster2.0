@@ -248,7 +248,44 @@ export default function PortraitStudioPage() {
               )}
             </Section>
 
-            {/* Gender */}
+            {/* Reference images */}
+            <Section label="Referências Visuais (cenário, roupa, acessórios)">
+              <input ref={refFileRef} type="file" accept="image/*" className="hidden" onChange={handleRefFileSelect} />
+              {referenceImages.length > 0 && (
+                <div className="space-y-2">
+                  {referenceImages.map((ref, i) => (
+                    <div key={i} className="flex gap-2 items-start">
+                      <div className="relative group shrink-0">
+                        <img src={ref.url} alt={`Ref ${i + 1}`} className="h-16 w-16 rounded-lg object-cover border border-border/20" />
+                        <button onClick={() => removeReference(i)} className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={ref.note}
+                        onChange={e => updateReferenceNote(i, e.target.value)}
+                        placeholder="O que aproveitar? Ex: cenário, roupa, acessório..."
+                        className="flex-1 h-9 px-2.5 rounded-lg border border-border/20 bg-secondary/20 text-[10px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {referenceImages.length < 3 && (
+                <button
+                  onClick={() => refFileRef.current?.click()}
+                  className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/20 text-muted-foreground hover:border-primary/30 hover:text-primary transition-all duration-200"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  <span className="text-[10px] font-medium">Adicionar referência ({referenceImages.length}/3)</span>
+                </button>
+              )}
+              <p className="text-[8px] text-muted-foreground/40">
+                Use para cenário, vestimenta, acessórios ou itens — sem alterar a aparência do sujeito.
+              </p>
+            </Section>
+
             <Section label="Gênero">
               <div className="flex gap-2">
                 {GENDERS.map(g => (
