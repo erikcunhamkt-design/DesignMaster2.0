@@ -420,6 +420,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
               trackingValue={config.textTrackingHeadline}
               onTrackingChange={(v) => onUpdate({ textTrackingHeadline: v as any })}
+              weightValue={config.textWeightHeadline}
+              onWeightChange={(v) => onUpdate({ textWeightHeadline: v as any })}
             />
           </div>
 
