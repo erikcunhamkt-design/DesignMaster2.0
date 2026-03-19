@@ -118,12 +118,12 @@ export default function PortraitStudioPage() {
   const { apiKey: googleApiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
   const [config, setConfig] = useState<PortraitConfig>({
-    gender: 'male',
-    lighting: 'rembrandt',
-    background: 'seamless-gray',
-    expression: 'confident',
-    cameraAngle: 'eye-level',
-    lens: '85mm',
+    gender: '',
+    lighting: '',
+    background: '',
+    expression: '',
+    cameraAngle: '',
+    lens: '',
     clothing: '',
     freePrompt: '',
     hasReference: false,
