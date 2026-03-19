@@ -16,6 +16,13 @@ interface Props {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
+const TEXT_TRACKING = [
+  { value: 'apertado' as const, label: 'Aa', cls: 'tracking-tighter', promptHint: 'tight letter-spacing, condensed tracking' },
+  { value: 'normal' as const, label: 'A a', cls: 'tracking-normal', promptHint: 'normal standard letter-spacing' },
+  { value: 'largo' as const, label: 'A  a', cls: 'tracking-wide', promptHint: 'wide letter-spacing, expanded tracking' },
+  { value: 'muito-largo' as const, label: 'A   a', cls: 'tracking-[0.25em]', promptHint: 'very wide letter-spacing, ultra expanded tracking' },
+];
+
 const TEXT_POSITIONS = [
   { value: 'topo' as const, label: 'Topo', icon: AlignStartVertical },
   { value: 'centro' as const, label: 'Centro', icon: AlignCenterVertical },
