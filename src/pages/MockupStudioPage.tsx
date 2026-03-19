@@ -221,6 +221,17 @@ function MockupPreviewPanel({
           </div>
         )}
       </div>
+
+      {/* Refinement Chat */}
+      {onRefine && imageUrl && (
+        <RefinementChat
+          open={refinementOpen}
+          onClose={() => setRefinementOpen(false)}
+          imageUrl={imageUrl}
+          onRefine={onRefine}
+          isRefining={isRefining ?? false}
+        />
+      )}
     </div>
   );
 }
@@ -231,9 +242,39 @@ export default function MockupStudioPage() {
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
   const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
+    setIsRefining(true);
+    try {
+      const refineText = `Edit this image: ${refinementPrompt}. Preserve the overall composition, subject, pose, lighting style, and visual quality. Only apply the requested change. The final image MUST fill the entire canvas edge to edge with no blank space.`;
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: refineText,
+          negativePrompt: 'low quality, blurry, artifacts, blank space, empty borders',
+          referenceImages: [currentImageUrl],
+          googleApiKey: apiKey,
+        },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      if (data?.imageUrl) {
+        setGeneratedImage(data.imageUrl);
+        toast.success('Imagem refinada!');
+      } else {
+        throw new Error('Nenhuma imagem retornada');
+      }
+    } catch (err: any) {
+      console.error('Refine error:', err);
+      toast.error(err.message || 'Erro ao refinar');
+      throw err;
+    } finally {
+      setIsRefining(false);
+    }
+  }, [apiKey]);
 
   useEffect(() => {
     if (previewState === 'gerando' && mobilePreviewRef.current) {
