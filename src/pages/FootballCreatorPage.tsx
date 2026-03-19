@@ -264,7 +264,7 @@ function FootballPreviewPanel({
 export default function FootballCreatorPage() {
   const [config, setConfig] = useState<FootballConfig>({ ...defaultFootballConfig });
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('football-creator');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [activeTab, setActiveTab] = useState<'avancado' | 'guiado'>('avancado');
