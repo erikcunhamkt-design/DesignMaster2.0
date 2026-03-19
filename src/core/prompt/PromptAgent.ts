@@ -275,10 +275,10 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     locked.push(config.additionalPrompt);
   }
 
-  // ─── ULTRA REALISM BOOST → EXPANDABLE ───
+  // ─── ULTRA REALISM BOOST → LOCKED (technical tokens, never rewritten) ───
   if (isHumanSubject(config) && !isNonRealistStyle(config)) {
-    expandable.push(HUMAN_REALISM_BOOST);
-    expandable.push(HUMAN_LIPS_BOOST);
+    locked.push(HUMAN_REALISM_BOOST);
+    locked.push(HUMAN_LIPS_BOOST);
     negativeParts.push(HUMAN_NEGATIVE_BOOST);
   }
 
@@ -287,8 +287,8 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     negativeParts.push(config.negativePrompt.trim());
   }
 
-  // ─── BASE STYLE → EXPANDABLE ───
-  expandable.push(BASE_STYLE);
+  // ─── BASE STYLE → LOCKED (technical tokens, never rewritten) ───
+  locked.push(BASE_STYLE);
 
   // ─── BUILD REFERENCES ───
   const references: ReferenceEntry[] = [];
