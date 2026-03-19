@@ -594,6 +594,11 @@ export default function VoidCanvasPage() {
             <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
+            {!rightPanelOpen && (
+              <button onClick={() => setRightPanelOpen(true)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ml-1" title="Abrir Gerador">
+                <Sparkles className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
