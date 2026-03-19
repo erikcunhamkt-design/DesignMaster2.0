@@ -262,7 +262,7 @@ function cn(...classes: (string | boolean | undefined)[]) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function HeroStudioPage() {
   const [config, setConfig] = useState<HeroConfig>({ ...defaultHeroConfig });
-  const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
+  const [previewState, setPreviewState] = useState<PreviewState>(() => hasImageHistory('hero-studio') ? 'concluido' : 'aguardando');
   const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('hero-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);

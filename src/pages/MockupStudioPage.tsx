@@ -247,7 +247,7 @@ function MockupPreviewPanel({
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function MockupStudioPage() {
   const [config, setConfig] = useState<MockupConfig>({ ...defaultMockupConfig });
-  const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
+  const [previewState, setPreviewState] = useState<PreviewState>(() => hasImageHistory('mockup-studio') ? 'concluido' : 'aguardando');
   const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('mockup-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);

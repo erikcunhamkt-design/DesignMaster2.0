@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { useImageHistory } from '@/hooks/useImageHistory';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
 import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';

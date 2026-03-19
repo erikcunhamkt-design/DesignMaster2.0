@@ -267,7 +267,7 @@ function AutoPreviewPanel({
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function AutoCreatorPage() {
   const [config, setConfig] = useState<AutoConfig>({ ...defaultAutoConfig });
-  const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
+  const [previewState, setPreviewState] = useState<PreviewState>(() => hasImageHistory('auto-creator') ? 'concluido' : 'aguardando');
   const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('auto-creator');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
