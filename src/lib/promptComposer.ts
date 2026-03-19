@@ -142,9 +142,17 @@ export function composePrompt(config: ProjectConfig): PromptResult {
   if (!config.textEnabled || config.textMode === 'camada') {
     parts.push('clean background with negative space for text overlay, no text in image');
   } else if (config.textEnabled && config.textMode === 'imagem') {
-    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible`);
-    if (config.text02) parts.push(`subheadline: "${config.text02}"`);
-    if (config.cta) parts.push(`call to action button/text: "${config.cta}"`);
+    const fontHintMap: Record<string, string> = {
+      'sans-serif': 'clean modern sans-serif typography',
+      'serif': 'elegant serif typography',
+      'script': 'flowing cursive script typography',
+      'display': 'bold heavy display typography',
+      'graffiti': 'urban graffiti street art lettering',
+    };
+    const fontSuffix = config.fontStyle && fontHintMap[config.fontStyle] ? `, ${fontHintMap[config.fontStyle]}` : '';
+    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${fontSuffix}`);
+    if (config.text02) parts.push(`subheadline: "${config.text02}"${fontSuffix}`);
+    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${fontSuffix}`);
   }
 
   // 12. Additional prompt
