@@ -353,11 +353,13 @@ export default function VoidCanvasPage() {
         textBuffer = lines.pop() || '';
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
-          const payload = line.slice(6);
+          const payload = line.slice(6).trim();
           if (payload === '[DONE]') break;
           try {
             const j = JSON.parse(payload);
-            const delta = j.choices?.[0]?.delta?.content;
+            // Support both OpenAI format and Gemini native format
+            const delta = j.choices?.[0]?.delta?.content
+              || j.candidates?.[0]?.content?.parts?.[0]?.text;
             if (delta) upsertAssistant(delta);
           } catch {}
         }
