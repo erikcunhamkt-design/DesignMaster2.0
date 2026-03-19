@@ -395,7 +395,7 @@ export default function HeroStudioPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+              <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
             </div>
           )}
         </div>
