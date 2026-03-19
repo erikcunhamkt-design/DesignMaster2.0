@@ -15,6 +15,49 @@ const TEXT_POSITIONS = [
   { value: 'rodape' as const, label: 'Rodapé', icon: AlignEndVertical },
 ];
 
+const FONT_STYLES = [
+  {
+    value: 'sans-serif',
+    label: 'Sans-serif',
+    preview: 'Abc',
+    fontClass: 'font-sans',
+    desc: 'Clean & moderna',
+    promptHint: 'clean modern sans-serif typography like Helvetica or Montserrat',
+  },
+  {
+    value: 'serif',
+    label: 'Serif',
+    preview: 'Abc',
+    fontClass: 'font-serif',
+    desc: 'Elegante & clássica',
+    promptHint: 'elegant serif typography like Times New Roman or Playfair Display',
+  },
+  {
+    value: 'script',
+    label: 'Script',
+    preview: 'Abc',
+    fontClass: 'italic',
+    desc: 'Cursiva & orgânica',
+    promptHint: 'flowing cursive script handwritten calligraphy typography',
+  },
+  {
+    value: 'display',
+    label: 'Display',
+    preview: 'ABC',
+    fontClass: 'font-sans font-black tracking-widest uppercase',
+    desc: 'Impactante & bold',
+    promptHint: 'bold heavy display typography, extra bold impact font, thick strong lettering',
+  },
+  {
+    value: 'graffiti',
+    label: 'Graffiti',
+    preview: 'Abc',
+    fontClass: 'font-sans font-extrabold italic',
+    desc: 'Urbano & street',
+    promptHint: 'urban graffiti street art spray paint lettering style typography',
+  },
+];
+
 export function TextSection({ config, onUpdate }: Props) {
   return (
     <div className="space-y-2.5">
@@ -46,6 +89,32 @@ export function TextSection({ config, onUpdate }: Props) {
             onChange={(v) => onUpdate({ cta: v })}
             className="h-7 bg-secondary/30 border-border/20 text-[10px]"
           />
+
+          {/* Estilo de Fonte */}
+          <div className="space-y-1.5 pt-1">
+            <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Estilo da Fonte</span>
+            <div className="grid grid-cols-5 gap-1">
+              {FONT_STYLES.map((f) => {
+                const selected = config.fontStyle === f.value;
+                return (
+                  <button
+                    key={f.value}
+                    onClick={() => onUpdate({ fontStyle: config.fontStyle === f.value ? '' : f.value })}
+                    className={cn(
+                      'flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 transition-all duration-200 border',
+                      selected
+                        ? 'bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_-3px_hsl(var(--primary)/0.3)]'
+                        : 'bg-secondary/20 text-muted-foreground/70 hover:text-foreground hover:border-border/40 border-transparent'
+                    )}
+                  >
+                    <span className={cn('text-[15px] leading-none', f.fontClass)}>{f.preview}</span>
+                    <span className="text-[7px] font-semibold leading-none mt-0.5">{f.label}</span>
+                    <span className="text-[6px] leading-none text-muted-foreground/40">{f.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Posição do texto */}
           <div className="space-y-1 pt-1">
@@ -94,4 +163,9 @@ export function TextSection({ config, onUpdate }: Props) {
       )}
     </div>
   );
+}
+
+/** Helper to get the prompt hint for a given fontStyle value */
+export function getFontStylePromptHint(fontStyle: string): string {
+  return FONT_STYLES.find(f => f.value === fontStyle)?.promptHint ?? '';
 }
