@@ -84,7 +84,7 @@ const Index = () => {
       const referenceNotes: string[] = [];
       for (const ref of genRequest.references.slice(0, 8)) {
         if (ref.role === 'identity') {
-          subjectImages.push(ref.url);
+          subjectImages.push(await compressImageToBase64(ref.url, 1024, 0.9));
         } else {
           styleReferenceImages.push(ref.url);
           if (ref.attributes && ref.attributes.length > 0) {
