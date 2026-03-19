@@ -311,7 +311,7 @@ export default function PortraitStudioPage() {
             <Section label="Iluminação">
               <div className="grid grid-cols-2 gap-1.5">
                 {LIGHTINGS.map(l => (
-                  <Chip key={l.value} selected={config.lighting === l.value} onClick={() => update('lighting', l.value)}>
+                  <Chip key={l.value} selected={config.lighting === l.value} onClick={() => update('lighting', config.lighting === l.value ? '' : l.value)}>
                     <div className="text-left">
                       <div>{l.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{l.desc}</div>
