@@ -192,8 +192,9 @@ export default function PortraitStudioPage() {
     setIsProcessing(true);
     setResultImage(null);
     try {
+      const refImages = referenceImages.map(r => ({ url: r.url, note: r.note }));
       const { data, error } = await supabase.functions.invoke('generate-portrait', {
-        body: { config, subjectImage, googleApiKey, aiModel },
+        body: { config, subjectImage, googleApiKey, aiModel, referenceImages: refImages },
       });
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
