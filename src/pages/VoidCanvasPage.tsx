@@ -521,7 +521,7 @@ export default function VoidCanvasPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center">
-                    <span className="text-lg">🕳️</span>
+                    <Sparkles className="h-5 w-5 text-primary" />
                   </div>
                   <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">VOID</h1>
                 </div>
