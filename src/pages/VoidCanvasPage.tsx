@@ -99,6 +99,7 @@ export default function VoidCanvasPage() {
   const [selectedAgent, setSelectedAgent] = useState(AGENTS[0]);
   const [chatModel, setChatModel] = useState(CHAT_MODELS[0]);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
   // ── Refs ──
   const genChatEndRef = useRef<HTMLDivElement>(null);
@@ -593,6 +594,11 @@ export default function VoidCanvasPage() {
             <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
+            {!rightPanelOpen && (
+              <button onClick={() => setRightPanelOpen(true)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ml-1" title="Abrir Gerador">
+                <Sparkles className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -631,6 +637,7 @@ export default function VoidCanvasPage() {
       </div>
 
       {/* ========== RIGHT: IMAGE GENERATOR ========== */}
+      {rightPanelOpen && (
       <div className="w-[400px] flex flex-col border-l border-border/15 bg-[#0a0f14] shrink-0">
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-12 border-b border-border/10 shrink-0">
@@ -638,7 +645,12 @@ export default function VoidCanvasPage() {
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-[12px] font-bold text-foreground/90">Gerador</span>
           </div>
-          <span className="text-[9px] text-muted-foreground/40">{images.length} imagens</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-muted-foreground/40">{images.length} imagens</span>
+            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setRightPanelOpen(false)}>
+              <PanelLeftOpen className="h-3.5 w-3.5 rotate-180" />
+            </Button>
+          </div>
         </div>
 
         {/* Gen messages */}
@@ -799,6 +811,7 @@ export default function VoidCanvasPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
