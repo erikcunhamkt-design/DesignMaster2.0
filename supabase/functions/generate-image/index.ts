@@ -87,8 +87,8 @@ async function createPromptWithArchitect(locked: string, expandable: string, goo
         parts: [{ text: `${PROMPT_ARCHITECT_SYSTEM}\n\nCREATIVE CONTEXT:\n${safeExpandable}` }]
       }],
       generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 1200,
+        temperature: 0.15,
+        maxOutputTokens: 800,
       },
     }),
   });
