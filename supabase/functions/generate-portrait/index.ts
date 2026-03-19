@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { config, subjectImage, googleApiKey, aiModel } = await req.json();
+    const { config, subjectImage, googleApiKey, aiModel, referenceImages } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256) {
       return new Response(
@@ -259,6 +259,21 @@ Deno.serve(async (req) => {
           parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
         }
       }
+    }
+
+    // Add reference images (scenery, clothing, accessories) — DO NOT affect subject identity
+    if (referenceImages && Array.isArray(referenceImages) && referenceImages.length > 0) {
+      for (const ref of referenceImages) {
+        const noteLabel = ref.note?.trim() ? ref.note.trim() : 'scenery, clothing, accessories or items';
+        parts.push({ text: `[VISUAL REFERENCE — Use this image ONLY as reference for: ${noteLabel}. DO NOT change the subject's face, identity, ethnicity, or gender based on this image. Extract ONLY the visual elements described above (environment, clothing, props, accessories, lighting mood) and apply them to the portrait.]` });
+        if (ref.url && ref.url.startsWith("data:")) {
+          const match = ref.url.match(/^data:(.*?);base64,(.*)$/);
+          if (match) {
+            parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+          }
+        }
+      }
+      console.log(`📎 Added ${referenceImages.length} visual reference(s) to portrait generation`);
     }
 
     const edgeFill = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. ZERO empty space, ZERO solid color bars, ZERO letterboxing.";
