@@ -16,6 +16,13 @@ interface Props {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
+const TEXT_TRACKING = [
+  { value: 'apertado' as const, label: 'Aa', cls: 'tracking-tighter', promptHint: 'tight letter-spacing, condensed tracking' },
+  { value: 'normal' as const, label: 'A a', cls: 'tracking-normal', promptHint: 'normal standard letter-spacing' },
+  { value: 'largo' as const, label: 'A  a', cls: 'tracking-wide', promptHint: 'wide letter-spacing, expanded tracking' },
+  { value: 'muito-largo' as const, label: 'A   a', cls: 'tracking-[0.25em]', promptHint: 'very wide letter-spacing, ultra expanded tracking' },
+];
+
 const TEXT_POSITIONS = [
   { value: 'topo' as const, label: 'Topo', icon: AlignStartVertical },
   { value: 'centro' as const, label: 'Centro', icon: AlignCenterVertical },
@@ -222,6 +229,39 @@ function SizePicker({
   );
 }
 
+/** Inline tracking selector */
+function TrackingPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {TEXT_TRACKING.map((t) => {
+        const active = value === t.value;
+        return (
+          <button
+            key={t.value}
+            type="button"
+            onClick={() => onChange(active ? '' : t.value)}
+            className={cn(
+              'px-1 py-0.5 rounded text-[7px] font-medium transition-all border whitespace-nowrap',
+              t.cls,
+              active
+                ? 'bg-primary/10 text-primary border-primary/30'
+                : 'text-muted-foreground/40 hover:text-muted-foreground/60 border-transparent'
+            )}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
@@ -231,6 +271,8 @@ function FontPicker({
   onColorChange,
   sizeValue,
   onSizeChange,
+  trackingValue,
+  onTrackingChange,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -239,6 +281,8 @@ function FontPicker({
   onColorChange: (v: string) => void;
   sizeValue: string;
   onSizeChange: (v: string) => void;
+  trackingValue: string;
+  onTrackingChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
@@ -266,6 +310,8 @@ function FontPicker({
         <SizePicker value={sizeValue} onChange={onSizeChange} />
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
+
+      <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
 
       {open && (
         <div className="flex gap-1 flex-wrap px-1 pb-1">
@@ -325,6 +371,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onColorChange={(v) => onUpdate({ textColorHeadline: v })}
               sizeValue={config.textSizeHeadline}
               onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
+              trackingValue={config.textTrackingHeadline}
+              onTrackingChange={(v) => onUpdate({ textTrackingHeadline: v as any })}
             />
           </div>
 
@@ -344,6 +392,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onColorChange={(v) => onUpdate({ textColorSubheadline: v })}
               sizeValue={config.textSizeSubheadline}
               onSizeChange={(v) => onUpdate({ textSizeSubheadline: v as any })}
+              trackingValue={config.textTrackingSubheadline}
+              onTrackingChange={(v) => onUpdate({ textTrackingSubheadline: v as any })}
             />
           </div>
 
@@ -363,6 +413,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onColorChange={(v) => onUpdate({ textColorCta: v })}
               sizeValue={config.textSizeCta}
               onSizeChange={(v) => onUpdate({ textSizeCta: v as any })}
+              trackingValue={config.textTrackingCta}
+              onTrackingChange={(v) => onUpdate({ textTrackingCta: v as any })}
             />
           </div>
 
@@ -423,4 +475,9 @@ export function getFontStylePromptHint(fontStyle: string): string {
 /** Helper to get the prompt hint for a given text size value */
 export function getTextSizePromptHint(size: string): string {
   return TEXT_SIZES.find((s) => s.value === size)?.promptHint ?? '';
+}
+
+/** Helper to get the prompt hint for a given tracking value */
+export function getTextTrackingPromptHint(tracking: string): string {
+  return TEXT_TRACKING.find((t) => t.value === tracking)?.promptHint ?? '';
 }

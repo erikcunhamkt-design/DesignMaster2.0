@@ -26,6 +26,9 @@ export interface ProjectConfig {
   textSizeHeadline: '' | 'pequeno' | 'medio' | 'grande';
   textSizeSubheadline: '' | 'pequeno' | 'medio' | 'grande';
   textSizeCta: '' | 'pequeno' | 'medio' | 'grande';
+  textTrackingHeadline: '' | 'apertado' | 'normal' | 'largo' | 'muito-largo';
+  textTrackingSubheadline: '' | 'apertado' | 'normal' | 'largo' | 'muito-largo';
+  textTrackingCta: '' | 'apertado' | 'normal' | 'largo' | 'muito-largo';
 
   // Projeto & Cenário
   niche: string;
@@ -115,6 +118,9 @@ export const defaultConfig: ProjectConfig = {
   textSizeHeadline: '',
   textSizeSubheadline: '',
   textSizeCta: '',
+  textTrackingHeadline: '',
+  textTrackingSubheadline: '',
+  textTrackingCta: '',
   niche: '',
   environment: '',
   sceneryPhotosEnabled: false,
