@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
     // Step 2: Silently expand with Fotógrafo Profissional
     const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey);
 
-    const genderLabel = config.gender === 'female' ? 'woman/female' : 'man/male';
+    const genderLabel = config.gender === 'female' ? 'woman/female' : config.gender === 'male' ? 'man/male' : 'person';
 
     // Step 3: Build parts for Google Gemini image generation
     const parts: any[] = [];
