@@ -394,7 +394,7 @@ export default function HeroStudioPage() {
         </div>
         {/* Desktop */}
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+          <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
           <HeroConfigPanel
             config={config}
             onUpdate={updateConfig}
