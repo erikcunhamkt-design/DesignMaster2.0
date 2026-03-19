@@ -5,6 +5,11 @@ const MAX_HISTORY = 5;
 // Module-level Map — survives component unmounts / route changes
 const studioHistories = new Map<string, string[]>();
 
+/** Check if a studio has existing history (useful for initial state) */
+export function hasImageHistory(studioId: string): boolean {
+  return (studioHistories.get(studioId)?.length ?? 0) > 0;
+}
+
 /**
  * Persists up to 5 generated image URLs per studio tool,
  * surviving tab/route switches without clearing.
