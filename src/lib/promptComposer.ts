@@ -155,9 +155,13 @@ export function composePrompt(config: ProjectConfig): PromptResult {
     const hCol = config.textColorHeadline ? `, ${config.textColorHeadline} colored` : '';
     const sCol = config.textColorSubheadline ? `, ${config.textColorSubheadline} colored` : '';
     const cCol = config.textColorCta ? `, ${config.textColorCta} colored` : '';
-    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}`);
-    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}`);
-    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}`);
+    const sizeMap: Record<string, string> = { pequeno: 'small', medio: 'medium', grande: 'large' };
+    const hSz = config.textSizeHeadline ? `, ${sizeMap[config.textSizeHeadline]} size` : '';
+    const sSz = config.textSizeSubheadline ? `, ${sizeMap[config.textSizeSubheadline]} size` : '';
+    const cSz = config.textSizeCta ? `, ${sizeMap[config.textSizeCta]} size` : '';
+    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}${hSz}`);
+    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}${sSz}`);
+    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}${cSz}`);
   }
 
   // 12. Additional prompt
