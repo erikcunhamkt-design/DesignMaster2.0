@@ -242,7 +242,7 @@ function MockupPreviewPanel({
 export default function MockupStudioPage() {
   const [config, setConfig] = useState<MockupConfig>({ ...defaultMockupConfig });
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('mockup-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
