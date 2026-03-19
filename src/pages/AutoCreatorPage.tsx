@@ -397,7 +397,7 @@ export default function AutoCreatorPage() {
           )}
         </div>
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+          <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
           <AutoConfigPanel
             config={config}
             onUpdate={updateConfig}

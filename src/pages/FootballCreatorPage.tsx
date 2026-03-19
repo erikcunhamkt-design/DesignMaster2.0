@@ -424,7 +424,7 @@ export default function FootballCreatorPage() {
               )}
             </div>
             <div className="hidden md:flex flex-1 overflow-hidden">
-              <FootballPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+              <FootballPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
               <FootballConfigPanel
                 config={config}
                 onUpdate={updateConfig}

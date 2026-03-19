@@ -377,7 +377,7 @@ export default function MockupStudioPage() {
           )}
         </div>
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
           <MockupConfigPanel
             config={config}
             onUpdate={updateConfig}
