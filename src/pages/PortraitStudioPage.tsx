@@ -163,6 +163,27 @@ export default function PortraitStudioPage() {
     update('hasReference', false);
   };
 
+  const handleRefFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || referenceImages.length >= 3) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const b64 = reader.result as string;
+      setReferenceImages(prev => [...prev, { url: b64, note: '' }]);
+      toast.success('Referência adicionada!');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const removeReference = (index: number) => {
+    setReferenceImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateReferenceNote = (index: number, note: string) => {
+    setReferenceImages(prev => prev.map((r, i) => i === index ? { ...r, note } : r));
+  };
+
   const handleGenerate = async () => {
     if (!hasKey) {
       toast.error('Configure sua API Key do Google primeiro (botão API na topbar).');
