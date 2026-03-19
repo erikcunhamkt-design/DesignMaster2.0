@@ -270,9 +270,12 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     const hColor = config.textColorHeadline ? `, in ${config.textColorHeadline} color` : '';
     const sColor = config.textColorSubheadline ? `, in ${config.textColorSubheadline} color` : '';
     const cColor = config.textColorCta ? `, in ${config.textColorCta} color` : '';
-    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography${hFont}${hColor}, positioned in the ${posLabel} of the image`);
-    if (config.text02) locked.push(`secondary text reading "${config.text02}", smaller, supporting the headline${sFont}${sColor}, in the ${posLabel}`);
-    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct${cFont}${cColor}, in the ${posLabel}`);
+    const hSize = config.textSizeHeadline ? `, ${getTextSizePromptHint(config.textSizeHeadline)}` : '';
+    const sSize = config.textSizeSubheadline ? `, ${getTextSizePromptHint(config.textSizeSubheadline)}` : '';
+    const cSize = config.textSizeCta ? `, ${getTextSizePromptHint(config.textSizeCta)}` : '';
+    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography${hFont}${hColor}${hSize}, positioned in the ${posLabel} of the image`);
+    if (config.text02) locked.push(`secondary text reading "${config.text02}", supporting the headline${sFont}${sColor}${sSize}, in the ${posLabel}`);
+    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct${cFont}${cColor}${cSize}, in the ${posLabel}`);
     locked.push(`all text elements must be placed in the ${posLabel} of the image`);
     negativeParts.push(TEXT_NEGATIVE);
   }
