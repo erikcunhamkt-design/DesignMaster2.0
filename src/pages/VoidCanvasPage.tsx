@@ -6,6 +6,7 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { ApiKeyDialog } from '@/components/ApiKeyDialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 import {
   Popover, PopoverContent, PopoverTrigger
 } from '@/components/ui/popover';
@@ -13,11 +14,11 @@ import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles,
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown,
   Mic, MicOff, Image, User, X, ChevronDown, Download,
-  Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus
+  Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus,
+  Paperclip
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // ── Types ──
 interface CanvasImage {
@@ -105,6 +106,8 @@ export default function VoidCanvasPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const refInputRef = useRef<HTMLInputElement>(null);
   const charInputRef = useRef<HTMLInputElement>(null);
+  const agentMediaRef = useRef<HTMLInputElement>(null);
+  const [agentAttachment, setAgentAttachment] = useState<string | null>(null);
 
   // ── Load canvas images ──
   useEffect(() => {
@@ -312,12 +315,20 @@ export default function VoidCanvasPage() {
   // ══════════════════════════════════════════════
   const handleAgentSend = async () => {
     const msg = agentInput.trim();
-    if (!msg || agentLoading) return;
+    const attachment = agentAttachment;
+    if ((!msg && !attachment) || agentLoading) return;
     if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google'); return; }
 
-    const userMsg: AgentMsg = { role: 'user', content: msg };
+    // Build content with optional image
+    let content = msg;
+    if (attachment) {
+      content = msg ? `${msg}\n\n[Imagem: ${attachment}]` : `[Imagem: ${attachment}]\n\nAnalise esta imagem.`;
+    }
+
+    const userMsg: AgentMsg = { role: 'user', content };
     setAgentMessages(prev => [...prev, userMsg]);
     setAgentInput('');
+    setAgentAttachment(null);
     setAgentLoading(true);
 
     let assistantSoFar = '';
@@ -386,7 +397,7 @@ export default function VoidCanvasPage() {
   // RENDER
   // ══════════════════════════════════════════════
   return (
-    <div className="fixed inset-0 bg-[#050a0e] overflow-hidden select-none flex">
+    <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex">
 
       {/* ========== LEFT: AGENT CHAT PANEL ========== */}
       {leftPanelOpen && (
@@ -448,9 +459,9 @@ export default function VoidCanvasPage() {
           </div>
 
           {/* Agent messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 select-text">
             {agentMessages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-40">
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-40 select-none">
                 <MessageSquare className="h-8 w-8 text-primary/30" />
                 <p className="text-[11px] text-muted-foreground/50 max-w-[200px]">
                   Converse com um agente para criar prompts, estratégias e ideias. Depois transfira direto para o gerador.
@@ -466,11 +477,13 @@ export default function VoidCanvasPage() {
                   </div>
                 ) : (
                   <div className="max-w-[95%] space-y-2">
-                    <div className="text-[11px] text-foreground/75 leading-relaxed whitespace-pre-wrap">{msg.content}</div>
+                    <div className="prose prose-sm prose-invert max-w-none text-[11px] text-foreground/75 leading-relaxed [&_p]:mb-2 [&_li]:mb-1 [&_code]:bg-secondary/30 [&_code]:px-1 [&_code]:rounded [&_pre]:bg-[#111820] [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
                     {/* Transfer button */}
                     <button
                       onClick={() => transferToGenerator(msg.content)}
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[9px] font-medium hover:bg-primary/20 transition-colors group"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[9px] font-medium hover:bg-primary/20 transition-colors group select-none"
                     >
                       <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                       Usar como prompt
@@ -490,7 +503,18 @@ export default function VoidCanvasPage() {
           </div>
 
           {/* Agent input */}
-          <div className="shrink-0 p-3">
+          <div className="shrink-0 p-3 space-y-2">
+            {/* Attachment preview */}
+            {agentAttachment && (
+              <div className="relative inline-block group">
+                <div className="w-16 h-16 rounded-lg overflow-hidden border border-primary/30 bg-[#111820]">
+                  <img src={agentAttachment} alt="Anexo" className="w-full h-full object-cover" />
+                </div>
+                <button onClick={() => setAgentAttachment(null)} className="absolute -top-1 -right-1 bg-destructive rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <X className="h-2 w-2 text-white" />
+                </button>
+              </div>
+            )}
             <div className="rounded-2xl border border-border/15 bg-[#111820] focus-within:border-primary/25 transition-colors overflow-hidden">
               <Textarea
                 value={agentInput}
@@ -500,11 +524,22 @@ export default function VoidCanvasPage() {
                 className="min-h-[50px] max-h-[100px] resize-none bg-transparent border-none text-[11px] text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-3.5 pt-2.5"
                 disabled={agentLoading}
               />
-              <div className="flex items-center justify-end px-3 py-1.5">
+              <div className="flex items-center justify-between px-3 py-1.5">
+                <div className="flex items-center gap-0.5">
+                  <input ref={agentMediaRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    if (!e.target.files?.[0]) return;
+                    const b64 = await fileToBase64(e.target.files[0]);
+                    setAgentAttachment(b64);
+                    e.target.value = '';
+                  }} />
+                  <button onClick={() => agentMediaRef.current?.click()} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-colors" title="Anexar imagem">
+                    <Paperclip className="h-3.5 w-3.5" />
+                  </button>
+                </div>
                 <button
                   onClick={handleAgentSend}
-                  disabled={agentLoading || !agentInput.trim() || !apiKey}
-                  className={cn('p-1.5 rounded-full transition-all', agentInput.trim() && apiKey ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed')}
+                  disabled={agentLoading || (!agentInput.trim() && !agentAttachment) || !apiKey}
+                  className={cn('p-1.5 rounded-full transition-all', (agentInput.trim() || agentAttachment) && apiKey ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed')}
                 >
                   {agentLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                 </button>
@@ -515,7 +550,7 @@ export default function VoidCanvasPage() {
       )}
 
       {/* ========== CENTER: CANVAS ========== */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden select-none">
         {/* Void bg */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-breathe" />
