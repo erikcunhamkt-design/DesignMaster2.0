@@ -212,18 +212,6 @@ const Index = () => {
         </div>
 
         {/* Project tabs — only in avançado mode */}
-        {mode === 'avancado' && (
-          <div className="flex-1 min-w-0 h-full">
-            <ProjectTabs
-              projects={projects}
-              activeId={activeProjectId}
-              onSelect={setActiveProjectId}
-              onClose={removeProject}
-              onAdd={addProject}
-              onRename={renameProject}
-            />
-          </div>
-        )}
       </div>
 
       <div className="flex flex-1 overflow-hidden relative flex-col md:flex-row">
