@@ -257,7 +257,7 @@ function cn(...classes: (string | boolean | undefined)[]) {
 export default function HeroStudioPage() {
   const [config, setConfig] = useState<HeroConfig>({ ...defaultHeroConfig });
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('hero-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
