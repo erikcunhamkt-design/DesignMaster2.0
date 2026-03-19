@@ -361,6 +361,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="CTA"
               colorValue={config.textColorCta}
               onColorChange={(v) => onUpdate({ textColorCta: v })}
+              sizeValue={config.textSizeCta}
+              onSizeChange={(v) => onUpdate({ textSizeCta: v as any })}
             />
           </div>
 
