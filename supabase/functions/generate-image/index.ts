@@ -228,22 +228,23 @@ Deno.serve(async (req) => {
     const hasStyleRef = styleReferenceImages && styleReferenceImages.length > 0;
     const hasLegacyRef = referenceImages && referenceImages.length > 0;
 
-    // 1. Subject photos FIRST with strong identity preservation instruction
+    // 1. Subject photos FIRST with ultra-strict identity preservation instruction
     if (hasSubject) {
-      parts.push({ text: `[SUBJECT IDENTITY — THIS IS THE ${genderWord.toUpperCase()} who MUST appear in the generated image. You MUST faithfully reproduce this EXACT person: same face shape, same eyes, same nose, same mouth, same skin tone, same hair color and style, same ethnicity. This is a ${genderWord}. Do NOT change the gender. Do NOT generate a different person. The output MUST be recognizable as this specific individual.]` });
+      parts.push({ text: `[SUBJECT IDENTITY LOCK — HIGHEST PRIORITY. The following photos define the EXACT person who must appear in the final image. Preserve the exact same face identity: face shape, eyes, eyebrows, nose, lips, jawline, skin tone, hairline, hair color, hairstyle, age impression, and ethnicity. Do NOT redesign, beautify, replace, randomize, or reinterpret the person. Do NOT create a similar person. Create the SAME person from these photos. Keep the exact same gender. Facial identity is more important than style.]` });
       for (const img of subjectImages.slice(0, 5)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
           parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
         }
       }
+      parts.push({ text: `[FINAL REMINDER ABOUT IDENTITY: the generated subject must be the exact same person from the uploaded photos, not a variation, not a lookalike, not a different model.]` });
     }
 
     // 2. Style/pose reference photos with clear "reference only" instruction
     if (hasStyleRef) {
       const notesList = (referenceNotes || []).filter((n: string) => n?.trim());
       const notesText = notesList.length > 0 ? ` Specifically use for: ${notesList.join('; ')}.` : '';
-      parts.push({ text: `[STYLE/POSE REFERENCE ONLY — These images are ONLY for pose, composition, framing, lighting, and styling inspiration. COMPLETELY IGNORE the person's face and identity in these reference photos. The person in the final image MUST be the ${genderWord} from the SUBJECT IDENTITY photos above, NOT the person in these references.${notesText}]` });
+      parts.push({ text: `[STYLE/POSE REFERENCE ONLY — These images are ONLY for pose, composition, framing, lighting, and styling inspiration. COMPLETELY IGNORE the person's face and identity in these reference photos. The person in the final image MUST be the person from the SUBJECT IDENTITY photos above, never the person from these references.${notesText}]` });
       for (const img of styleReferenceImages.slice(0, 3)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
@@ -265,9 +266,9 @@ Deno.serve(async (req) => {
     // 4. Main prompt text AFTER images with identity reinforcement
     let identityReminder = "";
     if (hasSubject) {
-      identityReminder = `\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderWord} from the SUBJECT IDENTITY photos. Same face, same features, same gender (${genderWord}). This is NON-NEGOTIABLE.`;
+      identityReminder = `\n\nABSOLUTE IDENTITY LOCK: Reproduce the exact uploaded person with the same facial identity and same gender. Do not change the person, do not swap facial features, do not generate a different model, do not reinterpret the face.`;
       if (hasStyleRef) {
-        identityReminder += ` Style references are ONLY for pose/lighting/composition — NEVER for the person's appearance.`;
+        identityReminder += ` Style references are ONLY for pose, framing, and lighting — never for facial identity.`;
       }
     }
     const fullPrompt = `${edgeFillInstruction}\n\n${finalPrompt}${identityReminder}\n\nAvoid: ${finalNegative}`;
