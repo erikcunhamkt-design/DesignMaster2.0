@@ -404,7 +404,7 @@ export default function AutoCreatorPage() {
           )}
         </div>
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+          <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
           <AutoConfigPanel
             config={config}
             onUpdate={updateConfig}
