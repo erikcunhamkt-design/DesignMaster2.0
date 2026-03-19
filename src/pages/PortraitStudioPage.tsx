@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
+import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Camera, X, Sparkles, User, ImagePlus, Wand2 } from 'lucide-react';
@@ -132,11 +134,11 @@ export default function PortraitStudioPage() {
   const [subjectImage, setSubjectImage] = useState<string | null>(null);
   const [subjectPreview, setSubjectPreview] = useState<string | null>(null);
   const [referenceImages, setReferenceImages] = useState<{ url: string; note: string }[]>([]);
-  const [resultImage, setResultImage] = useState<string | null>(null);
+  const { images: historyImages, currentImage: resultImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('portrait-studio');
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
-  const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
+  const { downloadState, download } = useWatermarkDownload(resultImage ?? null, 'portrait-master');
   const hasKey = googleApiKey.length >= 10;
   const [isRefining, setIsRefining] = useState(false);
   const [refinementOpen, setRefinementOpen] = useState(false);
@@ -156,7 +158,7 @@ export default function PortraitStudioPage() {
       if (error) throw new Error(error.message || 'Erro no refinamento');
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setResultImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada no refinamento');
@@ -222,7 +224,6 @@ export default function PortraitStudioPage() {
       return;
     }
     setIsProcessing(true);
-    setResultImage(null);
     try {
       const refImages = referenceImages.map(r => ({ url: r.url, note: r.note }));
       const { data, error } = await supabase.functions.invoke('generate-portrait', {
@@ -231,7 +232,7 @@ export default function PortraitStudioPage() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setResultImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Retrato profissional gerado!');
       }
     } catch (err: any) {
@@ -490,6 +491,7 @@ export default function PortraitStudioPage() {
                     Refinar
                   </Button>
                 </div>
+                <ImageHistoryBar images={historyImages} activeIndex={historyIndex} onSelect={selectHistoryImage} onClear={clearHistory} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
+import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { MockupConfigPanel } from '@/components/mockup/MockupConfigPanel';
@@ -20,10 +22,13 @@ type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 // ── Preview Panel ──────────────────────────────────────────────────────────
 function MockupPreviewPanel({
   state, imageUrl, config, onRefine, isRefining,
+  historyImages, historyIndex, onSelectHistory, onClearHistory,
 }: {
   state: PreviewState; imageUrl?: string; config: MockupConfig;
   onRefine?: (prompt: string, currentImage: string) => Promise<void>;
   isRefining?: boolean;
+  historyImages?: string[]; historyIndex?: number;
+  onSelectHistory?: (i: number) => void; onClearHistory?: () => void;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
@@ -232,6 +237,9 @@ function MockupPreviewPanel({
           isRefining={isRefining ?? false}
         />
       )}
+      {state === 'concluido' && onSelectHistory && (
+        <ImageHistoryBar images={historyImages ?? []} activeIndex={historyIndex ?? 0} onSelect={onSelectHistory} onClear={onClearHistory} />
+      )}
     </div>
   );
 }
@@ -239,8 +247,8 @@ function MockupPreviewPanel({
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function MockupStudioPage() {
   const [config, setConfig] = useState<MockupConfig>({ ...defaultMockupConfig });
-  const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const [previewState, setPreviewState] = useState<PreviewState>(() => hasImageHistory('mockup-studio') ? 'concluido' : 'aguardando');
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('mockup-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
@@ -262,7 +270,7 @@ export default function MockupStudioPage() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada');
@@ -289,7 +297,6 @@ export default function MockupStudioPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildMockupRequest(config);
@@ -326,7 +333,7 @@ export default function MockupStudioPage() {
       if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         setPreviewState('concluido');
         toast.success('Mockup gerado com sucesso! ✨');
       } else {
@@ -372,12 +379,12 @@ export default function MockupStudioPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
             </div>
           )}
         </div>
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
           <MockupConfigPanel
             config={config}
             onUpdate={updateConfig}

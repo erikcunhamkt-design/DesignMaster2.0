@@ -14,6 +14,8 @@ import { cn } from '@/lib/utils';
 import { SlidersHorizontal, Wand2 } from 'lucide-react';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { compressImageToBase64 } from '@/lib/imageUtils';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
+import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 
 
 // Estimated generation time in seconds
@@ -21,8 +23,8 @@ const ESTIMATED_SECONDS = 35;
 
 const Index = () => {
   const [mode, setMode] = useState<'avancado' | 'guiado'>('avancado');
-  const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>(() => hasImageHistory('design-master') ? 'concluido' : 'aguardando');
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('design-master');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -61,7 +63,6 @@ const Index = () => {
 
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
     setElapsedSeconds(0);
 
     // Start elapsed timer
@@ -116,7 +117,7 @@ const Index = () => {
       if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         setPreviewState('concluido');
         toast.success('Imagem gerada com sucesso!');
       } else {
@@ -160,7 +161,7 @@ const Index = () => {
       if (error) throw new Error(error.message || 'Erro no refinamento');
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada no refinamento');
@@ -253,6 +254,10 @@ const Index = () => {
                       estimatedSeconds={ESTIMATED_SECONDS}
                       onRefine={handleRefine}
                       isRefining={isRefining}
+                      historyImages={historyImages}
+                      historyIndex={historyIndex}
+                      onSelectHistory={selectHistoryImage}
+                      onClearHistory={clearHistory}
                     />
                   </div>
                 )}
@@ -267,6 +272,10 @@ const Index = () => {
                   estimatedSeconds={ESTIMATED_SECONDS}
                   onRefine={handleRefine}
                   isRefining={isRefining}
+                  historyImages={historyImages}
+                  historyIndex={historyIndex}
+                  onSelectHistory={selectHistoryImage}
+                  onClearHistory={clearHistory}
                 />
                 <ConfiguratorPanel
                   config={activeProject.config}

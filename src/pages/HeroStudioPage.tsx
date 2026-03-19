@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
+import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { MobileGenerateButton } from '@/components/layout/MobileGenerateButton';
 import { HeroConfigPanel } from '@/components/hero/HeroConfigPanel';
@@ -20,10 +22,13 @@ type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 // ── Preview Panel ──────────────────────────────────────────────────────────
 function HeroPreviewPanel({
   state, imageUrl, config, onRefine, isRefining,
+  historyImages, historyIndex, onSelectHistory, onClearHistory,
 }: {
   state: PreviewState; imageUrl?: string; config: HeroConfig;
   onRefine?: (prompt: string, currentImage: string) => Promise<void>;
   isRefining?: boolean;
+  historyImages?: string[]; historyIndex?: number;
+  onSelectHistory?: (i: number) => void; onClearHistory?: () => void;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
@@ -243,6 +248,9 @@ function HeroPreviewPanel({
           isRefining={isRefining ?? false}
         />
       )}
+      {state === 'concluido' && onSelectHistory && (
+        <ImageHistoryBar images={historyImages ?? []} activeIndex={historyIndex ?? 0} onSelect={onSelectHistory} onClear={onClearHistory} />
+      )}
     </div>
   );
 }
@@ -254,8 +262,8 @@ function cn(...classes: (string | boolean | undefined)[]) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function HeroStudioPage() {
   const [config, setConfig] = useState<HeroConfig>({ ...defaultHeroConfig });
-  const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const [previewState, setPreviewState] = useState<PreviewState>(() => hasImageHistory('hero-studio') ? 'concluido' : 'aguardando');
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('hero-studio');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
@@ -277,7 +285,7 @@ export default function HeroStudioPage() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada');
@@ -304,7 +312,6 @@ export default function HeroStudioPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildHeroRequest(config);
@@ -341,7 +348,7 @@ export default function HeroStudioPage() {
       if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         setPreviewState('concluido');
         toast.success('Hero section gerado com sucesso! ✨');
       } else {
@@ -388,13 +395,13 @@ export default function HeroStudioPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+              <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
             </div>
           )}
         </div>
         {/* Desktop */}
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+          <HeroPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
           <HeroConfigPanel
             config={config}
             onUpdate={updateConfig}
