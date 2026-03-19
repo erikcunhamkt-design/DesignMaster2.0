@@ -20,6 +20,9 @@ export interface ProjectConfig {
   fontStyleHeadline: string;
   fontStyleSubheadline: string;
   fontStyleCta: string;
+  textColorHeadline: string;
+  textColorSubheadline: string;
+  textColorCta: string;
 
   // Projeto & Cenário
   niche: string;
