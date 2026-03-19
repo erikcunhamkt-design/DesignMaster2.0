@@ -419,7 +419,7 @@ export default function FootballCreatorPage() {
               />
               {previewState !== 'aguardando' && (
                 <div ref={mobilePreviewRef} className="min-h-[400px]">
-                  <FootballPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+                  <FootballPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
                 </div>
               )}
             </div>
