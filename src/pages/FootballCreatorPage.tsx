@@ -350,7 +350,7 @@ export default function FootballCreatorPage() {
       if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         setPreviewState('concluido');
         toast.success('Arte de futebol gerada! ⚽🏆');
       } else {

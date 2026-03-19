@@ -161,7 +161,7 @@ const Index = () => {
       if (error) throw new Error(error.message || 'Erro no refinamento');
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada no refinamento');

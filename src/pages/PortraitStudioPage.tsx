@@ -232,7 +232,7 @@ export default function PortraitStudioPage() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setResultImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Retrato profissional gerado!');
       }
     } catch (err: any) {

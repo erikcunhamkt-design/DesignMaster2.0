@@ -327,7 +327,7 @@ export default function MockupStudioPage() {
       if (data?.error) throw new Error(data.error);
 
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         setPreviewState('concluido');
         toast.success('Mockup gerado com sucesso! ✨');
       } else {
