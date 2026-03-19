@@ -224,7 +224,6 @@ export default function PortraitStudioPage() {
       return;
     }
     setIsProcessing(true);
-    setResultImage(null);
     try {
       const refImages = referenceImages.map(r => ({ url: r.url, note: r.note }));
       const { data, error } = await supabase.functions.invoke('generate-portrait', {
