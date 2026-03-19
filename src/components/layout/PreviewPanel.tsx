@@ -15,9 +15,13 @@ interface PreviewPanelProps {
   estimatedSeconds?: number;
   onRefine?: (prompt: string, currentImage: string) => Promise<void>;
   isRefining?: boolean;
+  historyImages?: string[];
+  historyIndex?: number;
+  onSelectHistory?: (index: number) => void;
+  onClearHistory?: () => void;
 }
 
-export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, estimatedSeconds = 35, onRefine, isRefining = false }: PreviewPanelProps) {
+export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, estimatedSeconds = 35, onRefine, isRefining = false, historyImages = [], historyIndex = 0, onSelectHistory, onClearHistory }: PreviewPanelProps) {
   const [zoom, setZoom] = useState(100);
   const [showOverlay, setShowOverlay] = useState(true);
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
