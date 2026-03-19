@@ -436,10 +436,16 @@ export default function VoidCanvasPage() {
         }
       } catch { console.warn('Smart router failed'); }
 
+      // Inject brand kit colors into prompt
+      if (activeBrandKit && activeBrandKit.colors.length > 0) {
+        const colorList = activeBrandKit.colors.join(', ');
+        expandedPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
+      }
+
       setGenMessages(prev => prev.map(m => m.id === routerId ? { ...m, content: agentName ? `${agentEmoji} Agente: **${agentName}** · Prompt expandido` : '🧠 Prompt processado' } : m));
 
       const thinkingId = crypto.randomUUID();
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
         prompt: expandedPrompt, googleApiKey: apiKey,
