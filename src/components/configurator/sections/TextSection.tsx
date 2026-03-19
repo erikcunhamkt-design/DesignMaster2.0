@@ -342,6 +342,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="sub"
               colorValue={config.textColorSubheadline}
               onColorChange={(v) => onUpdate({ textColorSubheadline: v })}
+              sizeValue={config.textSizeSubheadline}
+              onSizeChange={(v) => onUpdate({ textSizeSubheadline: v as any })}
             />
           </div>
 
