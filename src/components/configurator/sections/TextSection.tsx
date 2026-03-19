@@ -80,6 +80,34 @@ export const FONT_STYLES = [
     fontClass: 'font-sans font-extrabold italic skew-x-[-6deg]',
     promptHint: 'dynamic brush stroke hand-painted ink typography with textured edges',
   },
+  {
+    value: 'gothic',
+    label: 'Gothic',
+    preview: 'Abc',
+    fontClass: 'font-serif font-black tracking-tight',
+    promptHint: 'dark gothic blackletter medieval calligraphy typography, old english ornate lettering',
+  },
+  {
+    value: 'pixel',
+    label: 'Pixel Art',
+    preview: 'Abc',
+    fontClass: 'font-mono font-bold tracking-widest',
+    promptHint: '8-bit pixel art retro video game bitmap typography, blocky pixelated lettering',
+  },
+  {
+    value: 'art-deco',
+    label: 'Art Deco',
+    preview: 'Abc',
+    fontClass: 'font-serif font-semibold tracking-[0.15em] uppercase',
+    promptHint: 'art deco 1920s glamorous geometric typography, elegant gatsby-era decorative lettering',
+  },
+  {
+    value: 'handwritten',
+    label: 'Handwritten',
+    preview: 'Abc',
+    fontClass: 'italic font-medium',
+    promptHint: 'casual handwritten natural pen ink typography, authentic hand-lettered organic style',
+  },
 ];
 
 /** Mini inline font picker that expands below the text field */
