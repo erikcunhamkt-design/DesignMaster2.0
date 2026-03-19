@@ -17,6 +17,9 @@ export interface ProjectConfig {
   textMode: 'camada' | 'imagem';
   textPosition: 'topo' | 'centro' | 'rodape';
   fontStyle: string;
+  fontStyleHeadline: string;
+  fontStyleSubheadline: string;
+  fontStyleCta: string;
 
   // Projeto & Cenário
   niche: string;
@@ -97,6 +100,9 @@ export const defaultConfig: ProjectConfig = {
   textMode: 'camada',
   textPosition: 'centro',
   fontStyle: '',
+  fontStyleHeadline: '',
+  fontStyleSubheadline: '',
+  fontStyleCta: '',
   niche: '',
   environment: '',
   sceneryPhotosEnabled: false,
