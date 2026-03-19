@@ -3,7 +3,7 @@ import { Switch } from '@/components/ui/switch';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
-import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown } from 'lucide-react';
+import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown, Palette } from 'lucide-react';
 
 interface Props {
   config: ProjectConfig;
