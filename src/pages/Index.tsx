@@ -24,7 +24,7 @@ const ESTIMATED_SECONDS = 35;
 const Index = () => {
   const [mode, setMode] = useState<'avancado' | 'guiado'>('avancado');
   const [previewState, setPreviewState] = useState<'aguardando' | 'gerando' | 'concluido'>('aguardando');
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>();
+  const { images: historyImages, currentImage: generatedImage, activeIndex: historyIndex, addImage, selectImage: selectHistoryImage, clearHistory } = useImageHistory('design-master');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
