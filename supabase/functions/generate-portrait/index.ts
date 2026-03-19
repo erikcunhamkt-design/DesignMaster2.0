@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { config, subjectImage, googleApiKey, aiModel } = await req.json();
+    const { config, subjectImage, googleApiKey, aiModel, referenceImages } = await req.json();
 
     if (!googleApiKey || typeof googleApiKey !== "string" || googleApiKey.trim().length < 10 || googleApiKey.trim().length > 256) {
       return new Response(
