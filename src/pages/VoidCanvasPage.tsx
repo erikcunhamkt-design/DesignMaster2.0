@@ -50,6 +50,23 @@ interface VoidProject {
   updated_at: string;
 }
 
+interface BrandKit {
+  id: string;
+  name: string;
+  colors: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface RecentCreation {
+  id: string;
+  image_url: string;
+  label: string;
+  created_at: string;
+}
+
+type HomeView = 'home' | 'projects' | 'brand-kit' | 'profile';
+
 // ── Constants ──
 const IMAGE_MODELS = [
   { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
