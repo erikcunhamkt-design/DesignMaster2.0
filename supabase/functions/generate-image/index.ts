@@ -189,23 +189,30 @@ Deno.serve(async (req) => {
     // Model selection
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
 
-    // ── Build final prompt with PROMPT ARCHITECT PRO ──
+    const hasSubjectPhotos = subjectImages && subjectImages.length > 0;
+
+    // ── Build final prompt ──
+    // When subject photos exist, SKIP architect to maximize identity fidelity
     let finalPrompt: string;
     const locked = lockedPrompt || prompt || "";
     const expandable = expandablePrompt || "";
 
     let expandedPromptForUI: string | undefined;
-    if (useArchitect && (locked.trim() || expandable.trim())) {
-      console.log("🧠 PROMPT ARCHITECT PRO: Creating hyper-detailed prompt...");
-      console.log("🔒 LOCKED (mandatory — NOT sent to LLM):", locked.substring(0, 300));
-      console.log("🔓 EXPANDABLE (creative — sent to LLM):", expandable.substring(0, 300));
+    const shouldUseArchitect = useArchitect && !hasSubjectPhotos && (locked.trim() || expandable.trim());
+    
+    if (shouldUseArchitect) {
+      console.log("🧠 PROMPT ARCHITECT PRO: Enhancing prompt (no subject photos)...");
       const result = await createPromptWithArchitect(locked, expandable, googleApiKey);
       finalPrompt = result.final;
       expandedPromptForUI = result.architectOutput || undefined;
-      console.log("✅ FINAL PROMPT:", finalPrompt.substring(0, 400));
     } else {
-      finalPrompt = locked + (expandable ? `\n\n${expandable}` : "");
+      // Direct mode: concatenate locked + expandable without AI rewriting
+      finalPrompt = [locked.trim(), expandable.trim()].filter(Boolean).join(". ");
+      if (hasSubjectPhotos) {
+        console.log("🔒 IDENTITY MODE: Skipping Architect to preserve subject fidelity");
+      }
     }
+    console.log("✅ FINAL PROMPT:", finalPrompt.substring(0, 400));
 
     const finalNegative = negativePrompt || "distorted anatomy, blurry areas, compression artifacts, plastic skin, waxy appearance, low quality, watermark, text artifacts";
 
