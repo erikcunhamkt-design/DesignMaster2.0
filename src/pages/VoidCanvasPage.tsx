@@ -98,6 +98,13 @@ export default function VoidCanvasPage() {
   const [editProjectTitle, setEditProjectTitle] = useState('');
   const [homePrompt, setHomePrompt] = useState('');
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [homeView, setHomeView] = useState<HomeView>('home');
+  const [brandKits, setBrandKits] = useState<BrandKit[]>([]);
+  const [activeBrandKit, setActiveBrandKit] = useState<BrandKit | null>(null);
+  const [recentCreations, setRecentCreations] = useState<RecentCreation[]>([]);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newBrandColors, setNewBrandColors] = useState<string[]>(['#10B981', '#0EA5E9', '#8B5CF6']);
+  const [newColorInput, setNewColorInput] = useState('#10B981');
 
   // ── Canvas state ──
   const [images, setImages] = useState<CanvasImage[]>([]);
