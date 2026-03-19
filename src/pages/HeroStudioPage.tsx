@@ -248,6 +248,9 @@ function HeroPreviewPanel({
           isRefining={isRefining ?? false}
         />
       )}
+      {state === 'concluido' && onSelectHistory && (
+        <ImageHistoryBar images={historyImages ?? []} activeIndex={historyIndex ?? 0} onSelect={onSelectHistory} onClear={onClearHistory} />
+      )}
     </div>
   );
 }
