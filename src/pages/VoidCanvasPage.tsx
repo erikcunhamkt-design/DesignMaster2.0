@@ -315,12 +315,20 @@ export default function VoidCanvasPage() {
   // ══════════════════════════════════════════════
   const handleAgentSend = async () => {
     const msg = agentInput.trim();
-    if (!msg || agentLoading) return;
+    const attachment = agentAttachment;
+    if ((!msg && !attachment) || agentLoading) return;
     if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google'); return; }
 
-    const userMsg: AgentMsg = { role: 'user', content: msg };
+    // Build content with optional image
+    let content = msg;
+    if (attachment) {
+      content = msg ? `${msg}\n\n[Imagem: ${attachment}]` : `[Imagem: ${attachment}]\n\nAnalise esta imagem.`;
+    }
+
+    const userMsg: AgentMsg = { role: 'user', content };
     setAgentMessages(prev => [...prev, userMsg]);
     setAgentInput('');
+    setAgentAttachment(null);
     setAgentLoading(true);
 
     let assistantSoFar = '';
