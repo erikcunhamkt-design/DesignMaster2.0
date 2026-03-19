@@ -52,6 +52,34 @@ export const FONT_STYLES = [
     fontClass: 'font-sans font-extrabold italic',
     promptHint: 'urban graffiti street art spray paint lettering style typography',
   },
+  {
+    value: 'retro',
+    label: 'Retro',
+    preview: 'Abc',
+    fontClass: 'font-serif italic tracking-wide',
+    promptHint: 'retro vintage 70s groovy typography with warm nostalgic lettering',
+  },
+  {
+    value: 'neon',
+    label: 'Neon',
+    preview: 'Abc',
+    fontClass: 'font-sans font-bold tracking-wider',
+    promptHint: 'glowing neon sign typography with luminous light tube lettering effect',
+  },
+  {
+    value: 'stencil',
+    label: 'Stencil',
+    preview: 'ABC',
+    fontClass: 'font-sans font-black uppercase tracking-[0.2em]',
+    promptHint: 'military stencil cut-out typography, bold stamped industrial lettering',
+  },
+  {
+    value: 'brush',
+    label: 'Brush',
+    preview: 'Abc',
+    fontClass: 'font-sans font-extrabold italic skew-x-[-6deg]',
+    promptHint: 'dynamic brush stroke hand-painted ink typography with textured edges',
+  },
 ];
 
 /** Mini inline font picker that expands below the text field */
