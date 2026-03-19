@@ -254,6 +254,10 @@ const Index = () => {
                       estimatedSeconds={ESTIMATED_SECONDS}
                       onRefine={handleRefine}
                       isRefining={isRefining}
+                      historyImages={historyImages}
+                      historyIndex={historyIndex}
+                      onSelectHistory={selectHistoryImage}
+                      onClearHistory={clearHistory}
                     />
                   </div>
                 )}
