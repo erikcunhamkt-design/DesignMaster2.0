@@ -632,6 +632,7 @@ export default function VoidCanvasPage() {
       </div>
 
       {/* ========== RIGHT: IMAGE GENERATOR ========== */}
+      {rightPanelOpen && (
       <div className="w-[400px] flex flex-col border-l border-border/15 bg-[#0a0f14] shrink-0">
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-12 border-b border-border/10 shrink-0">
@@ -639,7 +640,12 @@ export default function VoidCanvasPage() {
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-[12px] font-bold text-foreground/90">Gerador</span>
           </div>
-          <span className="text-[9px] text-muted-foreground/40">{images.length} imagens</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-muted-foreground/40">{images.length} imagens</span>
+            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setRightPanelOpen(false)}>
+              <PanelLeftOpen className="h-3.5 w-3.5 rotate-180" />
+            </Button>
+          </div>
         </div>
 
         {/* Gen messages */}
