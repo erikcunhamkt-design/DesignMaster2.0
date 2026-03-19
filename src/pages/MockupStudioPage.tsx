@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 import type { AiModel } from '@/components/configurator/ModelSelector';
 import {
   Download, ZoomIn, ZoomOut, Check,
-  Loader2, Droplets, Lock, SlidersHorizontal,
+  Loader2, Droplets, Lock, SlidersHorizontal, Wand2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RefinementChat } from '@/components/layout/RefinementChat';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 

@@ -10,10 +10,11 @@ import { toast } from 'sonner';
 import type { AiModel } from '@/components/configurator/ModelSelector';
 import {
   Download, ZoomIn, ZoomOut,
-  Check, Loader2, Droplets, Lock, SlidersHorizontal, ListChecks
+  Check, Loader2, Droplets, Lock, SlidersHorizontal, ListChecks, Wand2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FootballGuidedWizard } from '@/components/football/FootballGuidedWizard';
+import { RefinementChat } from '@/components/layout/RefinementChat';
 
 // ── Football Preview Panel ─────────────────────────────────────────────────
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
