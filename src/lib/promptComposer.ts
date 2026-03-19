@@ -159,9 +159,13 @@ export function composePrompt(config: ProjectConfig): PromptResult {
     const hSz = config.textSizeHeadline ? `, ${sizeMap[config.textSizeHeadline]} size` : '';
     const sSz = config.textSizeSubheadline ? `, ${sizeMap[config.textSizeSubheadline]} size` : '';
     const cSz = config.textSizeCta ? `, ${sizeMap[config.textSizeCta]} size` : '';
-    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}${hSz}`);
-    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}${sSz}`);
-    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}${cSz}`);
+    const trackMap: Record<string, string> = { apertado: 'tight tracking', normal: 'normal tracking', largo: 'wide tracking', 'muito-largo': 'very wide tracking' };
+    const hTr = config.textTrackingHeadline ? `, ${trackMap[config.textTrackingHeadline]}` : '';
+    const sTr = config.textTrackingSubheadline ? `, ${trackMap[config.textTrackingSubheadline]}` : '';
+    const cTr = config.textTrackingCta ? `, ${trackMap[config.textTrackingCta]}` : '';
+    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}${hSz}${hTr}`);
+    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}${sSz}${sTr}`);
+    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}${cSz}${cTr}`);
   }
 
   // 12. Additional prompt
