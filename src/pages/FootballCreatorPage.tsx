@@ -314,7 +314,6 @@ export default function FootballCreatorPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildFootballRequest(config);
