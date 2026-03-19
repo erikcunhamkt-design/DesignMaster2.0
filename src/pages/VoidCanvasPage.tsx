@@ -83,7 +83,7 @@ export default function VoidCanvasPage() {
   const [genMessages, setGenMessages] = useState<ChatMessage[]>([]);
   const [genPrompt, setGenPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [imageModel, setImageModel] = useState(IMAGE_MODELS[0].id);
+  const [imageModel, setImageModel] = useState<string>(IMAGE_MODELS[0].id);
   const [modelOpen, setModelOpen] = useState(false);
 
   // Multimedia
