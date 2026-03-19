@@ -16,6 +16,13 @@ interface Props {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
+const TEXT_WEIGHTS = [
+  { value: 'light' as const, label: 'Light', cls: 'font-light', promptHint: 'light thin font weight' },
+  { value: 'regular' as const, label: 'Regular', cls: 'font-normal', promptHint: 'regular normal font weight' },
+  { value: 'bold' as const, label: 'Bold', cls: 'font-bold', promptHint: 'bold strong font weight' },
+  { value: 'extrabold' as const, label: 'Extra Bold', cls: 'font-extrabold', promptHint: 'extra bold heavy thick font weight' },
+];
+
 const TEXT_TRACKING = [
   { value: 'apertado' as const, label: 'Aa', cls: 'tracking-tighter', promptHint: 'tight letter-spacing, condensed tracking' },
   { value: 'normal' as const, label: 'A a', cls: 'tracking-normal', promptHint: 'normal standard letter-spacing' },
@@ -262,6 +269,39 @@ function TrackingPicker({
   );
 }
 
+/** Inline font weight selector */
+function WeightPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {TEXT_WEIGHTS.map((w) => {
+        const active = value === w.value;
+        return (
+          <button
+            key={w.value}
+            type="button"
+            onClick={() => onChange(active ? '' : w.value)}
+            className={cn(
+              'px-1.5 py-0.5 rounded text-[7px] transition-all border',
+              w.cls,
+              active
+                ? 'bg-primary/10 text-primary border-primary/30'
+                : 'text-muted-foreground/40 hover:text-muted-foreground/60 border-transparent'
+            )}
+          >
+            {w.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
@@ -273,6 +313,8 @@ function FontPicker({
   onSizeChange,
   trackingValue,
   onTrackingChange,
+  weightValue,
+  onWeightChange,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -283,6 +325,8 @@ function FontPicker({
   onSizeChange: (v: string) => void;
   trackingValue: string;
   onTrackingChange: (v: string) => void;
+  weightValue: string;
+  onWeightChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
@@ -311,7 +355,10 @@ function FontPicker({
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
 
-      <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
+      <div className="flex items-center gap-2 px-1">
+        <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
+        <WeightPicker value={weightValue} onChange={onWeightChange} />
+      </div>
 
       {open && (
         <div className="flex gap-1 flex-wrap px-1 pb-1">
@@ -373,6 +420,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
               trackingValue={config.textTrackingHeadline}
               onTrackingChange={(v) => onUpdate({ textTrackingHeadline: v as any })}
+              weightValue={config.textWeightHeadline}
+              onWeightChange={(v) => onUpdate({ textWeightHeadline: v as any })}
             />
           </div>
 
@@ -394,6 +443,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onSizeChange={(v) => onUpdate({ textSizeSubheadline: v as any })}
               trackingValue={config.textTrackingSubheadline}
               onTrackingChange={(v) => onUpdate({ textTrackingSubheadline: v as any })}
+              weightValue={config.textWeightSubheadline}
+              onWeightChange={(v) => onUpdate({ textWeightSubheadline: v as any })}
             />
           </div>
 
@@ -415,6 +466,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onSizeChange={(v) => onUpdate({ textSizeCta: v as any })}
               trackingValue={config.textTrackingCta}
               onTrackingChange={(v) => onUpdate({ textTrackingCta: v as any })}
+              weightValue={config.textWeightCta}
+              onWeightChange={(v) => onUpdate({ textWeightCta: v as any })}
             />
           </div>
 
@@ -480,4 +533,9 @@ export function getTextSizePromptHint(size: string): string {
 /** Helper to get the prompt hint for a given tracking value */
 export function getTextTrackingPromptHint(tracking: string): string {
   return TEXT_TRACKING.find((t) => t.value === tracking)?.promptHint ?? '';
+}
+
+/** Helper to get the prompt hint for a given weight value */
+export function getTextWeightPromptHint(weight: string): string {
+  return TEXT_WEIGHTS.find((w) => w.value === weight)?.promptHint ?? '';
 }

@@ -6,7 +6,7 @@
  */
 
 import { ProjectConfig } from '@/types/project';
-import { getFontStylePromptHint, getTextSizePromptHint, getTextTrackingPromptHint } from '@/components/configurator/sections/TextSection';
+import { getFontStylePromptHint, getTextSizePromptHint, getTextTrackingPromptHint, getTextWeightPromptHint } from '@/components/configurator/sections/TextSection';
 
 export interface GenerationRequest {
   prompt: string;
@@ -276,9 +276,12 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
     const hTrack = config.textTrackingHeadline ? `, ${getTextTrackingPromptHint(config.textTrackingHeadline)}` : '';
     const sTrack = config.textTrackingSubheadline ? `, ${getTextTrackingPromptHint(config.textTrackingSubheadline)}` : '';
     const cTrack = config.textTrackingCta ? `, ${getTextTrackingPromptHint(config.textTrackingCta)}` : '';
-    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography${hFont}${hColor}${hSize}${hTrack}, positioned in the ${posLabel} of the image`);
-    if (config.text02) locked.push(`secondary text reading "${config.text02}", supporting the headline${sFont}${sColor}${sSize}${sTrack}, in the ${posLabel}`);
-    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct${cFont}${cColor}${cSize}${cTrack}, in the ${posLabel}`);
+    const hWeight = config.textWeightHeadline ? `, ${getTextWeightPromptHint(config.textWeightHeadline)}` : '';
+    const sWeight = config.textWeightSubheadline ? `, ${getTextWeightPromptHint(config.textWeightSubheadline)}` : '';
+    const cWeight = config.textWeightCta ? `, ${getTextWeightPromptHint(config.textWeightCta)}` : '';
+    if (config.text01) locked.push(`prominent headline text reading "${config.text01}", high readability, professional typography${hFont}${hColor}${hSize}${hTrack}${hWeight}, positioned in the ${posLabel} of the image`);
+    if (config.text02) locked.push(`secondary text reading "${config.text02}", supporting the headline${sFont}${sColor}${sSize}${sTrack}${sWeight}, in the ${posLabel}`);
+    if (config.cta) locked.push(`call-to-action text reading "${config.cta}", visually distinct${cFont}${cColor}${cSize}${cTrack}${cWeight}, in the ${posLabel}`);
     locked.push(`all text elements must be placed in the ${posLabel} of the image`);
     negativeParts.push(TEXT_NEGATIVE);
   }
