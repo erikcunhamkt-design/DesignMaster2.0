@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
+import { useImageHistory } from '@/hooks/useImageHistory';
+import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Camera, X, Sparkles, User, ImagePlus, Wand2 } from 'lucide-react';
