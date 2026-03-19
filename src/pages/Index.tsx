@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { SlidersHorizontal, Wand2 } from 'lucide-react';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
 import { compressImageToBase64 } from '@/lib/imageUtils';
-import { useImageHistory } from '@/hooks/useImageHistory';
+import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
 import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 
 
