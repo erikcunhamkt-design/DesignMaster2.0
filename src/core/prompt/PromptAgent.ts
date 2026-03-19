@@ -6,7 +6,7 @@
  */
 
 import { ProjectConfig } from '@/types/project';
-import { getFontStylePromptHint, getTextSizePromptHint } from '@/components/configurator/sections/TextSection';
+import { getFontStylePromptHint, getTextSizePromptHint, getTextTrackingPromptHint } from '@/components/configurator/sections/TextSection';
 
 export interface GenerationRequest {
   prompt: string;

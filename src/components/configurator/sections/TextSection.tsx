@@ -476,3 +476,8 @@ export function getFontStylePromptHint(fontStyle: string): string {
 export function getTextSizePromptHint(size: string): string {
   return TEXT_SIZES.find((s) => s.value === size)?.promptHint ?? '';
 }
+
+/** Helper to get the prompt hint for a given tracking value */
+export function getTextTrackingPromptHint(tracking: string): string {
+  return TEXT_TRACKING.find((t) => t.value === tracking)?.promptHint ?? '';
+}
