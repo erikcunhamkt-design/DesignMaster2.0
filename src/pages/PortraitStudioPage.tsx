@@ -138,7 +138,7 @@ export default function PortraitStudioPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
-  const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
+  const { downloadState, download } = useWatermarkDownload(resultImage ?? null, 'portrait-master');
   const hasKey = googleApiKey.length >= 10;
   const [isRefining, setIsRefining] = useState(false);
   const [refinementOpen, setRefinementOpen] = useState(false);
