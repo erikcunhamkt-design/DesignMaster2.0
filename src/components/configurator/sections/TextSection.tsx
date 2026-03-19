@@ -190,6 +190,38 @@ function ColorPicker({
   );
 }
 
+/** Inline text size selector */
+function SizePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {TEXT_SIZES.map((s) => {
+        const active = value === s.value;
+        return (
+          <button
+            key={s.value}
+            type="button"
+            onClick={() => onChange(active ? '' : s.value)}
+            className={cn(
+              'px-1.5 py-0.5 rounded text-[8px] font-bold transition-all border',
+              active
+                ? 'bg-primary/10 text-primary border-primary/30'
+                : 'text-muted-foreground/40 hover:text-muted-foreground/60 border-transparent'
+            )}
+          >
+            {s.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
@@ -197,12 +229,16 @@ function FontPicker({
   label,
   colorValue,
   onColorChange,
+  sizeValue,
+  onSizeChange,
 }: {
   value: string;
   onChange: (v: string) => void;
   label: string;
   colorValue: string;
   onColorChange: (v: string) => void;
+  sizeValue: string;
+  onSizeChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
