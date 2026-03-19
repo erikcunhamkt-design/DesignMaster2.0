@@ -63,7 +63,6 @@ const Index = () => {
 
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
     setElapsedSeconds(0);
 
     // Start elapsed timer
