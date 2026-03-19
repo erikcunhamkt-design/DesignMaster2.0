@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
-import { Upload, Loader2, Camera, X, Sparkles, User } from 'lucide-react';
+import { Loader2, Camera, X, Sparkles, User, ImagePlus } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
