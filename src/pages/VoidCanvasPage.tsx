@@ -550,7 +550,7 @@ export default function VoidCanvasPage() {
       )}
 
       {/* ========== CENTER: CANVAS ========== */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden select-none">
         {/* Void bg */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-breathe" />
