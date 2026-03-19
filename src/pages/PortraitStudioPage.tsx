@@ -118,12 +118,12 @@ export default function PortraitStudioPage() {
   const { apiKey: googleApiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
   const [config, setConfig] = useState<PortraitConfig>({
-    gender: 'male',
-    lighting: 'rembrandt',
-    background: 'seamless-gray',
-    expression: 'confident',
-    cameraAngle: 'eye-level',
-    lens: '85mm',
+    gender: '',
+    lighting: '',
+    background: '',
+    expression: '',
+    cameraAngle: '',
+    lens: '',
     clothing: '',
     freePrompt: '',
     hasReference: false,
@@ -289,7 +289,7 @@ export default function PortraitStudioPage() {
             <Section label="Gênero">
               <div className="flex gap-2">
                 {GENDERS.map(g => (
-                  <Chip key={g.value} selected={config.gender === g.value} onClick={() => update('gender', g.value)} className="flex-1 text-center">
+                  <Chip key={g.value} selected={config.gender === g.value} onClick={() => update('gender', config.gender === g.value ? '' : g.value)} className="flex-1 text-center">
                     {g.icon} {g.label}
                   </Chip>
                 ))}
@@ -300,7 +300,7 @@ export default function PortraitStudioPage() {
             <Section label="Expressão">
               <div className="flex flex-wrap gap-1.5">
                 {EXPRESSIONS.map(e => (
-                  <Chip key={e.value} selected={config.expression === e.value} onClick={() => update('expression', e.value)}>
+                  <Chip key={e.value} selected={config.expression === e.value} onClick={() => update('expression', config.expression === e.value ? '' : e.value)}>
                     {e.label}
                   </Chip>
                 ))}
@@ -311,7 +311,7 @@ export default function PortraitStudioPage() {
             <Section label="Iluminação">
               <div className="grid grid-cols-2 gap-1.5">
                 {LIGHTINGS.map(l => (
-                  <Chip key={l.value} selected={config.lighting === l.value} onClick={() => update('lighting', l.value)}>
+                  <Chip key={l.value} selected={config.lighting === l.value} onClick={() => update('lighting', config.lighting === l.value ? '' : l.value)}>
                     <div className="text-left">
                       <div>{l.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{l.desc}</div>
@@ -325,7 +325,7 @@ export default function PortraitStudioPage() {
             <Section label="Fundo">
               <div className="grid grid-cols-2 gap-1.5">
                 {BACKGROUNDS.map(b => (
-                  <Chip key={b.value} selected={config.background === b.value} onClick={() => update('background', b.value)}>
+                  <Chip key={b.value} selected={config.background === b.value} onClick={() => update('background', config.background === b.value ? '' : b.value)}>
                     <div className="text-left">
                       <div>{b.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{b.desc}</div>
@@ -339,7 +339,7 @@ export default function PortraitStudioPage() {
             <Section label="Ângulo de Câmera">
               <div className="flex flex-wrap gap-1.5">
                 {CAMERA_ANGLES.map(c => (
-                  <Chip key={c.value} selected={config.cameraAngle === c.value} onClick={() => update('cameraAngle', c.value)}>
+                  <Chip key={c.value} selected={config.cameraAngle === c.value} onClick={() => update('cameraAngle', config.cameraAngle === c.value ? '' : c.value)}>
                     {c.label}
                   </Chip>
                 ))}
@@ -350,7 +350,7 @@ export default function PortraitStudioPage() {
             <Section label="Lente">
               <div className="flex flex-wrap gap-1.5">
                 {LENSES.map(l => (
-                  <Chip key={l.value} selected={config.lens === l.value} onClick={() => update('lens', l.value)}>
+                  <Chip key={l.value} selected={config.lens === l.value} onClick={() => update('lens', config.lens === l.value ? '' : l.value)}>
                     <div className="text-left">
                       <div>{l.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{l.desc}</div>
