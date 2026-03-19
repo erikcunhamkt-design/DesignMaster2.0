@@ -6,6 +6,7 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { ApiKeyDialog } from '@/components/ApiKeyDialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 import {
   Popover, PopoverContent, PopoverTrigger
 } from '@/components/ui/popover';
@@ -13,11 +14,11 @@ import {
   ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Sparkles,
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown,
   Mic, MicOff, Image, User, X, ChevronDown, Download,
-  Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus
+  Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus,
+  Paperclip
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // ── Types ──
 interface CanvasImage {
