@@ -264,7 +264,7 @@ export function buildGenerationRequest(config: ProjectConfig): GenerationRequest
   } else if (config.textEnabled && config.textMode === 'imagem') {
     const posMap = { topo: 'top area', centro: 'center area', rodape: 'bottom area' };
     const posLabel = posMap[config.textPosition] || 'center area';
-    const fontHint = config.fontStyle ? (() => { const { getFontStylePromptHint } = require('@/components/configurator/sections/TextSection'); return getFontStylePromptHint(config.fontStyle); })() : '';
+    const fontHint = config.fontStyle ? getFontStylePromptHint(config.fontStyle) : '';
     const fontInstruction = fontHint ? `, using ${fontHint}` : '';
     if (config.text01) locked.push(`prominent headline text reading "${config.text01}", bold, high readability, professional typography${fontInstruction}, positioned in the ${posLabel} of the image`);
     if (config.text02) locked.push(`secondary text reading "${config.text02}", smaller, supporting the headline${fontInstruction}, in the ${posLabel}`);
