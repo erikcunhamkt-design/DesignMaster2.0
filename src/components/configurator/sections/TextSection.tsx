@@ -16,6 +16,13 @@ interface Props {
   onUpdate: (patch: Partial<ProjectConfig>) => void;
 }
 
+const TEXT_WEIGHTS = [
+  { value: 'light' as const, label: 'Light', cls: 'font-light', promptHint: 'light thin font weight' },
+  { value: 'regular' as const, label: 'Regular', cls: 'font-normal', promptHint: 'regular normal font weight' },
+  { value: 'bold' as const, label: 'Bold', cls: 'font-bold', promptHint: 'bold strong font weight' },
+  { value: 'extrabold' as const, label: 'Extra Bold', cls: 'font-extrabold', promptHint: 'extra bold heavy thick font weight' },
+];
+
 const TEXT_TRACKING = [
   { value: 'apertado' as const, label: 'Aa', cls: 'tracking-tighter', promptHint: 'tight letter-spacing, condensed tracking' },
   { value: 'normal' as const, label: 'A a', cls: 'tracking-normal', promptHint: 'normal standard letter-spacing' },
