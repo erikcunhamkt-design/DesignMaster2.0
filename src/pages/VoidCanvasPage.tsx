@@ -167,6 +167,56 @@ export default function VoidCanvasPage() {
 
   useEffect(() => { loadProjects(); }, [loadProjects]);
 
+  // Load brand kits
+  const loadBrandKits = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('void_brand_kits' as any)
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (data) setBrandKits(data as any as BrandKit[]);
+  }, [user]);
+
+  // Load recent creations (last 7 days)
+  const loadRecentCreations = useCallback(async () => {
+    if (!user) return;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const { data } = await supabase
+      .from('void_canvas_nodes')
+      .select('id, image_url, label, created_at')
+      .eq('user_id', user.id)
+      .eq('node_type', 'image')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (data) setRecentCreations(data.filter((d: any) => d.image_url) as any as RecentCreation[]);
+  }, [user]);
+
+  useEffect(() => { loadBrandKits(); loadRecentCreations(); }, [loadBrandKits, loadRecentCreations]);
+
+  const createBrandKit = async () => {
+    if (!user || !newBrandName.trim() || newBrandColors.length === 0) return;
+    const { data } = await supabase
+      .from('void_brand_kits' as any)
+      .insert({ user_id: user.id, name: newBrandName.trim(), colors: newBrandColors } as any)
+      .select()
+      .single();
+    if (data) {
+      setBrandKits(prev => [data as any as BrandKit, ...prev]);
+      setNewBrandName('');
+      setNewBrandColors(['#10B981', '#0EA5E9', '#8B5CF6']);
+      toast.success('Kit de marca criado!');
+    }
+  };
+
+  const deleteBrandKit = async (id: string) => {
+    await supabase.from('void_brand_kits' as any).delete().eq('id', id);
+    setBrandKits(prev => prev.filter(k => k.id !== id));
+    if (activeBrandKit?.id === id) setActiveBrandKit(null);
+  };
+
   const createProject = async (initialPrompt?: string) => {
     if (!user) return null;
     const title = initialPrompt ? initialPrompt.slice(0, 50) : 'Sem título';
