@@ -306,7 +306,6 @@ export default function HeroStudioPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildHeroRequest(config);
