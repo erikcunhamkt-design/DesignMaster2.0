@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
-import { Loader2, Camera, X, Sparkles, User, ImagePlus } from 'lucide-react';
+import { Loader2, Camera, X, Sparkles, User, ImagePlus, Wand2 } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
@@ -9,6 +9,7 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RefinementChat } from '@/components/layout/RefinementChat';
 
 
 interface PortraitConfig {
