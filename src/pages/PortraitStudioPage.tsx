@@ -289,7 +289,7 @@ export default function PortraitStudioPage() {
             <Section label="Gênero">
               <div className="flex gap-2">
                 {GENDERS.map(g => (
-                  <Chip key={g.value} selected={config.gender === g.value} onClick={() => update('gender', g.value)} className="flex-1 text-center">
+                  <Chip key={g.value} selected={config.gender === g.value} onClick={() => update('gender', config.gender === g.value ? '' : g.value)} className="flex-1 text-center">
                     {g.icon} {g.label}
                   </Chip>
                 ))}
