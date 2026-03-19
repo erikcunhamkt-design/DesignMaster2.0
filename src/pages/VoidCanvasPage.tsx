@@ -389,7 +389,7 @@ export default function VoidCanvasPage() {
   // RENDER
   // ══════════════════════════════════════════════
   return (
-    <div className="fixed inset-0 bg-[#050a0e] overflow-hidden select-none flex">
+    <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex">
 
       {/* ========== LEFT: AGENT CHAT PANEL ========== */}
       {leftPanelOpen && (
