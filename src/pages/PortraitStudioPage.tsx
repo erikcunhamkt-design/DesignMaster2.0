@@ -477,10 +477,33 @@ export default function PortraitStudioPage() {
                   alt="Portrait"
                   className="max-w-full max-h-[80vh] rounded-xl shadow-[0_20px_60px_-15px_hsl(0_0%_0%/0.5)] ring-1 ring-white/[0.03]"
                 />
-                <DownloadButtons downloadState={downloadState} onDownload={download} />
+                <div className="flex items-center gap-2 mt-3 justify-center">
+                  <DownloadButtons downloadState={downloadState} onDownload={download} />
+                  <Button
+                    size="sm"
+                    variant={refinementOpen ? 'default' : 'outline'}
+                    onClick={() => setRefinementOpen(!refinementOpen)}
+                    disabled={isRefining}
+                    className={`h-8 gap-1.5 text-[11px] rounded-lg font-medium transition-all ${refinementOpen ? 'bg-primary/90 hover:bg-primary border-primary/50 text-primary-foreground shadow-sm' : 'border-border/30 text-muted-foreground hover:text-foreground'}`}
+                  >
+                    {isRefining ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                    Refinar
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Refinement Chat */}
+          {resultImage && (
+            <RefinementChat
+              open={refinementOpen}
+              onClose={() => setRefinementOpen(false)}
+              imageUrl={resultImage}
+              onRefine={handleRefine}
+              isRefining={isRefining}
+            />
+          )}
         </div>
       </div>
     </div>
