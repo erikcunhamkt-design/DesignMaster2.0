@@ -371,6 +371,8 @@ export function TextSection({ config, onUpdate }: Props) {
               onColorChange={(v) => onUpdate({ textColorHeadline: v })}
               sizeValue={config.textSizeHeadline}
               onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
+              trackingValue={config.textTrackingHeadline}
+              onTrackingChange={(v) => onUpdate({ textTrackingHeadline: v as any })}
             />
           </div>
 
