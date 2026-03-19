@@ -152,9 +152,12 @@ export function composePrompt(config: ProjectConfig): PromptResult {
     const hSuffix = config.fontStyleHeadline && fontHintMap[config.fontStyleHeadline] ? `, ${fontHintMap[config.fontStyleHeadline]}` : '';
     const sSuffix = config.fontStyleSubheadline && fontHintMap[config.fontStyleSubheadline] ? `, ${fontHintMap[config.fontStyleSubheadline]}` : '';
     const cSuffix = config.fontStyleCta && fontHintMap[config.fontStyleCta] ? `, ${fontHintMap[config.fontStyleCta]}` : '';
-    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}`);
-    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}`);
-    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}`);
+    const hCol = config.textColorHeadline ? `, ${config.textColorHeadline} colored` : '';
+    const sCol = config.textColorSubheadline ? `, ${config.textColorSubheadline} colored` : '';
+    const cCol = config.textColorCta ? `, ${config.textColorCta} colored` : '';
+    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}`);
+    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}`);
+    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}`);
   }
 
   // 12. Additional prompt
