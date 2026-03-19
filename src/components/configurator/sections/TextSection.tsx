@@ -295,6 +295,8 @@ export function TextSection({ config, onUpdate }: Props) {
               value={config.fontStyleSubheadline}
               onChange={(v) => onUpdate({ fontStyleSubheadline: v })}
               label="sub"
+              colorValue={config.textColorSubheadline}
+              onColorChange={(v) => onUpdate({ textColorSubheadline: v })}
             />
           </div>
 
