@@ -106,6 +106,8 @@ export default function VoidCanvasPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const refInputRef = useRef<HTMLInputElement>(null);
   const charInputRef = useRef<HTMLInputElement>(null);
+  const agentMediaRef = useRef<HTMLInputElement>(null);
+  const [agentAttachment, setAgentAttachment] = useState<string | null>(null);
 
   // ── Load canvas images ──
   useEffect(() => {
