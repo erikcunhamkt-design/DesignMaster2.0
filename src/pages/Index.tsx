@@ -86,7 +86,7 @@ const Index = () => {
         if (ref.role === 'identity') {
           subjectImages.push(await compressImageToBase64(ref.url, 1024, 0.9));
         } else {
-          styleReferenceImages.push(ref.url);
+          styleReferenceImages.push(await compressImageToBase64(ref.url, 1024, 0.9));
           if (ref.attributes && ref.attributes.length > 0) {
             referenceNotes.push(ref.attributes.join(', '));
           }
