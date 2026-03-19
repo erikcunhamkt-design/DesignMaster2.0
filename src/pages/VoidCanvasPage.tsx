@@ -493,7 +493,7 @@ export default function VoidCanvasPage() {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-[10px]">🕳️</span>
+                <Sparkles className="h-3 w-3 text-primary-foreground" />
               </div>
               <span className="text-sm font-bold font-display text-foreground tracking-tight">VOID</span>
             </div>
@@ -521,7 +521,7 @@ export default function VoidCanvasPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center">
-                    <span className="text-lg">🕳️</span>
+                    <Sparkles className="h-5 w-5 text-primary" />
                   </div>
                   <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">VOID</h1>
                 </div>
@@ -856,7 +856,7 @@ export default function VoidCanvasPage() {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-[8px]">🕳️</span>
+                <Sparkles className="h-2.5 w-2.5 text-primary-foreground" />
               </div>
               {/* Editable project title */}
               {editingProjectId === activeProjectId ? (
@@ -926,7 +926,7 @@ export default function VoidCanvasPage() {
         {images.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="text-center space-y-2 animate-fade-up">
-              <div className="text-3xl">🕳️</div>
+              <Sparkles className="h-8 w-8 text-primary/30 mx-auto" />
               <h2 className="text-sm font-display font-bold text-foreground/50">Canvas vazio</h2>
               <p className="text-[10px] text-muted-foreground max-w-[200px]">Use o gerador à direita para criar imagens neste projeto.</p>
             </div>
