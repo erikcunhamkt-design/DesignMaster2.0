@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.void-smart-router]
 verify_jwt = false
+
+[functions.chat-social-copy]
+verify_jwt = false
