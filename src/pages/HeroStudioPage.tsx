@@ -232,6 +232,17 @@ function HeroPreviewPanel({
           </div>
         )}
       </div>
+
+      {/* Refinement Chat */}
+      {onRefine && imageUrl && (
+        <RefinementChat
+          open={refinementOpen}
+          onClose={() => setRefinementOpen(false)}
+          imageUrl={imageUrl}
+          onRefine={onRefine}
+          isRefining={isRefining ?? false}
+        />
+      )}
     </div>
   );
 }
