@@ -284,7 +284,7 @@ export default function AutoCreatorPage() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       if (data?.imageUrl) {
-        setGeneratedImage(data.imageUrl);
+        addImage(data.imageUrl);
         toast.success('Imagem refinada!');
       } else {
         throw new Error('Nenhuma imagem retornada');
