@@ -48,13 +48,8 @@ const IMAGE_MODELS = [
 ] as const;
 
 const AGENTS = [
-  { id: 'general', label: 'Assistente Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
-  { id: 'prompt-architect', label: 'Prompt Architect Pro', emoji: '🧠', desc: 'Gerador de prompts cinematográficos' },
-  { id: 'design-master', label: 'Design Master', emoji: '🎨', desc: 'Mentor de design' },
-  { id: 'carousel-master', label: 'Carrossel Master', emoji: '📰', desc: 'Narrativas editoriais' },
-  { id: 'editorial', label: 'Estrategista Editorial', emoji: '📋', desc: 'Linhas editoriais' },
-  { id: 'calendar', label: 'Calendário Master', emoji: '📅', desc: 'Calendários de conteúdo' },
-  { id: 'bio', label: 'Bio Master', emoji: '✍️', desc: 'Bios para Instagram' },
+  { id: 'general', label: 'Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
+  { id: 'prompt-architect', label: 'Gerador de Prompts Pro', emoji: '🧠', desc: 'Prompts cinematográficos hiper-detalhados' },
 ];
 
 const CHAT_MODELS = [
