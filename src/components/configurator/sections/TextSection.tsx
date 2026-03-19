@@ -312,6 +312,8 @@ export function TextSection({ config, onUpdate }: Props) {
               value={config.fontStyleCta}
               onChange={(v) => onUpdate({ fontStyleCta: v })}
               label="CTA"
+              colorValue={config.textColorCta}
+              onColorChange={(v) => onUpdate({ textColorCta: v })}
             />
           </div>
 
