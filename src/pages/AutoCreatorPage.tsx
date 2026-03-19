@@ -22,15 +22,20 @@ function AutoPreviewPanel({
   state,
   imageUrl,
   config,
+  onRefine,
+  isRefining,
 }: {
   state: PreviewState;
   imageUrl?: string;
   config: AutoConfig;
+  onRefine?: (prompt: string, currentImage: string) => Promise<void>;
+  isRefining?: boolean;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [refinementOpen, setRefinementOpen] = useState(false);
 
   const hasTextOverlay = config.textEnabled && (config.text01 || config.text02 || config.cta);
   const overlayPos = config.verticalPosition === 'cima' ? 'bottom' : config.verticalPosition === 'baixo' ? 'top' : 'bottom';
