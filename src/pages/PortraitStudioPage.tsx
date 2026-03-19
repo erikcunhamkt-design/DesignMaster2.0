@@ -325,7 +325,7 @@ export default function PortraitStudioPage() {
             <Section label="Fundo">
               <div className="grid grid-cols-2 gap-1.5">
                 {BACKGROUNDS.map(b => (
-                  <Chip key={b.value} selected={config.background === b.value} onClick={() => update('background', b.value)}>
+                  <Chip key={b.value} selected={config.background === b.value} onClick={() => update('background', config.background === b.value ? '' : b.value)}>
                     <div className="text-left">
                       <div>{b.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{b.desc}</div>
