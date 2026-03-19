@@ -534,3 +534,8 @@ export function getTextSizePromptHint(size: string): string {
 export function getTextTrackingPromptHint(tracking: string): string {
   return TEXT_TRACKING.find((t) => t.value === tracking)?.promptHint ?? '';
 }
+
+/** Helper to get the prompt hint for a given weight value */
+export function getTextWeightPromptHint(weight: string): string {
+  return TEXT_WEIGHTS.find((w) => w.value === weight)?.promptHint ?? '';
+}
