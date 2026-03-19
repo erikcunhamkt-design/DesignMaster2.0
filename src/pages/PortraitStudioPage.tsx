@@ -491,6 +491,7 @@ export default function PortraitStudioPage() {
                     Refinar
                   </Button>
                 </div>
+                <ImageHistoryBar images={historyImages} activeIndex={historyIndex} onSelect={selectHistoryImage} onClear={clearHistory} />
               </motion.div>
             )}
           </AnimatePresence>
