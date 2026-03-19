@@ -513,16 +513,6 @@ export default function VoidCanvasPage() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3 py-2 rounded-2xl bg-background/60 backdrop-blur-xl border border-border/30">
-          <label className="cursor-pointer">
-            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-            <Button size="sm" variant="ghost" className="gap-1.5 rounded-xl text-muted-foreground hover:text-foreground h-8 text-[10px]" asChild>
-              <span><Upload className="h-3 w-3" /> Importar</span>
-            </Button>
-          </label>
-          <span className="text-[9px] text-muted-foreground/40">{images.length} itens</span>
-        </div>
 
         {/* Empty state */}
         {images.length === 0 && (
