@@ -806,6 +806,7 @@ export default function VoidCanvasPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
