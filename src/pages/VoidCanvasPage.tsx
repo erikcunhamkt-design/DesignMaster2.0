@@ -502,12 +502,20 @@ export default function VoidCanvasPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto relative">
+          {/* Black hole + particles bg (same as workspace) */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-breathe" />
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/10 blur-[60px] animate-pulse" />
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] rounded-full bg-[#050a0e] shadow-[0_0_60px_30px_rgba(0,0,0,0.8)]" />
+            <div className="absolute inset-0" style={{
+              backgroundImage: 'radial-gradient(1px 1px at 20% 30%, hsl(var(--primary) / 0.3) 1px, transparent 0), radial-gradient(1px 1px at 60% 70%, hsl(var(--primary) / 0.2) 1px, transparent 0), radial-gradient(1px 1px at 40% 50%, hsl(var(--primary) / 0.15) 1px, transparent 0)',
+              backgroundSize: '200px 200px, 300px 300px, 150px 150px',
+            }} />
+          </div>
+
           {/* Hero Section */}
-          <div className="flex flex-col items-center justify-center pt-24 pb-16 px-6">
-            {/* Void glow */}
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-primary/8 blur-[60px] pointer-events-none" />
+          <div className="flex flex-col items-center justify-center pt-24 pb-16 px-6 relative z-10">
 
             <div className="relative z-10 text-center space-y-6 max-w-2xl w-full">
               <div className="space-y-3">
