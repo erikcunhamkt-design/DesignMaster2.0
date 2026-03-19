@@ -493,7 +493,7 @@ export default function VoidCanvasPage() {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-[10px]">🕳️</span>
+                <Sparkles className="h-3 w-3 text-primary-foreground" />
               </div>
               <span className="text-sm font-bold font-display text-foreground tracking-tight">VOID</span>
             </div>
