@@ -163,9 +163,13 @@ export function composePrompt(config: ProjectConfig): PromptResult {
     const hTr = config.textTrackingHeadline ? `, ${trackMap[config.textTrackingHeadline]}` : '';
     const sTr = config.textTrackingSubheadline ? `, ${trackMap[config.textTrackingSubheadline]}` : '';
     const cTr = config.textTrackingCta ? `, ${trackMap[config.textTrackingCta]}` : '';
-    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}${hSz}${hTr}`);
-    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}${sSz}${sTr}`);
-    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}${cSz}${cTr}`);
+    const weightMap: Record<string, string> = { light: 'light weight', regular: 'regular weight', bold: 'bold weight', extrabold: 'extra bold weight' };
+    const hWt = config.textWeightHeadline ? `, ${weightMap[config.textWeightHeadline]}` : '';
+    const sWt = config.textWeightSubheadline ? `, ${weightMap[config.textWeightSubheadline]}` : '';
+    const cWt = config.textWeightCta ? `, ${weightMap[config.textWeightCta]}` : '';
+    if (config.text01) parts.push(`headline text: "${config.text01}" prominently displayed, legible${hSuffix}${hCol}${hSz}${hTr}${hWt}`);
+    if (config.text02) parts.push(`subheadline: "${config.text02}"${sSuffix}${sCol}${sSz}${sTr}${sWt}`);
+    if (config.cta) parts.push(`call to action button/text: "${config.cta}"${cSuffix}${cCol}${cSz}${cTr}${cWt}`);
   }
 
   // 12. Additional prompt
