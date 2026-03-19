@@ -323,6 +323,8 @@ export function TextSection({ config, onUpdate }: Props) {
               label="headline"
               colorValue={config.textColorHeadline}
               onColorChange={(v) => onUpdate({ textColorHeadline: v })}
+              sizeValue={config.textSizeHeadline}
+              onSizeChange={(v) => onUpdate({ textSizeHeadline: v as any })}
             />
           </div>
 
