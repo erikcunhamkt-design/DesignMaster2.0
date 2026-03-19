@@ -494,6 +494,33 @@ export type Database = {
         }
         Relationships: []
       }
+      void_brand_kits: {
+        Row: {
+          colors: Json
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       void_canvas_connections: {
         Row: {
           created_at: string

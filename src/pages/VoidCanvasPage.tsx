@@ -15,7 +15,7 @@ import {
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown,
   Mic, MicOff, Image, User, X, ChevronDown, Download,
   Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus,
-  Paperclip, Pencil, FolderOpen, Clock
+  Paperclip, Pencil, FolderOpen, Clock, Home, Palette, UserCircle, Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -50,6 +50,23 @@ interface VoidProject {
   updated_at: string;
 }
 
+interface BrandKit {
+  id: string;
+  name: string;
+  colors: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface RecentCreation {
+  id: string;
+  image_url: string;
+  label: string;
+  created_at: string;
+}
+
+type HomeView = 'home' | 'projects' | 'brand-kit' | 'profile';
+
 // ── Constants ──
 const IMAGE_MODELS = [
   { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
@@ -81,6 +98,13 @@ export default function VoidCanvasPage() {
   const [editProjectTitle, setEditProjectTitle] = useState('');
   const [homePrompt, setHomePrompt] = useState('');
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [homeView, setHomeView] = useState<HomeView>('home');
+  const [brandKits, setBrandKits] = useState<BrandKit[]>([]);
+  const [activeBrandKit, setActiveBrandKit] = useState<BrandKit | null>(null);
+  const [recentCreations, setRecentCreations] = useState<RecentCreation[]>([]);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newBrandColors, setNewBrandColors] = useState<string[]>(['#10B981', '#0EA5E9', '#8B5CF6']);
+  const [newColorInput, setNewColorInput] = useState('#10B981');
 
   // ── Canvas state ──
   const [images, setImages] = useState<CanvasImage[]>([]);
@@ -142,6 +166,56 @@ export default function VoidCanvasPage() {
   }, [user]);
 
   useEffect(() => { loadProjects(); }, [loadProjects]);
+
+  // Load brand kits
+  const loadBrandKits = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('void_brand_kits' as any)
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (data) setBrandKits(data as any as BrandKit[]);
+  }, [user]);
+
+  // Load recent creations (last 7 days)
+  const loadRecentCreations = useCallback(async () => {
+    if (!user) return;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const { data } = await supabase
+      .from('void_canvas_nodes')
+      .select('id, image_url, label, created_at')
+      .eq('user_id', user.id)
+      .eq('node_type', 'image')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (data) setRecentCreations(data.filter((d: any) => d.image_url) as any as RecentCreation[]);
+  }, [user]);
+
+  useEffect(() => { loadBrandKits(); loadRecentCreations(); }, [loadBrandKits, loadRecentCreations]);
+
+  const createBrandKit = async () => {
+    if (!user || !newBrandName.trim() || newBrandColors.length === 0) return;
+    const { data } = await supabase
+      .from('void_brand_kits' as any)
+      .insert({ user_id: user.id, name: newBrandName.trim(), colors: newBrandColors } as any)
+      .select()
+      .single();
+    if (data) {
+      setBrandKits(prev => [data as any as BrandKit, ...prev]);
+      setNewBrandName('');
+      setNewBrandColors(['#10B981', '#0EA5E9', '#8B5CF6']);
+      toast.success('Kit de marca criado!');
+    }
+  };
+
+  const deleteBrandKit = async (id: string) => {
+    await supabase.from('void_brand_kits' as any).delete().eq('id', id);
+    setBrandKits(prev => prev.filter(k => k.id !== id));
+    if (activeBrandKit?.id === id) setActiveBrandKit(null);
+  };
 
   const createProject = async (initialPrompt?: string) => {
     if (!user) return null;
@@ -362,10 +436,16 @@ export default function VoidCanvasPage() {
         }
       } catch { console.warn('Smart router failed'); }
 
+      // Inject brand kit colors into prompt
+      if (activeBrandKit && activeBrandKit.colors.length > 0) {
+        const colorList = activeBrandKit.colors.join(', ');
+        expandedPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
+      }
+
       setGenMessages(prev => prev.map(m => m.id === routerId ? { ...m, content: agentName ? `${agentEmoji} Agente: **${agentName}** · Prompt expandido` : '🧠 Prompt processado' } : m));
 
       const thinkingId = crypto.randomUUID();
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
         prompt: expandedPrompt, googleApiKey: apiKey,
@@ -483,27 +563,59 @@ export default function VoidCanvasPage() {
   // HOME SCREEN (no project selected)
   // ══════════════════════════════════════════════
   if (!activeProjectId) {
+    const sidebarItems = [
+      { id: 'home' as HomeView, icon: Home, label: 'Início' },
+      { id: 'projects' as HomeView, icon: FolderOpen, label: 'Projetos' },
+      { id: 'brand-kit' as HomeView, icon: Palette, label: 'Kit de Marca' },
+      { id: 'profile' as HomeView, icon: UserCircle, label: 'Minhas Criações' },
+    ];
+
     return (
-      <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex flex-col">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-6 h-14 border-b border-border/10 shrink-0 bg-background/30 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/')} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+      <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex">
+        {/* ===== LATERAL ICON SIDEBAR ===== */}
+        <div className="w-16 flex flex-col items-center py-4 gap-2 border-r border-border/10 bg-[#070c10] shrink-0">
+          {/* New Project */}
+          <button
+            onClick={async () => { const id = await createProject(); if (id) openProject(id); }}
+            className="w-10 h-10 rounded-full bg-foreground/10 border border-border/20 flex items-center justify-center text-foreground/70 hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all mb-3"
+            title="Novo Projeto"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+
+          {/* Divider */}
+          <div className="w-8 h-px bg-border/15 mb-1" />
+
+          {/* Nav items */}
+          <div className="flex flex-col items-center gap-1 bg-[#0d1218] rounded-2xl p-1.5 border border-border/10">
+            {sidebarItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setHomeView(item.id)}
+                className={cn(
+                  'w-9 h-9 rounded-xl flex items-center justify-center transition-all',
+                  homeView === item.id
+                    ? 'bg-primary/15 text-primary shadow-sm'
+                    : 'text-muted-foreground/50 hover:text-foreground/70 hover:bg-secondary/20'
+                )}
+                title={item.label}
+              >
+                <item.icon className="h-4 w-4" />
+              </button>
+            ))}
+          </div>
+
+          {/* Spacer + back */}
+          <div className="mt-auto">
+            <button onClick={() => navigate('/')} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-all" title="Voltar">
               <ArrowLeft className="h-4 w-4" />
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="h-3 w-3 text-primary-foreground" />
-              </div>
-              <span className="text-sm font-bold font-display text-foreground tracking-tight">VOID</span>
-            </div>
           </div>
-          <ApiKeyDialog />
         </div>
 
-        {/* Content */}
+        {/* ===== MAIN CONTENT ===== */}
         <div className="flex-1 overflow-y-auto relative">
-          {/* Black hole + particles bg (same as workspace) */}
+          {/* Black hole + particles bg */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-breathe" />
             <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/10 blur-[60px] animate-pulse" />
@@ -514,160 +626,291 @@ export default function VoidCanvasPage() {
             }} />
           </div>
 
-          {/* Hero Section */}
-          <div className="flex flex-col items-center justify-center pt-24 pb-16 px-6 relative z-10">
-
-            <div className="relative z-10 text-center space-y-6 max-w-2xl w-full">
-              <div className="space-y-3">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                  </div>
-                  <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">VOID</h1>
-                </div>
-                <p className="text-sm text-muted-foreground/60">
-                  Descreva o que quer criar e comece um novo projeto
-                </p>
-              </div>
-
-              {/* Hero input */}
-              <div className="w-full max-w-xl mx-auto">
-                <div className="rounded-2xl border border-border/20 bg-[#0d1218] focus-within:border-primary/30 transition-all shadow-2xl overflow-hidden">
-                  <Textarea
-                    value={homePrompt}
-                    onChange={(e) => setHomePrompt(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHomeSubmit(); } }}
-                    placeholder="Descreva o que quer criar..."
-                    className="min-h-[70px] max-h-[140px] resize-none bg-transparent border-none text-sm text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-5 pt-4"
-                  />
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <Paperclip className="h-4 w-4 text-muted-foreground/30" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/25 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
-                            <Sparkles className="h-3 w-3" />
-                            {IMAGE_MODELS.find(m => m.id === imageModel)?.label.split(' ').slice(-2).join(' ') || 'Modelo'}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[260px] p-1.5 bg-[#111820] border-border/20" side="top" align="end">
-                          {IMAGE_MODELS.map(m => (
-                            <button key={m.id} onClick={() => setImageModel(m.id)}
-                              className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors', imageModel === m.id ? 'bg-primary/15 text-primary' : 'text-foreground/70 hover:bg-secondary/20')}>
-                              <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[11px] font-medium truncate">{m.label}</span>
-                                  {m.badge && <span className={cn('rounded-full px-1.5 py-0.5 text-[7px] font-bold uppercase', m.badge === 'PRO' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400')}>{m.badge}</span>}
-                                </div>
-                                <p className="text-[9px] text-muted-foreground/40 truncate">{m.desc}</p>
-                              </div>
-                            </button>
-                          ))}
-                        </PopoverContent>
-                      </Popover>
-                      <button
-                        onClick={handleHomeSubmit}
-                        disabled={!homePrompt.trim()}
-                        className={cn('p-2.5 rounded-full transition-all', homePrompt.trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-sm' : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed')}
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Projects grid */}
-          <div className="px-6 pb-12 max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground/50" />
-                Projetos Recentes
-              </h2>
-              <span className="text-[10px] text-muted-foreground/40">{projects.length} projetos</span>
-            </div>
-
-            {loadingProjects ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-5 w-5 animate-spin text-primary/50" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {/* New Project card */}
-                <button
-                  onClick={async () => {
-                    const id = await createProject();
-                    if (id) openProject(id);
-                  }}
-                  className="group aspect-[4/3] rounded-xl border-2 border-dashed border-border/20 bg-[#0a0f14] hover:border-primary/30 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Plus className="h-5 w-5 text-primary/60 group-hover:text-primary transition-colors" />
-                  </div>
-                  <span className="text-[11px] font-medium text-muted-foreground/50 group-hover:text-foreground/70 transition-colors">Novo Projeto</span>
-                </button>
-
-                {/* Existing projects */}
-                {projects.map(project => (
-                  <div
-                    key={project.id}
-                    className="group relative aspect-[4/3] rounded-xl border border-border/15 bg-[#0a0f14] hover:border-primary/25 transition-all cursor-pointer overflow-hidden"
-                    onClick={() => openProject(project.id)}
-                  >
-                    {/* Thumbnail */}
-                    {project.thumbnail_url ? (
-                      <img src={project.thumbnail_url} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <FolderOpen className="h-8 w-8 text-muted-foreground/15" />
+          <div className="relative z-10">
+            {/* ═══ HOME VIEW ═══ */}
+            {homeView === 'home' && (
+              <>
+                {/* Hero Section */}
+                <div className="flex flex-col items-center justify-center pt-24 pb-16 px-6">
+                  <div className="text-center space-y-6 max-w-2xl w-full">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                        </div>
+                        <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">VOID</h1>
                       </div>
-                    )}
-
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0a0f14] to-transparent" />
-
-                    {/* Info */}
-                    <div className="absolute inset-x-0 bottom-0 p-3 space-y-1">
-                      {editingProjectId === project.id ? (
-                        <input
-                          value={editProjectTitle}
-                          onChange={(e) => setEditProjectTitle(e.target.value)}
-                          onBlur={() => renameProject(project.id, editProjectTitle)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') renameProject(project.id, editProjectTitle); if (e.key === 'Escape') setEditingProjectId(null); }}
-                          onClick={(e) => e.stopPropagation()}
-                          autoFocus
-                          className="w-full bg-transparent text-[11px] font-medium text-foreground border-b border-primary/40 focus:outline-none pb-0.5"
-                        />
-                      ) : (
-                        <p className="text-[11px] font-medium text-foreground/80 truncate">{project.title}</p>
-                      )}
-                      <p className="text-[9px] text-muted-foreground/40">
-                        {new Date(project.updated_at).toLocaleDateString('pt-BR')}
+                      <p className="text-sm text-muted-foreground/60">
+                        Descreva o que quer criar e comece um novo projeto
                       </p>
                     </div>
 
-                    {/* Actions */}
-                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setEditingProjectId(project.id); setEditProjectTitle(project.title); }}
-                        className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-foreground transition-colors"
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); if (confirm('Excluir projeto?')) deleteProject(project.id); }}
-                        className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-destructive transition-colors"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
+                    {/* Active brand kit indicator */}
+                    {activeBrandKit && (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] text-primary font-medium">
+                          <Palette className="h-3 w-3" />
+                          <span>Kit: {activeBrandKit.name}</span>
+                          <div className="flex gap-0.5 ml-1">
+                            {activeBrandKit.colors.slice(0, 4).map((c, i) => (
+                              <div key={i} className="w-3 h-3 rounded-full border border-white/10" style={{ backgroundColor: c }} />
+                            ))}
+                          </div>
+                          <button onClick={() => setActiveBrandKit(null)} className="ml-1 hover:text-destructive"><X className="h-2.5 w-2.5" /></button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Hero input */}
+                    <div className="w-full max-w-xl mx-auto">
+                      <div className="rounded-2xl border border-border/20 bg-[#0d1218] focus-within:border-primary/30 transition-all shadow-2xl overflow-hidden">
+                        <Textarea
+                          value={homePrompt}
+                          onChange={(e) => setHomePrompt(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHomeSubmit(); } }}
+                          placeholder="Descreva o que quer criar..."
+                          className="min-h-[70px] max-h-[140px] resize-none bg-transparent border-none text-sm text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-5 pt-4"
+                        />
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            <Paperclip className="h-4 w-4 text-muted-foreground/30" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/25 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
+                                  <Sparkles className="h-3 w-3" />
+                                  {IMAGE_MODELS.find(m => m.id === imageModel)?.label.split(' ').slice(-2).join(' ') || 'Modelo'}
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[260px] p-1.5 bg-[#111820] border-border/20" side="top" align="end">
+                                {IMAGE_MODELS.map(m => (
+                                  <button key={m.id} onClick={() => setImageModel(m.id)}
+                                    className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors', imageModel === m.id ? 'bg-primary/15 text-primary' : 'text-foreground/70 hover:bg-secondary/20')}>
+                                    <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="text-[11px] font-medium truncate">{m.label}</span>
+                                        {m.badge && <span className={cn('rounded-full px-1.5 py-0.5 text-[7px] font-bold uppercase', m.badge === 'PRO' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400')}>{m.badge}</span>}
+                                      </div>
+                                      <p className="text-[9px] text-muted-foreground/40 truncate">{m.desc}</p>
+                                    </div>
+                                  </button>
+                                ))}
+                              </PopoverContent>
+                            </Popover>
+                            <button
+                              onClick={handleHomeSubmit}
+                              disabled={!homePrompt.trim()}
+                              className={cn('p-2.5 rounded-full transition-all', homePrompt.trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-sm' : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed')}
+                            >
+                              <ArrowRight className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Recent Projects preview */}
+                <div className="px-6 pb-12 max-w-5xl mx-auto">
+                  <div className="flex items-center justify-between mb-5">
+                    <h2 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground/50" />
+                      Projetos Recentes
+                    </h2>
+                    <button onClick={() => setHomeView('projects')} className="text-[10px] text-primary/60 hover:text-primary transition-colors">Ver todos →</button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {projects.slice(0, 4).map(project => (
+                      <div key={project.id} className="group relative aspect-[4/3] rounded-xl border border-border/15 bg-[#0a0f14] hover:border-primary/25 transition-all cursor-pointer overflow-hidden"
+                        onClick={() => openProject(project.id)}>
+                        {project.thumbnail_url ? (
+                          <img src={project.thumbnail_url} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center"><FolderOpen className="h-8 w-8 text-muted-foreground/15" /></div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0a0f14] to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 p-3 space-y-1">
+                          <p className="text-[11px] font-medium text-foreground/80 truncate">{project.title}</p>
+                          <p className="text-[9px] text-muted-foreground/40">{new Date(project.updated_at).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ═══ PROJECTS VIEW ═══ */}
+            {homeView === 'projects' && (
+              <div className="px-8 py-8 max-w-5xl mx-auto">
+                <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5 text-primary" />
+                  Todos os Projetos
+                </h2>
+                {loadingProjects ? (
+                  <div className="flex items-center justify-center py-12"><Loader2 className="h-5 w-5 animate-spin text-primary/50" /></div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <button onClick={async () => { const id = await createProject(); if (id) openProject(id); }}
+                      className="group aspect-[4/3] rounded-xl border-2 border-dashed border-border/20 bg-[#0a0f14] hover:border-primary/30 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Plus className="h-5 w-5 text-primary/60 group-hover:text-primary transition-colors" />
+                      </div>
+                      <span className="text-[11px] font-medium text-muted-foreground/50 group-hover:text-foreground/70 transition-colors">Novo Projeto</span>
+                    </button>
+                    {projects.map(project => (
+                      <div key={project.id} className="group relative aspect-[4/3] rounded-xl border border-border/15 bg-[#0a0f14] hover:border-primary/25 transition-all cursor-pointer overflow-hidden"
+                        onClick={() => openProject(project.id)}>
+                        {project.thumbnail_url ? (
+                          <img src={project.thumbnail_url} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center"><FolderOpen className="h-8 w-8 text-muted-foreground/15" /></div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0a0f14] to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 p-3 space-y-1">
+                          {editingProjectId === project.id ? (
+                            <input value={editProjectTitle} onChange={(e) => setEditProjectTitle(e.target.value)}
+                              onBlur={() => renameProject(project.id, editProjectTitle)}
+                              onKeyDown={(e) => { if (e.key === 'Enter') renameProject(project.id, editProjectTitle); if (e.key === 'Escape') setEditingProjectId(null); }}
+                              onClick={(e) => e.stopPropagation()} autoFocus
+                              className="w-full bg-transparent text-[11px] font-medium text-foreground border-b border-primary/40 focus:outline-none pb-0.5" />
+                          ) : (
+                            <p className="text-[11px] font-medium text-foreground/80 truncate">{project.title}</p>
+                          )}
+                          <p className="text-[9px] text-muted-foreground/40">{new Date(project.updated_at).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={(e) => { e.stopPropagation(); setEditingProjectId(project.id); setEditProjectTitle(project.title); }}
+                            className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-foreground transition-colors">
+                            <Pencil className="h-3 w-3" />
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); if (confirm('Excluir projeto?')) deleteProject(project.id); }}
+                            className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-destructive transition-colors">
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ═══ BRAND KIT VIEW ═══ */}
+            {homeView === 'brand-kit' && (
+              <div className="px-8 py-8 max-w-3xl mx-auto">
+                <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-primary" />
+                  Kit de Marca
+                </h2>
+                <p className="text-[12px] text-muted-foreground/50 mb-8">
+                  Defina paletas de cores que serão aplicadas automaticamente em todas as suas gerações.
+                </p>
+
+                {/* Create new kit */}
+                <div className="rounded-xl border border-border/15 bg-[#0a0f14] p-5 mb-6 space-y-4">
+                  <h3 className="text-[13px] font-semibold text-foreground/80">Criar novo kit</h3>
+                  <input
+                    value={newBrandName}
+                    onChange={(e) => setNewBrandName(e.target.value)}
+                    placeholder="Nome da marca..."
+                    className="w-full bg-[#111820] border border-border/15 rounded-lg px-3 py-2 text-[12px] text-foreground/80 placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/30"
+                  />
+                  <div className="space-y-2">
+                    <span className="text-[11px] text-muted-foreground/60">Cores da paleta:</span>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {newBrandColors.map((c, i) => (
+                        <div key={i} className="relative group">
+                          <div className="w-8 h-8 rounded-lg border border-white/10 cursor-pointer" style={{ backgroundColor: c }} />
+                          <button onClick={() => setNewBrandColors(prev => prev.filter((_, idx) => idx !== i))}
+                            className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X className="h-2 w-2" />
+                          </button>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={newColorInput} onChange={(e) => setNewColorInput(e.target.value)}
+                          className="w-8 h-8 rounded-lg border-none cursor-pointer bg-transparent" />
+                        <button onClick={() => { if (!newBrandColors.includes(newColorInput)) setNewBrandColors(prev => [...prev, newColorInput]); }}
+                          className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={createBrandKit} disabled={!newBrandName.trim() || newBrandColors.length === 0}
+                    className={cn('w-full py-2 rounded-lg text-[12px] font-medium transition-all', newBrandName.trim() && newBrandColors.length > 0 ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary/20 text-muted-foreground/30 cursor-not-allowed')}>
+                    Criar Kit de Marca
+                  </button>
+                </div>
+
+                {/* Existing kits */}
+                {brandKits.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-[13px] font-semibold text-foreground/70">Seus kits</h3>
+                    {brandKits.map(kit => (
+                      <div key={kit.id}
+                        className={cn('rounded-xl border bg-[#0a0f14] p-4 flex items-center justify-between transition-all cursor-pointer',
+                          activeBrandKit?.id === kit.id ? 'border-primary/40 bg-primary/5' : 'border-border/15 hover:border-border/30')}
+                        onClick={() => setActiveBrandKit(activeBrandKit?.id === kit.id ? null : kit)}>
+                        <div className="flex items-center gap-3">
+                          <div className="flex gap-1">
+                            {kit.colors.slice(0, 5).map((c, i) => (
+                              <div key={i} className="w-5 h-5 rounded-md border border-white/10" style={{ backgroundColor: c }} />
+                            ))}
+                          </div>
+                          <div>
+                            <p className="text-[12px] font-medium text-foreground/80">{kit.name}</p>
+                            <p className="text-[9px] text-muted-foreground/40">{kit.colors.length} cores · {activeBrandKit?.id === kit.id ? 'Ativo' : 'Clique para ativar'}</p>
+                          </div>
+                        </div>
+                        <button onClick={(e) => { e.stopPropagation(); if (confirm('Excluir kit?')) deleteBrandKit(kit.id); }}
+                          className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-destructive transition-colors">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ═══ PROFILE / RECENT CREATIONS VIEW ═══ */}
+            {homeView === 'profile' && (
+              <div className="px-8 py-8 max-w-5xl mx-auto">
+                <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                  <UserCircle className="h-5 w-5 text-primary" />
+                  Minhas Criações
+                </h2>
+                <p className="text-[12px] text-muted-foreground/50 mb-8">
+                  Imagens geradas nos últimos 7 dias.
+                </p>
+
+                {recentCreations.length === 0 ? (
+                  <div className="text-center py-16 space-y-3">
+                    <Image className="h-10 w-10 text-muted-foreground/15 mx-auto" />
+                    <p className="text-[12px] text-muted-foreground/40">Nenhuma criação nos últimos 7 dias.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {recentCreations.map(creation => (
+                      <div key={creation.id} className="group relative aspect-square rounded-xl border border-border/15 bg-[#0a0f14] overflow-hidden">
+                        <img src={creation.image_url} alt={creation.label} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0a0f14] to-transparent p-3">
+                          <p className="text-[10px] text-foreground/70 truncate">{creation.label}</p>
+                          <p className="text-[8px] text-muted-foreground/40">{new Date(creation.created_at).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <button onClick={() => { const a = document.createElement('a'); a.href = creation.image_url; a.download = `void-${Date.now()}.png`; a.click(); }}
+                          className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/50 hover:text-foreground opacity-0 group-hover:opacity-100 transition-all">
+                          <Download className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
