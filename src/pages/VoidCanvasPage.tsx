@@ -856,7 +856,7 @@ export default function VoidCanvasPage() {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-[8px]">🕳️</span>
+                <Sparkles className="h-2.5 w-2.5 text-primary-foreground" />
               </div>
               {/* Editable project title */}
               {editingProjectId === activeProjectId ? (
