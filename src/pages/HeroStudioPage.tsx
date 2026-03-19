@@ -19,14 +19,17 @@ type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 
 // ── Preview Panel ──────────────────────────────────────────────────────────
 function HeroPreviewPanel({
-  state, imageUrl, config,
+  state, imageUrl, config, onRefine, isRefining,
 }: {
   state: PreviewState; imageUrl?: string; config: HeroConfig;
+  onRefine?: (prompt: string, currentImage: string) => Promise<void>;
+  isRefining?: boolean;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [refinementOpen, setRefinementOpen] = useState(false);
 
   const hasTextOverlay = config.textEnabled && (config.headline || config.subheadline);
 
