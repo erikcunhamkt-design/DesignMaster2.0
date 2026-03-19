@@ -355,7 +355,10 @@ function FontPicker({
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
 
-      <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
+      <div className="flex items-center gap-2 px-1">
+        <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
+        <WeightPicker value={weightValue} onChange={onWeightChange} />
+      </div>
 
       {open && (
         <div className="flex gap-1 flex-wrap px-1 pb-1">
