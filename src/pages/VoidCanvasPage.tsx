@@ -48,7 +48,8 @@ const IMAGE_MODELS = [
 ] as const;
 
 const AGENTS = [
-  { id: 'general', label: 'Assistente Geral', emoji: '🤖', desc: 'IA versátil' },
+  { id: 'general', label: 'Assistente Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
+  { id: 'prompt-architect', label: 'Prompt Architect Pro', emoji: '🧠', desc: 'Gerador de prompts cinematográficos' },
   { id: 'design-master', label: 'Design Master', emoji: '🎨', desc: 'Mentor de design' },
   { id: 'carousel-master', label: 'Carrossel Master', emoji: '📰', desc: 'Narrativas editoriais' },
   { id: 'editorial', label: 'Estrategista Editorial', emoji: '📋', desc: 'Linhas editoriais' },
