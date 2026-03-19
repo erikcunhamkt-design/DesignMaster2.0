@@ -229,6 +229,39 @@ function SizePicker({
   );
 }
 
+/** Inline tracking selector */
+function TrackingPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {TEXT_TRACKING.map((t) => {
+        const active = value === t.value;
+        return (
+          <button
+            key={t.value}
+            type="button"
+            onClick={() => onChange(active ? '' : t.value)}
+            className={cn(
+              'px-1 py-0.5 rounded text-[7px] font-medium transition-all border whitespace-nowrap',
+              t.cls,
+              active
+                ? 'bg-primary/10 text-primary border-primary/30'
+                : 'text-muted-foreground/40 hover:text-muted-foreground/60 border-transparent'
+            )}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
@@ -238,6 +271,8 @@ function FontPicker({
   onColorChange,
   sizeValue,
   onSizeChange,
+  trackingValue,
+  onTrackingChange,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -246,6 +281,8 @@ function FontPicker({
   onColorChange: (v: string) => void;
   sizeValue: string;
   onSizeChange: (v: string) => void;
+  trackingValue: string;
+  onTrackingChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
@@ -273,6 +310,8 @@ function FontPicker({
         <SizePicker value={sizeValue} onChange={onSizeChange} />
         <ColorPicker value={colorValue} onChange={onColorChange} />
       </div>
+
+      <TrackingPicker value={trackingValue} onChange={onTrackingChange} />
 
       {open && (
         <div className="flex gap-1 flex-wrap px-1 pb-1">
