@@ -392,7 +392,7 @@ export default function AutoCreatorPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+              <AutoPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
             </div>
           )}
         </div>
