@@ -15,7 +15,7 @@ import {
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown,
   Mic, MicOff, Image, User, X, ChevronDown, Download,
   Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus,
-  Paperclip
+  Paperclip, Pencil, FolderOpen, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,6 +42,14 @@ interface ChatMessage {
 
 type AgentMsg = { role: 'user' | 'assistant'; content: string };
 
+interface VoidProject {
+  id: string;
+  title: string;
+  thumbnail_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // ── Constants ──
 const IMAGE_MODELS = [
   { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
@@ -65,6 +73,14 @@ export default function VoidCanvasPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { apiKey } = useGoogleApiKey();
+
+  // ── Project state ──
+  const [projects, setProjects] = useState<VoidProject[]>([]);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editProjectTitle, setEditProjectTitle] = useState('');
+  const [homePrompt, setHomePrompt] = useState('');
+  const [loadingProjects, setLoadingProjects] = useState(true);
 
   // ── Canvas state ──
   const [images, setImages] = useState<CanvasImage[]>([]);
@@ -110,25 +126,91 @@ export default function VoidCanvasPage() {
   const agentMediaRef = useRef<HTMLInputElement>(null);
   const [agentAttachment, setAgentAttachment] = useState<string | null>(null);
 
-  // ── Load canvas images ──
-  useEffect(() => {
+  // ══════════════════════════════════════════════
+  // PROJECT MANAGEMENT
+  // ══════════════════════════════════════════════
+  const loadProjects = useCallback(async () => {
     if (!user) return;
-    (async () => {
-      const { data } = await supabase
-        .from('void_canvas_nodes')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('node_type', 'image')
-        .order('z_index');
-      if (data) {
-        setImages(data.filter(d => d.image_url).map(d => ({
-          id: d.id, image_url: d.image_url!, label: d.label,
-          position_x: d.position_x, position_y: d.position_y,
-          width: d.width, height: d.height,
-        })));
-      }
-    })();
+    setLoadingProjects(true);
+    const { data } = await supabase
+      .from('void_projects' as any)
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (data) setProjects(data as any as VoidProject[]);
+    setLoadingProjects(false);
   }, [user]);
+
+  useEffect(() => { loadProjects(); }, [loadProjects]);
+
+  const createProject = async (initialPrompt?: string) => {
+    if (!user) return null;
+    const title = initialPrompt ? initialPrompt.slice(0, 50) : 'Sem título';
+    const { data, error } = await supabase
+      .from('void_projects' as any)
+      .insert({ user_id: user.id, title } as any)
+      .select()
+      .single();
+    if (error || !data) { toast.error('Erro ao criar projeto'); return null; }
+    const project = data as any as VoidProject;
+    setProjects(prev => [project, ...prev]);
+    return project.id;
+  };
+
+  const openProject = async (projectId: string) => {
+    setActiveProjectId(projectId);
+    setImages([]);
+    setGenMessages([]);
+    setAgentMessages([]);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+    // Load images for this project
+    if (!user) return;
+    const { data } = await supabase
+      .from('void_canvas_nodes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('node_type', 'image')
+      .eq('project_id', projectId)
+      .order('z_index');
+    if (data) {
+      setImages(data.filter((d: any) => d.image_url).map((d: any) => ({
+        id: d.id, image_url: d.image_url!, label: d.label,
+        position_x: d.position_x, position_y: d.position_y,
+        width: d.width, height: d.height,
+      })));
+    }
+  };
+
+  const renameProject = async (projectId: string, newTitle: string) => {
+    if (!newTitle.trim()) return;
+    await supabase.from('void_projects' as any).update({ title: newTitle.trim() } as any).eq('id', projectId);
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, title: newTitle.trim() } : p));
+    setEditingProjectId(null);
+  };
+
+  const deleteProject = async (projectId: string) => {
+    await supabase.from('void_projects' as any).delete().eq('id', projectId);
+    setProjects(prev => prev.filter(p => p.id !== projectId));
+  };
+
+  const handleHomeSubmit = async () => {
+    const prompt = homePrompt.trim();
+    if (!prompt) return;
+    const projectId = await createProject(prompt);
+    if (projectId) {
+      setHomePrompt('');
+      setActiveProjectId(projectId);
+      // Pre-fill the gen prompt so user can generate right away
+      setGenPrompt(prompt);
+    }
+  };
+
+  // ── Load canvas images (when in workspace without project - legacy) ──
+  useEffect(() => {
+    if (!user || activeProjectId) return;
+    // Don't load anything if no project selected
+  }, [user, activeProjectId]);
 
   useEffect(() => { genChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [genMessages]);
   useEffect(() => { agentChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [agentMessages]);
@@ -182,7 +264,7 @@ export default function VoidCanvasPage() {
   };
 
   const addImageToCanvas = async (imageUrl: string, label: string, promptText: string) => {
-    if (!user) return;
+    if (!user || !activeProjectId) return;
     const baseX = 80 + Math.random() * 400;
     const baseY = 80 + images.length * 140 + Math.random() * 60;
     const { data: newRow } = await supabase.from('void_canvas_nodes').insert({
@@ -190,14 +272,18 @@ export default function VoidCanvasPage() {
       image_url: imageUrl, prompt: promptText,
       position_x: baseX, position_y: baseY,
       width: 200, height: 200, z_index: images.length,
-    }).select().single();
+      project_id: activeProjectId,
+    } as any).select().single();
 
-    if (newRow?.image_url) {
+    if (newRow && (newRow as any).image_url) {
+      const r = newRow as any;
       setImages(prev => [...prev, {
-        id: newRow.id, image_url: newRow.image_url!, label: newRow.label,
-        position_x: newRow.position_x, position_y: newRow.position_y,
-        width: newRow.width, height: newRow.height,
+        id: r.id, image_url: r.image_url!, label: r.label,
+        position_x: r.position_x, position_y: r.position_y,
+        width: r.width, height: r.height,
       }]);
+      // Update project thumbnail & updated_at
+      await supabase.from('void_projects' as any).update({ thumbnail_url: imageUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
     }
   };
 
@@ -320,7 +406,6 @@ export default function VoidCanvasPage() {
     if ((!msg && !attachment) || agentLoading) return;
     if (!apiKey || apiKey.length < 10) { toast.error('Configure sua API Key do Google'); return; }
 
-    // Build content with optional image
     let content = msg;
     if (attachment) {
       content = msg ? `${msg}\n\n[Imagem: ${attachment}]` : `[Imagem: ${attachment}]\n\nAnalise esta imagem.`;
@@ -369,7 +454,6 @@ export default function VoidCanvasPage() {
           if (payload === '[DONE]') break;
           try {
             const j = JSON.parse(payload);
-            // Support both OpenAI format and Gemini native format
             const delta = j.choices?.[0]?.delta?.content
               || j.candidates?.[0]?.content?.parts?.[0]?.text;
             if (delta) upsertAssistant(delta);
@@ -385,7 +469,6 @@ export default function VoidCanvasPage() {
     }
   };
 
-  // Transfer last agent message to gen prompt
   const transferToGenerator = (text: string) => {
     setGenPrompt(text);
     toast.success('Prompt transferido para o gerador!');
@@ -394,8 +477,199 @@ export default function VoidCanvasPage() {
   const handleGenKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenSend(); } };
   const handleAgentKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAgentSend(); } };
 
+  const activeProject = projects.find(p => p.id === activeProjectId);
+
   // ══════════════════════════════════════════════
-  // RENDER
+  // HOME SCREEN (no project selected)
+  // ══════════════════════════════════════════════
+  if (!activeProjectId) {
+    return (
+      <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-6 h-14 border-b border-border/10 shrink-0 bg-background/30 backdrop-blur-xl">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/')} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <span className="text-[10px]">🕳️</span>
+              </div>
+              <span className="text-sm font-bold font-display text-foreground tracking-tight">VOID</span>
+            </div>
+          </div>
+          <ApiKeyDialog />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Hero Section */}
+          <div className="flex flex-col items-center justify-center pt-24 pb-16 px-6">
+            {/* Void glow */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-primary/8 blur-[60px] pointer-events-none" />
+
+            <div className="relative z-10 text-center space-y-6 max-w-2xl w-full">
+              <div className="space-y-3">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center">
+                    <span className="text-lg">🕳️</span>
+                  </div>
+                  <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">VOID</h1>
+                </div>
+                <p className="text-sm text-muted-foreground/60">
+                  Descreva o que quer criar e comece um novo projeto
+                </p>
+              </div>
+
+              {/* Hero input */}
+              <div className="w-full max-w-xl mx-auto">
+                <div className="rounded-2xl border border-border/20 bg-[#0d1218] focus-within:border-primary/30 transition-all shadow-2xl overflow-hidden">
+                  <Textarea
+                    value={homePrompt}
+                    onChange={(e) => setHomePrompt(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHomeSubmit(); } }}
+                    placeholder="Descreva o que quer criar..."
+                    className="min-h-[70px] max-h-[140px] resize-none bg-transparent border-none text-sm text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-5 pt-4"
+                  />
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <Paperclip className="h-4 w-4 text-muted-foreground/30" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/25 text-primary text-[11px] font-medium hover:bg-primary/10 transition-colors">
+                            <Sparkles className="h-3 w-3" />
+                            {IMAGE_MODELS.find(m => m.id === imageModel)?.label.split(' ').slice(-2).join(' ') || 'Modelo'}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[260px] p-1.5 bg-[#111820] border-border/20" side="top" align="end">
+                          {IMAGE_MODELS.map(m => (
+                            <button key={m.id} onClick={() => setImageModel(m.id)}
+                              className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors', imageModel === m.id ? 'bg-primary/15 text-primary' : 'text-foreground/70 hover:bg-secondary/20')}>
+                              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[11px] font-medium truncate">{m.label}</span>
+                                  {m.badge && <span className={cn('rounded-full px-1.5 py-0.5 text-[7px] font-bold uppercase', m.badge === 'PRO' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400')}>{m.badge}</span>}
+                                </div>
+                                <p className="text-[9px] text-muted-foreground/40 truncate">{m.desc}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </PopoverContent>
+                      </Popover>
+                      <button
+                        onClick={handleHomeSubmit}
+                        disabled={!homePrompt.trim()}
+                        className={cn('p-2.5 rounded-full transition-all', homePrompt.trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-sm' : 'bg-secondary/20 text-muted-foreground/20 cursor-not-allowed')}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Projects grid */}
+          <div className="px-6 pb-12 max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground/50" />
+                Projetos Recentes
+              </h2>
+              <span className="text-[10px] text-muted-foreground/40">{projects.length} projetos</span>
+            </div>
+
+            {loadingProjects ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-5 w-5 animate-spin text-primary/50" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {/* New Project card */}
+                <button
+                  onClick={async () => {
+                    const id = await createProject();
+                    if (id) openProject(id);
+                  }}
+                  className="group aspect-[4/3] rounded-xl border-2 border-dashed border-border/20 bg-[#0a0f14] hover:border-primary/30 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3"
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Plus className="h-5 w-5 text-primary/60 group-hover:text-primary transition-colors" />
+                  </div>
+                  <span className="text-[11px] font-medium text-muted-foreground/50 group-hover:text-foreground/70 transition-colors">Novo Projeto</span>
+                </button>
+
+                {/* Existing projects */}
+                {projects.map(project => (
+                  <div
+                    key={project.id}
+                    className="group relative aspect-[4/3] rounded-xl border border-border/15 bg-[#0a0f14] hover:border-primary/25 transition-all cursor-pointer overflow-hidden"
+                    onClick={() => openProject(project.id)}
+                  >
+                    {/* Thumbnail */}
+                    {project.thumbnail_url ? (
+                      <img src={project.thumbnail_url} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <FolderOpen className="h-8 w-8 text-muted-foreground/15" />
+                      </div>
+                    )}
+
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0a0f14] to-transparent" />
+
+                    {/* Info */}
+                    <div className="absolute inset-x-0 bottom-0 p-3 space-y-1">
+                      {editingProjectId === project.id ? (
+                        <input
+                          value={editProjectTitle}
+                          onChange={(e) => setEditProjectTitle(e.target.value)}
+                          onBlur={() => renameProject(project.id, editProjectTitle)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') renameProject(project.id, editProjectTitle); if (e.key === 'Escape') setEditingProjectId(null); }}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          className="w-full bg-transparent text-[11px] font-medium text-foreground border-b border-primary/40 focus:outline-none pb-0.5"
+                        />
+                      ) : (
+                        <p className="text-[11px] font-medium text-foreground/80 truncate">{project.title}</p>
+                      )}
+                      <p className="text-[9px] text-muted-foreground/40">
+                        {new Date(project.updated_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setEditingProjectId(project.id); setEditProjectTitle(project.title); }}
+                        className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-foreground transition-colors"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Excluir projeto?')) deleteProject(project.id); }}
+                        className="p-1.5 rounded-lg bg-background/60 backdrop-blur-sm text-muted-foreground/60 hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ══════════════════════════════════════════════
+  // WORKSPACE (project selected)
   // ══════════════════════════════════════════════
   return (
     <div className="fixed inset-0 bg-[#050a0e] overflow-hidden flex">
@@ -481,7 +755,6 @@ export default function VoidCanvasPage() {
                     <div className="prose prose-sm prose-invert max-w-none text-[11px] text-foreground/75 leading-relaxed [&_p]:mb-2 [&_li]:mb-1 [&_code]:bg-secondary/30 [&_code]:px-1 [&_code]:rounded [&_pre]:bg-[#111820] [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
-                    {/* Transfer button */}
                     <button
                       onClick={() => transferToGenerator(msg.content)}
                       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[9px] font-medium hover:bg-primary/20 transition-colors group select-none"
@@ -505,7 +778,6 @@ export default function VoidCanvasPage() {
 
           {/* Agent input */}
           <div className="shrink-0 p-3 space-y-2">
-            {/* Attachment preview */}
             {agentAttachment && (
               <div className="relative inline-block group">
                 <div className="w-16 h-16 rounded-lg overflow-hidden border border-primary/30 bg-[#111820]">
@@ -571,14 +843,32 @@ export default function VoidCanvasPage() {
                 <PanelLeftOpen className="h-4 w-4" />
               </button>
             )}
-            <button onClick={() => navigate('/')} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+            <button onClick={() => setActiveProjectId(null)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors" title="Voltar aos projetos">
               <ArrowLeft className="h-4 w-4" />
             </button>
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <span className="text-[8px]">🕳️</span>
               </div>
-              <span className="text-xs font-bold font-display text-foreground tracking-tight">VOID</span>
+              {/* Editable project title */}
+              {editingProjectId === activeProjectId ? (
+                <input
+                  value={editProjectTitle}
+                  onChange={(e) => setEditProjectTitle(e.target.value)}
+                  onBlur={() => { renameProject(activeProjectId, editProjectTitle); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') renameProject(activeProjectId, editProjectTitle); if (e.key === 'Escape') setEditingProjectId(null); }}
+                  autoFocus
+                  className="bg-transparent text-xs font-bold text-foreground border-b border-primary/40 focus:outline-none max-w-[200px]"
+                />
+              ) : (
+                <button
+                  onDoubleClick={() => { setEditingProjectId(activeProjectId); setEditProjectTitle(activeProject?.title || ''); }}
+                  className="text-xs font-bold font-display text-foreground tracking-tight hover:text-primary transition-colors"
+                  title="Clique duplo para renomear"
+                >
+                  {activeProject?.title || 'VOID'}
+                </button>
+              )}
             </div>
           </div>
 
@@ -629,8 +919,8 @@ export default function VoidCanvasPage() {
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="text-center space-y-2 animate-fade-up">
               <div className="text-3xl">🕳️</div>
-              <h2 className="text-sm font-display font-bold text-foreground/50">O VOID está vazio</h2>
-              <p className="text-[10px] text-muted-foreground max-w-[200px]">Use o gerador à direita ou converse com um agente à esquerda.</p>
+              <h2 className="text-sm font-display font-bold text-foreground/50">Canvas vazio</h2>
+              <p className="text-[10px] text-muted-foreground max-w-[200px]">Use o gerador à direita para criar imagens neste projeto.</p>
             </div>
           </div>
         )}
