@@ -138,6 +138,37 @@ export default function PortraitStudioPage() {
   const refFileRef = useRef<HTMLInputElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
   const hasKey = googleApiKey.length >= 10;
+  const [isRefining, setIsRefining] = useState(false);
+  const [refinementOpen, setRefinementOpen] = useState(false);
+
+  const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
+    setIsRefining(true);
+    try {
+      const refineText = `Edit this image: ${refinementPrompt}. Preserve the overall composition, subject, pose, lighting style, and visual quality. Only apply the requested change. The final image MUST fill the entire canvas edge to edge with no blank space.`;
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: refineText,
+          negativePrompt: 'low quality, blurry, artifacts, blank space, empty borders',
+          referenceImages: [currentImageUrl],
+          googleApiKey,
+        },
+      });
+      if (error) throw new Error(error.message || 'Erro no refinamento');
+      if (data?.error) throw new Error(data.error);
+      if (data?.imageUrl) {
+        setResultImage(data.imageUrl);
+        toast.success('Imagem refinada!');
+      } else {
+        throw new Error('Nenhuma imagem retornada no refinamento');
+      }
+    } catch (err: any) {
+      console.error('Refine error:', err);
+      toast.error(err.message || 'Erro ao refinar imagem');
+      throw err;
+    } finally {
+      setIsRefining(false);
+    }
+  }, [googleApiKey]);
 
   const update = <K extends keyof PortraitConfig>(key: K, value: PortraitConfig[K]) => {
     setConfig(prev => ({ ...prev, [key]: value }));
