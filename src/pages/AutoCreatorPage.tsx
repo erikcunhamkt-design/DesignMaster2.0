@@ -78,6 +78,18 @@ function AutoPreviewPanel({
             </Button>
           </div>
           <div className="flex items-center gap-2">
+            {onRefine && (
+              <Button
+                size="sm"
+                variant={refinementOpen ? 'default' : 'outline'}
+                onClick={() => setRefinementOpen(!refinementOpen)}
+                disabled={isRefining}
+                className={`h-7 gap-1.5 text-[10px] rounded-lg font-medium transition-all ${refinementOpen ? 'bg-primary/90 hover:bg-primary border-primary/50 text-primary-foreground shadow-sm' : 'border-border/30 text-muted-foreground hover:text-foreground'}`}
+              >
+                {isRefining ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                Refinar
+              </Button>
+            )}
             <Button
               size="sm"
               variant={watermarkEnabled ? 'default' : 'outline'}
