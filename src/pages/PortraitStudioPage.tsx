@@ -350,7 +350,7 @@ export default function PortraitStudioPage() {
             <Section label="Lente">
               <div className="flex flex-wrap gap-1.5">
                 {LENSES.map(l => (
-                  <Chip key={l.value} selected={config.lens === l.value} onClick={() => update('lens', l.value)}>
+                  <Chip key={l.value} selected={config.lens === l.value} onClick={() => update('lens', config.lens === l.value ? '' : l.value)}>
                     <div className="text-left">
                       <div>{l.label}</div>
                       <div className="text-[9px] opacity-60 font-normal">{l.desc}</div>

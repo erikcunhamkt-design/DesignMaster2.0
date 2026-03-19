@@ -116,17 +116,17 @@ function buildConfigDescription(config: {
   clothing: string;
   freePrompt: string;
 }): string {
-  const genderLabel = config.gender === 'female' ? 'woman' : 'man';
+  const genderLabel = config.gender === 'female' ? 'woman' : config.gender === 'male' ? 'man' : 'person';
 
   const parts = [
     `Professional studio portrait of a ${genderLabel}`,
-    `Expression: ${config.expression}`,
-    `Lighting style: ${config.lighting}`,
-    `Background: ${config.background}`,
-    `Camera angle: ${config.cameraAngle}`,
-    `Preferred lens: ${config.lens}`,
   ];
 
+  if (config.expression?.trim()) parts.push(`Expression: ${config.expression}`);
+  if (config.lighting?.trim()) parts.push(`Lighting style: ${config.lighting}`);
+  if (config.background?.trim()) parts.push(`Background: ${config.background}`);
+  if (config.cameraAngle?.trim()) parts.push(`Camera angle: ${config.cameraAngle}`);
+  if (config.lens?.trim()) parts.push(`Preferred lens: ${config.lens}`);
   if (config.clothing?.trim()) parts.push(`Wearing: ${config.clothing.trim()}`);
   if (config.freePrompt?.trim()) parts.push(`Additional instructions (HIGHEST PRIORITY): ${config.freePrompt.trim()}`);
 
