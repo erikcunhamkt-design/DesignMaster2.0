@@ -40,7 +40,8 @@ const MODELS = [
 ];
 
 const AGENTS = [
-  { id: 'general', label: 'Assistente Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
+  { id: 'general', label: 'Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
+  { id: 'prompt-architect', label: 'Gerador de Prompts Pro', emoji: '🧠', desc: 'Prompts cinematográficos hiper-detalhados' },
   { id: 'design-master', label: 'Design Master', emoji: '🎨', desc: 'Mentor de design e branding' },
   { id: 'carousel-master', label: 'Carrossel Master', emoji: '📰', desc: 'Narrativas editoriais para carrossel' },
   { id: 'editorial', label: 'Estrategista Editorial', emoji: '📋', desc: 'Linhas editoriais estratégicas' },
