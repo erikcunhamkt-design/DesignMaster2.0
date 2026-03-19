@@ -419,3 +419,8 @@ export function TextSection({ config, onUpdate }: Props) {
 export function getFontStylePromptHint(fontStyle: string): string {
   return FONT_STYLES.find((f) => f.value === fontStyle)?.promptHint ?? '';
 }
+
+/** Helper to get the prompt hint for a given text size value */
+export function getTextSizePromptHint(size: string): string {
+  return TEXT_SIZES.find((s) => s.value === size)?.promptHint ?? '';
+}
