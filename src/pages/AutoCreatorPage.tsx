@@ -311,7 +311,6 @@ export default function AutoCreatorPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildAutoRequest(config);
