@@ -99,6 +99,7 @@ export default function VoidCanvasPage() {
   const [selectedAgent, setSelectedAgent] = useState(AGENTS[0]);
   const [chatModel, setChatModel] = useState(CHAT_MODELS[0]);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
   // ── Refs ──
   const genChatEndRef = useRef<HTMLDivElement>(null);
