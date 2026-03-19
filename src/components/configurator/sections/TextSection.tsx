@@ -110,38 +110,119 @@ export const FONT_STYLES = [
   },
 ];
 
+const PRESET_COLORS = [
+  '#FFFFFF', '#000000', '#F5F5F5', '#1A1A1A',
+  '#EF4444', '#F97316', '#EAB308', '#22C55E',
+  '#3B82F6', '#8B5CF6', '#EC4899', '#14B8A6',
+];
+
+/** Inline color picker */
+function ColorPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={cn(
+          'flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] transition-all',
+          value
+            ? 'text-primary/80'
+            : 'text-muted-foreground/40 hover:text-muted-foreground/60'
+        )}
+      >
+        {value ? (
+          <span
+            className="h-3 w-3 rounded-full border border-border/40"
+            style={{ backgroundColor: value }}
+          />
+        ) : (
+          <Palette className="h-2.5 w-2.5" />
+        )}
+        <ChevronDown className={cn('h-2 w-2 transition-transform', open && 'rotate-180')} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 z-20 mt-0.5 flex flex-col gap-1.5 rounded-md border border-border/30 bg-background p-1.5 shadow-lg">
+          <div className="grid grid-cols-6 gap-1">
+            {PRESET_COLORS.map((c) => (
+              <button
+                key={c}
+                onClick={() => { onChange(value === c ? '' : c); setOpen(false); }}
+                className={cn(
+                  'h-4 w-4 rounded-full border-2 transition-all',
+                  value === c ? 'border-primary scale-110' : 'border-transparent hover:scale-110'
+                )}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+          </div>
+          <input
+            type="color"
+            value={value || '#FFFFFF'}
+            onChange={(e) => { onChange(e.target.value); setOpen(false); }}
+            className="h-5 w-full cursor-pointer rounded border-none bg-transparent"
+          />
+          {value && (
+            <button
+              onClick={() => { onChange(''); setOpen(false); }}
+              className="text-[7px] text-muted-foreground hover:text-foreground"
+            >
+              Limpar
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Mini inline font picker that expands below the text field */
 function FontPicker({
   value,
   onChange,
   label,
+  colorValue,
+  onColorChange,
 }: {
   value: string;
   onChange: (v: string) => void;
   label: string;
+  colorValue: string;
+  onColorChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const selected = FONT_STYLES.find((f) => f.value === value);
 
   return (
     <div className="space-y-0.5">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={cn(
-          'flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] transition-all w-full',
-          selected
-            ? 'text-primary/80'
-            : 'text-muted-foreground/40 hover:text-muted-foreground/60'
-        )}
-      >
-        {selected ? (
-          <span className={cn('text-[10px]', selected.fontClass)}>{selected.label}</span>
-        ) : (
-          <span>Fonte {label}</span>
-        )}
-        <ChevronDown className={cn('h-2 w-2 ml-auto transition-transform', open && 'rotate-180')} />
-      </button>
+      <div className="flex items-center">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className={cn(
+            'flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] transition-all flex-1',
+            selected
+              ? 'text-primary/80'
+              : 'text-muted-foreground/40 hover:text-muted-foreground/60'
+          )}
+        >
+          {selected ? (
+            <span className={cn('text-[10px]', selected.fontClass)}>{selected.label}</span>
+          ) : (
+            <span>Fonte {label}</span>
+          )}
+          <ChevronDown className={cn('h-2 w-2 ml-auto transition-transform', open && 'rotate-180')} />
+        </button>
+        <ColorPicker value={colorValue} onChange={onColorChange} />
+      </div>
 
       {open && (
         <div className="flex gap-1 flex-wrap px-1 pb-1">
