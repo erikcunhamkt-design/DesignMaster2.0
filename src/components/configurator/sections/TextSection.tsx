@@ -3,7 +3,13 @@ import { Switch } from '@/components/ui/switch';
 import { VoiceTextField } from '@/components/ui/VoiceTextField';
 import { cn } from '@/lib/utils';
 import { ProjectConfig } from '@/types/project';
-import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown, Palette } from 'lucide-react';
+import { AlignStartVertical, AlignCenterVertical, AlignEndVertical, ChevronDown, Palette, Type } from 'lucide-react';
+
+const TEXT_SIZES = [
+  { value: 'pequeno' as const, label: 'P', promptHint: 'small subtle text size' },
+  { value: 'medio' as const, label: 'M', promptHint: 'medium standard text size' },
+  { value: 'grande' as const, label: 'G', promptHint: 'large bold prominent text size' },
+];
 
 interface Props {
   config: ProjectConfig;
