@@ -300,7 +300,7 @@ export default function PortraitStudioPage() {
             <Section label="Expressão">
               <div className="flex flex-wrap gap-1.5">
                 {EXPRESSIONS.map(e => (
-                  <Chip key={e.value} selected={config.expression === e.value} onClick={() => update('expression', e.value)}>
+                  <Chip key={e.value} selected={config.expression === e.value} onClick={() => update('expression', config.expression === e.value ? '' : e.value)}>
                     {e.label}
                   </Chip>
                 ))}
