@@ -379,7 +379,7 @@ export default function MockupStudioPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
+              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} historyImages={historyImages} historyIndex={historyIndex} onSelectHistory={selectHistoryImage} onClearHistory={clearHistory} />
             </div>
           )}
         </div>
