@@ -26,12 +26,15 @@ function AutoPreviewPanel({
   config,
   onRefine,
   isRefining,
+  historyImages, historyIndex, onSelectHistory, onClearHistory,
 }: {
   state: PreviewState;
   imageUrl?: string;
   config: AutoConfig;
   onRefine?: (prompt: string, currentImage: string) => Promise<void>;
   isRefining?: boolean;
+  historyImages?: string[]; historyIndex?: number;
+  onSelectHistory?: (i: number) => void; onClearHistory?: () => void;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
