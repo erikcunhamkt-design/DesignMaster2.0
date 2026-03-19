@@ -291,7 +291,6 @@ export default function MockupStudioPage() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
-    setGeneratedImage(undefined);
 
     try {
       const genRequest = buildMockupRequest(config);
