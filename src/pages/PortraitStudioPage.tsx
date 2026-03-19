@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
-import { Loader2, Camera, X, Sparkles, User, ImagePlus } from 'lucide-react';
+import { Loader2, Camera, X, Sparkles, User, ImagePlus, Wand2 } from 'lucide-react';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
 import { ModelSelector, type AiModel } from '@/components/configurator/ModelSelector';
@@ -9,6 +9,7 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RefinementChat } from '@/components/layout/RefinementChat';
 
 
 interface PortraitConfig {
@@ -137,6 +138,37 @@ export default function PortraitStudioPage() {
   const refFileRef = useRef<HTMLInputElement>(null);
   const { downloadState, download } = useWatermarkDownload(resultImage, 'portrait-master');
   const hasKey = googleApiKey.length >= 10;
+  const [isRefining, setIsRefining] = useState(false);
+  const [refinementOpen, setRefinementOpen] = useState(false);
+
+  const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
+    setIsRefining(true);
+    try {
+      const refineText = `Edit this image: ${refinementPrompt}. Preserve the overall composition, subject, pose, lighting style, and visual quality. Only apply the requested change. The final image MUST fill the entire canvas edge to edge with no blank space.`;
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: refineText,
+          negativePrompt: 'low quality, blurry, artifacts, blank space, empty borders',
+          referenceImages: [currentImageUrl],
+          googleApiKey,
+        },
+      });
+      if (error) throw new Error(error.message || 'Erro no refinamento');
+      if (data?.error) throw new Error(data.error);
+      if (data?.imageUrl) {
+        setResultImage(data.imageUrl);
+        toast.success('Imagem refinada!');
+      } else {
+        throw new Error('Nenhuma imagem retornada no refinamento');
+      }
+    } catch (err: any) {
+      console.error('Refine error:', err);
+      toast.error(err.message || 'Erro ao refinar imagem');
+      throw err;
+    } finally {
+      setIsRefining(false);
+    }
+  }, [googleApiKey]);
 
   const update = <K extends keyof PortraitConfig>(key: K, value: PortraitConfig[K]) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -445,10 +477,33 @@ export default function PortraitStudioPage() {
                   alt="Portrait"
                   className="max-w-full max-h-[80vh] rounded-xl shadow-[0_20px_60px_-15px_hsl(0_0%_0%/0.5)] ring-1 ring-white/[0.03]"
                 />
-                <DownloadButtons downloadState={downloadState} onDownload={download} />
+                <div className="flex items-center gap-2 mt-3 justify-center">
+                  <DownloadButtons downloadState={downloadState} onDownload={download} />
+                  <Button
+                    size="sm"
+                    variant={refinementOpen ? 'default' : 'outline'}
+                    onClick={() => setRefinementOpen(!refinementOpen)}
+                    disabled={isRefining}
+                    className={`h-8 gap-1.5 text-[11px] rounded-lg font-medium transition-all ${refinementOpen ? 'bg-primary/90 hover:bg-primary border-primary/50 text-primary-foreground shadow-sm' : 'border-border/30 text-muted-foreground hover:text-foreground'}`}
+                  >
+                    {isRefining ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                    Refinar
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Refinement Chat */}
+          {resultImage && (
+            <RefinementChat
+              open={refinementOpen}
+              onClose={() => setRefinementOpen(false)}
+              imageUrl={resultImage}
+              onRefine={handleRefine}
+              isRefining={isRefining}
+            />
+          )}
         </div>
       </div>
     </div>

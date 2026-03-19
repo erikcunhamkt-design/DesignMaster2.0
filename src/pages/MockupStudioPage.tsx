@@ -10,22 +10,26 @@ import { toast } from 'sonner';
 import type { AiModel } from '@/components/configurator/ModelSelector';
 import {
   Download, ZoomIn, ZoomOut, Check,
-  Loader2, Droplets, Lock, SlidersHorizontal,
+  Loader2, Droplets, Lock, SlidersHorizontal, Wand2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RefinementChat } from '@/components/layout/RefinementChat';
 
 type PreviewState = 'aguardando' | 'gerando' | 'concluido';
 
 // ── Preview Panel ──────────────────────────────────────────────────────────
 function MockupPreviewPanel({
-  state, imageUrl, config,
+  state, imageUrl, config, onRefine, isRefining,
 }: {
   state: PreviewState; imageUrl?: string; config: MockupConfig;
+  onRefine?: (prompt: string, currentImage: string) => Promise<void>;
+  isRefining?: boolean;
 }) {
   const [zoom, setZoom] = useState(100);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [refinementOpen, setRefinementOpen] = useState(false);
 
   const hasTextOverlay = config.textEnabled && (config.text01 || config.text02);
   const overlayPos = config.verticalPosition === 'cima' ? 'top' : 'bottom';
@@ -68,6 +72,18 @@ function MockupPreviewPanel({
             </Button>
           </div>
           <div className="flex items-center gap-2">
+            {onRefine && (
+              <Button
+                size="sm"
+                variant={refinementOpen ? 'default' : 'outline'}
+                onClick={() => setRefinementOpen(!refinementOpen)}
+                disabled={isRefining}
+                className={`h-7 gap-1.5 text-[10px] rounded-lg font-medium transition-all ${refinementOpen ? 'bg-primary/90 hover:bg-primary border-primary/50 text-primary-foreground shadow-sm' : 'border-border/30 text-muted-foreground hover:text-foreground'}`}
+              >
+                {isRefining ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                Refinar
+              </Button>
+            )}
             <Button
               size="sm"
               variant={watermarkEnabled ? 'default' : 'outline'}
@@ -205,6 +221,17 @@ function MockupPreviewPanel({
           </div>
         )}
       </div>
+
+      {/* Refinement Chat */}
+      {onRefine && imageUrl && (
+        <RefinementChat
+          open={refinementOpen}
+          onClose={() => setRefinementOpen(false)}
+          imageUrl={imageUrl}
+          onRefine={onRefine}
+          isRefining={isRefining ?? false}
+        />
+      )}
     </div>
   );
 }
@@ -215,9 +242,39 @@ export default function MockupStudioPage() {
   const [previewState, setPreviewState] = useState<PreviewState>('aguardando');
   const [generatedImage, setGeneratedImage] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
   const { apiKey } = useGoogleApiKey();
   const [aiModel, setAiModel] = useState<AiModel>('pro');
   const mobilePreviewRef = useRef<HTMLDivElement>(null);
+
+  const handleRefine = useCallback(async (refinementPrompt: string, currentImageUrl: string) => {
+    setIsRefining(true);
+    try {
+      const refineText = `Edit this image: ${refinementPrompt}. Preserve the overall composition, subject, pose, lighting style, and visual quality. Only apply the requested change. The final image MUST fill the entire canvas edge to edge with no blank space.`;
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: refineText,
+          negativePrompt: 'low quality, blurry, artifacts, blank space, empty borders',
+          referenceImages: [currentImageUrl],
+          googleApiKey: apiKey,
+        },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      if (data?.imageUrl) {
+        setGeneratedImage(data.imageUrl);
+        toast.success('Imagem refinada!');
+      } else {
+        throw new Error('Nenhuma imagem retornada');
+      }
+    } catch (err: any) {
+      console.error('Refine error:', err);
+      toast.error(err.message || 'Erro ao refinar');
+      throw err;
+    } finally {
+      setIsRefining(false);
+    }
+  }, [apiKey]);
 
   useEffect(() => {
     if (previewState === 'gerando' && mobilePreviewRef.current) {
@@ -315,12 +372,12 @@ export default function MockupStudioPage() {
           />
           {previewState !== 'aguardando' && (
             <div ref={mobilePreviewRef} className="min-h-[400px]">
-              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+              <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
             </div>
           )}
         </div>
         <div className="hidden md:flex flex-1 overflow-hidden">
-          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} />
+          <MockupPreviewPanel state={previewState} imageUrl={generatedImage} config={config} onRefine={handleRefine} isRefining={isRefining} />
           <MockupConfigPanel
             config={config}
             onUpdate={updateConfig}
