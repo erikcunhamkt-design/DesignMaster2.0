@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
-import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw, Shield, MessageCircle, AlertTriangle, Ban, Bell, Send } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Trash2, CheckCircle, XCircle, Search, Plus, Timer, Copy, Eye, EyeOff, Key, RefreshCw, Shield, MessageCircle, AlertTriangle, Ban, Bell, Send, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,7 +48,15 @@ export default function AdminPage() {
   };
 
   const updateLicensePlan = async (id: string, plan: string) => {
-    const { error } = await supabase.from('licenses').update({ plan }).eq('id', id);
+    let expires_at: string | null = null;
+    if (plan === 'monthly') {
+      const d = new Date(); d.setDate(d.getDate() + 30);
+      expires_at = d.toISOString();
+    } else if (plan === 'yearly') {
+      const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+      expires_at = d.toISOString();
+    }
+    const { error } = await supabase.from('licenses').update({ plan, status: 'active', expires_at }).eq('id', id);
     if (error) { toast.error('Erro ao atualizar plano'); return; }
     toast.success(`Plano alterado para ${plan}`);
     fetchLicenses();
@@ -175,6 +183,7 @@ export default function AdminPage() {
                               <CheckCircle className="h-3.5 w-3.5 mr-1" /> Ativar
                             </Button>
                           )}
+                          <ResetPasswordButton userId={license.user_id} email={license.email} />
                           <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => deleteLicense(license.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -787,6 +796,88 @@ function ChatModerationPanel() {
           </TableBody>
         </Table>
       </div>
+    </div>
+  );
+}
+
+function ResetPasswordButton({ userId, email }: { userId: string; email: string | null }) {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const generatePassword = () => {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
+    let pwd = '';
+    for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    setPassword(pwd);
+  };
+
+  const handleReset = async () => {
+    if (!password || password.length < 6) { toast.error('Senha deve ter pelo menos 6 caracteres'); return; }
+    setLoading(true);
+
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
+
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ userId, newPassword: password }),
+      }
+    );
+
+    if (response.ok) {
+      toast.success(`Senha alterada para ${email || userId}`);
+      navigator.clipboard.writeText(password);
+      toast.info('Nova senha copiada para a área de transferência');
+      setOpen(false);
+      setPassword('');
+    } else {
+      const data = await response.json();
+      toast.error('Erro: ' + (data.error || 'Falha ao resetar senha'));
+    }
+    setLoading(false);
+  };
+
+  if (!open) {
+    return (
+      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(true); generatePassword(); }}>
+        <Lock className="h-3.5 w-3.5 mr-1" /> Senha
+      </Button>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1.5">
+      <div className="relative">
+        <Input
+          type={showPwd ? 'text' : 'password'}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="h-7 text-xs w-32 pr-14"
+        />
+        <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex gap-0.5">
+          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowPwd(!showPwd)}>
+            {showPwd ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={generatePassword}>
+            <Key className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <Button size="sm" className="h-7 text-xs" onClick={handleReset} disabled={loading}>
+        {loading ? '...' : 'OK'}
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(false); setPassword(''); }}>
+        ✕
+      </Button>
     </div>
   );
 }
