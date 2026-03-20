@@ -412,17 +412,18 @@ export default function VoidCanvasPage() {
           // Add both to linkedImages if not already there
           const srcImg = images.find(i => i.id === linkSource);
           if (srcImg && !linkedImages.some(l => l.id === srcImg.id)) {
-            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: 'estilo' }]);
+            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: '' }]);
           }
           if (!linkedImages.some(l => l.id === imgId)) {
-            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]);
+            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: '' }]);
           }
           setRightPanelOpen(true);
-          toast.success('Imagens conectadas! Escolha o que usar de cada uma no painel do gerador.');
+          toast.success('Conectado! Descreva o que usar de cada imagem. Clique em outra para continuar conectando.');
         } else {
           toast.info('Essas imagens já estão conectadas');
         }
-        setLinkSource(null);
+        // Keep linkSource so user can chain connections from same source
+        // Click on empty area or press Escape to deselect
       }
       e.stopPropagation();
       return;
