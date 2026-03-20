@@ -1279,7 +1279,198 @@ export default function VoidCanvasPage() {
             <div className="text-center space-y-2 animate-fade-up">
               <Sparkles className="h-8 w-8 text-primary/30 mx-auto" />
               <h2 className="text-sm font-display font-bold text-foreground/50">Canvas vazio</h2>
-              <p className="text-[10px] text-muted-foreground max-w-[200px]">Use o gerador à direita para criar imagens neste projeto.</p>
+              <p className="text-[10px] text-muted-foreground max-w-[200px]">Use a toolbar abaixo ou o gerador à direita para começar.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Hidden upload input */}
+        <input ref={canvasUploadRef} type="file" accept="image/*,.heic,.avif,.webp" className="hidden" onChange={handleUploadToCanvas} />
+
+        {/* ═══ BOTTOM TOOLBAR ═══ */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="flex items-center gap-0.5 px-2 py-1.5 rounded-2xl bg-[#0d1218]/90 backdrop-blur-xl border border-border/20 shadow-2xl">
+            {/* Select */}
+            <button onClick={() => setActiveTool('select')}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'select' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Selecionar (V)">
+              <MousePointer2 className="h-4 w-4" />
+            </button>
+            {/* Hand */}
+            <button onClick={() => setActiveTool('hand')}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'hand' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Mão (H)">
+              <Hand className="h-4 w-4" />
+            </button>
+
+            <div className="w-px h-5 bg-border/20 mx-0.5" />
+
+            {/* Mark (AI object extraction) */}
+            <button onClick={() => { setActiveTool('mark'); toast.info('Clique em uma imagem para enviar ao agente IA'); }}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'mark' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Marcar objeto (M)">
+              <Target className="h-4 w-4" />
+            </button>
+
+            {/* Upload image */}
+            <button onClick={() => canvasUploadRef.current?.click()}
+              className="p-2 rounded-xl text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20 transition-all"
+              title="Carregar imagem">
+              <Upload className="h-4 w-4" />
+            </button>
+
+            {/* Shapes */}
+            <Popover open={showShapesMenu} onOpenChange={setShowShapesMenu}>
+              <PopoverTrigger asChild>
+                <button className={cn('p-2 rounded-xl transition-all', SHAPES.some(s => s.id === activeTool) ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+                  title="Formas">
+                  <Hash className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[180px] p-1.5 bg-[#111820] border-border/20" side="top" align="center">
+                {SHAPES.map(s => (
+                  <button key={s.id} onClick={() => { setActiveTool(s.id); setShowShapesMenu(false); toast.info(`Ferramenta: ${s.label}`); }}
+                    className={cn('w-full flex items-center justify-between px-3 py-2 rounded-lg text-left text-[11px] transition-colors', activeTool === s.id ? 'bg-primary/15 text-primary' : 'text-foreground/70 hover:bg-secondary/20')}>
+                    <div className="flex items-center gap-2">
+                      <s.icon className="h-3.5 w-3.5" />
+                      <span>{s.label}</span>
+                    </div>
+                    {s.shortcut && <span className="text-[9px] text-muted-foreground/40">{s.shortcut}</span>}
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+
+            {/* Pencil */}
+            <button onClick={() => { setActiveTool('pencil'); toast.info('Ferramenta: Lápis'); }}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'pencil' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Lápis">
+              <Pencil className="h-4 w-4" />
+            </button>
+
+            {/* Text */}
+            <button onClick={() => { setActiveTool('text'); toast.info('Ferramenta: Texto'); }}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'text' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Texto (T)">
+              <Type className="h-4 w-4" />
+            </button>
+
+            <div className="w-px h-5 bg-border/20 mx-0.5" />
+
+            {/* Note/Frame */}
+            <button onClick={addNoteToCanvas}
+              className="p-2 rounded-xl text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20 transition-all"
+              title="Adicionar nota">
+              <Hash className="h-4 w-4" />
+            </button>
+
+            {/* Image Generator */}
+            <button onClick={() => setRightPanelOpen(true)}
+              className={cn('p-2 rounded-xl transition-all', rightPanelOpen ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Gerador de Imagens">
+              <Sparkles className="h-4 w-4" />
+            </button>
+
+            <div className="w-px h-5 bg-border/20 mx-0.5" />
+
+            {/* Layers */}
+            <button onClick={() => { setShowLayers(!showLayers); setShowFiles(false); }}
+              className={cn('p-2 rounded-xl transition-all', showLayers ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Camadas">
+              <Layers className="h-4 w-4" />
+            </button>
+
+            {/* Files */}
+            <button onClick={() => { setShowFiles(!showFiles); setShowLayers(false); }}
+              className={cn('p-2 rounded-xl transition-all', showFiles ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Arquivos do projeto">
+              <FolderOpen className="h-4 w-4" />
+            </button>
+
+            <div className="w-px h-5 bg-border/20 mx-0.5" />
+
+            {/* Zoom */}
+            <button onClick={() => setZoom(z => Math.max(0.1, z - 0.2))} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 transition-colors">
+              <ZoomOut className="h-3.5 w-3.5" />
+            </button>
+            <span className="text-[9px] text-muted-foreground/50 font-mono min-w-[32px] text-center select-none">{Math.round(zoom * 100)}%</span>
+            <button onClick={() => setZoom(z => Math.min(3, z + 0.2))} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 transition-colors">
+              <ZoomIn className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* ═══ LAYERS PANEL ═══ */}
+        {showLayers && (
+          <div className="absolute top-14 right-2 z-50 w-[220px] bg-[#0d1218]/95 backdrop-blur-xl border border-border/20 rounded-xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border/10">
+              <span className="text-[11px] font-bold text-foreground/80">Camadas</span>
+              <button onClick={() => setShowLayers(false)} className="text-muted-foreground/40 hover:text-foreground"><X className="h-3 w-3" /></button>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto p-2 space-y-1">
+              {images.length === 0 && <p className="text-[10px] text-muted-foreground/40 text-center py-4">Nenhuma camada</p>}
+              {[...images].reverse().map((img, i) => (
+                <button key={img.id} onClick={() => setSelectedImage(img.id)}
+                  className={cn('w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors', selectedImage === img.id ? 'bg-primary/15 text-primary' : 'text-foreground/70 hover:bg-secondary/20')}>
+                  {img.node_type === 'note' ? (
+                    <div className="w-6 h-6 rounded bg-amber-500/20 flex items-center justify-center shrink-0">
+                      <Hash className="h-3 w-3 text-amber-400" />
+                    </div>
+                  ) : (
+                    <div className="w-6 h-6 rounded overflow-hidden bg-secondary/20 shrink-0">
+                      <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <span className="text-[10px] truncate flex-1">{img.label}</span>
+                  <span className="text-[8px] text-muted-foreground/30">{images.length - i}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ FILES PANEL ═══ */}
+        {showFiles && (
+          <div className="absolute top-14 right-2 z-50 w-[240px] bg-[#0d1218]/95 backdrop-blur-xl border border-border/20 rounded-xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border/10">
+              <span className="text-[11px] font-bold text-foreground/80">Arquivos do Projeto</span>
+              <button onClick={() => setShowFiles(false)} className="text-muted-foreground/40 hover:text-foreground"><X className="h-3 w-3" /></button>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto p-2 space-y-1">
+              {images.filter(i => i.image_url).length === 0 && <p className="text-[10px] text-muted-foreground/40 text-center py-4">Nenhum arquivo</p>}
+              {images.filter(i => i.image_url).map(img => (
+                <div key={img.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/20 transition-colors group">
+                  <div className="w-8 h-8 rounded overflow-hidden bg-secondary/20 shrink-0">
+                    <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-foreground/70 truncate">{img.label}</p>
+                  </div>
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
+                    <button onClick={() => { setAgentAttachment(img.image_url); setAgentInput(''); setLeftPanelOpen(true); }}
+                      className="p-1 rounded text-muted-foreground/30 hover:text-primary" title="Enviar ao chat">
+                      <MessageSquare className="h-3 w-3" />
+                    </button>
+                    <button onClick={() => { const a = document.createElement('a'); a.href = img.image_url; a.download = `void-${Date.now()}.png`; a.click(); }}
+                      className="p-1 rounded text-muted-foreground/30 hover:text-foreground" title="Baixar">
+                      <Download className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Palette indicator on canvas */}
+        {usePaletteInChat && activeBrandKit && (
+          <div className="absolute top-14 left-2 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-[9px] text-primary font-medium">
+            <Palette className="h-3 w-3" />
+            <span>Paleta: {activeBrandKit.name}</span>
+            <div className="flex gap-0.5 ml-1">
+              {activeBrandKit.colors.slice(0, 4).map((c, i) => (
+                <div key={i} className="w-2.5 h-2.5 rounded-full border border-white/10" style={{ backgroundColor: c }} />
+              ))}
             </div>
           </div>
         )}
