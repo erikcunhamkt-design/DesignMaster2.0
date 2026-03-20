@@ -15,6 +15,14 @@ export function StudioCard({ studio, index }: StudioCardProps) {
       className="group relative flex flex-col items-start gap-5 rounded-2xl border border-border/15 bg-card/40 p-8 min-h-[260px] w-full transition-all duration-200 hover:scale-[1.02] hover:border-primary/25 hover:bg-card/70 hover:shadow-glow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background overflow-hidden"
       style={{ animationDelay: `${index * 60}ms` }}
     >
+      {/* Background image */}
+      {studio.image && (
+        <div className="absolute inset-0 pointer-events-none">
+          <img src={studio.image} alt="" className="h-full w-full object-cover opacity-10 group-hover:opacity-20 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
+        </div>
+      )}
+
       {/* Gradient fill */}
       <div className={`absolute inset-0 bg-gradient-to-br ${studio.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl`} />
 
