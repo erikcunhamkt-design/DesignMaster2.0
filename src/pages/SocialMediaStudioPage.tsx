@@ -404,7 +404,7 @@ ABSOLUTELY FORBIDDEN:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts }],
-          generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.8 },
+          generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.4 },
         }),
       });
 
