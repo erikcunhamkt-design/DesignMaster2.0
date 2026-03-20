@@ -277,9 +277,13 @@ Deno.serve(async (req) => {
     const result = await generateWithGoogle(parts, googleApiKey, model, aspectRatio);
 
     if (!result.imageUrl) {
+      const reason = result.textResponse?.trim() 
+        ? `O modelo respondeu sem imagem: "${result.textResponse.slice(0, 200)}"`
+        : "Nenhuma imagem foi gerada. O prompt pode ter sido bloqueado por filtros de segurança. Tente reformular.";
+      console.warn("⚠️ No image returned. Text response:", result.textResponse || "(empty)");
       return new Response(
-        JSON.stringify({ error: "Nenhuma imagem foi gerada. Tente com outro prompt." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: reason }),
+        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
