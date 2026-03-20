@@ -1737,6 +1737,52 @@ export default function VoidCanvasPage() {
 
         {/* ===== GEN INPUT AREA ===== */}
         <div className="shrink-0 p-4 space-y-2">
+          {/* Linked images panel */}
+          {linkedImages.length > 0 && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1.5">
+                  <ArrowUpRight className="h-3 w-3" />
+                  {linkedImages.length} {linkedImages.length === 1 ? 'imagem vinculada' : 'imagens vinculadas'}
+                </span>
+                <button onClick={() => setLinkedImages([])} className="text-[9px] text-muted-foreground/40 hover:text-destructive transition-colors">Limpar</button>
+              </div>
+              <div className="space-y-1.5">
+                {linkedImages.map((li, idx) => (
+                  <div key={li.id} className="flex items-center gap-2 p-1.5 rounded-lg bg-[#111820]/80 border border-border/10">
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-emerald-500/30">
+                        <img src={li.imageUrl} alt={li.label} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-emerald-500 text-white text-[7px] font-bold flex items-center justify-center border border-white/20">
+                        {idx + 1}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] text-foreground/60 truncate mb-1">{li.label}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {USAGE_OPTIONS.map(opt => (
+                          <button key={opt.id} onClick={() => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: opt.id } : l))}
+                            className={cn('px-1.5 py-0.5 rounded-full text-[8px] font-medium transition-colors border',
+                              li.usage === opt.id
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                : 'bg-secondary/10 text-muted-foreground/40 border-transparent hover:text-foreground/60 hover:bg-secondary/20'
+                            )}>
+                            {opt.emoji} {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button onClick={() => setLinkedImages(prev => prev.filter(l => l.id !== li.id))}
+                      className="p-1 rounded text-muted-foreground/30 hover:text-destructive shrink-0">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Attachment previews */}
           {(referenceImage || characterImage || audioBlob) && (
             <div className="flex flex-wrap gap-2">
