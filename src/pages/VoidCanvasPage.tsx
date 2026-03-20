@@ -1403,7 +1403,7 @@ export default function VoidCanvasPage() {
             <div className="w-px h-5 bg-border/20 mx-0.5" />
 
             {/* Mark (AI object extraction) */}
-            <button onClick={() => { setActiveTool('mark'); toast.info('Clique em uma imagem para enviar ao agente IA'); }}
+            <button onClick={() => { setActiveTool('mark'); toast.info('Clique em um objeto na imagem — ele será recortado e enviado ao gerador'); }}
               className={cn('p-2 rounded-xl transition-all', activeTool === 'mark' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
               title="Marcar objeto (M)">
               <Target className="h-4 w-4" />
