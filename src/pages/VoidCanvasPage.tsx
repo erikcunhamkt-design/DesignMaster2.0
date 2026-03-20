@@ -329,6 +329,32 @@ export default function VoidCanvasPage() {
   useEffect(() => { genChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [genMessages]);
   useEffect(() => { agentChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [agentMessages]);
 
+  // ── Keyboard shortcuts ──
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) return;
+      if (!activeProjectId) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'v': setActiveTool('select'); break;
+        case 'h': setActiveTool('hand'); break;
+        case 'm': setActiveTool('mark'); break;
+        case 'r': setActiveTool('rectangle'); break;
+        case 't': setActiveTool('text'); break;
+        case 'p': setActiveTool('pencil'); break;
+        case 'delete':
+        case 'backspace':
+          if (selectedImage) {
+            deleteImage(selectedImage);
+          }
+          break;
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeProjectId, selectedImage]);
+
   // ── Canvas interactions ──
   const savePosition = useCallback(async (img: CanvasImage) => {
     await supabase.from('void_canvas_nodes').update({ position_x: img.position_x, position_y: img.position_y }).eq('id', img.id);
