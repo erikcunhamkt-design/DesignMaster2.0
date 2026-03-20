@@ -23,6 +23,17 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 // ── Types ──
+type CanvasTool = 'select' | 'hand' | 'mark' | 'rectangle' | 'line' | 'arrow' | 'ellipse' | 'polygon' | 'star' | 'pencil' | 'text';
+
+const SHAPES = [
+  { id: 'rectangle' as CanvasTool, icon: Square, label: 'Retângulo', shortcut: 'R' },
+  { id: 'line' as CanvasTool, icon: Minus, label: 'Linha', shortcut: 'L' },
+  { id: 'arrow' as CanvasTool, icon: ArrowUpRight, label: 'Seta', shortcut: '↑L' },
+  { id: 'ellipse' as CanvasTool, icon: Circle, label: 'Elipse', shortcut: 'O' },
+  { id: 'polygon' as CanvasTool, icon: Triangle, label: 'Polígono', shortcut: '' },
+  { id: 'star' as CanvasTool, icon: Star, label: 'Estrela', shortcut: '' },
+];
+
 interface CanvasImage {
   id: string;
   image_url: string;
@@ -31,6 +42,7 @@ interface CanvasImage {
   position_y: number;
   width: number;
   height: number;
+  node_type?: string;
 }
 
 interface ChatMessage {
