@@ -1361,8 +1361,20 @@ export default function VoidCanvasPage() {
                 <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-[8px] text-white/80 truncate">{img.label}</p>
                 </div>
-                {selectedImage === img.id && (
+                {selectedImage === img.id && img.node_type !== 'note' && (
                   <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Link to generator */}
+                    {linkedImages.some(l => l.id === img.id) ? (
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => prev.filter(l => l.id !== img.id)); toast.success('Imagem desvinculada'); }}
+                        className="p-1 rounded-md bg-emerald-500/80 text-white hover:bg-emerald-600" title="Deslinkar do gerador">
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    ) : (
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]); setRightPanelOpen(true); toast.success('Imagem vinculada ao gerador!'); }}
+                        className="p-1 rounded-md bg-black/60 text-emerald-400 hover:bg-black/80" title="Linkar ao gerador">
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    )}
                     <button onClick={(e) => { e.stopPropagation(); setAgentAttachment(img.image_url || ''); setAgentInput('Analise esta imagem.'); setLeftPanelOpen(true); toast.success('Imagem enviada ao chat'); }}
                       className="p-1 rounded-md bg-black/60 text-primary hover:bg-black/80" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
@@ -1371,6 +1383,14 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80">
                       <Trash2 className="h-3 w-3" />
                     </button>
+                  </div>
+                )}
+                {/* Linked indicator */}
+                {linkedImages.some(l => l.id === img.id) && (
+                  <div className="absolute top-1 left-1 z-20">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500 text-white text-[8px] font-bold flex items-center justify-center shadow-lg border border-white/30">
+                      {linkedImages.findIndex(l => l.id === img.id) + 1}
+                    </div>
                   </div>
                 )}
               </div>
