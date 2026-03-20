@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 // ── Types ──
-type CanvasTool = 'select' | 'hand' | 'mark' | 'rectangle' | 'line' | 'arrow' | 'ellipse' | 'polygon' | 'star' | 'pencil' | 'text';
+type CanvasTool = 'select' | 'hand' | 'mark' | 'link' | 'rectangle' | 'line' | 'arrow' | 'ellipse' | 'polygon' | 'star' | 'pencil' | 'text';
 
 const SHAPES = [
   { id: 'rectangle' as CanvasTool, icon: Square, label: 'Retângulo', shortcut: 'R' },
@@ -189,6 +189,8 @@ export default function VoidCanvasPage() {
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
   const [linkedImages, setLinkedImages] = useState<LinkedImage[]>([]);
+  const [nodeConnections, setNodeConnections] = useState<{ from: string; to: string }[]>([]);
+  const [linkSource, setLinkSource] = useState<string | null>(null);
   const [markers, setMarkers] = useState<CanvasMarker[]>([]);
   const [markCounter, setMarkCounter] = useState(1);
   const [strokes, setStrokes] = useState<DrawingStroke[]>([]);
@@ -357,6 +359,7 @@ export default function VoidCanvasPage() {
         case 'v': setActiveTool('select'); break;
         case 'h': setActiveTool('hand'); break;
         case 'm': setActiveTool('mark'); break;
+        case 'c': setActiveTool('link'); setLinkSource(null); toast.info('Clique na 1ª imagem, depois na 2ª para conectar'); break;
         case 'r': setActiveTool('rectangle'); break;
         case 't': setActiveTool('text'); break;
         case 'p': setActiveTool('pencil'); break;
@@ -402,6 +405,37 @@ export default function VoidCanvasPage() {
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
+    // Link tool: click first image (source), then second (target) to create connection
+    if (activeTool === 'link' && imgId) {
+      const img = images.find(i => i.id === imgId);
+      if (!img || img.node_type === 'note') return;
+      if (!linkSource) {
+        setLinkSource(imgId);
+        setSelectedImage(imgId);
+        toast.info('Agora clique na segunda imagem para conectar');
+      } else if (linkSource !== imgId) {
+        // Create connection
+        const alreadyConnected = nodeConnections.some(c => (c.from === linkSource && c.to === imgId) || (c.from === imgId && c.to === linkSource));
+        if (!alreadyConnected) {
+          setNodeConnections(prev => [...prev, { from: linkSource, to: imgId }]);
+          // Add both to linkedImages if not already there
+          const srcImg = images.find(i => i.id === linkSource);
+          if (srcImg && !linkedImages.some(l => l.id === srcImg.id)) {
+            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: 'estilo' }]);
+          }
+          if (!linkedImages.some(l => l.id === imgId)) {
+            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]);
+          }
+          setRightPanelOpen(true);
+          toast.success('Imagens conectadas! Escolha o que usar de cada uma no painel do gerador.');
+        } else {
+          toast.info('Essas imagens já estão conectadas');
+        }
+        setLinkSource(null);
+      }
+      e.stopPropagation();
+      return;
+    }
     // Mark tool: crop region, place marker, send to generator
     if (activeTool === 'mark' && imgId) {
       const img = images.find(i => i.id === imgId);
@@ -1345,7 +1379,7 @@ export default function VoidCanvasPage() {
         {/* Canvas area */}
         <div ref={canvasRef} className={cn("absolute inset-0 pt-12",
             activeTool === 'hand' ? 'cursor-grab active:cursor-grabbing' :
-            activeTool === 'mark' ? 'cursor-crosshair' :
+            activeTool === 'mark' || activeTool === 'link' ? 'cursor-crosshair' :
             activeTool === 'pencil' || ['rectangle','line','arrow','ellipse','polygon','star'].includes(activeTool) ? 'cursor-crosshair' :
             activeTool === 'text' ? 'cursor-text' : 'cursor-default'
           )}
@@ -1354,8 +1388,9 @@ export default function VoidCanvasPage() {
             {images.map(img => (
               <div key={img.id} onMouseDown={(e) => handleMouseDown(e, img.id)}
                 className={cn('absolute rounded-lg overflow-hidden group transition-shadow duration-200',
-                  activeTool === 'mark' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
-                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
+                  activeTool === 'mark' || activeTool === 'link' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
+                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm',
+                  activeTool === 'link' && linkSource === img.id ? 'ring-2 ring-emerald-400/60' : '')}
                 style={{ left: img.position_x, top: img.position_y, width: img.width, height: img.height }}>
                 {img.node_type === 'note' ? (
                   <div className="w-full h-full bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-center justify-center backdrop-blur-sm">
@@ -1411,8 +1446,28 @@ export default function VoidCanvasPage() {
               </div>
             ))}
 
-            {/* SVG Drawing Layer */}
+            {/* SVG Drawing + Connection Layer */}
             <svg className="absolute inset-0 pointer-events-none" style={{ width: '10000px', height: '10000px', overflow: 'visible' }}>
+              <defs>
+                <marker id="arrowhead-link" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#10B981" opacity="0.8" />
+                </marker>
+              </defs>
+              {/* Node connections */}
+              {nodeConnections.map((conn, i) => {
+                const fromImg = images.find(im => im.id === conn.from);
+                const toImg = images.find(im => im.id === conn.to);
+                if (!fromImg || !toImg) return null;
+                const x1 = fromImg.position_x + fromImg.width / 2;
+                const y1 = fromImg.position_y + fromImg.height / 2;
+                const x2 = toImg.position_x + toImg.width / 2;
+                const y2 = toImg.position_y + toImg.height / 2;
+                return (
+                  <line key={`conn-${i}`} x1={x1} y1={y1} x2={x2} y2={y2}
+                    stroke="#10B981" strokeWidth="2" strokeDasharray="6 4" opacity="0.6"
+                    markerEnd="url(#arrowhead-link)" />
+                );
+              })}
               {strokes.map((stroke, i) => (
                 <polyline key={i} points={stroke.points.map(p => `${p.x},${p.y}`).join(' ')}
                   fill="none" stroke={stroke.color} strokeWidth={stroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
@@ -1424,6 +1479,17 @@ export default function VoidCanvasPage() {
             </svg>
           </div>
         </div>
+
+        {/* Link mode indicator */}
+        {activeTool === 'link' && (
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] text-emerald-300 font-medium flex items-center gap-2 backdrop-blur-sm">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+            {linkSource ? 'Clique na 2ª imagem para conectar' : 'Clique na 1ª imagem'}
+            <button onClick={() => { setActiveTool('select'); setLinkSource(null); }} className="ml-1 text-emerald-400/60 hover:text-white">
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
 
         {/* Empty state */}
         {images.length === 0 && (
@@ -1462,6 +1528,13 @@ export default function VoidCanvasPage() {
               className={cn('p-2 rounded-xl transition-all', activeTool === 'mark' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
               title="Marcar objeto (M)">
               <Target className="h-4 w-4" />
+            </button>
+
+            {/* Link tool */}
+            <button onClick={() => { setActiveTool('link'); setLinkSource(null); toast.info('Clique na 1ª imagem, depois na 2ª para conectar'); }}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'link' ? 'bg-emerald-500/15 text-emerald-400' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Conectar imagens (C)">
+              <ArrowUpRight className="h-4 w-4" />
             </button>
 
             {/* Upload image */}
@@ -1519,7 +1592,7 @@ export default function VoidCanvasPage() {
             {/* Eraser - clear strokes, markers, notes */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className={cn('p-2 rounded-xl transition-all', (strokes.length > 0 || markers.length > 0 || images.some(i => i.node_type === 'note')) ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10' : 'text-muted-foreground/30 hover:text-muted-foreground/50 hover:bg-secondary/10')}
+                <button className={cn('p-2 rounded-xl transition-all', (strokes.length > 0 || markers.length > 0 || nodeConnections.length > 0 || images.some(i => i.node_type === 'note')) ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10' : 'text-muted-foreground/30 hover:text-muted-foreground/50 hover:bg-secondary/10')}
                   title="Apagar elementos">
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -1550,8 +1623,15 @@ export default function VoidCanvasPage() {
                   <span>Apagar notas ({images.filter(i => i.node_type === 'note').length})</span>
                 </button>
                 <div className="h-px bg-border/15 my-1" />
+                <button onClick={() => { setNodeConnections([]); setLinkedImages([]); setLinkSource(null); toast.success('Conexões apagadas'); }}
+                  disabled={nodeConnections.length === 0}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-foreground/70 hover:bg-secondary/20 transition-colors disabled:opacity-30">
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <span>Apagar conexões ({nodeConnections.length})</span>
+                </button>
+                <div className="h-px bg-border/15 my-1" />
                 <button onClick={() => {
-                  setStrokes([]); setMarkers([]); setMarkCounter(1);
+                  setStrokes([]); setMarkers([]); setMarkCounter(1); setNodeConnections([]); setLinkedImages([]); setLinkSource(null);
                   const noteIds = images.filter(i => i.node_type === 'note').map(i => i.id);
                   noteIds.forEach(id => supabase.from('void_canvas_nodes').delete().eq('id', id));
                   setImages(prev => prev.filter(i => i.node_type !== 'note'));
