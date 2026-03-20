@@ -216,6 +216,7 @@ export const studios: Studio[] = [
     tagline: 'O melhor criador de artes para social media do Brasil.',
     description: 'Crie artes profissionais para Instagram, Facebook e LinkedIn com IA — kit de marca, copy integrada, fontes, paletas e formatos prontos para publicar.',
     icon: '📱',
+    image: '/src/assets/social-media-studio-hero.jpg',
     route: '/studio/social-media',
     gradient: 'from-fuchsia-500/15 to-violet-500/10',
     isNew: true,
