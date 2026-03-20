@@ -1,41 +1,35 @@
 
 
-## Problema: Referências de estilo chegam como `blob:` URLs inacessiveis ao backend
+## Problem Analysis
 
-### Diagnostico
+Two issues in the Admin panel:
 
-No `src/pages/Index.tsx` (linha 89), as imagens de referência de estilo (`scenery` e `inspiration`) sao enviadas como URLs cruas (`blob:...`), sem conversão para base64:
+1. **Plan change doesn't set expiration**: `updateLicensePlan` only updates the `plan` field but never sets `expires_at`. So changing to "monthly" or "yearly" has no effect on access duration.
+2. **Can't reset password for existing users**: No UI or backend call to change a user's password from the admin panel.
 
-```javascript
-// Linha 87: subject photos → convertidas para base64 ✅
-subjectImages.push(await compressImageToBase64(ref.url, 1024, 0.9));
+## Plan
 
-// Linha 89: style references → blob: URL crua ❌
-styleReferenceImages.push(ref.url);
-```
+### 1. Fix plan change to auto-set expiration dates
+In `AdminPage.tsx`, update `updateLicensePlan` to calculate and set `expires_at`:
+- **monthly** → `expires_at = now + 30 days`
+- **yearly** → `expires_at = now + 365 days`  
+- **lifetime** → `expires_at = null`
 
-No backend (`generate-image/index.ts`, linhas 248-253), o código tenta extrair base64 com regex, mas a URL `blob:` não casa com o pattern `data:...;base64,...`, então a imagem é **silenciosamente ignorada**. O modelo nunca "vê" a referência.
+Also auto-set `status = 'active'` when changing plan.
 
-### Solução
+### 2. Add "Reset Password" button per user row
+- Add a button in the actions column of each user row
+- On click, show an inline dialog/input to set new password (with generate button)
+- Call a new edge function endpoint or extend `create-test-user` to handle password-only updates via `supabaseAdmin.auth.admin.updateUserById(userId, { password })`
 
-**1 arquivo frontend** (`src/pages/Index.tsx`):
-- Converter `styleReferenceImages` para base64 usando `compressImageToBase64`, exatamente como já é feito para `subjectImages`
-- Aplicar a mesma resolução máxima de 1024px para manter o payload controlado
+### 3. Create `reset-user-password` edge function
+- Accepts `{ userId, newPassword }` 
+- Verifies caller is admin (same pattern as `create-test-user`)
+- Calls `supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword })`
+- Returns success/error
 
-### Mudança concreta
-
-```text
-// ANTES (linha 89):
-styleReferenceImages.push(ref.url);
-
-// DEPOIS:
-styleReferenceImages.push(await compressImageToBase64(ref.url, 1024, 0.9));
-```
-
-### Detalhes técnicos
-
-- `compressImageToBase64` já existe em `src/lib/imageUtils.ts` e produz `data:image/jpeg;base64,...`
-- O backend já sabe processar esse formato (regex na linha 249)
-- Sem mudanças no backend necessárias
-- Impacto: todas as referências de estilo/pose/cenário passarão a ser efetivamente "vistas" pelo modelo Gemini
+### Files to change
+- **`src/pages/AdminPage.tsx`**: Fix `updateLicensePlan`, add password reset UI per row
+- **`supabase/functions/reset-user-password/index.ts`**: New edge function for admin password reset
+- **`supabase/config.toml`**: Register new function
 
