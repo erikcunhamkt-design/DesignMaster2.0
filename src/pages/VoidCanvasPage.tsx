@@ -268,10 +268,10 @@ export default function VoidCanvasPage() {
       .eq('project_id', projectId)
       .order('z_index');
     if (data) {
-      setImages(data.filter((d: any) => d.image_url).map((d: any) => ({
-        id: d.id, image_url: d.image_url!, label: d.label,
+      setImages(data.map((d: any) => ({
+        id: d.id, image_url: d.image_url || '', label: d.label,
         position_x: d.position_x, position_y: d.position_y,
-        width: d.width, height: d.height,
+        width: d.width, height: d.height, node_type: d.node_type,
       })));
     }
   };
