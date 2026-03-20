@@ -398,6 +398,46 @@ export default function VoidCanvasPage() {
       // Update project thumbnail & updated_at
       await supabase.from('void_projects' as any).update({ thumbnail_url: imageUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
     }
+    };
+
+  // Upload image directly to canvas
+  const handleUploadToCanvas = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0] || !user || !activeProjectId) return;
+    const file = e.target.files[0];
+    const filePath = `void/${user.id}/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from('chat-media').upload(filePath, file);
+    if (!error) {
+      const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(filePath);
+      await addImageToCanvas(publicUrl, file.name.slice(0, 50), 'Imagem carregada');
+      toast.success('Imagem adicionada ao canvas!');
+    } else {
+      toast.error('Erro ao fazer upload');
+    }
+    e.target.value = '';
+  };
+
+  // Add a note/frame to canvas
+  const addNoteToCanvas = async () => {
+    if (!user || !activeProjectId) return;
+    const text = prompt('Digite o texto da nota:');
+    if (!text?.trim()) return;
+    const baseX = 100 + Math.random() * 300;
+    const baseY = 100 + Math.random() * 300;
+    const { data: newRow } = await supabase.from('void_canvas_nodes').insert({
+      user_id: user.id, label: text.trim(), node_type: 'note',
+      position_x: baseX, position_y: baseY,
+      width: 200, height: 120, z_index: images.length,
+      project_id: activeProjectId,
+    } as any).select().single();
+    if (newRow) {
+      const r = newRow as any;
+      setImages(prev => [...prev, {
+        id: r.id, image_url: '', label: r.label,
+        position_x: r.position_x, position_y: r.position_y,
+        width: r.width, height: r.height, node_type: 'note',
+      }]);
+      toast.success('Nota adicionada ao canvas!');
+    }
   };
 
   // ── Multimedia helpers ──
