@@ -13,6 +13,61 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.8.0',
+    date: '20 Mar 2026',
+    title: 'VOID, Fotógrafo Profissional & Social Media Creator',
+    highlights: [
+      'VOID — Cockpit Criativo com tela infinita, hub de agentes e geração direta',
+      'Fotógrafo Profissional com motor técnico de elite e Identity Lock',
+      'Social Media Creator com Kit de Marca, Copiloto de Copy e controles premium',
+      'Smart Router classifica intenção e atribui agente especializado automaticamente',
+    ],
+    changes: [
+      {
+        icon: <Layers className="h-4 w-4 text-emerald-400" />,
+        category: 'VOID — Cockpit Criativo',
+        items: [
+          'Tela infinita com pan/zoom e reposicionamento livre de imagens',
+          'Hub de Agentes integrado com transferência de prompts para o gerador',
+          'Sistema de projetos com galeria "Minhas Criações" (últimos 7 dias)',
+          'Renomeação de projetos via clique duplo e históricos isolados',
+          'Smart Router com feedback visual de roteamento em tempo real',
+        ],
+      },
+      {
+        icon: <Camera className="h-4 w-4 text-primary" />,
+        category: 'Fotógrafo Profissional',
+        items: [
+          'Motor interno com base de conhecimento completa de fotografia',
+          'Identity Lock para preservação absoluta de traços faciais',
+          'Câmeras Phase One, Sony a7R IV, Hasselblad H6D e mais',
+          'Lentes 85mm f/1.2, 135mm f/2, 50mm f/1.4 mapeadas automaticamente',
+          'API Google direta com seletor de modelo e retry automático',
+        ],
+      },
+      {
+        icon: <Palette className="h-4 w-4 text-pink-400" />,
+        category: 'Social Media Creator',
+        items: [
+          'Kit de Marca integrado com paleta de cores persistente',
+          'Copiloto de Copy via chat com preenchimento automático',
+          'Controles tipográficos independentes por campo de texto',
+          'Motor Elite Designer (temperatura 0.4) com regras de composição',
+          'Layout de três colunas com seções colapsáveis',
+        ],
+      },
+      {
+        icon: <Share2 className="h-4 w-4 text-blue-400" />,
+        category: 'Melhorias Gerais',
+        items: [
+          'Ícone do VOID atualizado na sidebar e cards',
+          'Gestão de licenças com prazo efetivo no painel admin',
+          'Reset de senha funcional pelo admin',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.7.0',
     date: '18 Mar 2026',
     title: 'Fotógrafo Profissional — Motor Fotográfico',
