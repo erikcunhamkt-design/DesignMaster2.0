@@ -594,40 +594,17 @@ export default function VoidCanvasPage() {
         finalPrompt = 'Generate an image based on the audio description provided';
       }
 
-      // Smart Router
-      const routerId = crypto.randomUUID();
-      setGenMessages(prev => [...prev, { id: routerId, role: 'assistant', content: '🧭 Analisando seu pedido...', model: 'Smart Router' }]);
-
-      let expandedPrompt = finalPrompt;
-      let agentName = ''; let agentEmoji = '';
-
-      try {
-        const routerRes = await fetch(`https://${projectId}.supabase.co/functions/v1/void-smart-router`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
-          body: JSON.stringify({ prompt: finalPrompt, googleApiKey: apiKey }),
-        });
-        const routerData = await routerRes.json();
-        if (routerData.expandedPrompt) {
-          expandedPrompt = routerData.expandedPrompt;
-          agentName = routerData.agentName || '';
-          agentEmoji = routerData.agentEmoji || '';
-        }
-      } catch { console.warn('Smart router failed'); }
-
       // Inject brand kit colors into prompt
       if (activeBrandKit && activeBrandKit.colors.length > 0) {
         const colorList = activeBrandKit.colors.join(', ');
-        expandedPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
+        finalPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
       }
-
-      setGenMessages(prev => prev.map(m => m.id === routerId ? { ...m, content: agentName ? `${agentEmoji} Agente: **${agentName}** · Prompt expandido` : '🧠 Prompt processado' } : m));
 
       const thinkingId = crypto.randomUUID();
       setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
-        prompt: expandedPrompt, googleApiKey: apiKey,
+        prompt: finalPrompt, googleApiKey: apiKey,
         aiModel: imageModel === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
         aspectRatio: '1:1', useArchitect: false,
       };
