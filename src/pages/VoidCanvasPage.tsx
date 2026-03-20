@@ -1581,7 +1581,7 @@ export default function VoidCanvasPage() {
             {/* Eraser - clear strokes, markers, notes */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className={cn('p-2 rounded-xl transition-all', (strokes.length > 0 || markers.length > 0 || images.some(i => i.node_type === 'note')) ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10' : 'text-muted-foreground/30 hover:text-muted-foreground/50 hover:bg-secondary/10')}
+                <button className={cn('p-2 rounded-xl transition-all', (strokes.length > 0 || markers.length > 0 || nodeConnections.length > 0 || images.some(i => i.node_type === 'note')) ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10' : 'text-muted-foreground/30 hover:text-muted-foreground/50 hover:bg-secondary/10')}
                   title="Apagar elementos">
                   <Trash2 className="h-4 w-4" />
                 </button>
