@@ -334,15 +334,47 @@ export default function VoidCanvasPage() {
     await supabase.from('void_canvas_nodes').update({ position_x: img.position_x, position_y: img.position_y }).eq('id', img.id);
   }, []);
 
+  // Crop a region from an image around a click point
+  const cropImageRegion = useCallback((imageUrl: string, relX: number, relY: number): Promise<string> => {
+    return new Promise((resolve) => {
+      const imgEl = new window.Image();
+      imgEl.crossOrigin = 'anonymous';
+      imgEl.onload = () => {
+        const cropSize = Math.min(imgEl.width, imgEl.height) * 0.4;
+        const centerX = relX * imgEl.width;
+        const centerY = relY * imgEl.height;
+        const sx = Math.max(0, centerX - cropSize / 2);
+        const sy = Math.max(0, centerY - cropSize / 2);
+        const sw = Math.min(cropSize, imgEl.width - sx);
+        const sh = Math.min(cropSize, imgEl.height - sy);
+        const canvas = document.createElement('canvas');
+        canvas.width = sw; canvas.height = sh;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(imgEl, sx, sy, sw, sh, 0, 0, sw, sh);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      imgEl.onerror = () => resolve(imageUrl);
+      imgEl.src = imageUrl;
+    });
+  }, []);
+
   const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
-    // Mark tool: send image to agent for AI analysis
+    // Mark tool: crop region, place marker, send to generator
     if (activeTool === 'mark' && imgId) {
       const img = images.find(i => i.id === imgId);
       if (img && img.image_url) {
-        setAgentAttachment(img.image_url);
-        setAgentInput('Identifique e descreva os elementos principais desta imagem.');
-        setLeftPanelOpen(true);
-        toast.success('Imagem enviada ao agente para análise');
+        const target = e.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const relY = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        const markerNum = markCounter;
+        setMarkers(prev => [...prev, { imageId: img.id, relX, relY, number: markerNum }]);
+        setMarkCounter(prev => prev + 1);
+        cropImageRegion(img.image_url, relX, relY).then(croppedBase64 => {
+          setReferenceImage(croppedBase64);
+          setRightPanelOpen(true);
+          toast.success(`Objeto #${markerNum} marcado e enviado ao gerador`);
+        });
       }
       e.stopPropagation();
       return;
@@ -352,6 +384,14 @@ export default function VoidCanvasPage() {
       setIsPanning(true);
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       setSelectedImage(null);
+      return;
+    }
+    // Pencil tool: start drawing
+    if (activeTool === 'pencil' && !imgId) {
+      const x = (e.clientX - pan.x) / zoom;
+      const y = (e.clientY - pan.y) / zoom;
+      setCurrentStroke({ points: [{ x, y }], color: strokeColor, width: strokeWidth });
+      setIsDrawing(true);
       return;
     }
     if (imgId) {
@@ -366,7 +406,7 @@ export default function VoidCanvasPage() {
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       setSelectedImage(null);
     }
-  }, [images, zoom, pan, activeTool]);
+  }, [images, zoom, pan, activeTool, markCounter, cropImageRegion, strokeColor, strokeWidth]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (dragging) {
