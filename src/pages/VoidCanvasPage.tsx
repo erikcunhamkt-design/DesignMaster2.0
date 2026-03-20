@@ -409,21 +409,35 @@ export default function VoidCanvasPage() {
   }, [images, zoom, pan, activeTool, markCounter, cropImageRegion, strokeColor, strokeWidth]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isDrawing && currentStroke) {
+      const x = (e.clientX - pan.x) / zoom;
+      const y = (e.clientY - pan.y) / zoom;
+      setCurrentStroke(prev => prev ? { ...prev, points: [...prev.points, { x, y }] } : null);
+      return;
+    }
     if (dragging) {
       setImages(prev => prev.map(i => i.id === dragging ? { ...i, position_x: e.clientX / zoom - dragOffset.x, position_y: e.clientY / zoom - dragOffset.y } : i));
     } else if (isPanning) {
       setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
     }
-  }, [dragging, isPanning, zoom, dragOffset, panStart]);
+  }, [dragging, isPanning, zoom, dragOffset, panStart, isDrawing, currentStroke, pan]);
 
   const handleMouseUp = useCallback(() => {
+    if (isDrawing && currentStroke) {
+      if (currentStroke.points.length > 1) {
+        setStrokes(prev => [...prev, currentStroke]);
+      }
+      setCurrentStroke(null);
+      setIsDrawing(false);
+      return;
+    }
     if (dragging) {
       const img = images.find(i => i.id === dragging);
       if (img) savePosition(img);
       setDragging(null);
     }
     setIsPanning(false);
-  }, [dragging, images, savePosition]);
+  }, [dragging, images, savePosition, isDrawing, currentStroke]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
