@@ -189,6 +189,8 @@ export default function VoidCanvasPage() {
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
   const [linkedImages, setLinkedImages] = useState<LinkedImage[]>([]);
+  const [nodeConnections, setNodeConnections] = useState<{ from: string; to: string }[]>([]);
+  const [linkSource, setLinkSource] = useState<string | null>(null);
   const [markers, setMarkers] = useState<CanvasMarker[]>([]);
   const [markCounter, setMarkCounter] = useState(1);
   const [strokes, setStrokes] = useState<DrawingStroke[]>([]);
