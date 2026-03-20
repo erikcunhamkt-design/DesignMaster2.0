@@ -154,6 +154,11 @@ export default function VoidCanvasPage() {
   const [chatModel, setChatModel] = useState(CHAT_MODELS[0]);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
+  const [activeTool, setActiveTool] = useState<CanvasTool>('select');
+  const [showLayers, setShowLayers] = useState(false);
+  const [showFiles, setShowFiles] = useState(false);
+  const [showShapesMenu, setShowShapesMenu] = useState(false);
+  const [usePaletteInChat, setUsePaletteInChat] = useState(false);
 
   // ── Refs ──
   const genChatEndRef = useRef<HTMLDivElement>(null);
@@ -162,6 +167,7 @@ export default function VoidCanvasPage() {
   const refInputRef = useRef<HTMLInputElement>(null);
   const charInputRef = useRef<HTMLInputElement>(null);
   const agentMediaRef = useRef<HTMLInputElement>(null);
+  const canvasUploadRef = useRef<HTMLInputElement>(null);
   const [agentAttachment, setAgentAttachment] = useState<string | null>(null);
 
   // ══════════════════════════════════════════════
