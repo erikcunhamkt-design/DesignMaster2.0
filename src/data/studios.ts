@@ -1,4 +1,5 @@
 import { Wand2, Scissors, PenTool, ArrowUpCircle, FileText, ShoppingBag, Sparkles, BookOpen } from 'lucide-react';
+import socialMediaHero from '@/assets/social-media-studio-hero.jpg';
 
 export interface Studio {
   id: string;
