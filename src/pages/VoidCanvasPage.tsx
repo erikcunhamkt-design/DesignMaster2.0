@@ -315,6 +315,25 @@ export default function VoidCanvasPage() {
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
+    // Mark tool: send image to agent for AI analysis
+    if (activeTool === 'mark' && imgId) {
+      const img = images.find(i => i.id === imgId);
+      if (img && img.image_url) {
+        setAgentAttachment(img.image_url);
+        setAgentInput('Identifique e descreva os elementos principais desta imagem.');
+        setLeftPanelOpen(true);
+        toast.success('Imagem enviada ao agente para análise');
+      }
+      e.stopPropagation();
+      return;
+    }
+    // Hand tool: always pan
+    if (activeTool === 'hand') {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+      setSelectedImage(null);
+      return;
+    }
     if (imgId) {
       const img = images.find(i => i.id === imgId);
       if (!img) return;
@@ -327,7 +346,7 @@ export default function VoidCanvasPage() {
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       setSelectedImage(null);
     }
-  }, [images, zoom, pan]);
+  }, [images, zoom, pan, activeTool]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (dragging) {
