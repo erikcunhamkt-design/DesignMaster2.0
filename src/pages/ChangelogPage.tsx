@@ -1,7 +1,7 @@
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Image, Mic, FileText, Copy, MessageSquare, Sparkles, MousePointerClick, Pin, Pencil, Trash2, Camera, Cpu, Upload } from 'lucide-react';
+import { Eye, Image, Mic, FileText, Copy, MessageSquare, Sparkles, MousePointerClick, Pin, Pencil, Trash2, Camera, Cpu, Upload, Layers, Palette, Share2 } from 'lucide-react';
 
 interface PatchNote {
   version: string;
