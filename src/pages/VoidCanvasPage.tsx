@@ -15,7 +15,9 @@ import {
   Loader2, Send, Trash2, ThumbsUp, ThumbsDown,
   Mic, MicOff, Image, User, X, ChevronDown, Download,
   Bot, ArrowRight, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus,
-  Paperclip, Pencil, FolderOpen, Clock, Home, Palette, UserCircle, Info
+  Paperclip, Pencil, FolderOpen, Clock, Home, Palette, UserCircle, Info,
+  MousePointer2, Hand, Target, Square, Minus, Circle, Triangle, Star,
+  Type, Layers, Hash, Upload, ArrowUpRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
