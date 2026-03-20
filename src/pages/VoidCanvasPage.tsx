@@ -404,6 +404,37 @@ export default function VoidCanvasPage() {
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
+    // Link tool: click first image (source), then second (target) to create connection
+    if (activeTool === 'link' && imgId) {
+      const img = images.find(i => i.id === imgId);
+      if (!img || img.node_type === 'note') return;
+      if (!linkSource) {
+        setLinkSource(imgId);
+        setSelectedImage(imgId);
+        toast.info('Agora clique na segunda imagem para conectar');
+      } else if (linkSource !== imgId) {
+        // Create connection
+        const alreadyConnected = nodeConnections.some(c => (c.from === linkSource && c.to === imgId) || (c.from === imgId && c.to === linkSource));
+        if (!alreadyConnected) {
+          setNodeConnections(prev => [...prev, { from: linkSource, to: imgId }]);
+          // Add both to linkedImages if not already there
+          const srcImg = images.find(i => i.id === linkSource);
+          if (srcImg && !linkedImages.some(l => l.id === srcImg.id)) {
+            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: 'estilo' }]);
+          }
+          if (!linkedImages.some(l => l.id === imgId)) {
+            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]);
+          }
+          setRightPanelOpen(true);
+          toast.success('Imagens conectadas! Escolha o que usar de cada uma no painel do gerador.');
+        } else {
+          toast.info('Essas imagens já estão conectadas');
+        }
+        setLinkSource(null);
+      }
+      e.stopPropagation();
+      return;
+    }
     // Mark tool: crop region, place marker, send to generator
     if (activeTool === 'mark' && imgId) {
       const img = images.find(i => i.id === imgId);
