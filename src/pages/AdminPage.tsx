@@ -48,7 +48,15 @@ export default function AdminPage() {
   };
 
   const updateLicensePlan = async (id: string, plan: string) => {
-    const { error } = await supabase.from('licenses').update({ plan }).eq('id', id);
+    let expires_at: string | null = null;
+    if (plan === 'monthly') {
+      const d = new Date(); d.setDate(d.getDate() + 30);
+      expires_at = d.toISOString();
+    } else if (plan === 'yearly') {
+      const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+      expires_at = d.toISOString();
+    }
+    const { error } = await supabase.from('licenses').update({ plan, status: 'active', expires_at }).eq('id', id);
     if (error) { toast.error('Erro ao atualizar plano'); return; }
     toast.success(`Plano alterado para ${plan}`);
     fetchLicenses();
