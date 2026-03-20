@@ -360,6 +360,9 @@ export default function VoidCanvasPage() {
             deleteImage(selectedImage);
           }
           break;
+        case 'escape':
+          if (activeTool === 'link') { setActiveTool('select'); setLinkSource(null); }
+          break;
       }
     };
     window.addEventListener('keydown', handler);
