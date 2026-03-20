@@ -58,6 +58,22 @@ interface DrawingStroke {
   width: number;
 }
 
+interface LinkedImage {
+  id: string;
+  imageUrl: string;
+  label: string;
+  usage: string; // e.g. 'estilo', 'composição', 'cores', 'personagem', 'tudo'
+}
+
+const USAGE_OPTIONS = [
+  { id: 'estilo', label: 'Estilo', emoji: '🎨' },
+  { id: 'composição', label: 'Composição', emoji: '📐' },
+  { id: 'cores', label: 'Cores', emoji: '🎨' },
+  { id: 'personagem', label: 'Personagem', emoji: '👤' },
+  { id: 'iluminação', label: 'Iluminação', emoji: '💡' },
+  { id: 'tudo', label: 'Tudo', emoji: '✨' },
+];
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
