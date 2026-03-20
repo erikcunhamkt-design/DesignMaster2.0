@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 // ── Types ──
-type CanvasTool = 'select' | 'hand' | 'mark' | 'rectangle' | 'line' | 'arrow' | 'ellipse' | 'polygon' | 'star' | 'pencil' | 'text';
+type CanvasTool = 'select' | 'hand' | 'mark' | 'link' | 'rectangle' | 'line' | 'arrow' | 'ellipse' | 'polygon' | 'star' | 'pencil' | 'text';
 
 const SHAPES = [
   { id: 'rectangle' as CanvasTool, icon: Square, label: 'Retângulo', shortcut: 'R' },
