@@ -283,32 +283,104 @@ export default function SocialMediaStudioPage() {
 
     const formatInfo = FORMATS.find(f => f.value === format);
     const brandColorsStr = activeBrandKit
-      ? `CORES OBRIGATÓRIAS DA MARCA: ${activeBrandKit.colors.join(', ')}. Use APENAS essas cores como paleta principal.`
+      ? `MANDATORY BRAND COLORS: Use ONLY these hex colors as the dominant palette — ${activeBrandKit.colors.join(', ')}. Every major surface, accent, and gradient MUST derive from these.`
       : '';
-    const subjectStr = subjectPhotos.length > 0 ? 'O sujeito principal da arte está nas fotos de referência anexadas.' : '';
-    const referenceStr = referencePhotos.length > 0 ? 'Use as referências visuais anexadas como inspiração para o estilo.' : '';
+    const subjectStr = subjectPhotos.length > 0
+      ? 'The MAIN SUBJECT is provided in the attached reference photo(s). Place this subject prominently as the focal point of the composition. Preserve their likeness, clothing, and expression with photographic accuracy.'
+      : '';
+    const referenceStr = referencePhotos.length > 0
+      ? 'VISUAL REFERENCES are attached — match their mood, color grading, layout structure, and graphic treatment as closely as possible.'
+      : '';
 
-    const prompt = `Crie uma arte profissional para social media com as seguintes especificações:
+    // Map typography to precise English instructions
+    const fontMap: Record<string, string> = {
+      'Sans-serif moderna': 'clean modern sans-serif (Helvetica Neue / Montserrat style)',
+      'Serif clássica': 'elegant serif (Playfair Display / Didot style)',
+      'Handwritten': 'natural handwritten script with ink texture',
+      'Bold/Impact': 'ultra-bold condensed impact typeface (Impact / Bebas Neue style)',
+      'Minimal/Thin': 'ultra-thin hairline sans-serif (Futura Light / Thin weight)',
+      'Retro/Vintage': 'retro vintage slab-serif with worn texture',
+      'Futurista': 'futuristic geometric tech typeface with sharp angles',
+      'Script elegante': 'luxury flowing calligraphic script',
+      'Gothic/Blackletter': 'ornate gothic blackletter fraktur typeface',
+      'Brush/Graffiti': 'raw brush-stroke street graffiti lettering',
+    };
+    const sizeMap: Record<string, string> = { pequeno: 'small (subtle, supporting)', medio: 'medium (balanced, prominent)', grande: 'large (dominant, hero-sized, filling significant space)' };
+    const weightMap: Record<string, string> = { light: 'light/thin weight', regular: 'regular weight', bold: 'bold weight', extrabold: 'extra-bold/black weight with maximum thickness' };
+    const alignMap: Record<string, string> = { left: 'left-aligned', center: 'centered', right: 'right-aligned' };
+    const posMap: Record<string, string> = { topo: 'TOP third of the canvas', centro: 'vertically CENTERED', rodape: 'BOTTOM third of the canvas', esquerda: 'LEFT side of the canvas', direita: 'RIGHT side of the canvas' };
 
-FORMATO: ${formatInfo?.label} (aspect ratio ${formatInfo?.ratio})
-ESTILO VISUAL: ${visualStyle}
-POSIÇÃO DO TEXTO: ${textPosition}
+    const styleMap: Record<string, string> = {
+      'Minimalista': 'ultra-clean minimalist design with generous whitespace, geometric precision, and Swiss design principles',
+      'Glassmorphism': 'frosted glass morphism with translucent panels, subtle blur effects, and luminous borders',
+      'Neon/Glow': 'vibrant neon glow aesthetic with electric light trails, dark background, and luminescent color bleeding',
+      'Gradiente vibrante': 'bold vibrant gradient backgrounds with smooth color transitions and depth',
+      'Editorial/Magazine': 'high-end editorial magazine layout with sophisticated grid system, premium typography hierarchy, and fashion-grade photography treatment',
+      'Flat design': 'modern flat design with bold solid colors, clean shapes, and strong geometric elements',
+      'Fotorrealista': 'photorealistic composition blending real photography seamlessly with overlaid typography',
+      'Ilustração vetorial': 'clean vector illustration style with crisp lines, flat colors, and scalable graphic elements',
+      'Retro/Vintage': 'authentic retro vintage aesthetic with film grain, muted warm tones, and period-appropriate design elements',
+      'Cyberpunk': 'cyberpunk aesthetic with holographic elements, glitch effects, neon-on-dark contrast, and sci-fi grid overlays',
+      'Orgânico/Natural': 'organic natural aesthetic with earth tones, botanical elements, soft textures, and warm lighting',
+      'Luxury/Premium': 'ultra-premium luxury aesthetic with gold/metallic accents, rich dark backgrounds, elegant spacing, and high-end material textures',
+    };
 
-${buildTypoPrompt()}
+    const typoLines: string[] = [];
+    if (headline) typoLines.push(`  HEADLINE TEXT: "${headline}"\n    → Typeface: ${fontMap[fontHeadline] || fontHeadline}\n    → Size: ${sizeMap[sizeHeadline]}\n    → Weight: ${weightMap[weightHeadline]}\n    → Alignment: ${alignMap[alignHeadline]}\n    → MUST be the most visually dominant text element. Render with perfect kerning and anti-aliasing.`);
+    if (subheadline) typoLines.push(`  SUBHEADLINE TEXT: "${subheadline}"\n    → Typeface: ${fontMap[fontSubheadline] || fontSubheadline}\n    → Size: ${sizeMap[sizeSubheadline]}\n    → Weight: ${weightMap[weightSubheadline]}\n    → Alignment: ${alignMap[alignSubheadline]}\n    → Must complement the headline with clear visual hierarchy (noticeably smaller).`);
+    if (cta) typoLines.push(`  CTA TEXT: "${cta}"\n    → Typeface: ${fontMap[fontCta] || fontCta}\n    → Size: ${sizeMap[sizeCta]}\n    → Weight: ${weightMap[weightCta]}\n    → Alignment: ${alignMap[alignCta]}\n    → Render inside a button/badge/pill shape or with a distinct background treatment to stand out as an actionable element.`);
 
-${niche ? `NICHO/SEGMENTO: ${niche}` : ''}
-${description ? `DESCRIÇÃO ADICIONAL: ${description}` : ''}
+    const prompt = `You are an ELITE graphic designer at a top creative agency. Create a STUNNING, award-winning social media art piece. This must look like it was crafted by a professional design studio — NOT by AI.
+
+═══════════════════════════════════════
+CANVAS & FORMAT
+═══════════════════════════════════════
+Format: ${formatInfo?.label} (aspect ratio ${formatInfo?.ratio})
+The image MUST fill the entire canvas edge-to-edge with ZERO empty borders, letterboxing, or dead space.
+
+═══════════════════════════════════════
+VISUAL STYLE & ART DIRECTION
+═══════════════════════════════════════
+Style: ${styleMap[visualStyle] || visualStyle}
+Apply this style with conviction — every pixel must reflect this aesthetic. Use professional-grade color grading, lighting, and composition techniques.
+
+═══════════════════════════════════════
+TYPOGRAPHY SYSTEM (CRITICAL)
+═══════════════════════════════════════
+Text Placement Zone: ${posMap[textPosition] || textPosition}
+
+${typoLines.length > 0 ? typoLines.join('\n\n') : 'No text elements specified.'}
+
+TYPOGRAPHY RULES:
+- Every single letter must be PERFECTLY LEGIBLE — zero distortion, no warping, no cut-off characters
+- Spell each word EXACTLY as provided — zero typos or letter substitutions
+- Apply professional kerning, leading, and tracking
+- Text must have sufficient contrast against its background (use text shadows, overlays, or solid backing panels if needed)
+- Create clear visual hierarchy: Headline > Subheadline > CTA
+
+${niche ? `═══════════════════════════════════════\nCONTEXT\n═══════════════════════════════════════\nNiche/Industry: ${niche}` : ''}
+${description ? `Creative Direction: ${description}` : ''}
 ${brandColorsStr}
 ${subjectStr}
 ${referenceStr}
 
-REGRAS:
-- Arte deve ser PROFISSIONAL e pronta para publicação
-- Texto deve ser LEGÍVEL e hierarquicamente organizado
-- Respeitar EXATAMENTE as fontes, tamanhos, pesos e alinhamentos especificados para cada campo de texto
-- Layout limpo e equilibrado
-- Paleta de cores harmoniosa${activeBrandKit ? ' seguindo as cores da marca' : ''}
-- Elementos gráficos devem complementar, não competir com o texto`;
+═══════════════════════════════════════
+PROFESSIONAL QUALITY STANDARDS
+═══════════════════════════════════════
+1. COMPOSITION: Use rule of thirds, golden ratio, or dynamic symmetry. Guide the eye from headline → visual → CTA.
+2. COLOR: Rich, cohesive palette with intentional contrast points. Professional color grading — not flat or washed out.
+3. DEPTH & DIMENSION: Use layering, subtle shadows, gradients, or depth-of-field to create visual depth.
+4. DETAILS: Add subtle design elements — geometric accents, light leaks, texture overlays, or decorative lines that elevate the design without cluttering.
+5. LIGHTING: Professional lighting treatment — dramatic shadows, highlights, and rim lighting where appropriate.
+6. FINISHING: The final output must look like a polished, print-ready design from Behance or Dribbble — high contrast, sharp details, premium feel.
+
+ABSOLUTELY FORBIDDEN:
+- Blurry, pixelated, or low-quality text rendering
+- Generic stock photo look
+- Cluttered or unbalanced layouts
+- Text that blends into the background or is hard to read
+- Empty/blank areas or unfinished edges
+- Amateur color combinations or flat, lifeless palettes`;
 
     try {
       const model = 'gemini-3-pro-image-preview';
@@ -332,7 +404,7 @@ REGRAS:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts }],
-          generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.8 },
+          generationConfig: { responseModalities: ['IMAGE', 'TEXT'], temperature: 0.4 },
         }),
       });
 
