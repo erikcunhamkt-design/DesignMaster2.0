@@ -45,6 +45,19 @@ interface CanvasImage {
   node_type?: string;
 }
 
+interface CanvasMarker {
+  imageId: string;
+  relX: number;
+  relY: number;
+  number: number;
+}
+
+interface DrawingStroke {
+  points: { x: number; y: number }[];
+  color: string;
+  width: number;
+}
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -159,6 +172,13 @@ export default function VoidCanvasPage() {
   const [showFiles, setShowFiles] = useState(false);
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
+  const [markers, setMarkers] = useState<CanvasMarker[]>([]);
+  const [markCounter, setMarkCounter] = useState(1);
+  const [strokes, setStrokes] = useState<DrawingStroke[]>([]);
+  const [currentStroke, setCurrentStroke] = useState<DrawingStroke | null>(null);
+  const [strokeColor] = useState('#ffffff');
+  const [strokeWidth] = useState(2);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   // ── Refs ──
   const genChatEndRef = useRef<HTMLDivElement>(null);
@@ -314,15 +334,47 @@ export default function VoidCanvasPage() {
     await supabase.from('void_canvas_nodes').update({ position_x: img.position_x, position_y: img.position_y }).eq('id', img.id);
   }, []);
 
+  // Crop a region from an image around a click point
+  const cropImageRegion = useCallback((imageUrl: string, relX: number, relY: number): Promise<string> => {
+    return new Promise((resolve) => {
+      const imgEl = new window.Image();
+      imgEl.crossOrigin = 'anonymous';
+      imgEl.onload = () => {
+        const cropSize = Math.min(imgEl.width, imgEl.height) * 0.4;
+        const centerX = relX * imgEl.width;
+        const centerY = relY * imgEl.height;
+        const sx = Math.max(0, centerX - cropSize / 2);
+        const sy = Math.max(0, centerY - cropSize / 2);
+        const sw = Math.min(cropSize, imgEl.width - sx);
+        const sh = Math.min(cropSize, imgEl.height - sy);
+        const canvas = document.createElement('canvas');
+        canvas.width = sw; canvas.height = sh;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(imgEl, sx, sy, sw, sh, 0, 0, sw, sh);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      imgEl.onerror = () => resolve(imageUrl);
+      imgEl.src = imageUrl;
+    });
+  }, []);
+
   const handleMouseDown = useCallback((e: React.MouseEvent, imgId?: string) => {
-    // Mark tool: send image to agent for AI analysis
+    // Mark tool: crop region, place marker, send to generator
     if (activeTool === 'mark' && imgId) {
       const img = images.find(i => i.id === imgId);
       if (img && img.image_url) {
-        setAgentAttachment(img.image_url);
-        setAgentInput('Identifique e descreva os elementos principais desta imagem.');
-        setLeftPanelOpen(true);
-        toast.success('Imagem enviada ao agente para análise');
+        const target = e.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const relY = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        const markerNum = markCounter;
+        setMarkers(prev => [...prev, { imageId: img.id, relX, relY, number: markerNum }]);
+        setMarkCounter(prev => prev + 1);
+        cropImageRegion(img.image_url, relX, relY).then(croppedBase64 => {
+          setReferenceImage(croppedBase64);
+          setRightPanelOpen(true);
+          toast.success(`Objeto #${markerNum} marcado e enviado ao gerador`);
+        });
       }
       e.stopPropagation();
       return;
@@ -332,6 +384,14 @@ export default function VoidCanvasPage() {
       setIsPanning(true);
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       setSelectedImage(null);
+      return;
+    }
+    // Pencil tool: start drawing
+    if (activeTool === 'pencil' && !imgId) {
+      const x = (e.clientX - pan.x) / zoom;
+      const y = (e.clientY - pan.y) / zoom;
+      setCurrentStroke({ points: [{ x, y }], color: strokeColor, width: strokeWidth });
+      setIsDrawing(true);
       return;
     }
     if (imgId) {
@@ -346,24 +406,38 @@ export default function VoidCanvasPage() {
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       setSelectedImage(null);
     }
-  }, [images, zoom, pan, activeTool]);
+  }, [images, zoom, pan, activeTool, markCounter, cropImageRegion, strokeColor, strokeWidth]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isDrawing && currentStroke) {
+      const x = (e.clientX - pan.x) / zoom;
+      const y = (e.clientY - pan.y) / zoom;
+      setCurrentStroke(prev => prev ? { ...prev, points: [...prev.points, { x, y }] } : null);
+      return;
+    }
     if (dragging) {
       setImages(prev => prev.map(i => i.id === dragging ? { ...i, position_x: e.clientX / zoom - dragOffset.x, position_y: e.clientY / zoom - dragOffset.y } : i));
     } else if (isPanning) {
       setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
     }
-  }, [dragging, isPanning, zoom, dragOffset, panStart]);
+  }, [dragging, isPanning, zoom, dragOffset, panStart, isDrawing, currentStroke, pan]);
 
   const handleMouseUp = useCallback(() => {
+    if (isDrawing && currentStroke) {
+      if (currentStroke.points.length > 1) {
+        setStrokes(prev => [...prev, currentStroke]);
+      }
+      setCurrentStroke(null);
+      setIsDrawing(false);
+      return;
+    }
     if (dragging) {
       const img = images.find(i => i.id === dragging);
       if (img) savePosition(img);
       setDragging(null);
     }
     setIsPanning(false);
-  }, [dragging, images, savePosition]);
+  }, [dragging, images, savePosition, isDrawing, currentStroke]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -1244,7 +1318,9 @@ export default function VoidCanvasPage() {
           <div style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: '0 0' }} className="absolute inset-0">
             {images.map(img => (
               <div key={img.id} onMouseDown={(e) => handleMouseDown(e, img.id)}
-                className={cn('absolute rounded-lg overflow-hidden cursor-grab active:cursor-grabbing group transition-shadow duration-200', selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
+                className={cn('absolute rounded-lg overflow-hidden group transition-shadow duration-200',
+                  activeTool === 'mark' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
+                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
                 style={{ left: img.position_x, top: img.position_y, width: img.width, height: img.height }}>
                 {img.node_type === 'note' ? (
                   <div className="w-full h-full bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-center justify-center backdrop-blur-sm">
@@ -1253,6 +1329,15 @@ export default function VoidCanvasPage() {
                 ) : (
                   <img src={img.image_url} alt={img.label} className="w-full h-full object-cover" draggable={false} />
                 )}
+                {/* Markers on this image */}
+                {markers.filter(m => m.imageId === img.id).map(marker => (
+                  <div key={marker.number} className="absolute z-20 pointer-events-none"
+                    style={{ left: `${marker.relX * 100}%`, top: `${marker.relY * 100}%`, transform: 'translate(-50%, -50%)' }}>
+                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center shadow-lg border-2 border-white animate-scale-in">
+                      {marker.number}
+                    </div>
+                  </div>
+                ))}
                 <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-[8px] text-white/80 truncate">{img.label}</p>
                 </div>
@@ -1270,6 +1355,18 @@ export default function VoidCanvasPage() {
                 )}
               </div>
             ))}
+
+            {/* SVG Drawing Layer */}
+            <svg className="absolute inset-0 pointer-events-none" style={{ width: '10000px', height: '10000px', overflow: 'visible' }}>
+              {strokes.map((stroke, i) => (
+                <polyline key={i} points={stroke.points.map(p => `${p.x},${p.y}`).join(' ')}
+                  fill="none" stroke={stroke.color} strokeWidth={stroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+              ))}
+              {currentStroke && (
+                <polyline points={currentStroke.points.map(p => `${p.x},${p.y}`).join(' ')}
+                  fill="none" stroke={currentStroke.color} strokeWidth={currentStroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+              )}
+            </svg>
           </div>
         </div>
 
@@ -1306,7 +1403,7 @@ export default function VoidCanvasPage() {
             <div className="w-px h-5 bg-border/20 mx-0.5" />
 
             {/* Mark (AI object extraction) */}
-            <button onClick={() => { setActiveTool('mark'); toast.info('Clique em uma imagem para enviar ao agente IA'); }}
+            <button onClick={() => { setActiveTool('mark'); toast.info('Clique em um objeto na imagem — ele será recortado e enviado ao gerador'); }}
               className={cn('p-2 rounded-xl transition-all', activeTool === 'mark' ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
               title="Marcar objeto (M)">
               <Target className="h-4 w-4" />
