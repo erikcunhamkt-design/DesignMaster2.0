@@ -58,6 +58,22 @@ interface DrawingStroke {
   width: number;
 }
 
+interface LinkedImage {
+  id: string;
+  imageUrl: string;
+  label: string;
+  usage: string; // e.g. 'estilo', 'composição', 'cores', 'personagem', 'tudo'
+}
+
+const USAGE_OPTIONS = [
+  { id: 'estilo', label: 'Estilo', emoji: '🎨' },
+  { id: 'composição', label: 'Composição', emoji: '📐' },
+  { id: 'cores', label: 'Cores', emoji: '🎨' },
+  { id: 'personagem', label: 'Personagem', emoji: '👤' },
+  { id: 'iluminação', label: 'Iluminação', emoji: '💡' },
+  { id: 'tudo', label: 'Tudo', emoji: '✨' },
+];
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -172,6 +188,7 @@ export default function VoidCanvasPage() {
   const [showFiles, setShowFiles] = useState(false);
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
+  const [linkedImages, setLinkedImages] = useState<LinkedImage[]>([]);
   const [markers, setMarkers] = useState<CanvasMarker[]>([]);
   const [markCounter, setMarkCounter] = useState(1);
   const [strokes, setStrokes] = useState<DrawingStroke[]>([]);
@@ -584,6 +601,7 @@ export default function VoidCanvasPage() {
 
     const currentRef = referenceImage; const currentRefDesc = referenceDesc;
     const currentChar = characterImage; const currentAudio = audioBlob;
+    const currentLinked = [...linkedImages];
     setReferenceImage(null); setReferenceDesc(''); setShowRefDesc(false);
     setCharacterImage(null); setAudioBlob(null);
 
@@ -594,6 +612,14 @@ export default function VoidCanvasPage() {
         finalPrompt = 'Generate an image based on the audio description provided';
       }
 
+      // Inject linked images instructions into prompt
+      if (currentLinked.length > 0) {
+        const linkedInstructions = currentLinked.map((li, i) =>
+          `Image ${i + 1}: use its ${li.usage === 'tudo' ? 'everything (style, composition, colors, subject)' : li.usage}`
+        ).join('; ');
+        finalPrompt += `. REFERENCE IMAGES: ${linkedInstructions}.`;
+      }
+
       // Inject brand kit colors into prompt
       if (activeBrandKit && activeBrandKit.colors.length > 0) {
         const colorList = activeBrandKit.colors.join(', ');
@@ -601,7 +627,8 @@ export default function VoidCanvasPage() {
       }
 
       const thinkingId = crypto.randomUUID();
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
         prompt: finalPrompt, googleApiKey: apiKey,
@@ -609,7 +636,12 @@ export default function VoidCanvasPage() {
         aspectRatio: '1:1', useArchitect: false,
       };
       if (currentChar) body.subjectImages = [currentChar];
-      if (currentRef) { body.styleReferenceImages = [currentRef]; if (currentRefDesc.trim()) body.referenceNotes = [currentRefDesc]; }
+      // Combine linked images + manual reference into styleReferenceImages
+      const allRefs: string[] = [];
+      const allRefNotes: string[] = [];
+      if (currentRef) { allRefs.push(currentRef); if (currentRefDesc.trim()) allRefNotes.push(currentRefDesc); }
+      currentLinked.forEach(li => { allRefs.push(li.imageUrl); allRefNotes.push(`Use: ${li.usage}`); });
+      if (allRefs.length > 0) { body.styleReferenceImages = allRefs; if (allRefNotes.length > 0) body.referenceNotes = allRefNotes; }
 
       const res = await fetch(`https://${projectId}.supabase.co/functions/v1/generate-image`, {
         method: 'POST',
@@ -1344,8 +1376,20 @@ export default function VoidCanvasPage() {
                 <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-[8px] text-white/80 truncate">{img.label}</p>
                 </div>
-                {selectedImage === img.id && (
+                {selectedImage === img.id && img.node_type !== 'note' && (
                   <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Link to generator */}
+                    {linkedImages.some(l => l.id === img.id) ? (
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => prev.filter(l => l.id !== img.id)); toast.success('Imagem desvinculada'); }}
+                        className="p-1 rounded-md bg-emerald-500/80 text-white hover:bg-emerald-600" title="Deslinkar do gerador">
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    ) : (
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]); setRightPanelOpen(true); toast.success('Imagem vinculada ao gerador!'); }}
+                        className="p-1 rounded-md bg-black/60 text-emerald-400 hover:bg-black/80" title="Linkar ao gerador">
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    )}
                     <button onClick={(e) => { e.stopPropagation(); setAgentAttachment(img.image_url || ''); setAgentInput('Analise esta imagem.'); setLeftPanelOpen(true); toast.success('Imagem enviada ao chat'); }}
                       className="p-1 rounded-md bg-black/60 text-primary hover:bg-black/80" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
@@ -1354,6 +1398,14 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80">
                       <Trash2 className="h-3 w-3" />
                     </button>
+                  </div>
+                )}
+                {/* Linked indicator */}
+                {linkedImages.some(l => l.id === img.id) && (
+                  <div className="absolute top-1 left-1 z-20">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500 text-white text-[8px] font-bold flex items-center justify-center shadow-lg border border-white/30">
+                      {linkedImages.findIndex(l => l.id === img.id) + 1}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1700,6 +1752,52 @@ export default function VoidCanvasPage() {
 
         {/* ===== GEN INPUT AREA ===== */}
         <div className="shrink-0 p-4 space-y-2">
+          {/* Linked images panel */}
+          {linkedImages.length > 0 && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1.5">
+                  <ArrowUpRight className="h-3 w-3" />
+                  {linkedImages.length} {linkedImages.length === 1 ? 'imagem vinculada' : 'imagens vinculadas'}
+                </span>
+                <button onClick={() => setLinkedImages([])} className="text-[9px] text-muted-foreground/40 hover:text-destructive transition-colors">Limpar</button>
+              </div>
+              <div className="space-y-1.5">
+                {linkedImages.map((li, idx) => (
+                  <div key={li.id} className="flex items-center gap-2 p-1.5 rounded-lg bg-[#111820]/80 border border-border/10">
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-emerald-500/30">
+                        <img src={li.imageUrl} alt={li.label} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-emerald-500 text-white text-[7px] font-bold flex items-center justify-center border border-white/20">
+                        {idx + 1}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] text-foreground/60 truncate mb-1">{li.label}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {USAGE_OPTIONS.map(opt => (
+                          <button key={opt.id} onClick={() => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: opt.id } : l))}
+                            className={cn('px-1.5 py-0.5 rounded-full text-[8px] font-medium transition-colors border',
+                              li.usage === opt.id
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                : 'bg-secondary/10 text-muted-foreground/40 border-transparent hover:text-foreground/60 hover:bg-secondary/20'
+                            )}>
+                            {opt.emoji} {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button onClick={() => setLinkedImages(prev => prev.filter(l => l.id !== li.id))}
+                      className="p-1 rounded text-muted-foreground/30 hover:text-destructive shrink-0">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Attachment previews */}
           {(referenceImage || characterImage || audioBlob) && (
             <div className="flex flex-wrap gap-2">
