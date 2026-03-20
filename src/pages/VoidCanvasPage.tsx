@@ -1612,8 +1612,15 @@ export default function VoidCanvasPage() {
                   <span>Apagar notas ({images.filter(i => i.node_type === 'note').length})</span>
                 </button>
                 <div className="h-px bg-border/15 my-1" />
+                <button onClick={() => { setNodeConnections([]); setLinkedImages([]); setLinkSource(null); toast.success('Conexões apagadas'); }}
+                  disabled={nodeConnections.length === 0}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-foreground/70 hover:bg-secondary/20 transition-colors disabled:opacity-30">
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <span>Apagar conexões ({nodeConnections.length})</span>
+                </button>
+                <div className="h-px bg-border/15 my-1" />
                 <button onClick={() => {
-                  setStrokes([]); setMarkers([]); setMarkCounter(1);
+                  setStrokes([]); setMarkers([]); setMarkCounter(1); setNodeConnections([]); setLinkedImages([]); setLinkSource(null);
                   const noteIds = images.filter(i => i.node_type === 'note').map(i => i.id);
                   noteIds.forEach(id => supabase.from('void_canvas_nodes').delete().eq('id', id));
                   setImages(prev => prev.filter(i => i.node_type !== 'note'));
