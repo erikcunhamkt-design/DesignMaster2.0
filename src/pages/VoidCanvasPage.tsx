@@ -1446,8 +1446,28 @@ export default function VoidCanvasPage() {
               </div>
             ))}
 
-            {/* SVG Drawing Layer */}
+            {/* SVG Drawing + Connection Layer */}
             <svg className="absolute inset-0 pointer-events-none" style={{ width: '10000px', height: '10000px', overflow: 'visible' }}>
+              <defs>
+                <marker id="arrowhead-link" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#10B981" opacity="0.8" />
+                </marker>
+              </defs>
+              {/* Node connections */}
+              {nodeConnections.map((conn, i) => {
+                const fromImg = images.find(im => im.id === conn.from);
+                const toImg = images.find(im => im.id === conn.to);
+                if (!fromImg || !toImg) return null;
+                const x1 = fromImg.position_x + fromImg.width / 2;
+                const y1 = fromImg.position_y + fromImg.height / 2;
+                const x2 = toImg.position_x + toImg.width / 2;
+                const y2 = toImg.position_y + toImg.height / 2;
+                return (
+                  <line key={`conn-${i}`} x1={x1} y1={y1} x2={x2} y2={y2}
+                    stroke="#10B981" strokeWidth="2" strokeDasharray="6 4" opacity="0.6"
+                    markerEnd="url(#arrowhead-link)" />
+                );
+              })}
               {strokes.map((stroke, i) => (
                 <polyline key={i} points={stroke.points.map(p => `${p.x},${p.y}`).join(' ')}
                   fill="none" stroke={stroke.color} strokeWidth={stroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
