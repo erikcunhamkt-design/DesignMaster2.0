@@ -1379,7 +1379,7 @@ export default function VoidCanvasPage() {
         {/* Canvas area */}
         <div ref={canvasRef} className={cn("absolute inset-0 pt-12",
             activeTool === 'hand' ? 'cursor-grab active:cursor-grabbing' :
-            activeTool === 'mark' ? 'cursor-crosshair' :
+            activeTool === 'mark' || activeTool === 'link' ? 'cursor-crosshair' :
             activeTool === 'pencil' || ['rectangle','line','arrow','ellipse','polygon','star'].includes(activeTool) ? 'cursor-crosshair' :
             activeTool === 'text' ? 'cursor-text' : 'cursor-default'
           )}
