@@ -1388,8 +1388,9 @@ export default function VoidCanvasPage() {
             {images.map(img => (
               <div key={img.id} onMouseDown={(e) => handleMouseDown(e, img.id)}
                 className={cn('absolute rounded-lg overflow-hidden group transition-shadow duration-200',
-                  activeTool === 'mark' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
-                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
+                  activeTool === 'mark' || activeTool === 'link' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
+                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm',
+                  activeTool === 'link' && linkSource === img.id ? 'ring-2 ring-emerald-400/60' : '')}
                 style={{ left: img.position_x, top: img.position_y, width: img.width, height: img.height }}>
                 {img.node_type === 'note' ? (
                   <div className="w-full h-full bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-center justify-center backdrop-blur-sm">
