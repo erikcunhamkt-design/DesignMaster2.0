@@ -1519,6 +1519,13 @@ export default function VoidCanvasPage() {
               <Target className="h-4 w-4" />
             </button>
 
+            {/* Link tool */}
+            <button onClick={() => { setActiveTool('link'); setLinkSource(null); toast.info('Clique na 1ª imagem, depois na 2ª para conectar'); }}
+              className={cn('p-2 rounded-xl transition-all', activeTool === 'link' ? 'bg-emerald-500/15 text-emerald-400' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
+              title="Conectar imagens (C)">
+              <ArrowUpRight className="h-4 w-4" />
+            </button>
+
             {/* Upload image */}
             <button onClick={() => canvasUploadRef.current?.click()}
               className="p-2 rounded-xl text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20 transition-all"
