@@ -62,17 +62,8 @@ interface LinkedImage {
   id: string;
   imageUrl: string;
   label: string;
-  usage: string; // e.g. 'estilo', 'composição', 'cores', 'personagem', 'tudo'
+  usage: string; // free text describing what to use from this image
 }
-
-const USAGE_OPTIONS = [
-  { id: 'estilo', label: 'Estilo', emoji: '🎨' },
-  { id: 'composição', label: 'Composição', emoji: '📐' },
-  { id: 'cores', label: 'Cores', emoji: '🎨' },
-  { id: 'personagem', label: 'Personagem', emoji: '👤' },
-  { id: 'iluminação', label: 'Iluminação', emoji: '💡' },
-  { id: 'tudo', label: 'Tudo', emoji: '✨' },
-];
 
 interface ChatMessage {
   id: string;
