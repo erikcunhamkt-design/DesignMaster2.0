@@ -1461,6 +1461,54 @@ export default function VoidCanvasPage() {
               <Hash className="h-4 w-4" />
             </button>
 
+            {/* Eraser - clear strokes, markers, notes */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={cn('p-2 rounded-xl transition-all', (strokes.length > 0 || markers.length > 0 || images.some(i => i.node_type === 'note')) ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10' : 'text-muted-foreground/30 hover:text-muted-foreground/50 hover:bg-secondary/10')}
+                  title="Apagar elementos">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[180px] p-1.5 bg-[#111820] border-border/20" side="top" align="center">
+                <button onClick={() => { setStrokes([]); toast.success('Riscos apagados'); }}
+                  disabled={strokes.length === 0}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-foreground/70 hover:bg-secondary/20 transition-colors disabled:opacity-30">
+                  <Pencil className="h-3.5 w-3.5" />
+                  <span>Apagar riscos ({strokes.length})</span>
+                </button>
+                <button onClick={() => { setMarkers([]); setMarkCounter(1); toast.success('Marcadores apagados'); }}
+                  disabled={markers.length === 0}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-foreground/70 hover:bg-secondary/20 transition-colors disabled:opacity-30">
+                  <Target className="h-3.5 w-3.5" />
+                  <span>Apagar marcadores ({markers.length})</span>
+                </button>
+                <button onClick={() => {
+                  const noteIds = images.filter(i => i.node_type === 'note').map(i => i.id);
+                  if (noteIds.length === 0) return;
+                  noteIds.forEach(id => supabase.from('void_canvas_nodes').delete().eq('id', id));
+                  setImages(prev => prev.filter(i => i.node_type !== 'note'));
+                  toast.success('Notas apagadas');
+                }}
+                  disabled={!images.some(i => i.node_type === 'note')}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-foreground/70 hover:bg-secondary/20 transition-colors disabled:opacity-30">
+                  <Hash className="h-3.5 w-3.5" />
+                  <span>Apagar notas ({images.filter(i => i.node_type === 'note').length})</span>
+                </button>
+                <div className="h-px bg-border/15 my-1" />
+                <button onClick={() => {
+                  setStrokes([]); setMarkers([]); setMarkCounter(1);
+                  const noteIds = images.filter(i => i.node_type === 'note').map(i => i.id);
+                  noteIds.forEach(id => supabase.from('void_canvas_nodes').delete().eq('id', id));
+                  setImages(prev => prev.filter(i => i.node_type !== 'note'));
+                  toast.success('Tudo limpo');
+                }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[11px] text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Limpar tudo</span>
+                </button>
+              </PopoverContent>
+            </Popover>
+
             {/* Image Generator */}
             <button onClick={() => setRightPanelOpen(true)}
               className={cn('p-2 rounded-xl transition-all', rightPanelOpen ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-foreground/80 hover:bg-secondary/20')}
@@ -1712,6 +1760,18 @@ export default function VoidCanvasPage() {
                   className={cn('p-2 rounded-lg transition-colors', isRecording ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')} title={isRecording ? 'Parar' : 'Gravar áudio'}>
                   {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
+                {activeBrandKit && (
+                  <button
+                    className="p-2 rounded-lg transition-colors text-primary bg-primary/10 relative"
+                    title={`Kit ativo: ${activeBrandKit.name} — cores aplicadas na geração`}>
+                    <Palette className="h-4 w-4" />
+                    <div className="absolute -top-0.5 -right-0.5 flex gap-px">
+                      {activeBrandKit.colors.slice(0, 3).map((c, i) => (
+                        <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                      ))}
+                    </div>
+                  </button>
+                )}
 
                 {/* Model selector */}
                 <Popover open={modelOpen} onOpenChange={setModelOpen}>
