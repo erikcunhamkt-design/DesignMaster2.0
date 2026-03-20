@@ -172,6 +172,13 @@ export default function VoidCanvasPage() {
   const [showFiles, setShowFiles] = useState(false);
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
+  const [markers, setMarkers] = useState<CanvasMarker[]>([]);
+  const [markCounter, setMarkCounter] = useState(1);
+  const [strokes, setStrokes] = useState<DrawingStroke[]>([]);
+  const [currentStroke, setCurrentStroke] = useState<DrawingStroke | null>(null);
+  const [strokeColor] = useState('#ffffff');
+  const [strokeWidth] = useState(2);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   // ── Refs ──
   const genChatEndRef = useRef<HTMLDivElement>(null);
