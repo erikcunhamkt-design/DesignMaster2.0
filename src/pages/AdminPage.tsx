@@ -799,3 +799,85 @@ function ChatModerationPanel() {
     </div>
   );
 }
+
+function ResetPasswordButton({ userId, email }: { userId: string; email: string | null }) {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const generatePassword = () => {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
+    let pwd = '';
+    for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    setPassword(pwd);
+  };
+
+  const handleReset = async () => {
+    if (!password || password.length < 6) { toast.error('Senha deve ter pelo menos 6 caracteres'); return; }
+    setLoading(true);
+
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
+
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ userId, newPassword: password }),
+      }
+    );
+
+    if (response.ok) {
+      toast.success(`Senha alterada para ${email || userId}`);
+      navigator.clipboard.writeText(password);
+      toast.info('Nova senha copiada para a área de transferência');
+      setOpen(false);
+      setPassword('');
+    } else {
+      const data = await response.json();
+      toast.error('Erro: ' + (data.error || 'Falha ao resetar senha'));
+    }
+    setLoading(false);
+  };
+
+  if (!open) {
+    return (
+      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(true); generatePassword(); }}>
+        <Lock className="h-3.5 w-3.5 mr-1" /> Senha
+      </Button>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1.5">
+      <div className="relative">
+        <Input
+          type={showPwd ? 'text' : 'password'}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="h-7 text-xs w-32 pr-14"
+        />
+        <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex gap-0.5">
+          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowPwd(!showPwd)}>
+            {showPwd ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={generatePassword}>
+            <Key className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <Button size="sm" className="h-7 text-xs" onClick={handleReset} disabled={loading}>
+        {loading ? '...' : 'OK'}
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(false); setPassword(''); }}>
+        ✕
+      </Button>
+    </div>
+  );
+}
