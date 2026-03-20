@@ -28,7 +28,7 @@ export const studios: Studio[] = [
     name: 'VOID',
     tagline: 'Canvas infinito criativo.',
     description: 'Espaço infinito para gerar, importar, arrastar e conectar suas criações com estilo de buraco negro.',
-    icon: '🕳️',
+    icon: '✦',
     route: '/studio/void',
     gradient: 'from-primary/20 to-cyan-500/10',
     isNew: true,

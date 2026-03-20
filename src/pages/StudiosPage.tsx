@@ -208,7 +208,7 @@ export default function StudiosPage() {
                         </span>
                       </div>
                       <h2 className="text-xl md:text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_rgba(0,255,200,0.2)]">
-                        🕳️ {featuredVoid.name}
+                        {featuredVoid.name}
                       </h2>
                       <p className="text-xs text-muted-foreground max-w-md leading-relaxed line-clamp-2">
                         {featuredVoid.description}
