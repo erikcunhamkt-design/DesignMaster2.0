@@ -62,17 +62,8 @@ interface LinkedImage {
   id: string;
   imageUrl: string;
   label: string;
-  usage: string; // e.g. 'estilo', 'composição', 'cores', 'personagem', 'tudo'
+  usage: string; // free text describing what to use from this image
 }
-
-const USAGE_OPTIONS = [
-  { id: 'estilo', label: 'Estilo', emoji: '🎨' },
-  { id: 'composição', label: 'Composição', emoji: '📐' },
-  { id: 'cores', label: 'Cores', emoji: '🎨' },
-  { id: 'personagem', label: 'Personagem', emoji: '👤' },
-  { id: 'iluminação', label: 'Iluminação', emoji: '💡' },
-  { id: 'tudo', label: 'Tudo', emoji: '✨' },
-];
 
 interface ChatMessage {
   id: string;
@@ -369,6 +360,9 @@ export default function VoidCanvasPage() {
             deleteImage(selectedImage);
           }
           break;
+        case 'escape':
+          if (activeTool === 'link') { setActiveTool('select'); setLinkSource(null); }
+          break;
       }
     };
     window.addEventListener('keydown', handler);
@@ -421,17 +415,18 @@ export default function VoidCanvasPage() {
           // Add both to linkedImages if not already there
           const srcImg = images.find(i => i.id === linkSource);
           if (srcImg && !linkedImages.some(l => l.id === srcImg.id)) {
-            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: 'estilo' }]);
+            setLinkedImages(prev => [...prev, { id: srcImg.id, imageUrl: srcImg.image_url, label: srcImg.label, usage: '' }]);
           }
           if (!linkedImages.some(l => l.id === imgId)) {
-            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]);
+            setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: '' }]);
           }
           setRightPanelOpen(true);
-          toast.success('Imagens conectadas! Escolha o que usar de cada uma no painel do gerador.');
+          toast.success('Conectado! Descreva o que usar de cada imagem. Clique em outra para continuar conectando.');
         } else {
           toast.info('Essas imagens já estão conectadas');
         }
-        setLinkSource(null);
+        // Keep linkSource so user can chain connections from same source
+        // Click on empty area or press Escape to deselect
       }
       e.stopPropagation();
       return;
@@ -1420,7 +1415,7 @@ export default function VoidCanvasPage() {
                         <ArrowUpRight className="h-3 w-3" />
                       </button>
                     ) : (
-                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]); setRightPanelOpen(true); toast.success('Imagem vinculada ao gerador!'); }}
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: '' }]); setRightPanelOpen(true); toast.success('Imagem vinculada! Descreva o que usar no painel.'); }}
                         className="p-1 rounded-md bg-black/60 text-emerald-400 hover:bg-black/80" title="Linkar ao gerador">
                         <ArrowUpRight className="h-3 w-3" />
                       </button>
@@ -1855,18 +1850,12 @@ export default function VoidCanvasPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[9px] text-foreground/60 truncate mb-1">{li.label}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {USAGE_OPTIONS.map(opt => (
-                          <button key={opt.id} onClick={() => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: opt.id } : l))}
-                            className={cn('px-1.5 py-0.5 rounded-full text-[8px] font-medium transition-colors border',
-                              li.usage === opt.id
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                                : 'bg-secondary/10 text-muted-foreground/40 border-transparent hover:text-foreground/60 hover:bg-secondary/20'
-                            )}>
-                            {opt.emoji} {opt.label}
-                          </button>
-                        ))}
-                      </div>
+                      <input
+                        value={li.usage}
+                        onChange={(e) => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: e.target.value } : l))}
+                        placeholder="Ex: usar o estilo, cores, pose, iluminação..."
+                        className="w-full bg-transparent border-b border-emerald-500/20 text-[10px] text-emerald-200/80 placeholder:text-muted-foreground/25 focus:outline-none focus:border-emerald-400/50 py-0.5"
+                      />
                     </div>
                     <button onClick={() => setLinkedImages(prev => prev.filter(l => l.id !== li.id))}
                       className="p-1 rounded text-muted-foreground/30 hover:text-destructive shrink-0">
