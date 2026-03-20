@@ -1142,6 +1142,13 @@ export default function VoidCanvasPage() {
                   <button onClick={() => agentMediaRef.current?.click()} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-colors" title="Anexar imagem">
                     <Paperclip className="h-3.5 w-3.5" />
                   </button>
+                  {activeBrandKit && (
+                    <button onClick={() => setUsePaletteInChat(!usePaletteInChat)}
+                      className={cn('p-1.5 rounded-lg transition-colors', usePaletteInChat ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')}
+                      title={usePaletteInChat ? `Paleta ativa: ${activeBrandKit.name}` : 'Ativar paleta no chat'}>
+                      <Palette className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
                 <button
                   onClick={handleAgentSend}
