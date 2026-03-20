@@ -1234,7 +1234,12 @@ export default function VoidCanvasPage() {
         </div>
 
         {/* Canvas area */}
-        <div ref={canvasRef} className="absolute inset-0 pt-12 cursor-grab active:cursor-grabbing"
+        <div ref={canvasRef} className={cn("absolute inset-0 pt-12",
+            activeTool === 'hand' ? 'cursor-grab active:cursor-grabbing' :
+            activeTool === 'mark' ? 'cursor-crosshair' :
+            activeTool === 'pencil' || ['rectangle','line','arrow','ellipse','polygon','star'].includes(activeTool) ? 'cursor-crosshair' :
+            activeTool === 'text' ? 'cursor-text' : 'cursor-default'
+          )}
           onMouseDown={(e) => handleMouseDown(e)} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onWheel={handleWheel}>
           <div style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: '0 0' }} className="absolute inset-0">
             {images.map(img => (
