@@ -1246,14 +1246,27 @@ export default function VoidCanvasPage() {
               <div key={img.id} onMouseDown={(e) => handleMouseDown(e, img.id)}
                 className={cn('absolute rounded-lg overflow-hidden cursor-grab active:cursor-grabbing group transition-shadow duration-200', selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
                 style={{ left: img.position_x, top: img.position_y, width: img.width, height: img.height }}>
-                <img src={img.image_url} alt={img.label} className="w-full h-full object-cover" draggable={false} />
+                {img.node_type === 'note' ? (
+                  <div className="w-full h-full bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-center justify-center backdrop-blur-sm">
+                    <p className="text-[11px] text-amber-200/80 text-center leading-relaxed">{img.label}</p>
+                  </div>
+                ) : (
+                  <img src={img.image_url} alt={img.label} className="w-full h-full object-cover" draggable={false} />
+                )}
                 <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-[8px] text-white/80 truncate">{img.label}</p>
                 </div>
                 {selectedImage === img.id && (
-                  <button onClick={(e) => { e.stopPropagation(); deleteImage(img.id); }} className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Trash2 className="h-3 w-3" />
-                  </button>
+                  <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => { e.stopPropagation(); setAgentAttachment(img.image_url || ''); setAgentInput('Analise esta imagem.'); setLeftPanelOpen(true); toast.success('Imagem enviada ao chat'); }}
+                      className="p-1 rounded-md bg-black/60 text-primary hover:bg-black/80" title="Enviar ao chat">
+                      <MessageSquare className="h-3 w-3" />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); deleteImage(img.id); }}
+                      className="p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
