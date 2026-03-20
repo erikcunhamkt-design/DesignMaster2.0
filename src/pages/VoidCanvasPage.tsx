@@ -1415,7 +1415,7 @@ export default function VoidCanvasPage() {
                         <ArrowUpRight className="h-3 w-3" />
                       </button>
                     ) : (
-                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: 'estilo' }]); setRightPanelOpen(true); toast.success('Imagem vinculada ao gerador!'); }}
+                      <button onClick={(e) => { e.stopPropagation(); setLinkedImages(prev => [...prev, { id: img.id, imageUrl: img.image_url, label: img.label, usage: '' }]); setRightPanelOpen(true); toast.success('Imagem vinculada! Descreva o que usar no painel.'); }}
                         className="p-1 rounded-md bg-black/60 text-emerald-400 hover:bg-black/80" title="Linkar ao gerador">
                         <ArrowUpRight className="h-3 w-3" />
                       </button>
