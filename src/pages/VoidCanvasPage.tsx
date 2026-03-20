@@ -1480,6 +1480,17 @@ export default function VoidCanvasPage() {
           </div>
         </div>
 
+        {/* Link mode indicator */}
+        {activeTool === 'link' && (
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] text-emerald-300 font-medium flex items-center gap-2 backdrop-blur-sm">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+            {linkSource ? 'Clique na 2ª imagem para conectar' : 'Clique na 1ª imagem'}
+            <button onClick={() => { setActiveTool('select'); setLinkSource(null); }} className="ml-1 text-emerald-400/60 hover:text-white">
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
         {/* Empty state */}
         {images.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
