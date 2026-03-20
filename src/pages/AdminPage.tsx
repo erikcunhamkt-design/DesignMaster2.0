@@ -153,13 +153,33 @@ function ResetPasswordButton({ userId, email }: { userId: string; email: string 
     }
 
     setLoading(true);
-    const { error } = await supabase.functions.invoke('reset-user-password', {
-      body: { userId, newPassword: password.trim() },
-    });
-    setLoading(false);
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
 
-    if (error) {
-      toast.error(error.message || 'Erro ao alterar senha');
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ userId, newPassword: password.trim() }),
+        }
+      );
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (!response.ok) {
+        toast.error('Erro: ' + (data.error || 'Falha ao alterar senha'));
+        return;
+      }
+    } catch (err: any) {
+      setLoading(false);
+      toast.error(err.message || 'Erro inesperado');
       return;
     }
 
