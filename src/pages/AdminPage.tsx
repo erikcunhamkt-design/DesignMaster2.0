@@ -294,8 +294,6 @@ function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
       setLoading(false);
       toast.error(err.message || 'Erro inesperado');
     }
-    });
-    onAdded();
   };
 
   if (result) {
