@@ -1318,7 +1318,9 @@ export default function VoidCanvasPage() {
           <div style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: '0 0' }} className="absolute inset-0">
             {images.map(img => (
               <div key={img.id} onMouseDown={(e) => handleMouseDown(e, img.id)}
-                className={cn('absolute rounded-lg overflow-hidden cursor-grab active:cursor-grabbing group transition-shadow duration-200', selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
+                className={cn('absolute rounded-lg overflow-hidden group transition-shadow duration-200',
+                  activeTool === 'mark' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
+                  selectedImage === img.id ? 'ring-2 ring-primary/50 shadow-glow-md' : 'hover:shadow-glow-sm')}
                 style={{ left: img.position_x, top: img.position_y, width: img.width, height: img.height }}>
                 {img.node_type === 'note' ? (
                   <div className="w-full h-full bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-center justify-center backdrop-blur-sm">
@@ -1327,6 +1329,15 @@ export default function VoidCanvasPage() {
                 ) : (
                   <img src={img.image_url} alt={img.label} className="w-full h-full object-cover" draggable={false} />
                 )}
+                {/* Markers on this image */}
+                {markers.filter(m => m.imageId === img.id).map(marker => (
+                  <div key={marker.number} className="absolute z-20 pointer-events-none"
+                    style={{ left: `${marker.relX * 100}%`, top: `${marker.relY * 100}%`, transform: 'translate(-50%, -50%)' }}>
+                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center shadow-lg border-2 border-white animate-scale-in">
+                      {marker.number}
+                    </div>
+                  </div>
+                ))}
                 <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-[8px] text-white/80 truncate">{img.label}</p>
                 </div>
@@ -1344,6 +1355,18 @@ export default function VoidCanvasPage() {
                 )}
               </div>
             ))}
+
+            {/* SVG Drawing Layer */}
+            <svg className="absolute inset-0 pointer-events-none" style={{ width: '10000px', height: '10000px', overflow: 'visible' }}>
+              {strokes.map((stroke, i) => (
+                <polyline key={i} points={stroke.points.map(p => `${p.x},${p.y}`).join(' ')}
+                  fill="none" stroke={stroke.color} strokeWidth={stroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+              ))}
+              {currentStroke && (
+                <polyline points={currentStroke.points.map(p => `${p.x},${p.y}`).join(' ')}
+                  fill="none" stroke={currentStroke.color} strokeWidth={currentStroke.width} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+              )}
+            </svg>
           </div>
         </div>
 
