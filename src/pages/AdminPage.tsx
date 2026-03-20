@@ -8,798 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface LicenseRow {
-  id: string;
-  user_id: string;
-  email: string | null;
-  plan: string;
-  status: string;
-  expires_at: string | null;
-  created_at: string;
-  access_key: string | null;
-}
-
-export default function AdminPage() {
-  const { signOut } = useAuth();
-  const [licenses, setLicenses] = useState<LicenseRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-
-  const fetchLicenses = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('licenses')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (!error && data) setLicenses(data as LicenseRow[]);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetchLicenses(); }, [fetchLicenses]);
-
-  const updateLicenseStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from('licenses').update({ status }).eq('id', id);
-    if (error) { toast.error('Erro ao atualizar'); return; }
-    toast.success(`Status alterado para ${status}`);
-    fetchLicenses();
-  };
-
-  const updateLicensePlan = async (id: string, plan: string) => {
-    let expires_at: string | null = null;
-    if (plan === 'monthly') {
-      const d = new Date(); d.setDate(d.getDate() + 30);
-      expires_at = d.toISOString();
-    } else if (plan === 'yearly') {
-      const d = new Date(); d.setFullYear(d.getFullYear() + 1);
-      expires_at = d.toISOString();
-    }
-    const { error } = await supabase.from('licenses').update({ plan, status: 'active', expires_at }).eq('id', id);
-    if (error) { toast.error('Erro ao atualizar plano'); return; }
-    toast.success(`Plano alterado para ${plan}`);
-    fetchLicenses();
-  };
-
-  const deleteLicense = async (id: string) => {
-    if (!confirm('Tem certeza que deseja remover esta licença?')) return;
-    const { error } = await supabase.from('licenses').delete().eq('id', id);
-    if (error) { toast.error('Erro ao remover'); return; }
-    toast.success('Licença removida');
-    fetchLicenses();
-  };
-
-  const filtered = licenses.filter(l =>
-    (l.email || '').toLowerCase().includes(search.toLowerCase())
-  );
-
-  const totalUsers = licenses.length;
-  const activeUsers = licenses.filter(l => l.status === 'active').length;
-  const planCounts = licenses.reduce((acc, l) => {
-    acc[l.plan] = (acc[l.plan] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Painel Admin" showApiKey={false} />
-
-      <div className="flex-1 overflow-auto p-6 space-y-6">
-        {/* Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard icon={<Users className="h-5 w-5 text-primary" />} label="Total Usuários" value={totalUsers} />
-          <MetricCard icon={<CheckCircle className="h-5 w-5 text-primary" />} label="Ativos" value={activeUsers} />
-          <MetricCard icon={<XCircle className="h-5 w-5 text-destructive" />} label="Inativos" value={totalUsers - activeUsers} />
-          <MetricCard icon={<CreditCard className="h-5 w-5 text-primary" />} label="Planos" value={Object.entries(planCounts).map(([k, v]) => `${k}: ${v}`).join(' · ')} />
-        </div>
-
-        <Tabs defaultValue="users" className="w-full">
-          <TabsList className="bg-secondary/50">
-            <TabsTrigger value="users">Usuários & Licenças</TabsTrigger>
-            <TabsTrigger value="moderation">Moderação Chat</TabsTrigger>
-            <TabsTrigger value="notifications">Notificações</TabsTrigger>
-            <TabsTrigger value="content">Conteúdo</TabsTrigger>
-          </TabsList>
-
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-4 mt-4">
-            <AddLicenseForm onAdded={fetchLicenses} />
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por email..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Button variant="outline" size="sm" onClick={fetchLicenses}>Atualizar</Button>
-            </div>
-
-            <div className="rounded-xl border border-border/40 glass-card overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-border/30">
-                    <TableHead>Email</TableHead>
-                    <TableHead>Plano</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Chave</TableHead>
-                    <TableHead>Expira em</TableHead>
-                    <TableHead>Criado em</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
-                    </TableRow>
-                  ) : filtered.length === 0 ? (
-                    <TableRow>
-                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhum resultado</TableCell>
-                    </TableRow>
-                  ) : (
-                    filtered.map(license => (
-                      <TableRow key={license.id} className="border-border/20">
-                        <TableCell className="font-medium text-foreground">{license.email || '—'}</TableCell>
-                        <TableCell>
-                          <Select defaultValue={license.plan} onValueChange={v => updateLicensePlan(license.id, v)}>
-                            <SelectTrigger className="w-28 h-8 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="monthly">Mensal</SelectItem>
-                              <SelectItem value="yearly">Anual</SelectItem>
-                              <SelectItem value="lifetime">Vitalício</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={license.status === 'active' ? 'default' : 'secondary'}
-                            className={license.status === 'active' ? 'bg-primary/15 text-primary border-primary/20' : 'bg-destructive/10 text-destructive border-destructive/20'}
-                          >
-                            {license.status === 'active' ? 'Ativo' : 'Inativo'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs font-mono">
-                          {license.access_key || '—'}
-                        </TableCell>
-                        <TableCell className="text-xs">
-                          {license.expires_at ? <CountdownCell expiresAt={license.expires_at} /> : '—'}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {new Date(license.created_at).toLocaleDateString('pt-BR')}
-                        </TableCell>
-                        <TableCell className="text-right space-x-1">
-                          {license.status === 'active' ? (
-                            <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => updateLicenseStatus(license.id, 'inactive')}>
-                              <XCircle className="h-3.5 w-3.5 mr-1" /> Desativar
-                            </Button>
-                          ) : (
-                            <Button size="sm" variant="ghost" className="h-7 text-xs text-primary hover:text-primary" onClick={() => updateLicenseStatus(license.id, 'active')}>
-                              <CheckCircle className="h-3.5 w-3.5 mr-1" /> Ativar
-                            </Button>
-                          )}
-                          <ResetPasswordButton userId={license.user_id} email={license.email} />
-                          <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => deleteLicense(license.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
-
-          {/* Moderation Tab */}
-          <TabsContent value="moderation" className="space-y-4 mt-4">
-            <ChatModerationPanel />
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-4 mt-4">
-            <NotificationManager />
-          </TabsContent>
-
-          {/* Content Tab */}
-          <TabsContent value="content" className="space-y-4 mt-4">
-            <ContentManager />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
-
-function MetricCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
-  return (
-    <div className="glass-card rounded-xl p-4 flex items-center gap-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/8">{icon}</div>
-      <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-lg font-bold text-foreground">{typeof value === 'number' ? value : value}</p>
-      </div>
-    </div>
-  );
-}
-
-function ContentManager() {
-  // This reads from the studios data file. In a future iteration it can be backed by a DB table.
-  const [studios, setStudios] = useState<{ id: string; name: string; route: string; icon: string }[]>([]);
-
-  useEffect(() => {
-    import('@/data/studios').then(mod => {
-      setStudios(mod.studios.map(s => ({ id: s.id, name: s.name, route: s.route, icon: s.icon })));
-    });
-  }, []);
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-foreground">Studios Ativos</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {studios.map(s => (
-          <div key={s.id} className="glass-card rounded-xl p-4 flex items-center gap-3">
-            <span className="text-2xl">{s.icon}</span>
-            <div>
-              <p className="text-sm font-medium text-foreground">{s.name}</p>
-              <p className="text-xs text-muted-foreground">{s.route}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Para adicionar ou remover studios, edite o arquivo de configuração de studios no código.
-      </p>
-    </div>
-  );
-}
-
-function NotificationManager() {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
-  const [notifs, setNotifs] = useState<{ id: string; title: string; message: string; created_at: string }[]>([]);
-  const [loadingNotifs, setLoadingNotifs] = useState(true);
-
-  const fetchNotifs = useCallback(async () => {
-    setLoadingNotifs(true);
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20);
-    setNotifs(data || []);
-    setLoadingNotifs(false);
-  }, []);
-
-  useEffect(() => { fetchNotifs(); }, [fetchNotifs]);
-
-  const handleSend = async () => {
-    if (!title.trim() || !message.trim()) {
-      toast.error('Preencha título e mensagem');
-      return;
-    }
-    setSending(true);
-    const { data: session } = await supabase.auth.getSession();
-    const userId = session?.session?.user?.id;
-    if (!userId) { toast.error('Não autenticado'); setSending(false); return; }
-
-    const { error } = await supabase
-      .from('notifications')
-      .insert({ title: title.trim(), message: message.trim(), created_by: userId });
-
-    if (error) {
-      toast.error('Erro ao enviar notificação');
-    } else {
-      toast.success('Notificação enviada para todos os usuários!');
-      setTitle('');
-      setMessage('');
-      fetchNotifs();
-    }
-    setSending(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from('notifications').delete().eq('id', id);
-    if (error) toast.error('Erro ao remover');
-    else { toast.success('Removida'); fetchNotifs(); }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Send notification form */}
-      <div className="glass-card rounded-xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-primary" />
-          <h3 className="text-sm font-semibold text-foreground">Enviar Notificação</h3>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">Título</label>
-            <Input
-              placeholder="Ex: Nova funcionalidade disponível!"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">Mensagem</label>
-            <Input
-              placeholder="Descreva o aviso para os usuários..."
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-            />
-          </div>
-          <Button onClick={handleSend} disabled={sending} className="gap-1.5">
-            <Send className="h-4 w-4" />
-            {sending ? 'Enviando...' : 'Enviar para todos'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Sent notifications list */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-foreground">Notificações Enviadas</h3>
-        {loadingNotifs ? (
-          <p className="text-xs text-muted-foreground">Carregando...</p>
-        ) : notifs.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Nenhuma notificação enviada ainda.</p>
-        ) : (
-          <div className="space-y-2">
-            {notifs.map(n => (
-              <div key={n.id} className="glass-card rounded-xl p-4 flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{n.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1">
-                    {new Date(n.created_at).toLocaleString('pt-BR')}
-                  </p>
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(n.id)}>
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-function AddLicenseForm({ onAdded }: { onAdded: () => void }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [plan, setPlan] = useState('monthly');
-  const [status, setStatus] = useState('active');
-  const [isTest, setIsTest] = useState(false);
-  const [testMinutes, setTestMinutes] = useState('10');
-  const [adding, setAdding] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [result, setResult] = useState<{ email: string; password: string; accessKey: string } | null>(null);
-
-  const generatePassword = () => {
-    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
-    let pwd = '';
-    for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
-    setPassword(pwd);
-  };
-
-  const handleAdd = async () => {
-    if (!email.trim()) { toast.error('Informe o email'); return; }
-    if (!password.trim() || password.length < 6) { toast.error('Senha deve ter pelo menos 6 caracteres'); return; }
-    setAdding(true);
-
-    const expiresAt = isTest
-      ? new Date(Date.now() + parseInt(testMinutes) * 60 * 1000).toISOString()
-      : undefined;
-
-    const { data: session } = await supabase.auth.getSession();
-    const token = session?.session?.access_token;
-
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-test-user`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password: password.trim(),
-          plan: isTest ? 'test' : plan,
-          expiresAt,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      toast.error('Erro: ' + (data.error || 'Falha ao criar'));
-    } else {
-      toast.success(data.renewed ? 'Licença renovada com sucesso!' : 'Usuário criado com sucesso!');
-      setResult({ email: email.trim(), password: password.trim(), accessKey: data.accessKey });
-      onAdded();
-    }
-    setAdding(false);
-  };
-
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${label} copiado!`);
-  };
-
-  if (result) {
-    return (
-      <div className="glass-card rounded-xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-primary" />
-          <span className="text-sm font-semibold text-foreground">Usuário Criado com Sucesso</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <CredentialField label="Email" value={result.email} onCopy={() => copyToClipboard(result.email, 'Email')} />
-          <CredentialField label="Senha" value={result.password} onCopy={() => copyToClipboard(result.password, 'Senha')} secret />
-          <CredentialField label="Chave de Acesso" value={result.accessKey} onCopy={() => copyToClipboard(result.accessKey, 'Chave')} />
-        </div>
-        <p className="text-xs text-muted-foreground">Guarde essas credenciais — a senha não poderá ser recuperada.</p>
-        <Button size="sm" variant="outline" onClick={() => { setResult(null); setEmail(''); setPassword(''); setOpen(false); }}>
-          Fechar
-        </Button>
-      </div>
-    );
-  }
-
-  if (!open) {
-    return (
-      <div className="flex gap-2">
-        <Button size="sm" onClick={() => { setIsTest(false); setOpen(true); generatePassword(); }} className="gap-1.5">
-          <Plus className="h-4 w-4" /> Adicionar Pessoa
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => { setIsTest(true); setOpen(true); generatePassword(); }} className="gap-1.5">
-          <Timer className="h-4 w-4" /> Licença Teste
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="glass-card rounded-xl p-4 space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        {isTest && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Licença Teste</Badge>}
-        <span className="text-sm font-medium text-foreground">{isTest ? 'Nova Licença Teste' : 'Adicionar Pessoa'}</span>
-      </div>
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="flex-1 min-w-[200px]">
-          <label className="text-xs text-muted-foreground mb-1 block">Email</label>
-          <Input placeholder="email@exemplo.com" value={email} onChange={e => setEmail(e.target.value)} type="email" />
-        </div>
-        <div className="w-48">
-          <label className="text-xs text-muted-foreground mb-1 block">Senha</label>
-          <div className="relative">
-            <Input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="pr-16"
-            />
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
-              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              </Button>
-              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={generatePassword} title="Gerar senha">
-                <Key className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-        {isTest ? (
-          <div className="w-40">
-            <label className="text-xs text-muted-foreground mb-1 block">Duração</label>
-            <Select value={testMinutes} onValueChange={setTestMinutes}>
-              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 minutos</SelectItem>
-                <SelectItem value="20">20 minutos</SelectItem>
-                <SelectItem value="30">30 minutos</SelectItem>
-                <SelectItem value="60">1 hora</SelectItem>
-                <SelectItem value="120">2 horas</SelectItem>
-                <SelectItem value="1440">24 horas</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        ) : (
-          <>
-            <div className="w-32">
-              <label className="text-xs text-muted-foreground mb-1 block">Plano</label>
-              <Select value={plan} onValueChange={setPlan}>
-                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="monthly">Mensal</SelectItem>
-                  <SelectItem value="yearly">Anual</SelectItem>
-                  <SelectItem value="lifetime">Vitalício</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-32">
-              <label className="text-xs text-muted-foreground mb-1 block">Status</label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="inactive">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </>
-        )}
-        <Button onClick={handleAdd} disabled={adding} className="gap-1.5">
-          <Plus className="h-4 w-4" /> {adding ? 'Criando...' : isTest ? 'Gerar Teste' : 'Adicionar'}
-        </Button>
-        <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
-      </div>
-    </div>
-  );
-}
-
-function CredentialField({ label, value, onCopy, secret }: { label: string; value: string; onCopy: () => void; secret?: boolean }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div className="rounded-lg border border-border/40 bg-secondary/30 p-3">
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <div className="flex items-center gap-2">
-        <code className="text-sm font-mono text-foreground flex-1 truncate">
-          {secret && !show ? '••••••••' : value}
-        </code>
-        {secret && (
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShow(!show)}>
-            {show ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          </Button>
-        )}
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onCopy}>
-          <Copy className="h-3 w-3" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function CountdownCell({ expiresAt }: { expiresAt: string }) {
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const diff = new Date(expiresAt).getTime() - now;
-
-  if (diff <= 0) {
-    return <span className="text-destructive font-medium">Expirado</span>;
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
-
-  if (days > 0) {
-    return <span className="text-muted-foreground">{days}d {hours}h {minutes}m</span>;
-  }
-  if (hours > 0) {
-    return <span className="text-amber-400">{hours}h {minutes}m {seconds}s</span>;
-  }
-  return <span className="text-destructive">{minutes}m {seconds}s</span>;
-}
-
-function ChatModerationPanel() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [statuses, setStatuses] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
-  const [searchMod, setSearchMod] = useState('');
-  const [muteMinutes, setMuteMinutes] = useState('30');
-
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    // Get all profiles
-    const { data: profilesData } = await supabase.from('profiles').select('*');
-    if (profilesData) setUsers(profilesData);
-
-    // Get all chat statuses (admin can see all)
-    const { data: statusData } = await supabase.from('chat_user_status').select('*');
-    if (statusData) {
-      const map: Record<string, any> = {};
-      statusData.forEach((s: any) => map[s.user_id] = s);
-      setStatuses(map);
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
-
-  const muteUser = async (userId: string) => {
-    const mutedUntil = new Date(Date.now() + parseInt(muteMinutes) * 60 * 1000).toISOString();
-    const existing = statuses[userId];
-    if (existing) {
-      await supabase.from('chat_user_status').update({ status: 'muted', muted_until: mutedUntil, reason: 'Admin action' } as any).eq('user_id', userId);
-    } else {
-      await supabase.from('chat_user_status').insert({ user_id: userId, status: 'muted', muted_until: mutedUntil, reason: 'Admin action' } as any);
-    }
-    toast.success('Usuário silenciado');
-    fetchUsers();
-  };
-
-  const banUser = async (userId: string) => {
-    const existing = statuses[userId];
-    if (existing) {
-      await supabase.from('chat_user_status').update({ status: 'banned', muted_until: null, reason: 'Admin ban' } as any).eq('user_id', userId);
-    } else {
-      await supabase.from('chat_user_status').insert({ user_id: userId, status: 'banned', muted_until: null, reason: 'Admin ban' } as any);
-    }
-    toast.success('Usuário banido');
-    fetchUsers();
-  };
-
-  const unmuteUser = async (userId: string) => {
-    await supabase.from('chat_user_status').update({ status: 'active', muted_until: null, reason: null } as any).eq('user_id', userId);
-    toast.success('Restrição removida');
-    fetchUsers();
-  };
-
-  const filtered = users.filter(u =>
-    (u.display_name || '').toLowerCase().includes(searchMod.toLowerCase()) ||
-    (u.id || '').toLowerCase().includes(searchMod.toLowerCase())
-  );
-
-  const getStatus = (userId: string) => {
-    const s = statuses[userId];
-    if (!s) return 'active';
-    if (s.status === 'muted' && s.muted_until && new Date(s.muted_until) < new Date()) return 'active';
-    return s.status;
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome..." value={searchMod} onChange={e => setSearchMod(e.target.value)} className="pl-9" />
-        </div>
-        <Select value={muteMinutes} onValueChange={setMuteMinutes}>
-          <SelectTrigger className="w-36 h-9 text-xs">
-            <SelectValue placeholder="Tempo mute" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="5">5 minutos</SelectItem>
-            <SelectItem value="15">15 minutos</SelectItem>
-            <SelectItem value="30">30 minutos</SelectItem>
-            <SelectItem value="60">1 hora</SelectItem>
-            <SelectItem value="360">6 horas</SelectItem>
-            <SelectItem value="1440">24 horas</SelectItem>
-            <SelectItem value="10080">7 dias</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button variant="outline" size="sm" onClick={fetchUsers}><RefreshCw className="h-3.5 w-3.5 mr-1" /> Atualizar</Button>
-      </div>
-
-      <div className="rounded-xl border border-border/40 glass-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-border/30">
-              <TableHead>Usuário</TableHead>
-              <TableHead>Cargo</TableHead>
-              <TableHead>Título</TableHead>
-              <TableHead>Status Chat</TableHead>
-              <TableHead>Silenciado até</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
-            ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum usuário</TableCell></TableRow>
-            ) : filtered.map(u => {
-              const status = getStatus(u.id);
-              const statusInfo = statuses[u.id];
-              return (
-                <TableRow key={u.id} className="border-border/20">
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
-                        {(u.display_name || '?').slice(0, 2).toUpperCase()}
-                      </div>
-                      <span className="text-sm font-medium text-foreground">{u.display_name || 'Sem nome'}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      defaultValue={u.cargo || '__none__'}
-                      onValueChange={(val) => {
-                        const newCargo = val === '__none__' ? null : val;
-                        supabase.from('profiles').update({ cargo: newCargo } as any).eq('id', u.id).then(() => toast.success('Cargo atualizado'));
-                      }}
-                    >
-                      <SelectTrigger className="h-7 text-xs w-36 bg-secondary/30 border-border/20">
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">Nenhum</SelectItem>
-                        <SelectItem value="Administrador">🔴 Administrador</SelectItem>
-                        <SelectItem value="Moderador">🟠 Moderador</SelectItem>
-                        <SelectItem value="Suporte">🔵 Suporte</SelectItem>
-                        <SelectItem value="Designer">🟢 Designer</SelectItem>
-                        <SelectItem value="Editor">🟣 Editor</SelectItem>
-                        <SelectItem value="Curador">🟡 Curador</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      defaultValue={u.title || '__none__'}
-                      onValueChange={(val) => {
-                        const newTitle = val === '__none__' ? null : val;
-                        supabase.from('profiles').update({ title: newTitle } as any).eq('id', u.id).then(() => toast.success('Título atualizado'));
-                      }}
-                    >
-                      <SelectTrigger className="h-7 text-xs w-32 bg-secondary/30 border-border/20">
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">Nenhum</SelectItem>
-                        <SelectItem value="MASTER">👑 MASTER</SelectItem>
-                        <SelectItem value="Fundador">⚜️ Fundador</SelectItem>
-                        <SelectItem value="VIP">⭐ VIP</SelectItem>
-                        <SelectItem value="Elite">💎 Elite</SelectItem>
-                        <SelectItem value="Membro">🏅 Membro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    {status === 'active' && <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>}
-                    {status === 'muted' && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20">Silenciado</Badge>}
-                    {status === 'banned' && <Badge className="bg-destructive/15 text-destructive border-destructive/20">Banido</Badge>}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {status === 'muted' && statusInfo?.muted_until
-                      ? new Date(statusInfo.muted_until).toLocaleString('pt-BR')
-                      : '—'}
-                  </TableCell>
-                  <TableCell className="text-right space-x-1">
-                    {status === 'active' ? (
-                      <>
-                        <Button size="sm" variant="ghost" className="h-7 text-xs text-amber-500 hover:text-amber-500" onClick={() => muteUser(u.id)}>
-                          <AlertTriangle className="h-3.5 w-3.5 mr-1" /> Silenciar
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => banUser(u.id)}>
-                          <Ban className="h-3.5 w-3.5 mr-1" /> Banir
-                        </Button>
-                      </>
-                    ) : (
-                      <Button size="sm" variant="ghost" className="h-7 text-xs text-primary hover:text-primary" onClick={() => unmuteUser(u.id)}>
-                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Desbloquear
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-}
-
+...
 function ResetPasswordButton({ userId, email }: { userId: string; email: string | null }) {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState('');
@@ -813,71 +25,95 @@ function ResetPasswordButton({ userId, email }: { userId: string; email: string 
     setPassword(pwd);
   };
 
-  const handleReset = async () => {
-    if (!password || password.length < 6) { toast.error('Senha deve ter pelo menos 6 caracteres'); return; }
-    setLoading(true);
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen && !password) generatePassword();
+    if (!nextOpen) {
+      setPassword('');
+      setShowPwd(false);
+    }
+  };
 
+  const handleReset = async () => {
+    if (!password || password.length < 6) {
+      toast.error('Senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    setLoading(true);
     const { data: session } = await supabase.auth.getSession();
     const token = session?.session?.access_token;
 
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ userId, newPassword: password }),
-      }
-    );
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({ userId, newPassword: password }),
+    });
 
     if (response.ok) {
       toast.success(`Senha alterada para ${email || userId}`);
       navigator.clipboard.writeText(password);
       toast.info('Nova senha copiada para a área de transferência');
-      setOpen(false);
-      setPassword('');
+      handleOpenChange(false);
     } else {
       const data = await response.json();
       toast.error('Erro: ' + (data.error || 'Falha ao resetar senha'));
     }
+
     setLoading(false);
   };
 
-  if (!open) {
-    return (
-      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(true); generatePassword(); }}>
-        <Lock className="h-3.5 w-3.5 mr-1" /> Senha
-      </Button>
-    );
-  }
-
   return (
-    <div className="inline-flex items-center gap-1.5">
-      <div className="relative">
-        <Input
-          type={showPwd ? 'text' : 'password'}
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          className="h-7 text-xs w-32 pr-14"
-        />
-        <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex gap-0.5">
-          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowPwd(!showPwd)}>
-            {showPwd ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          </Button>
-          <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={generatePassword}>
-            <Key className="h-3 w-3" />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="ghost" className="h-7 text-xs whitespace-nowrap">
+          <Lock className="mr-1 h-3.5 w-3.5" /> Alterar senha
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Alterar senha</DialogTitle>
+          <DialogDescription>
+            Defina uma nova senha para {email || 'este usuário'}.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          <div className="relative">
+            <Input
+              type={showPwd ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pr-20"
+              placeholder="Nova senha"
+            />
+            <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
+              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setShowPwd((value) => !value)}>
+                {showPwd ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              </Button>
+              <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={generatePassword}>
+                <Key className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={generatePassword} className="w-full">
+            Gerar senha
           </Button>
         </div>
-      </div>
-      <Button size="sm" className="h-7 text-xs" onClick={handleReset} disabled={loading}>
-        {loading ? '...' : 'OK'}
-      </Button>
-      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setOpen(false); setPassword(''); }}>
-        ✕
-      </Button>
-    </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button type="button" onClick={handleReset} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar senha'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
