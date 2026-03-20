@@ -601,6 +601,7 @@ export default function VoidCanvasPage() {
 
     const currentRef = referenceImage; const currentRefDesc = referenceDesc;
     const currentChar = characterImage; const currentAudio = audioBlob;
+    const currentLinked = [...linkedImages];
     setReferenceImage(null); setReferenceDesc(''); setShowRefDesc(false);
     setCharacterImage(null); setAudioBlob(null);
 
@@ -611,6 +612,14 @@ export default function VoidCanvasPage() {
         finalPrompt = 'Generate an image based on the audio description provided';
       }
 
+      // Inject linked images instructions into prompt
+      if (currentLinked.length > 0) {
+        const linkedInstructions = currentLinked.map((li, i) =>
+          `Image ${i + 1}: use its ${li.usage === 'tudo' ? 'everything (style, composition, colors, subject)' : li.usage}`
+        ).join('; ');
+        finalPrompt += `. REFERENCE IMAGES: ${linkedInstructions}.`;
+      }
+
       // Inject brand kit colors into prompt
       if (activeBrandKit && activeBrandKit.colors.length > 0) {
         const colorList = activeBrandKit.colors.join(', ');
@@ -618,7 +627,8 @@ export default function VoidCanvasPage() {
       }
 
       const thinkingId = crypto.randomUUID();
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
         prompt: finalPrompt, googleApiKey: apiKey,
@@ -626,7 +636,12 @@ export default function VoidCanvasPage() {
         aspectRatio: '1:1', useArchitect: false,
       };
       if (currentChar) body.subjectImages = [currentChar];
-      if (currentRef) { body.styleReferenceImages = [currentRef]; if (currentRefDesc.trim()) body.referenceNotes = [currentRefDesc]; }
+      // Combine linked images + manual reference into styleReferenceImages
+      const allRefs: string[] = [];
+      const allRefNotes: string[] = [];
+      if (currentRef) { allRefs.push(currentRef); if (currentRefDesc.trim()) allRefNotes.push(currentRefDesc); }
+      currentLinked.forEach(li => { allRefs.push(li.imageUrl); allRefNotes.push(`Use: ${li.usage}`); });
+      if (allRefs.length > 0) { body.styleReferenceImages = allRefs; if (allRefNotes.length > 0) body.referenceNotes = allRefNotes; }
 
       const res = await fetch(`https://${projectId}.supabase.co/functions/v1/generate-image`, {
         method: 'POST',
