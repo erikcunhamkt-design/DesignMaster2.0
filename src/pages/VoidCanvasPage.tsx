@@ -359,6 +359,7 @@ export default function VoidCanvasPage() {
         case 'v': setActiveTool('select'); break;
         case 'h': setActiveTool('hand'); break;
         case 'm': setActiveTool('mark'); break;
+        case 'c': setActiveTool('link'); setLinkSource(null); toast.info('Clique na 1ª imagem, depois na 2ª para conectar'); break;
         case 'r': setActiveTool('rectangle'); break;
         case 't': setActiveTool('text'); break;
         case 'p': setActiveTool('pencil'); break;
