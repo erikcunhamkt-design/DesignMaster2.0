@@ -45,6 +45,19 @@ interface CanvasImage {
   node_type?: string;
 }
 
+interface CanvasMarker {
+  imageId: string;
+  relX: number;
+  relY: number;
+  number: number;
+}
+
+interface DrawingStroke {
+  points: { x: number; y: number }[];
+  color: string;
+  width: number;
+}
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
