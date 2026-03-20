@@ -43,12 +43,14 @@ Deno.serve(async (req) => {
     }
 
     const callerId = claims.claims.sub as string;
-    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", {
-      _user_id: callerId,
-      _role: "admin",
-    });
+    const { data: roleData } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", callerId)
+      .eq("role", "admin")
+      .maybeSingle();
 
-    if (!isAdmin) {
+    if (!roleData) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
