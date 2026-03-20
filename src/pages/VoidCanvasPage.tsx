@@ -569,6 +569,10 @@ export default function VoidCanvasPage() {
     if (attachment) {
       content = msg ? `${msg}\n\n[Imagem: ${attachment}]` : `[Imagem: ${attachment}]\n\nAnalise esta imagem.`;
     }
+    // Inject brand palette if active
+    if (usePaletteInChat && activeBrandKit) {
+      content += `\n\n[PALETA DE CORES ATIVA: ${activeBrandKit.colors.join(', ')}] Use estas cores como referência para prompts e sugestões visuais.`;
+    }
 
     const userMsg: AgentMsg = { role: 'user', content };
     setAgentMessages(prev => [...prev, userMsg]);
