@@ -1846,18 +1846,12 @@ export default function VoidCanvasPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[9px] text-foreground/60 truncate mb-1">{li.label}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {USAGE_OPTIONS.map(opt => (
-                          <button key={opt.id} onClick={() => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: opt.id } : l))}
-                            className={cn('px-1.5 py-0.5 rounded-full text-[8px] font-medium transition-colors border',
-                              li.usage === opt.id
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                                : 'bg-secondary/10 text-muted-foreground/40 border-transparent hover:text-foreground/60 hover:bg-secondary/20'
-                            )}>
-                            {opt.emoji} {opt.label}
-                          </button>
-                        ))}
-                      </div>
+                      <input
+                        value={li.usage}
+                        onChange={(e) => setLinkedImages(prev => prev.map(l => l.id === li.id ? { ...l, usage: e.target.value } : l))}
+                        placeholder="Ex: usar o estilo, cores, pose, iluminação..."
+                        className="w-full bg-transparent border-b border-emerald-500/20 text-[10px] text-emerald-200/80 placeholder:text-muted-foreground/25 focus:outline-none focus:border-emerald-400/50 py-0.5"
+                      />
                     </div>
                     <button onClick={() => setLinkedImages(prev => prev.filter(l => l.id !== li.id))}
                       className="p-1 rounded text-muted-foreground/30 hover:text-destructive shrink-0">
