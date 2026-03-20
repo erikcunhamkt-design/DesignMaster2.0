@@ -183,6 +183,7 @@ export default function AdminPage() {
                               <CheckCircle className="h-3.5 w-3.5 mr-1" /> Ativar
                             </Button>
                           )}
+                          <ResetPasswordButton userId={license.user_id} email={license.email} />
                           <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => deleteLicense(license.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
