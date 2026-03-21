@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
       prompt += `\n\nADDITIONAL INSTRUCTION: If this is a black and white or sepia photograph, carefully colorize it with historically accurate and natural colors while maintaining the authentic feel. Use realistic skin tones, natural fabric colors, and period-appropriate hues. The colorization must look natural, not artificial or oversaturated.`;
     }
 
-    const model = "gemini-2.5-flash";
+    const model = "gemini-3-pro-image-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
     const response = await fetch(url, {
