@@ -81,27 +81,38 @@ Deno.serve(async (req) => {
       const parts: any[] = [];
       let textContent = msg.content;
 
-      // Handle inline images
-      const imageRegex = /\[Imagem:\s*(https?:\/\/[^\]]+)\]/g;
-      const imageUrls: string[] = [];
+      // Handle inline images (both http URLs and data URIs)
+      const imageRegex = /\[Imagem:\s*((?:https?:\/\/|data:image\/)[^\]]+)\]/g;
+      const imageRefs: string[] = [];
       let match;
       while ((match = imageRegex.exec(textContent)) !== null) {
-        imageUrls.push(match[1]);
+        imageRefs.push(match[1]);
       }
       textContent = textContent.replace(imageRegex, '').trim();
 
-      for (const imageUrl of imageUrls) {
+      for (const imageRef of imageRefs) {
         try {
-          const imgResp = await fetch(imageUrl);
-          if (imgResp.ok) {
-            const arrayBuf = await imgResp.arrayBuffer();
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)));
-            const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
-            const mimeType = contentType.split(';')[0].trim();
-            parts.push({ inlineData: { mimeType, data: base64 } });
+          if (imageRef.startsWith('data:')) {
+            // Parse data URI directly
+            const dataMatch = imageRef.match(/^data:(image\/[^;]+);base64,(.+)$/);
+            if (dataMatch) {
+              const mimeType = dataMatch[1];
+              // Limit base64 size to ~1MB to avoid token limits
+              const b64 = dataMatch[2].length > 1_400_000 ? dataMatch[2].substring(0, 1_400_000) : dataMatch[2];
+              parts.push({ inlineData: { mimeType, data: b64 } });
+            }
+          } else {
+            const imgResp = await fetch(imageRef);
+            if (imgResp.ok) {
+              const arrayBuf = await imgResp.arrayBuffer();
+              const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)));
+              const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
+              const mimeType = contentType.split(';')[0].trim();
+              parts.push({ inlineData: { mimeType, data: base64 } });
+            }
           }
         } catch (e) {
-          console.error("Failed to fetch image:", imageUrl, e);
+          console.error("Failed to process image:", e);
         }
       }
 
