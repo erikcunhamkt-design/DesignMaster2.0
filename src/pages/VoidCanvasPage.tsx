@@ -659,8 +659,29 @@ export default function VoidCanvasPage() {
       const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
       setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
+      // Step 1: Smart Router — classify intent & expand prompt with specialist agent
+      let smartPrompt = finalPrompt;
+      let agentName = '';
+      let agentEmoji = '';
+      try {
+        const routerRes = await fetch(`https://${projectId}.supabase.co/functions/v1/void-smart-router`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
+          body: JSON.stringify({ prompt: finalPrompt, googleApiKey: apiKey }),
+        });
+        if (routerRes.ok) {
+          const routerData = await routerRes.json();
+          smartPrompt = routerData.expandedPrompt || finalPrompt;
+          agentName = routerData.agentName || '';
+          agentEmoji = routerData.agentEmoji || '';
+          console.log(`🧭 Smart Router: ${agentEmoji} ${agentName}`);
+        }
+      } catch (e) {
+        console.warn('Smart Router unavailable, using raw prompt', e);
+      }
+
       const body: Record<string, unknown> = {
-        prompt: finalPrompt, googleApiKey: apiKey,
+        prompt: smartPrompt, googleApiKey: apiKey,
         aiModel: imageModel === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
         aspectRatio: '1:1', useArchitect: false,
       };
