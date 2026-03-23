@@ -569,11 +569,16 @@ export default function VoidCanvasPage() {
 
   const addImageToCanvas = async (imageUrl: string, label: string, promptText: string) => {
     if (!user || !activeProjectId) return;
+    // If base64, upload to storage first
+    let finalUrl = imageUrl;
+    if (imageUrl.startsWith('data:')) {
+      finalUrl = await base64ToStorageUrl(imageUrl, user.id);
+    }
     const baseX = 80 + Math.random() * 400;
     const baseY = 80 + images.length * 140 + Math.random() * 60;
     const { data: newRow } = await supabase.from('void_canvas_nodes').insert({
       user_id: user.id, label: label.slice(0, 50), node_type: 'image',
-      image_url: imageUrl, prompt: promptText,
+      image_url: finalUrl, prompt: promptText,
       position_x: baseX, position_y: baseY,
       width: 200, height: 200, z_index: images.length,
       project_id: activeProjectId,
@@ -586,8 +591,8 @@ export default function VoidCanvasPage() {
         position_x: r.position_x, position_y: r.position_y,
         width: r.width, height: r.height,
       }]);
-      // Update project thumbnail & updated_at
-      await supabase.from('void_projects' as any).update({ thumbnail_url: imageUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
+      // Update project thumbnail with a small version, not the full base64
+      await supabase.from('void_projects' as any).update({ thumbnail_url: finalUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
     }
     };
 
