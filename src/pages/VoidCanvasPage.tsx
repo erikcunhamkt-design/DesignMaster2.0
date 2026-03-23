@@ -657,7 +657,8 @@ export default function VoidCanvasPage() {
 
       const thinkingId = crypto.randomUUID();
       const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${agentLabel}${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       // Step 1: Smart Router — classify intent & expand prompt with specialist agent
       let smartPrompt = finalPrompt;
