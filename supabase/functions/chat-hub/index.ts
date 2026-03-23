@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
 
       if (textContent) {
         parts.push({ text: textContent });
-      } else if (imageUrls.length > 0) {
+      } else if (imageRefs.length > 0) {
         parts.push({ text: "Analise esta imagem." });
       }
 
