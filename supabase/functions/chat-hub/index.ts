@@ -74,7 +74,10 @@ Deno.serve(async (req) => {
     geminiContents.push({ role: "user", parts: [{ text: agent.system }] });
     geminiContents.push({ role: "model", parts: [{ text: agent.greeting }] });
 
-    for (const msg of messages) {
+    // Limit to last 40 messages to avoid exceeding token limits
+    const recentMessages = messages.slice(-40);
+
+    for (const msg of recentMessages) {
       const parts: any[] = [];
       let textContent = msg.content;
 
