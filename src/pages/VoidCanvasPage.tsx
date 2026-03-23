@@ -700,8 +700,8 @@ export default function VoidCanvasPage() {
         finalPrompt += `. REFERENCE IMAGES: ${linkedInstructions}.`;
       }
 
-      // Inject brand kit colors into prompt
-      if (activeBrandKit && activeBrandKit.colors.length > 0) {
+      // Inject brand kit colors into prompt only if toggle is on
+      if (usePaletteInGen && activeBrandKit && activeBrandKit.colors.length > 0) {
         const colorList = activeBrandKit.colors.join(', ');
         finalPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
       }
