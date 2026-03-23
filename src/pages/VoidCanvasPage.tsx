@@ -1529,7 +1529,7 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded-md bg-black/60 text-primary hover:bg-black/80" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
                     </button>
-                    <button onClick={(e) => {
+                    <button onClick={async (e) => {
                       e.stopPropagation();
                       if (!img.image_url) return;
                       try {
