@@ -674,7 +674,7 @@ export default function VoidCanvasPage() {
     if (!apiKey) { toast.error('Configure sua API Key primeiro'); return; }
 
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: genPrompt || '🎤 Áudio enviado' };
-    setGenMessages(prev => [...prev, userMessage]);
+    setGenMessages(prev => [...prev.slice(-30), userMessage]);
     const currentPrompt = genPrompt;
     setGenPrompt('');
     setIsGenerating(true);
@@ -732,8 +732,13 @@ export default function VoidCanvasPage() {
 
       const data = await res.json();
       if (data.imageUrl || data.image) {
-        const imageUrl = data.imageUrl || data.image;
+        let imageUrl = data.imageUrl || data.image;
         const title = finalPrompt.slice(0, 60);
+        // Convert base64 to storage URL BEFORE storing in state to prevent massive re-renders
+        if (imageUrl.startsWith('data:') && user) {
+          const storageUrl = await base64ToStorageUrl(imageUrl, user.id);
+          if (storageUrl !== imageUrl) imageUrl = storageUrl;
+        }
         setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: 'Pronto! Imagem criada e adicionada ao canvas.', imageUrl, title } : m));
         await addImageToCanvas(imageUrl, title, finalPrompt);
       } else {
