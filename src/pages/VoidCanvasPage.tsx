@@ -2026,14 +2026,17 @@ export default function VoidCanvasPage() {
                 </button>
                 {activeBrandKit && (
                   <button
-                    className="p-2 rounded-lg transition-colors text-primary bg-primary/10 relative"
-                    title={`Kit ativo: ${activeBrandKit.name} — cores aplicadas na geração`}>
+                    onClick={() => setUsePaletteInGen(!usePaletteInGen)}
+                    className={cn('p-2 rounded-lg transition-colors relative', usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')}
+                    title={usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : 'Ativar paleta na geração'}>
                     <Palette className="h-4 w-4" />
-                    <div className="absolute -top-0.5 -right-0.5 flex gap-px">
-                      {activeBrandKit.colors.slice(0, 3).map((c, i) => (
-                        <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
-                      ))}
-                    </div>
+                    {usePaletteInGen && (
+                      <div className="absolute -top-0.5 -right-0.5 flex gap-px">
+                        {activeBrandKit.colors.slice(0, 3).map((c, i) => (
+                          <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                    )}
                   </button>
                 )}
 
