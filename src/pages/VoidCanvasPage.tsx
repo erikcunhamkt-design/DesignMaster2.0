@@ -2002,21 +2002,27 @@ export default function VoidCanvasPage() {
                   className={cn('p-2 rounded-lg transition-colors', isRecording ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')} title={isRecording ? 'Parar' : 'Gravar áudio'}>
                   {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
-                {activeBrandKit && (
-                  <button
-                    onClick={() => setUsePaletteInGen(!usePaletteInGen)}
-                    className={cn('p-2 rounded-lg transition-colors relative', usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')}
-                    title={usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : 'Ativar paleta na geração'}>
-                    <Palette className="h-4 w-4" />
-                    {usePaletteInGen && (
-                      <div className="absolute -top-0.5 -right-0.5 flex gap-px">
-                        {activeBrandKit.colors.slice(0, 3).map((c, i) => (
-                          <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
-                        ))}
-                      </div>
-                    )}
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    if (!activeBrandKit) {
+                      toast.info('Crie um Kit de Marca primeiro na aba lateral');
+                      return;
+                    }
+                    setUsePaletteInGen(!usePaletteInGen);
+                  }}
+                  className={cn('p-2 rounded-lg transition-colors relative', 
+                    activeBrandKit && usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20'
+                  )}
+                  title={activeBrandKit && usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : activeBrandKit ? 'Ativar paleta na geração' : 'Crie um Kit de Marca primeiro'}>
+                  <Palette className="h-4 w-4" />
+                  {activeBrandKit && usePaletteInGen && (
+                    <div className="absolute -top-0.5 -right-0.5 flex gap-px">
+                      {activeBrandKit.colors.slice(0, 3).map((c, i) => (
+                        <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                      ))}
+                    </div>
+                  )}
+                </button>
 
                 {/* Model selector */}
                 <Popover open={modelOpen} onOpenChange={setModelOpen}>
