@@ -712,7 +712,7 @@ export default function VoidCanvasPage() {
       setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${paletteLabel}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
-        prompt: smartPrompt, googleApiKey: apiKey,
+        prompt: finalPrompt, googleApiKey: apiKey,
         aiModel: imageModel === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
         aspectRatio: '1:1', useArchitect: false,
       };
