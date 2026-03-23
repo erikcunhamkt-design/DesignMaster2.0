@@ -1872,7 +1872,7 @@ export default function VoidCanvasPage() {
                   )}
                   {msg.imageUrl && (
                     <div className="flex items-center gap-1 pt-0.5">
-                      <button onClick={() => { const a = document.createElement('a'); a.href = msg.imageUrl!; a.download = `void-${Date.now()}.png`; a.click(); }}
+                      <button onClick={() => downloadImage(msg.imageUrl!, `void-${Date.now()}.png`)}
                         className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-foreground/70 hover:bg-secondary/30 transition-colors" title="Baixar imagem">
                         <Download className="h-3.5 w-3.5" />
                       </button>
