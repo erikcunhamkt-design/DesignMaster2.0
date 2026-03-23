@@ -255,7 +255,7 @@ Deno.serve(async (req) => {
 
     // 3. Legacy fallback (old format without separation)
     if (!hasSubject && !hasStyleRef && hasLegacyRef) {
-      for (const refImg of referenceImages.slice(0, 3)) {
+      for (const refImg of referenceImages.slice(0, 8)) {
         const match = refImg.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
           parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
