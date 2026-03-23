@@ -1,35 +1,42 @@
 
 
-## Problem Analysis
+## Plano: Gerar Relatório PDF da Infraestrutura Cloud
 
-Two issues in the Admin panel:
+### Objetivo
+Criar um documento PDF profissional com o panorama completo da infraestrutura backend, sem expor dados sensíveis.
 
-1. **Plan change doesn't set expiration**: `updateLicensePlan` only updates the `plan` field but never sets `expires_at`. So changing to "monthly" or "yearly" has no effect on access duration.
-2. **Can't reset password for existing users**: No UI or backend call to change a user's password from the admin panel.
+### Dados já coletados
+Consultei o banco de dados e o projeto para levantar todos os números:
 
-## Plan
+| Métrica | Valor |
+|---------|-------|
+| Tabelas (schema public) | 21 |
+| Usuários registrados | 27 |
+| Storage Buckets | 3 (todos públicos) |
+| Edge Functions | 23 |
+| Database Functions | 6 |
+| Secrets configurados | 7 (apenas nomes) |
+| Cron Jobs | 0 |
+| Políticas RLS | 63 |
+| Tipos customizados (enums) | 2 |
 
-### 1. Fix plan change to auto-set expiration dates
-In `AdminPage.tsx`, update `updateLicensePlan` to calculate and set `expires_at`:
-- **monthly** → `expires_at = now + 30 days`
-- **yearly** → `expires_at = now + 365 days`  
-- **lifetime** → `expires_at = null`
+### Conteúdo do PDF
+1. **Resumo Executivo** — tabela com todas as métricas acima
+2. **Tabelas do Banco** — lista das 21 tabelas com quantidade de colunas e políticas RLS
+3. **Storage Buckets** — 3 buckets com visibilidade
+4. **Edge Functions** — lista das 23 functions
+5. **Database Functions** — 6 functions com tipo e nível de segurança
+6. **Secrets** — 7 nomes (sem valores)
+7. **Cron Jobs** — nenhum configurado
+8. **Tipos Customizados** — app_role e chat_status
+9. **Observações de Segurança** — notas sobre RLS, SECURITY DEFINER, buckets públicos
 
-Also auto-set `status = 'active'` when changing plan.
+### Implementação
+- Script Python com ReportLab para gerar o PDF
+- Tabelas estilizadas com cores roxas (identidade do projeto)
+- Saída em `/mnt/documents/relatorio_backend_cloud.pdf`
+- QA visual após geração
 
-### 2. Add "Reset Password" button per user row
-- Add a button in the actions column of each user row
-- On click, show an inline dialog/input to set new password (with generate button)
-- Call a new edge function endpoint or extend `create-test-user` to handle password-only updates via `supabaseAdmin.auth.admin.updateUserById(userId, { password })`
-
-### 3. Create `reset-user-password` edge function
-- Accepts `{ userId, newPassword }` 
-- Verifies caller is admin (same pattern as `create-test-user`)
-- Calls `supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword })`
-- Returns success/error
-
-### Files to change
-- **`src/pages/AdminPage.tsx`**: Fix `updateLicensePlan`, add password reset UI per row
-- **`supabase/functions/reset-user-password/index.ts`**: New edge function for admin password reset
-- **`supabase/config.toml`**: Register new function
+### Segurança
+Nenhum valor de secret, token, senha ou chave será incluído — apenas nomes de referência.
 
