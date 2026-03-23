@@ -691,7 +691,7 @@ export default function VoidCanvasPage() {
     if (!apiKey) { toast.error('Configure sua API Key primeiro'); return; }
 
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: genPrompt || '🎤 Áudio enviado' };
-    setGenMessages(prev => [...prev.slice(-30), userMessage]);
+    setGenMessages(prev => [...prev.slice(-99), userMessage]);
     const currentPrompt = genPrompt;
     setGenPrompt('');
     setIsGenerating(true);
