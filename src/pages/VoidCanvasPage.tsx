@@ -708,33 +708,11 @@ export default function VoidCanvasPage() {
 
       const thinkingId = crypto.randomUUID();
       const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `🧭 Interpretando seu pedido...`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
-
-      // Step 1: Smart Router — classify intent & expand prompt with specialist agent
-      let smartPrompt = finalPrompt;
-      let agentName = '';
-      let agentEmoji = '';
-      try {
-        const routerRes = await fetch(`https://${projectId}.supabase.co/functions/v1/void-smart-router`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
-          body: JSON.stringify({ prompt: finalPrompt, googleApiKey: apiKey }),
-        });
-        if (routerRes.ok) {
-          const routerData = await routerRes.json();
-          smartPrompt = routerData.expandedPrompt || finalPrompt;
-          agentName = routerData.agentName || '';
-          agentEmoji = routerData.agentEmoji || '';
-        }
-      } catch (e) {
-        console.warn('Smart Router unavailable, using raw prompt', e);
-      }
-
-      const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
-      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${usePaletteInGen && activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
+      const paletteLabel = usePaletteInGen && activeBrandKit ? ` · 🎨 ${activeBrandKit.name}` : '';
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${paletteLabel}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
-        prompt: smartPrompt, googleApiKey: apiKey,
+        prompt: finalPrompt, googleApiKey: apiKey,
         aiModel: imageModel === 'gemini-3-pro-image-preview' ? 'pro' : 'flash',
         aspectRatio: '1:1', useArchitect: false,
       };
@@ -2024,21 +2002,27 @@ export default function VoidCanvasPage() {
                   className={cn('p-2 rounded-lg transition-colors', isRecording ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')} title={isRecording ? 'Parar' : 'Gravar áudio'}>
                   {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
-                {activeBrandKit && (
-                  <button
-                    onClick={() => setUsePaletteInGen(!usePaletteInGen)}
-                    className={cn('p-2 rounded-lg transition-colors relative', usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')}
-                    title={usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : 'Ativar paleta na geração'}>
-                    <Palette className="h-4 w-4" />
-                    {usePaletteInGen && (
-                      <div className="absolute -top-0.5 -right-0.5 flex gap-px">
-                        {activeBrandKit.colors.slice(0, 3).map((c, i) => (
-                          <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
-                        ))}
-                      </div>
-                    )}
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    if (!activeBrandKit) {
+                      toast.info('Crie um Kit de Marca primeiro na aba lateral');
+                      return;
+                    }
+                    setUsePaletteInGen(!usePaletteInGen);
+                  }}
+                  className={cn('p-2 rounded-lg transition-colors relative', 
+                    activeBrandKit && usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20'
+                  )}
+                  title={activeBrandKit && usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : activeBrandKit ? 'Ativar paleta na geração' : 'Crie um Kit de Marca primeiro'}>
+                  <Palette className="h-4 w-4" />
+                  {activeBrandKit && usePaletteInGen && (
+                    <div className="absolute -top-0.5 -right-0.5 flex gap-px">
+                      {activeBrandKit.colors.slice(0, 3).map((c, i) => (
+                        <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                      ))}
+                    </div>
+                  )}
+                </button>
 
                 {/* Model selector */}
                 <Popover open={modelOpen} onOpenChange={setModelOpen}>
