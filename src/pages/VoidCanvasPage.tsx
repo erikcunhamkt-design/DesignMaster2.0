@@ -101,6 +101,51 @@ interface RecentCreation {
 
 type HomeView = 'home' | 'projects' | 'brand-kit' | 'profile';
 
+// ── Helpers ──
+async function downloadImage(url: string, filename: string) {
+  try {
+    if (url.startsWith('data:')) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      return;
+    }
+    const resp = await fetch(url);
+    const blob = await resp.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  } catch {
+    // Fallback: open in new tab
+    window.open(url, '_blank');
+  }
+}
+
+async function base64ToStorageUrl(base64: string, userId: string): Promise<string> {
+  try {
+    const match = base64.match(/^data:(image\/\w+);base64,(.+)$/);
+    if (!match) return base64;
+    const mimeType = match[1];
+    const ext = mimeType.split('/')[1] || 'png';
+    const byteStr = atob(match[2]);
+    const ab = new ArrayBuffer(byteStr.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+    const blob = new Blob([ab], { type: mimeType });
+    const filePath = `void/${userId}/${Date.now()}-gen.${ext}`;
+    const { error } = await supabase.storage.from('chat-media').upload(filePath, blob);
+    if (error) return base64;
+    const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(filePath);
+    return publicUrl;
+  } catch {
+    return base64;
+  }
+}
+
 // ── Constants ──
 const IMAGE_MODELS = [
   { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
