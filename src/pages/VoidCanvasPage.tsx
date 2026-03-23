@@ -639,17 +639,34 @@ export default function VoidCanvasPage() {
 
   // ── Multimedia helpers ──
   const fileToBase64 = (file: File): Promise<string> =>
-    new Promise((resolve) => { const r = new FileReader(); r.onloadend = () => resolve(r.result as string); r.readAsDataURL(file); });
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onloadend = () => resolve(r.result as string);
+      r.onerror = () => reject(new Error('Falha ao ler imagem'));
+      r.readAsDataURL(file);
+    });
 
   const handleRefImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    setReferenceImage(await fileToBase64(e.target.files[0]));
-    setShowRefDesc(true);
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      setReferenceImage(await fileToBase64(file));
+      setShowRefDesc(true);
+    } catch {
+      toast.error('Não foi possível carregar a imagem de referência');
+    }
   };
 
   const handleCharImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    setCharacterImage(await fileToBase64(e.target.files[0]));
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      setCharacterImage(await fileToBase64(file));
+    } catch {
+      toast.error('Não foi possível carregar a imagem do personagem');
+    }
   };
 
   const toggleRecording = async () => {
@@ -674,7 +691,7 @@ export default function VoidCanvasPage() {
     if (!apiKey) { toast.error('Configure sua API Key primeiro'); return; }
 
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: genPrompt || '🎤 Áudio enviado' };
-    setGenMessages(prev => [...prev.slice(-30), userMessage]);
+    setGenMessages(prev => [...prev.slice(-99), userMessage]);
     const currentPrompt = genPrompt;
     setGenPrompt('');
     setIsGenerating(true);
