@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
       const notesList = (referenceNotes || []).filter((n: string) => n?.trim());
       const notesText = notesList.length > 0 ? ` Specifically use for: ${notesList.join('; ')}.` : '';
       parts.push({ text: `[STYLE/POSE REFERENCE ONLY — These images are ONLY for pose, composition, framing, lighting, and styling inspiration. COMPLETELY IGNORE the person's face and identity in these reference photos. The person in the final image MUST be the person from the SUBJECT IDENTITY photos above, never the person from these references.${notesText}]` });
-      for (const img of styleReferenceImages.slice(0, 3)) {
+      for (const img of styleReferenceImages.slice(0, 8)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
           parts.push({ inlineData: { mimeType: match[1], data: match[2] } });

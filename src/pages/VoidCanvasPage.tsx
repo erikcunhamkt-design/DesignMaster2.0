@@ -735,10 +735,21 @@ export default function VoidCanvasPage() {
       };
       if (currentChar) body.subjectImages = [currentChar];
       // Combine linked images + manual reference into styleReferenceImages
+      // IMPORTANT: Backend only processes base64 data URLs, so convert storage URLs
       const allRefs: string[] = [];
       const allRefNotes: string[] = [];
       if (currentRef) { allRefs.push(currentRef); if (currentRefDesc.trim()) allRefNotes.push(currentRefDesc); }
-      currentLinked.forEach(li => { allRefs.push(li.imageUrl); allRefNotes.push(`Use: ${li.usage}`); });
+      // Convert linked node images (storage URLs) to base64
+      for (const li of currentLinked) {
+        try {
+          const { compressImageToBase64 } = await import('@/lib/imageUtils');
+          const b64 = await compressImageToBase64(li.imageUrl, 1024, 0.85);
+          allRefs.push(b64);
+          allRefNotes.push(`Use: ${li.usage || 'tudo'}`);
+        } catch {
+          console.warn('Failed to convert linked image to base64:', li.label);
+        }
+      }
       if (allRefs.length > 0) { body.styleReferenceImages = allRefs; if (allRefNotes.length > 0) body.referenceNotes = allRefNotes; }
 
       const res = await fetch(`https://${projectId}.supabase.co/functions/v1/generate-image`, {
