@@ -657,8 +657,7 @@ export default function VoidCanvasPage() {
 
       const thinkingId = crypto.randomUUID();
       const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
-      const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel}...${agentLabel}${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `🧭 Interpretando seu pedido...`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       // Step 1: Smart Router — classify intent & expand prompt with specialist agent
       let smartPrompt = finalPrompt;
@@ -675,11 +674,13 @@ export default function VoidCanvasPage() {
           smartPrompt = routerData.expandedPrompt || finalPrompt;
           agentName = routerData.agentName || '';
           agentEmoji = routerData.agentEmoji || '';
-          console.log(`🧭 Smart Router: ${agentEmoji} ${agentName}`);
         }
       } catch (e) {
         console.warn('Smart Router unavailable, using raw prompt', e);
       }
+
+      const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
+      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
 
       const body: Record<string, unknown> = {
         prompt: smartPrompt, googleApiKey: apiKey,
