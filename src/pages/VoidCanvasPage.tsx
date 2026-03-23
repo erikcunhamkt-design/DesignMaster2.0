@@ -2006,7 +2006,21 @@ export default function VoidCanvasPage() {
           {/* Textarea */}
           <div className="rounded-2xl border border-border/15 bg-[#111820] focus-within:border-primary/25 transition-colors overflow-hidden">
             <Textarea value={genPrompt} onChange={(e) => setGenPrompt(e.target.value)} onKeyDown={handleGenKeyDown}
-              placeholder="Descreva sua criação..." className="min-h-[60px] max-h-[120px] resize-none bg-transparent border-none text-[12px] text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-4 pt-3"
+              onPaste={(e) => {
+                const items = e.clipboardData.items;
+                for (const item of Array.from(items)) {
+                  if (item.type.startsWith('image/')) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    if (file) {
+                      fileToBase64(file).then(b64 => { setReferenceImage(b64); setShowRefDesc(true); }).catch(() => toast.error('Erro ao colar imagem'));
+                    }
+                    break;
+                  }
+                }
+              }}
+              placeholder="Descreva sua criação... (cole imagens aqui)"
+              className="min-h-[60px] max-h-[120px] resize-none bg-transparent border-none text-[12px] text-foreground/90 focus-visible:ring-0 placeholder:text-muted-foreground/30 px-4 pt-3"
               disabled={isGenerating} />
             <div className="flex items-center justify-between px-3 py-2">
               <div className="flex items-center gap-0.5">
