@@ -1529,6 +1529,19 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded-md bg-black/60 text-primary hover:bg-black/80" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
                     </button>
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      if (!img.image_url) return;
+                      const link = document.createElement('a');
+                      link.href = img.image_url;
+                      link.download = `void-${img.label || 'image'}-${Date.now()}.png`;
+                      link.target = '_blank';
+                      link.click();
+                      toast.success('Download iniciado');
+                    }}
+                      className="p-1 rounded-md bg-black/60 text-accent hover:bg-black/80" title="Baixar imagem">
+                      <Download className="h-3 w-3" />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); deleteImage(img.id); }}
                       className="p-1 rounded-md bg-black/60 text-destructive hover:bg-black/80">
                       <Trash2 className="h-3 w-3" />
