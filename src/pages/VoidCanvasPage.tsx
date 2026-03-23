@@ -708,30 +708,8 @@ export default function VoidCanvasPage() {
 
       const thinkingId = crypto.randomUUID();
       const linkedLabel = currentLinked.length > 0 ? ` · ${currentLinked.length} ref` : '';
-      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `🧭 Interpretando seu pedido...`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
-
-      // Step 1: Smart Router — classify intent & expand prompt with specialist agent
-      let smartPrompt = finalPrompt;
-      let agentName = '';
-      let agentEmoji = '';
-      try {
-        const routerRes = await fetch(`https://${projectId}.supabase.co/functions/v1/void-smart-router`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
-          body: JSON.stringify({ prompt: finalPrompt, googleApiKey: apiKey }),
-        });
-        if (routerRes.ok) {
-          const routerData = await routerRes.json();
-          smartPrompt = routerData.expandedPrompt || finalPrompt;
-          agentName = routerData.agentName || '';
-          agentEmoji = routerData.agentEmoji || '';
-        }
-      } catch (e) {
-        console.warn('Smart Router unavailable, using raw prompt', e);
-      }
-
-      const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
-      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${usePaletteInGen && activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
+      const paletteLabel = usePaletteInGen && activeBrandKit ? ` · 🎨 ${activeBrandKit.name}` : '';
+      setGenMessages(prev => [...prev, { id: thinkingId, role: 'assistant', content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${paletteLabel}${linkedLabel}`, model: IMAGE_MODELS.find(m => m.id === imageModel)?.label || imageModel }]);
 
       const body: Record<string, unknown> = {
         prompt: smartPrompt, googleApiKey: apiKey,
