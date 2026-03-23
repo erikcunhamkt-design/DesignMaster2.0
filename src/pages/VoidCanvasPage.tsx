@@ -1794,7 +1794,7 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded text-muted-foreground/30 hover:text-primary" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
                     </button>
-                    <button onClick={() => { const a = document.createElement('a'); a.href = img.image_url; a.download = `void-${Date.now()}.png`; a.click(); }}
+                    <button onClick={() => downloadImage(img.image_url, `void-${Date.now()}.png`)}
                       className="p-1 rounded text-muted-foreground/30 hover:text-foreground" title="Baixar">
                       <Download className="h-3 w-3" />
                     </button>
