@@ -731,7 +731,7 @@ export default function VoidCanvasPage() {
       }
 
       const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
-      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
+      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${usePaletteInGen && activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
 
       const body: Record<string, unknown> = {
         prompt: smartPrompt, googleApiKey: apiKey,
