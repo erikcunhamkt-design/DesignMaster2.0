@@ -962,7 +962,27 @@ export default function VoidCanvasPage() {
                         />
                         <div className="flex items-center justify-between px-4 py-3">
                           <div className="flex items-center gap-1">
-                            <Paperclip className="h-4 w-4 text-muted-foreground/30" />
+                            <input ref={canvasUploadRef} type="file" accept="image/*,.heic,.avif,.webp" className="hidden" onChange={async (e) => {
+                              if (!e.target.files?.[0] || !user) return;
+                              const file = e.target.files[0];
+                              const projectId = await createProject(file.name.slice(0, 40));
+                              if (projectId) {
+                                setActiveProjectId(projectId);
+                                const filePath = `void/${user.id}/${Date.now()}-${file.name}`;
+                                const { error } = await supabase.storage.from('chat-media').upload(filePath, file);
+                                if (!error) {
+                                  const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(filePath);
+                                  await addImageToCanvas(publicUrl, file.name.slice(0, 50), 'Imagem carregada');
+                                  toast.success('Projeto criado com a imagem!');
+                                } else {
+                                  toast.error('Erro ao fazer upload');
+                                }
+                              }
+                              e.target.value = '';
+                            }} />
+                            <button onClick={() => canvasUploadRef.current?.click()} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-colors" title="Carregar imagem">
+                              <Paperclip className="h-4 w-4" />
+                            </button>
                           </div>
                           <div className="flex items-center gap-2">
                             <Popover>
