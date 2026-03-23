@@ -101,6 +101,51 @@ interface RecentCreation {
 
 type HomeView = 'home' | 'projects' | 'brand-kit' | 'profile';
 
+// ── Helpers ──
+async function downloadImage(url: string, filename: string) {
+  try {
+    if (url.startsWith('data:')) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      return;
+    }
+    const resp = await fetch(url);
+    const blob = await resp.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  } catch {
+    // Fallback: open in new tab
+    window.open(url, '_blank');
+  }
+}
+
+async function base64ToStorageUrl(base64: string, userId: string): Promise<string> {
+  try {
+    const match = base64.match(/^data:(image\/\w+);base64,(.+)$/);
+    if (!match) return base64;
+    const mimeType = match[1];
+    const ext = mimeType.split('/')[1] || 'png';
+    const byteStr = atob(match[2]);
+    const ab = new ArrayBuffer(byteStr.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+    const blob = new Blob([ab], { type: mimeType });
+    const filePath = `void/${userId}/${Date.now()}-gen.${ext}`;
+    const { error } = await supabase.storage.from('chat-media').upload(filePath, blob);
+    if (error) return base64;
+    const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(filePath);
+    return publicUrl;
+  } catch {
+    return base64;
+  }
+}
+
 // ── Constants ──
 const IMAGE_MODELS = [
   { id: 'gemini-3-pro-image-preview', label: 'Nano Banana Pro', desc: 'Qualidade máxima · Gemini 3', badge: 'PRO' },
@@ -179,6 +224,7 @@ export default function VoidCanvasPage() {
   const [showFiles, setShowFiles] = useState(false);
   const [showShapesMenu, setShowShapesMenu] = useState(false);
   const [usePaletteInChat, setUsePaletteInChat] = useState(false);
+  const [usePaletteInGen, setUsePaletteInGen] = useState(true);
   const [linkedImages, setLinkedImages] = useState<LinkedImage[]>([]);
   const [nodeConnections, setNodeConnections] = useState<{ from: string; to: string }[]>([]);
   const [linkSource, setLinkSource] = useState<string | null>(null);
@@ -524,11 +570,16 @@ export default function VoidCanvasPage() {
 
   const addImageToCanvas = async (imageUrl: string, label: string, promptText: string) => {
     if (!user || !activeProjectId) return;
+    // If base64, upload to storage first
+    let finalUrl = imageUrl;
+    if (imageUrl.startsWith('data:')) {
+      finalUrl = await base64ToStorageUrl(imageUrl, user.id);
+    }
     const baseX = 80 + Math.random() * 400;
     const baseY = 80 + images.length * 140 + Math.random() * 60;
     const { data: newRow } = await supabase.from('void_canvas_nodes').insert({
       user_id: user.id, label: label.slice(0, 50), node_type: 'image',
-      image_url: imageUrl, prompt: promptText,
+      image_url: finalUrl, prompt: promptText,
       position_x: baseX, position_y: baseY,
       width: 200, height: 200, z_index: images.length,
       project_id: activeProjectId,
@@ -541,8 +592,8 @@ export default function VoidCanvasPage() {
         position_x: r.position_x, position_y: r.position_y,
         width: r.width, height: r.height,
       }]);
-      // Update project thumbnail & updated_at
-      await supabase.from('void_projects' as any).update({ thumbnail_url: imageUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
+      // Update project thumbnail with a small version, not the full base64
+      await supabase.from('void_projects' as any).update({ thumbnail_url: finalUrl, updated_at: new Date().toISOString() } as any).eq('id', activeProjectId);
     }
     };
 
@@ -649,8 +700,8 @@ export default function VoidCanvasPage() {
         finalPrompt += `. REFERENCE IMAGES: ${linkedInstructions}.`;
       }
 
-      // Inject brand kit colors into prompt
-      if (activeBrandKit && activeBrandKit.colors.length > 0) {
+      // Inject brand kit colors into prompt only if toggle is on
+      if (usePaletteInGen && activeBrandKit && activeBrandKit.colors.length > 0) {
         const colorList = activeBrandKit.colors.join(', ');
         finalPrompt += `. MANDATORY COLOR PALETTE: Use exclusively these brand colors: ${colorList}. All design elements, lighting, accents, and color scheme must strictly follow this palette.`;
       }
@@ -680,7 +731,7 @@ export default function VoidCanvasPage() {
       }
 
       const agentLabel = agentName ? ` · ${agentEmoji} ${agentName}` : '';
-      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
+      setGenMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, content: `Gerando com ${IMAGE_MODELS.find(mi => mi.id === imageModel)?.label || imageModel}...${agentLabel}${usePaletteInGen && activeBrandKit ? ` · Kit: ${activeBrandKit.name}` : ''}${linkedLabel}` } : m));
 
       const body: Record<string, unknown> = {
         prompt: smartPrompt, googleApiKey: apiKey,
@@ -917,7 +968,27 @@ export default function VoidCanvasPage() {
                         />
                         <div className="flex items-center justify-between px-4 py-3">
                           <div className="flex items-center gap-1">
-                            <Paperclip className="h-4 w-4 text-muted-foreground/30" />
+                            <input ref={canvasUploadRef} type="file" accept="image/*,.heic,.avif,.webp" className="hidden" onChange={async (e) => {
+                              if (!e.target.files?.[0] || !user) return;
+                              const file = e.target.files[0];
+                              const projectId = await createProject(file.name.slice(0, 40));
+                              if (projectId) {
+                                setActiveProjectId(projectId);
+                                const filePath = `void/${user.id}/${Date.now()}-${file.name}`;
+                                const { error } = await supabase.storage.from('chat-media').upload(filePath, file);
+                                if (!error) {
+                                  const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(filePath);
+                                  await addImageToCanvas(publicUrl, file.name.slice(0, 50), 'Imagem carregada');
+                                  toast.success('Projeto criado com a imagem!');
+                                } else {
+                                  toast.error('Erro ao fazer upload');
+                                }
+                              }
+                              e.target.value = '';
+                            }} />
+                            <button onClick={() => canvasUploadRef.current?.click()} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20 transition-colors" title="Carregar imagem">
+                              <Paperclip className="h-4 w-4" />
+                            </button>
                           </div>
                           <div className="flex items-center gap-2">
                             <Popover>
@@ -1749,7 +1820,7 @@ export default function VoidCanvasPage() {
                       className="p-1 rounded text-muted-foreground/30 hover:text-primary" title="Enviar ao chat">
                       <MessageSquare className="h-3 w-3" />
                     </button>
-                    <button onClick={() => { const a = document.createElement('a'); a.href = img.image_url; a.download = `void-${Date.now()}.png`; a.click(); }}
+                    <button onClick={() => downloadImage(img.image_url, `void-${Date.now()}.png`)}
                       className="p-1 rounded text-muted-foreground/30 hover:text-foreground" title="Baixar">
                       <Download className="h-3 w-3" />
                     </button>
@@ -1827,7 +1898,7 @@ export default function VoidCanvasPage() {
                   )}
                   {msg.imageUrl && (
                     <div className="flex items-center gap-1 pt-0.5">
-                      <button onClick={() => { const a = document.createElement('a'); a.href = msg.imageUrl!; a.download = `void-${Date.now()}.png`; a.click(); }}
+                      <button onClick={() => downloadImage(msg.imageUrl!, `void-${Date.now()}.png`)}
                         className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-foreground/70 hover:bg-secondary/30 transition-colors" title="Baixar imagem">
                         <Download className="h-3.5 w-3.5" />
                       </button>
@@ -1955,14 +2026,17 @@ export default function VoidCanvasPage() {
                 </button>
                 {activeBrandKit && (
                   <button
-                    className="p-2 rounded-lg transition-colors text-primary bg-primary/10 relative"
-                    title={`Kit ativo: ${activeBrandKit.name} — cores aplicadas na geração`}>
+                    onClick={() => setUsePaletteInGen(!usePaletteInGen)}
+                    className={cn('p-2 rounded-lg transition-colors relative', usePaletteInGen ? 'text-primary bg-primary/10' : 'text-muted-foreground/40 hover:text-foreground/70 hover:bg-secondary/20')}
+                    title={usePaletteInGen ? `Paleta ativa: ${activeBrandKit.name} (clique para desativar)` : 'Ativar paleta na geração'}>
                     <Palette className="h-4 w-4" />
-                    <div className="absolute -top-0.5 -right-0.5 flex gap-px">
-                      {activeBrandKit.colors.slice(0, 3).map((c, i) => (
-                        <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
-                      ))}
-                    </div>
+                    {usePaletteInGen && (
+                      <div className="absolute -top-0.5 -right-0.5 flex gap-px">
+                        {activeBrandKit.colors.slice(0, 3).map((c, i) => (
+                          <div key={i} className="w-2 h-2 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                    )}
                   </button>
                 )}
 
