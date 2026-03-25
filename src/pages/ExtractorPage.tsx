@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { Upload, Loader2, Copy, Check, Wand2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
@@ -150,32 +149,32 @@ export default function ExtractorPage() {
           {/* Replicate options */}
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-3">
-              O que deseja replicar?
+              O que deseja extrair?
             </p>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {REPLICATE_OPTIONS.map(opt => (
-                <label key={opt.id} className="flex items-center gap-2 cursor-pointer text-xs text-foreground/70">
-                  <Checkbox
-                    checked={selectedOptions.includes(opt.id)}
-                    onCheckedChange={() => toggleOption(opt.id)}
-                  />
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => toggleOption(opt.id)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 ${
+                    selectedOptions.includes(opt.id)
+                      ? 'bg-primary/20 border-primary/50 text-primary'
+                      : 'bg-secondary/40 border-border/20 text-muted-foreground hover:border-primary/30 hover:text-foreground/80'
+                  }`}
+                >
                   {opt.label}
-                </label>
+                </button>
               ))}
             </div>
-          </div>
-
-          {/* Extra instruction */}
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
-              Instrução extra (opcional)
-            </p>
-            <Input
-              placeholder="Ex: trocar cenário para praia, mudar cor para azul..."
-              value={extraInstruction}
-              onChange={(e) => setExtraInstruction(e.target.value)}
-              className="h-9 bg-secondary/50 border-border/20 text-xs rounded-lg focus:border-primary/40"
-            />
+            <div className="mt-3">
+              <Input
+                placeholder="Ou descreva o que quer extrair: ex. 'só o rosto do personagem', 'a paleta neon do fundo'..."
+                value={extraInstruction}
+                onChange={(e) => setExtraInstruction(e.target.value)}
+                className="h-9 bg-secondary/50 border-border/20 text-xs rounded-lg focus:border-primary/40"
+              />
+            </div>
           </div>
 
           {/* Extract button */}
