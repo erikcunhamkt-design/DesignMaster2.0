@@ -21,11 +21,18 @@ interface ExtractedResult {
 }
 
 const REPLICATE_OPTIONS = [
+  { id: 'tudo', label: 'Tudo' },
+  { id: 'personagem', label: 'Personagem' },
+  { id: 'background', label: 'Background' },
   { id: 'estilo', label: 'Estilo' },
+  { id: 'iluminação', label: 'Iluminação' },
   { id: 'composição', label: 'Composição' },
   { id: 'paleta', label: 'Paleta de Cores' },
-  { id: 'iluminação', label: 'Iluminação' },
-  { id: 'tudo', label: 'Tudo' },
+  { id: 'texturas', label: 'Texturas' },
+  { id: 'camera', label: 'Câmera / Ângulo' },
+  { id: 'mood', label: 'Mood / Atmosfera' },
+  { id: 'objetos', label: 'Objetos / Props' },
+  { id: 'tipografia', label: 'Tipografia' },
 ];
 
 export default function ExtractorPage() {
