@@ -1,5 +1,3 @@
-// Deno.serve used below
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -7,104 +5,69 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// FOTÓGRAFO PROFISSIONAL — Internal Photography Knowledge Base
-// Silently expands user config into hyper-detailed photographic prompts
-// using professional camera, lens, angle, composition & lighting data.
+// FOTÓGRAFO PROFISSIONAL v3 — Elite Portrait Engine
 // ══════════════════════════════════════════════════════════════
 
-const PHOTOSHOOT_SYSTEM = `You are FOTÓGRAFO PROFISSIONAL — an elite internal photography prompt engine.
-You receive a portrait configuration and SILENTLY transform it into a hyper-detailed, cinematic, professional photography prompt.
+const PHOTOSHOOT_SYSTEM = `You are FOTÓGRAFO PROFISSIONAL — the world's most elite portrait photography prompt architect.
 
-You have deep knowledge of professional photography equipment and techniques:
+You receive a portrait configuration and transform it into a hyper-detailed, cinematic, studio-grade photography prompt.
 
-═══ CAMERAS ═══
-- Canon EOS 5D Mark IV: DSLR full frame, fidelidade de cor, ótima performance em ISO alto — retratos, moda, estúdio.
-- Nikon D850: Altíssima resolução, amplo alcance dinâmico — editoriais, produtos, texturas.
-- Sony Alpha a7R IV: Mirrorless full-frame, nitidez extrema, cores consistentes — ensaios externos.
-- Fujifilm GFX 100: Médio formato 102MP — campanhas publicitárias, fine art, profundidade tonal.
-- Leica M10-R: Visual minimalista, look analógico sofisticado — documental, estilo refinado.
-- Hasselblad H6D-100c: Médio formato top — moda de luxo, precisão em tons, contraste, nitidez.
-- Canon EOS R5: Mirrorless, foco ultrarrápido — retratos contemporâneos, campanhas modernas.
-- Sony FX3: Atmosfera cinematográfica — direção de arte experimental.
-- Nikon Z7 II: Mirrorless full-frame, reprodução de cor precisa — leveza e qualidade premium.
-- Panasonic Lumix S1R: Alta resolução — moda, arquitetura, fine art.
+═══ YOUR KNOWLEDGE BASE ═══
 
-═══ LENSES ═══
-- 50mm f/1.4: Clássica versátil, campo de visão natural, desfoque suave — retratos, lifestyle.
-- 85mm f/1.2: Separação de fundo extrema, bokeh cremoso — closes com emoção, estética cinematográfica.
-- 35mm f/1.4: Grande angular com distorção natural — moda urbana, documentário.
-- 24mm f/1.4: Ampla cobertura — cenas abertas, interiores, arquitetura.
-- 70-200mm f/2.8: Zoom telefoto — eventos, editoriais à distância, retratos comprimidos.
-- 100mm f/2.8 Macro: Detalhes e closes extremos — produtos, joias, texturas.
-- 135mm f/2.0: Compressão suave, separação excelente — retratos editoriais, campanhas.
-- 24-70mm f/2.8: Zoom equilibrado — estúdios, moda, produtos.
+CAMERAS: Canon EOS R5, Sony A1, Hasselblad X2D 100C, Phase One IQ4, Fujifilm GFX 100 II, Leica SL3
+LENSES: 85mm f/1.2L (classic portrait king), 105mm f/1.4E (perfect compression), 135mm f/2L (maximum bokeh separation), 50mm f/1.2 (environmental portrait), 70-200mm f/2.8 (editorial versatility)
+LIGHTING SETUPS: Rembrandt (triangle), Butterfly/Paramount, Split, Loop, Broad, Short, Clamshell, Beauty dish + rim, 3-point studio, Natural window + reflector
 
-═══ ANGLES ═══
-- Eye-level: Altura dos olhos, igualdade e naturalidade, conexão direta.
-- High angle: De cima, sujeito menor, vulnerabilidade.
-- Low angle: De baixo, autoridade, imponência, poder.
-- Overhead: Vista vertical aérea, padrões gráficos.
-- Worm's-eye view: Do chão, dramaticidade extrema.
-- Dutch angle: Inclinado, desequilíbrio, tensão psicológica.
-- Side view: Perfil, linhas, formas, silhuetas.
-- Close-up: Rosto, emoções, detalhes.
-- Extreme close-up: Olhos, dedos, textura, elementos sensoriais.
-- Wide shot: Cena completa, contexto, espaço.
-- Medium long shot (Americano): Joelhos para cima, moda, expressão corporal.
+═══ OUTPUT RULES ═══
+1. Output ONLY a single continuous English prompt paragraph — NO labels, NO commentary
+2. Start with subject description, then lighting, then camera/lens, then composition, then texture/quality tokens
+3. Be ULTRA specific: exact camera model, exact lens with aperture, exact lighting modifier names (softbox, beauty dish, strip light, barn doors)
+4. Include MANDATORY quality tokens at the end: "shot on [camera], [lens] at f/[aperture], 8K resolution, RAW file quality, extreme skin detail with visible pores and micro-textures, individual hair strands, catchlights in eyes, professional color grading, depth of field, volumetric lighting"
+5. NEVER mention text, watermarks, or UI elements in the prompt
+6. Temperature and light color must be specified in Kelvin
+7. Minimum 200 words`;
 
-═══ COMPOSITION ═══
-- Rule of thirds: Elementos nas interseções, equilíbrio visual.
-- Centered: Estabilidade, simetria, destaque imediato.
-- Symmetry: Elementos espelhados, ordem, perfeição.
-- Layered depth: Múltiplos planos, profundidade narrativa.
-- Leading lines: Linhas naturais conduzem o olhar.
-- Full frame fill: Objeto ocupa todo quadro, textura e expressividade.
-- Negative space: Área vazia valoriza foco, leveza ou isolamento.
-- Natural framing: Portas, janelas como moldura interna.
-- Depth perspective: Sensação tridimensional.
-- Intentional asymmetry: Tensão visual, impacto estético moderno.
+const IDENTITY_LOCK_BLOCK = `
+═══ ABSOLUTE IDENTITY PRESERVATION PROTOCOL ═══
 
-═══ LIGHTING ═══
-- Soft light: Dispersa, sem sombras marcadas — retratos delicados, clean.
-- Hard light: Direta e intensa, sombras nítidas — formas, texturas, drama.
-- Backlight: Atrás do sujeito, brilhos, silhuetas, etéreo.
-- Rim light: Bordas iluminadas, separação do fundo.
-- Split lighting: Meia luz, contraste intenso, cinematográfico.
-- Rembrandt (triangular): Triângulo de luz sob olho oposto — retratos expressivos.
-- Butterfly: De cima frontal, sombra sob nariz — beleza, traços simétricos.
-- Natural ambient: Luz disponível, sol, janelas — autêntico, orgânico.
-- Studio setup: Luzes artificiais, softboxes, refletores — controle total.
-- Cinematic: Sombras dramáticas, cores específicas, narrativa visual.
-- Creative colored: Filtros coloridos — artístico, futurista, conceitual.
+You are performing a FACE TRANSPLANT operation. This means:
 
-YOUR TASK:
-Given the user's portrait configuration, create a SINGLE continuous prompt in English that:
-1. Describes the subject with vivid physical and emotional detail
-2. Selects the BEST camera + lens combination for this specific portrait style
-3. Defines precise lighting setup with modifiers and ratios
-4. Specifies camera angle, composition technique and framing
-5. Adds deep texture commands: skin pores, hair strands, fabric fiber, volumetric lighting
-6. Adds realism tokens: 8K, HDR, extreme sharpness, depth of field
-7. Ends with negative commands: no text, no watermark, no distortion, no cartoon
+1. FACE GEOMETRY: Reproduce the EXACT bone structure — jaw line, cheekbone prominence, chin shape, forehead height and width. These are NON-NEGOTIABLE anatomical landmarks.
 
-RULES:
-- Output ONLY the expanded prompt as a single continuous paragraph in English
-- Be ULTRA specific about camera model, exact lens, and aperture
-- Match lighting to the mood (dramatic = hard light setups, gentle = soft diffused)
-- Choose composition that enhances the portrait style
-- NO commentary, NO labels, NO explanations
-- Include the clothing/outfit details if provided
-- Always include deep texture and realism commands`;
+2. EYES: Same eye shape (round/almond/hooded/monolid), same eye color, same distance between eyes (interpupillary distance), same eyebrow shape/thickness/arch. Reproduce the EXACT iris pattern and color.
 
-const PORTRAIT_SYSTEM_PROMPT = `You are PORTRAIT MASTER — the world's most elite portrait photography AI.
-You generate ULTRA-REALISTIC professional studio portraits indistinguishable from master photographers.
+3. NOSE: Same nose bridge width, nostril shape, tip angle (upturned/straight/downturned), same profile.
 
-CRITICAL RULES:
-- NEVER generate cartoon, illustration, or AI-looking images
-- NEVER produce plastic skin, waxy appearance, or uncanny valley effects
-- ALWAYS maintain anatomical correctness
-- ALWAYS produce catchlights in eyes
-- ALWAYS ensure natural skin texture with visible pores`;
+4. MOUTH: Same lip fullness ratio (upper vs lower), same lip color, same mouth width, same smile lines.
+
+5. SKIN: Same skin tone (exact melanin level), same texture, same any visible freckles/moles/beauty marks. Do NOT lighten or darken the skin.
+
+6. HAIR: Same hair color, same texture (straight/wavy/curly/coily), same approximate length and style.
+
+7. ETHNICITY & GENDER: These are IMMUTABLE. A Black woman stays a Black woman. An Asian man stays an Asian man. A Latino person stays Latino. ZERO ethnic drift. ZERO gender swap.
+
+8. AGE: Maintain the apparent age of the subject. Do NOT age up or down.
+
+QUALITY STANDARD: The output portrait must be so faithful that the subject's mother, partner, or close friend would IMMEDIATELY recognize them without hesitation.
+
+FAILURE MODE: If you cannot preserve identity with confidence, prioritize the face/eyes/skin tone over all other creative elements.`;
+
+const REFERENCE_REPLICATION_BLOCK = `
+═══ REFERENCE IMAGE REPLICATION PROTOCOL ═══
+
+When reference images are provided alongside a subject photo, your task is SURGICAL:
+
+1. FROM THE REFERENCE: Extract the EXACT pose, body position, framing, composition, background/environment, lighting setup, color grading, clothing style, accessories, props, atmosphere, and overall visual aesthetic.
+
+2. FROM THE SUBJECT PHOTO: Extract ONLY the face, skin tone, ethnicity, gender, hair characteristics, and physical identity.
+
+3. MERGE OPERATION: Place the subject's face/identity INTO the reference's scene, pose, and aesthetic. The result should look like the subject was the original model in the reference photo's shoot.
+
+4. LIGHTING MATCH: The lighting on the face must be consistent with the reference's lighting direction and quality. If the reference has rim light from the left, the subject's face must show the same rim light.
+
+5. SCALE & PROPORTION: The subject's head size must match the proportions shown in the reference. Do not shrink or enlarge the head unnaturally.
+
+THE GOLD STANDARD: A viewer looking at the reference and the output side by side should think "same photoshoot, same photographer, same setup — just a different model."`;
 
 function buildConfigDescription(config: {
   gender: string;
@@ -117,10 +80,7 @@ function buildConfigDescription(config: {
   freePrompt: string;
 }): string {
   const genderLabel = config.gender === 'female' ? 'woman' : config.gender === 'male' ? 'man' : 'person';
-
-  const parts = [
-    `Professional studio portrait of a ${genderLabel}`,
-  ];
+  const parts = [`Professional studio portrait of a ${genderLabel}`];
 
   if (config.expression?.trim()) parts.push(`Expression: ${config.expression}`);
   if (config.lighting?.trim()) parts.push(`Lighting style: ${config.lighting}`);
@@ -128,26 +88,30 @@ function buildConfigDescription(config: {
   if (config.cameraAngle?.trim()) parts.push(`Camera angle: ${config.cameraAngle}`);
   if (config.lens?.trim()) parts.push(`Preferred lens: ${config.lens}`);
   if (config.clothing?.trim()) parts.push(`Wearing: ${config.clothing.trim()}`);
-  if (config.freePrompt?.trim()) parts.push(`Additional instructions (HIGHEST PRIORITY): ${config.freePrompt.trim()}`);
+  if (config.freePrompt?.trim()) parts.push(`MANDATORY USER INSTRUCTIONS (HIGHEST PRIORITY — override everything else): ${config.freePrompt.trim()}`);
 
   return parts.join('. ') + '.';
 }
 
-async function expandWithPhotoshootAgent(configDescription: string, googleApiKey: string): Promise<string> {
+async function expandWithPhotoshootAgent(configDescription: string, googleApiKey: string, hasReferences: boolean): Promise<string> {
   const model = "gemini-3.1-pro-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
-  console.log("📸 FOTÓGRAFO PROFISSIONAL: Expanding portrait config into detailed prompt...");
+  const referenceContext = hasReferences
+    ? "\n\nIMPORTANT: Reference images are being provided. Your prompt must EXPLICITLY instruct the image generator to replicate the reference's pose, composition, environment, and aesthetic while preserving the subject's identity."
+    : "";
+
+  console.log("📸 FOTÓGRAFO PROFISSIONAL v3: Expanding portrait config...");
 
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: `${PHOTOSHOOT_SYSTEM}\n\nPORTRAIT CONFIGURATION:\n${configDescription}` }]
+        parts: [{ text: `${PHOTOSHOOT_SYSTEM}${referenceContext}\n\nPORTRAIT CONFIGURATION:\n${configDescription}` }]
       }],
       generationConfig: {
-        temperature: 0.4,
+        temperature: 0.15,
         maxOutputTokens: 1500,
       },
     }),
@@ -172,7 +136,7 @@ async function expandWithPhotoshootAgent(configDescription: string, googleApiKey
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
-  console.log(`🎨 Calling Google Gemini ${model} for portrait generation...`);
+  console.log(`🎨 Generating portrait with ${model}...`);
 
   const requestBody = JSON.stringify({
     contents: [{ parts }],
@@ -237,21 +201,25 @@ Deno.serve(async (req) => {
     }
 
     const model = aiModel === "flash" ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
+    const hasRefs = referenceImages && Array.isArray(referenceImages) && referenceImages.length > 0;
 
-    // Step 1: Build config description from user selections
+    // Step 1: Build config description
     const configDescription = buildConfigDescription(config);
-    console.log("📋 Config description:", configDescription.substring(0, 300));
+    console.log("📋 Config:", configDescription.substring(0, 300));
 
-    // Step 2: Silently expand with Fotógrafo Profissional
-    const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey);
+    // Step 2: Expand with Fotógrafo Profissional v3
+    const expandedPrompt = await expandWithPhotoshootAgent(configDescription, googleApiKey, hasRefs);
 
     const genderLabel = config.gender === 'female' ? 'woman/female' : config.gender === 'male' ? 'man/male' : 'person';
 
-    // Step 3: Build parts for Google Gemini image generation
+    // Step 3: Build parts array with strategic ordering
     const parts: any[] = [];
 
+    // 3a: Subject photo FIRST — this is the identity anchor
     if (subjectImage) {
-      parts.push({ text: `[SUBJECT IDENTITY — THIS IS THE ${genderLabel.toUpperCase()} who MUST appear in the generated portrait. You MUST faithfully reproduce this EXACT person: same face shape, same eyes, same nose, same mouth, same skin tone, same hair color and style, same ethnicity. This is a ${genderLabel}. Do NOT change the gender. Do NOT generate a different person. The output MUST be recognizable as this specific individual.]` });
+      parts.push({
+        text: `[SUBJECT IDENTITY PHOTO — THIS IS THE PERSON]\n${IDENTITY_LOCK_BLOCK}\n\nThis is a ${genderLabel}. Study this face with forensic precision. Every facial feature, skin detail, and ethnic characteristic MUST appear in the output.`
+      });
 
       if (subjectImage.startsWith("data:")) {
         const match = subjectImage.match(/^data:(.*?);base64,(.*)$/);
@@ -261,11 +229,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Add reference images (scenery, clothing, accessories) — DO NOT affect subject identity
-    if (referenceImages && Array.isArray(referenceImages) && referenceImages.length > 0) {
-      for (const ref of referenceImages) {
-        const noteLabel = ref.note?.trim() ? ref.note.trim() : 'scenery, clothing, accessories or items';
-        parts.push({ text: `[VISUAL REFERENCE — Use this image ONLY as reference for: ${noteLabel}. DO NOT change the subject's face, identity, ethnicity, or gender based on this image. Extract ONLY the visual elements described above (environment, clothing, props, accessories, lighting mood) and apply them to the portrait.]` });
+    // 3b: Reference images — visual style targets
+    if (hasRefs) {
+      parts.push({ text: REFERENCE_REPLICATION_BLOCK });
+
+      for (let i = 0; i < referenceImages.length; i++) {
+        const ref = referenceImages[i];
+        const noteLabel = ref.note?.trim() || 'pose, composition, environment, lighting, clothing, and overall aesthetic';
+        parts.push({
+          text: `[REFERENCE IMAGE ${i + 1}/${referenceImages.length}]\nREPLICATE from this reference: ${noteLabel}.\n${subjectImage ? 'DO NOT use this person\'s face — use ONLY the subject identity photo\'s face. Extract everything EXCEPT the face/identity from this reference.' : 'Replicate this entire aesthetic.'}`
+        });
         if (ref.url && ref.url.startsWith("data:")) {
           const match = ref.url.match(/^data:(.*?);base64,(.*)$/);
           if (match) {
@@ -273,16 +246,49 @@ Deno.serve(async (req) => {
           }
         }
       }
-      console.log(`📎 Added ${referenceImages.length} visual reference(s) to portrait generation`);
+      console.log(`📎 Added ${referenceImages.length} reference(s)`);
     }
 
-    const edgeFill = "CRITICAL FRAMING RULE: The generated image MUST fill 100% of the canvas from edge to edge. ZERO empty space, ZERO solid color bars, ZERO letterboxing.";
+    // 3c: Final generation instruction
+    const edgeFill = "CRITICAL FRAMING: The image MUST fill 100% of the canvas edge to edge. ZERO empty space, ZERO solid color bars, ZERO letterboxing, ZERO blank margins.";
 
-    const finalText = subjectImage
-      ? `${PORTRAIT_SYSTEM_PROMPT}\n\n${expandedPrompt}\n\n${edgeFill}\n\nABSOLUTE RULE — IDENTITY LOCK: The generated person MUST be the EXACT ${genderLabel} from the SUBJECT IDENTITY photo. Same face, same features, same gender (${genderLabel}). This is NON-NEGOTIABLE.`
-      : `${PORTRAIT_SYSTEM_PROMPT}\n\n${expandedPrompt}\n\n${edgeFill}`;
+    const qualityTokens = "Ultra-realistic professional photograph. 8K resolution. RAW file quality. Visible skin pores and micro-textures. Individual hair strands catching light. Natural catchlights in eyes. Professional color grading with rich tonal range. Shallow depth of field with creamy bokeh. Volumetric lighting with atmospheric depth. No text. No watermark. No artifacts. No AI-looking features. No plastic skin. No uncanny valley.";
 
-    parts.push({ text: finalText });
+    let finalInstruction: string;
+
+    if (subjectImage && hasRefs) {
+      // FACE SWAP MODE: Subject identity + reference aesthetic
+      finalInstruction = `GENERATION MODE: IDENTITY + REFERENCE FUSION
+
+${expandedPrompt}
+
+${qualityTokens}
+${edgeFill}
+
+FINAL DIRECTIVE: Generate a portrait that looks EXACTLY like the reference image(s) in terms of pose, composition, lighting, environment, and clothing — but with the EXACT face and identity of the subject photo. The result must look like the subject was the original model in the reference photoshoot. Gender is ${genderLabel} — this is IMMUTABLE.`;
+
+    } else if (subjectImage) {
+      // IDENTITY MODE: Subject identity + config settings
+      finalInstruction = `GENERATION MODE: IDENTITY PORTRAIT
+
+${expandedPrompt}
+
+${qualityTokens}
+${edgeFill}
+
+ABSOLUTE IDENTITY LOCK: The person in the output MUST be the EXACT ${genderLabel} from the subject photo. Same face, same features, same ethnicity, same gender. This is the #1 priority above all creative decisions.`;
+
+    } else {
+      // CREATIVE MODE: No subject photo
+      finalInstruction = `GENERATION MODE: CREATIVE PORTRAIT
+
+${expandedPrompt}
+
+${qualityTokens}
+${edgeFill}`;
+    }
+
+    parts.push({ text: finalInstruction });
 
     // Step 4: Generate
     const result = await generateWithGoogle(parts, googleApiKey, model);
