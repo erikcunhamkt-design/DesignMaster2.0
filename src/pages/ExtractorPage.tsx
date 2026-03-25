@@ -178,19 +178,6 @@ export default function ExtractorPage() {
             </div>
           </div>
 
-          {/* Extra instruction */}
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
-              Instrução extra (opcional)
-            </p>
-            <Input
-              placeholder="Ex: trocar cenário para praia, mudar cor para azul..."
-              value={extraInstruction}
-              onChange={(e) => setExtraInstruction(e.target.value)}
-              className="h-9 bg-secondary/50 border-border/20 text-xs rounded-lg focus:border-primary/40"
-            />
-          </div>
-
           {/* Extract button */}
           <Button
             onClick={handleExtract}
