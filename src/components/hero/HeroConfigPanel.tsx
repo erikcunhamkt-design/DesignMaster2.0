@@ -193,9 +193,56 @@ function HeroTypeSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (
   );
 }
 
-// ── Subject Section ───────────────────────────────────────────────────────
-function SubjectSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
+// ── Upload Block (reusable) ────────────────────────────────────────────────
+function UploadBlock({ photos, onUpdate, fieldKey, label, placeholder, max = 3 }: {
+  photos: string[]; onUpdate: (p: Partial<HeroConfig>) => void;
+  fieldKey: 'subjectPhotos' | 'productPhotos' | 'referencePhotos';
+  label: string; placeholder: string; max?: number;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const remaining = max - photos.length;
+    if (remaining <= 0) return;
+    const selected = Array.from(files).slice(0, remaining);
+    e.target.value = '';
+    const newUrls = selected.map(f => URL.createObjectURL(f));
+    onUpdate({ [fieldKey]: [...photos, ...newUrls] } as Partial<HeroConfig>);
+  };
+
+  return (
+    <div>
+      <Label>{label}</Label>
+      <input ref={fileInputRef} type="file" accept="image/*,.heic,.heif,.avif,.webp" multiple className="hidden" onChange={handleFile} />
+      {photos.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {photos.map((url, i) => (
+            <motion.div key={i} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group">
+              <img src={url} alt={`${label} ${i + 1}`} className="h-full w-full object-cover" />
+              <button onClick={() => onUpdate({ [fieldKey]: photos.filter((_, j) => j !== i) } as Partial<HeroConfig>)}
+                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                <X className="h-4 w-4 text-white" />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
+      {photos.length < max && (
+        <button onClick={() => fileInputRef.current?.click()}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/15 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200">
+          <Plus className="h-3.5 w-3.5" />
+          <span className="text-[10px] font-medium">{placeholder}</span>
+        </button>
+      )}
+      <p className="text-[8px] text-muted-foreground/35 mt-1">{photos.length}/{max}</p>
+    </div>
+  );
+}
+
+// ── Element Selector Section ──────────────────────────────────────────────
+function ElementSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
   const elements: { id: HeroConfig['element']; label: string; icon: string; desc: string }[] = [
     { id: 'pessoa_fundador',   label: 'Pessoa',      icon: '👤', desc: 'Fundador ou especialista' },
     { id: 'produto_mockup',    label: 'Produto',     icon: '🖥️', desc: 'App, dashboard, mockup' },
@@ -204,110 +251,10 @@ function SubjectSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p
     { id: 'simbolo_conceito',  label: 'Símbolo',     icon: '🔷', desc: 'Metáfora visual' },
   ];
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    const remaining = 3 - config.referencePhotos.length;
-    if (remaining <= 0) return;
-    const selected = Array.from(files).slice(0, remaining);
-    e.target.value = '';
-    const newUrls = selected.map(f => URL.createObjectURL(f));
-    onUpdate({ referencePhotos: [...config.referencePhotos, ...newUrls] });
-  };
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label>Elemento Principal</Label>
-        <ChipSelector options={elements} value={config.element} onChange={(v) => onUpdate({ element: v })} columns={1} />
-      </div>
-
-      {/* Upload de referência do sujeito */}
-      <div>
-        <Label>Foto de Referência</Label>
-        <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
-        {config.referencePhotos.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {config.referencePhotos.map((url, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group"
-              >
-                <img src={url} alt={`Ref ${i + 1}`} className="h-full w-full object-cover" />
-                <button
-                  onClick={() => onUpdate({ referencePhotos: config.referencePhotos.filter((_, j) => j !== i) })}
-                  className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-4 w-4 text-white" />
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        )}
-        {config.referencePhotos.length < 3 && (
-          <button onClick={() => fileInputRef.current?.click()}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/15 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span className="text-[10px] font-medium">Upload de pessoa, produto ou mockup</span>
-          </button>
-        )}
-        <p className="text-[8px] text-muted-foreground/35 mt-1.5">
-          {config.referencePhotos.length}/3 · Referência visual para a IA
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ── Reference Upload Section ──────────────────────────────────────────────
-function ReferenceSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach(f => {
-      const url = URL.createObjectURL(f);
-      onUpdate({ referencePhotos: [...config.referencePhotos, url] });
-    });
-    e.target.value = '';
-  };
-
   return (
     <div>
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
-      {config.referencePhotos.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {config.referencePhotos.map((url, i) => (
-            <motion.div
-              key={i}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group"
-            >
-              <img src={url} alt={`Ref ${i + 1}`} className="h-full w-full object-cover" />
-              <button
-                onClick={() => onUpdate({ referencePhotos: config.referencePhotos.filter((_, j) => j !== i) })}
-                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-4 w-4 text-white" />
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      )}
-      <button onClick={() => fileInputRef.current?.click()}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/15 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200"
-      >
-        <Plus className="h-3.5 w-3.5" />
-        <span className="text-[10px] font-medium">Adicionar pessoa, produto ou mockup</span>
-      </button>
-      <p className="text-[8px] text-muted-foreground/35 mt-1.5 italic">
-        Até 3 imagens de referência para guiar a IA.
-      </p>
+      <Label>Elemento Principal</Label>
+      <ChipSelector options={elements} value={config.element} onChange={(v) => onUpdate({ element: v })} columns={1} />
     </div>
   );
 }
