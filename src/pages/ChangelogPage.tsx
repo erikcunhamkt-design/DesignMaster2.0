@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import {
