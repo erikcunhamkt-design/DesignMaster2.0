@@ -230,7 +230,7 @@ Deno.serve(async (req) => {
 
     // 1. Subject photos FIRST with ultra-strict identity preservation instruction
     if (hasSubject) {
-      parts.push({ text: `[SUBJECT IDENTITY LOCK — HIGHEST PRIORITY. The following photos define the EXACT person who must appear in the final image. Preserve the exact same face identity: face shape, eyes, eyebrows, nose, lips, jawline, skin tone, hairline, hair color, hairstyle, age impression, and ethnicity. Do NOT redesign, beautify, replace, randomize, or reinterpret the person. Do NOT create a similar person. Create the SAME person from these photos. Keep the exact same gender. Facial identity is more important than style.]` });
+      parts.push({ text: `[SUBJECT IDENTITY LOCK — HIGHEST PRIORITY. The following photos define the EXACT person who must appear in the final image. Preserve the exact same face identity: face shape, eyes, eyebrows, nose, lips, jawline, skin tone, hairline, hair color, hairstyle, age impression, and ethnicity. Do NOT redesign, beautify, replace, randomize, or reinterpret the person. Do NOT create a similar person. Create the SAME person from these photos. Keep the exact same gender. Facial identity is more important than style. CRITICAL INTEGRATION: The face must be ORGANICALLY integrated into the body — match lighting direction, color temperature, and shadow angles between face and body. The neck/shoulder transition must be seamless with continuous skin tone. Head size must be anatomically proportional to body (1/7.5 ratio). The result must look like ONE continuous photograph, NOT a face pasted onto a body. Apply the SAME color grading to face and body.]` });
       for (const img of subjectImages.slice(0, 5)) {
         const match = img.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
@@ -266,7 +266,7 @@ Deno.serve(async (req) => {
     // 4. Main prompt text AFTER images with identity reinforcement
     let identityReminder = "";
     if (hasSubject) {
-      identityReminder = `\n\nABSOLUTE IDENTITY LOCK: Reproduce the exact uploaded person with the same facial identity and same gender. Do not change the person, do not swap facial features, do not generate a different model, do not reinterpret the face.`;
+      identityReminder = `\n\nABSOLUTE IDENTITY LOCK: Reproduce the exact uploaded person with the same facial identity and same gender. Do not change the person, do not swap facial features, do not generate a different model, do not reinterpret the face. CRITICAL: The face must be ORGANICALLY part of the body — match lighting, shadows, color temperature, and skin tone seamlessly between face, neck, and body. The head must be proportional to the body. NO "pasted head" effect — generate as ONE unified photograph.`;
       if (hasStyleRef) {
         identityReminder += ` Style references are ONLY for pose, framing, and lighting — never for facial identity.`;
       }
