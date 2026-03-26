@@ -662,12 +662,8 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
           <HeroTypeSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
 
-        <CollapsibleBlock icon={Image} title="Sujeito" subtitle="Elemento visual principal" defaultOpen accent>
+        <CollapsibleBlock icon={Image} title="Sujeito & Referência" subtitle={config.referencePhotos.length > 0 ? `${config.referencePhotos.length} ref · ${config.element}` : config.element} defaultOpen accent>
           <SubjectSection config={config} onUpdate={onUpdate} />
-        </CollapsibleBlock>
-
-        <CollapsibleBlock icon={Plus} title="Referência Visual" subtitle={config.referencePhotos.length > 0 ? `${config.referencePhotos.length} imagem(ns)` : 'Nenhuma'}>
-          <ReferenceSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
 
         <CollapsibleBlock icon={Layers} title="Composição" subtitle="Layout e posicionamento">
