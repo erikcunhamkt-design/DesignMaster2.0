@@ -19,6 +19,7 @@ import {
   Download,
   Settings,
   MessagesSquare,
+  Megaphone,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
