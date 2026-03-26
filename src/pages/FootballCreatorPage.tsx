@@ -150,10 +150,6 @@ function FootballPreviewPanel({
             subtitle="IA construindo visual profissional de futebol"
           />
         )}
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
-            </div>
-          </div>
-        )}
 
         {state === 'concluido' && imageUrl && (
           <div className="relative inline-block group" style={{ maxWidth: `${zoom}%`, maxHeight: `${zoom}%` }}>
