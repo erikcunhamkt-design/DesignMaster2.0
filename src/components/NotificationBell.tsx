@@ -30,9 +30,9 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
   };
 
   const handleGoToChangelog = () => {
-    navigate('/studio/changelog');
     setOpen(false);
     setSelected(null);
+    setTimeout(() => navigate('/studio/changelog'), 100);
   };
 
   return (
