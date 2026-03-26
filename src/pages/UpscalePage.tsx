@@ -318,8 +318,8 @@ export default function UpscalePage() {
           {isProcessing && (
             <GeneratingAnimation
               icon={ArrowUpCircle}
-              title={`Restaurando imagem em ${resolution}…`}
-              subtitle="Reconstruindo detalhes e texturas pixel a pixel"
+              title={`Ultra Upscale ${resolution} — Pipeline Multi-Pass`}
+              subtitle="Pass 1: Upscale estrutural + detalhes · Pass 2: Polish & micro-refinamento"
             />
           )}
           {resultImage && (
