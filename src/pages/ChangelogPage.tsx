@@ -42,6 +42,54 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.9.2',
+    date: '26 Mar 2026',
+    title: 'Ultra Upscale — Motor de Restauração Reescrito',
+    emoji: '🔬',
+    highlights: [
+      'Motor de upscale completamente reescrito — agora restaura de verdade',
+      'Modelo Gemini 3 Pro Image dedicado para reconstrução pixel a pixel',
+      'Suporte real a 2K e 4K com recuperação de microdetalhes',
+      'Animação de loading premium durante o processamento',
+    ],
+    changes: [
+      {
+        icon: <Cpu className="h-4 w-4" />,
+        category: 'Novo Motor de Upscale',
+        tag: 'motor',
+        items: [
+          'Edge function dedicada "upscale-image" substituiu o fluxo antigo',
+          'Modelo gemini-3-pro-image-preview para restauração real de imagens',
+          'Imagem enviada como inline_data — IA trabalha sobre os pixels exatos',
+          'Prompt especializado em nitidez, texturas, ruído e range dinâmico',
+          'Retry automático para rate limit (429)',
+        ],
+      },
+      {
+        icon: <Zap className="h-4 w-4" />,
+        category: 'Qualidade de Saída',
+        tag: 'melhoria',
+        items: [
+          'Upscale real para 2K ou 4K em vez de reinterpretação da imagem',
+          'Remoção de artefatos de compressão e ruído',
+          'Reconstrução de texturas e microdetalhes perdidos',
+          'Melhoria de range dinâmico e fidelidade de cor',
+          'Correções guiadas pela análise de qualidade da imagem',
+        ],
+      },
+      {
+        icon: <Sparkles className="h-4 w-4" />,
+        category: 'UX do Upscale',
+        tag: 'ux',
+        items: [
+          'Animação de loading premium com barra de progresso durante restauração',
+          'Feedback visual "Reconstruindo detalhes pixel a pixel"',
+          'Fluxo simplificado — resultado mais fiel à imagem original',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.9.1',
     date: '26 Mar 2026',
     title: 'Hero Studio — Uploads Separados & UX Refinada',
