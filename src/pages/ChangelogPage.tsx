@@ -353,7 +353,7 @@ const containerVariants = {
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.97 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 const itemVariants = {
