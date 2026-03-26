@@ -13,6 +13,51 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.9.0',
+    date: '26 Mar 2026',
+    title: 'Animais Fantásticos — Motor Fotográfico de Fauna Brasileira',
+    highlights: [
+      'Novo estúdio Animais Fantásticos com motor de ângulos magnéticos e iluminação cinematográfica',
+      'UX/UI totalmente redesenhada com seções colapsáveis e chips visuais',
+      'Ângulos heroicos (Low Angle, Eye Level, Aerial) com profundidade e movimento',
+      'Iluminação magnética: Golden Hour, Rim Light, Misty e mais para cada bioma',
+    ],
+    changes: [
+      {
+        icon: <Camera className="h-4 w-4 text-primary" />,
+        category: 'Motor Fotográfico de Fauna',
+        items: [
+          'Ângulos magnéticos: Low Angle Heroico, Eye Level, Aerial Drone, Close-up Macro',
+          'Iluminação cinematográfica: Golden Hour, Rim Light, Backlit Silhouette, Misty Atmosphere',
+          'Efeitos visuais: Bokeh, Motion Blur, Partículas, Reflexos na Água, Raios de Luz',
+          'Composição com regras profissionais de fotografia wildlife',
+          'Prompt engine ultra-detalhado com câmera, lente e ISO automáticos',
+        ],
+      },
+      {
+        icon: <Palette className="h-4 w-4 text-emerald-400" />,
+        category: 'Biomas Brasileiros',
+        items: [
+          'Amazônia, Pantanal, Cerrado, Mata Atlântica, Caatinga, Pampas',
+          'Cada bioma injeta vegetação, luz e atmosfera específicas no prompt',
+          'Combinação inteligente animal + bioma para resultados autênticos',
+        ],
+      },
+      {
+        icon: <Layers className="h-4 w-4 text-blue-400" />,
+        category: 'UX/UI Redesenhada',
+        items: [
+          'Seções colapsáveis para reduzir ruído visual',
+          'Grid de animais em 3 colunas com emojis e seleção visual',
+          'Cards clicáveis para ângulos e iluminação com ícones',
+          'Resumo de seleção antes de gerar',
+          'Preview com ambient glow e download direto',
+          'Mobile responsivo com auto-scroll para resultado',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.8.0',
     date: '20 Mar 2026',
     title: 'VOID, Fotógrafo Profissional & Social Media Creator',
