@@ -47,8 +47,10 @@ export interface HeroConfig {
   // Element
   element: HeroElement;
 
-  // Upload
+  // Uploads
   referencePhotos: string[];
+  subjectPhotos: string[];
+  productPhotos: string[];
 
   // Composition
   composition: HeroComposition;
@@ -92,6 +94,8 @@ export const defaultHeroConfig: HeroConfig = {
   heroType: 'saas_tecnologia',
   element: 'pessoa_fundador',
   referencePhotos: [],
+  subjectPhotos: [],
+  productPhotos: [],
   composition: 'pessoa_direita',
   visualStyle: 'clean_premium',
   intensity: 60,
