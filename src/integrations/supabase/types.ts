@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_name: string
+          file_url: string
+          id: string
+          title: string
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_url: string
+          id?: string
+          title: string
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_url?: string
+          id?: string
+          title?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           agent_id: string
