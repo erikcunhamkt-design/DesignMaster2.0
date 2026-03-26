@@ -150,9 +150,9 @@ Deno.serve(async (req) => {
       const { theme, character, style, elements, extra } = body;
       systemPrompt = COVERS_SYSTEM;
       userInstructions = `Theme/Concept: ${theme}`;
-      if (character) userInstructions += `\nCharacter/Animal: ${character}`;
+      if (character) userInstructions += `\nFeatured Animal: ${character} — render with ABSOLUTE anatomical accuracy, show every texture detail`;
       if (style) userInstructions += `\nVisual style: ${style}`;
-      if (elements) userInstructions += `\nGraphic elements: ${elements}`;
+      if (elements) userInstructions += `\nPhotographic direction: ${elements}`;
       if (extra) userInstructions += `\n\n⚠️ MANDATORY USER INSTRUCTIONS (YOU MUST FOLLOW THESE EXACTLY):\n${extra}`;
     } else {
       return new Response(
