@@ -5,102 +5,110 @@ const corsHeaders = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-// ULTRA UPSCALE ENGINE — True image enhancement, not regeneration
-// Uses the image as INLINE DATA so the model enhances the EXACT pixels
+// ULTRA UPSCALE ENGINE V2 — Inspired by ComfyUI Ultimate Upscale V5
+//
+// Key techniques adapted from the ComfyUI workflow:
+// 1. MULTI-PASS: First structural upscale, then detail refinement
+// 2. LOW INTERVENTION: Like denoise 0.15-0.25 — barely change, only enhance
+// 3. TILE-AWARE: Process thinking in 1024×1024 regions for consistency
+// 4. FACE DETAILING: Dedicated face preservation pass
+// 5. TEXTURE FIDELITY: Photorealistic texture reconstruction (skin, fabric, surfaces)
+// 6. CONTROLNET PHILOSOPHY: Structure-first, detail-second
 // ══════════════════════════════════════════════════════════════════════════
 
-function buildUpscalePrompt(resolution: string, diagnosticCorrections?: string): string {
-  const resLabel = resolution === '4K' ? '4K (3840×2160)' : '2K (2560×1440)';
+function buildPass1Prompt(resolution: string, diagnosticCorrections?: string): string {
+  const resLabel = resolution === '4K' ? '3840×2160' : '2560×1440';
 
-  let prompt = `You are a professional image restoration and upscaling specialist. Your task is to ENHANCE this exact image to ${resLabel} resolution while preserving ABSOLUTE PIXEL FIDELITY.
+  let prompt = `ROLE: You are a professional image upscaling pipeline, equivalent to a 4xRealWebPhoto neural upscaler followed by a controlled diffusion refinement at denoise strength 0.15.
 
-THIS IS NOT AN IMAGE GENERATION TASK. You must return the EXACT SAME IMAGE with dramatically improved quality. The output must be the same scene, same composition, same everything — only the technical quality changes.
+TASK: Upscale this image to ${resLabel} resolution with ABSOLUTE PIXEL FIDELITY. This is a RESTORATION task, NOT a generation task.
 
-═══ CRITICAL IDENTITY PRESERVATION ═══
-• The subject's face, body, pose, clothing, accessories must remain 100% IDENTICAL
-• The background, objects, setting must remain 100% IDENTICAL
-• The composition, framing, camera angle, crop must remain 100% IDENTICAL
-• The lighting direction, color temperature, mood must remain 100% IDENTICAL
-• The color palette, saturation, hue balance must remain 100% IDENTICAL
+═══ PIPELINE STAGE 1: STRUCTURAL UPSCALE ═══
 
-═══ ENHANCEMENT OPERATIONS (what you MUST do) ═══
+Think of this as running a dedicated upscale model (like 4xRealWebPhoto_v3) on the image:
 
-1. RESOLUTION UPSCALE TO ${resLabel}:
-   - Intelligently reconstruct sub-pixel detail to fill the higher resolution
-   - Generate sharp, natural detail at the new resolution — no blurry upscaling
-   - Every pixel must carry meaningful information at the target resolution
+1. RESOLUTION RECONSTRUCTION:
+   - Reconstruct every pixel to fill ${resLabel} with genuine detail
+   - Use intelligent interpolation — NOT bicubic stretching
+   - Each 1024×1024 tile region must have consistent detail density
+   - Fill sub-pixel information with contextually appropriate detail
 
-2. SHARPNESS & DETAIL RECOVERY:
-   - Recover micro-textures: skin pores, fabric weave, hair strands, surface grain
-   - Apply frequency-aware sharpening — enhance real detail, not noise
-   - Restore edge definition without haloing or ringing artifacts
-   - Reconstruct fine typography, patterns, and geometric details
+2. ARTIFACT REMOVAL (pre-upscale cleanup):
+   - Remove JPEG blocking, banding, and mosquito noise
+   - Eliminate compression artifacts BEFORE upscaling them
+   - Clean posterization in gradients
+   - Remove any prior low-quality upscale artifacts (haloing, ringing)
 
-3. NOISE & ARTIFACT ELIMINATION:
-   - Remove JPEG/WebP compression blocking and banding
-   - Eliminate color noise and luminance noise
-   - Remove mosquito noise around high-contrast edges
-   - Clean up posterization in gradients
-   - Remove any existing upscale artifacts from prior low-quality upscaling
+3. STRUCTURAL INTEGRITY (ControlNet-like fidelity):
+   - The edge map of the output must match the input EXACTLY
+   - All contours, shapes, boundaries remain pixel-accurate
+   - No structural drift, warping, or geometric distortion
+   - Depth relationships between elements preserved perfectly
 
-4. DYNAMIC RANGE ENHANCEMENT:
-   - Recover shadow detail without lifting blacks unnaturally
+═══ PIPELINE STAGE 2: DETAIL REFINEMENT (denoise 0.20) ═══
+
+Like a KSampler at 12 steps with denoise 0.20 — minimal creative intervention:
+
+4. TEXTURE RECONSTRUCTION (realistic LoRA-level quality):
+   - Skin: reconstruct pores, fine lines, natural imperfections — NOT smooth/plastic
+   - Fabric: rebuild cotton weave, silk sheen, leather grain, stitching
+   - Hair: individual strand detail, natural highlights, volume
+   - Surfaces: metal reflections, glass transparency, wood grain
+   - Environment: foliage leaves, water ripples, cloud wisps, concrete texture
+
+5. SHARPNESS & MICRO-DETAIL:
+   - Apply frequency-aware sharpening on genuine detail only
+   - Enhance edge definition without haloing (like unsharp mask r=1 amount=0.3)
+   - Recover micro-textures lost to compression
+   - Typography and patterns must be crisp and readable
+
+6. DYNAMIC RANGE & COLOR:
+   - Recover shadow detail naturally (lift shadows max 5%)
    - Restore highlight information without clipping
-   - Improve local contrast for added depth and dimensionality
-   - Enhance tonal separation between similar values
+   - Improve local contrast for depth (like clarity +10, not +50)
+   - Color fidelity: correct only obvious casts, preserve artistic intent
+   - Smooth color gradients without banding (10-bit quality)
 
-5. COLOR FIDELITY:
-   - Correct any color cast or white balance drift
-   - Restore natural saturation without oversaturating
-   - Improve color depth and bit-depth rendering
-   - Ensure smooth color gradients without banding
+═══ PIPELINE STAGE 3: FACE DETAILING ═══
 
-6. TEXTURE RECONSTRUCTION:
-   - Rebuild fabric textures (cotton weave, silk sheen, leather grain)
-   - Reconstruct skin texture naturally (pores, fine lines, natural imperfections)
-   - Restore material surfaces (metal reflections, glass transparency, wood grain)
-   - Rebuild environmental textures (foliage detail, water surface, clouds)
+Like FaceDetailer with SAM segmentation — dedicated face enhancement:
 
-═══ QUALITY STANDARD ═══
-The final result must look like it was originally captured at ${resLabel} with a Phase One IQ4 150MP medium format camera — not like a low-res image that was stretched. Every millimeter must carry genuine, sharp, detailed information.
+7. FACE PRESERVATION (CRITICAL):
+   - Detect all faces in the image
+   - For each face: enhance at higher detail level than surrounding areas
+   - Preserve EXACT identity: same eyes, nose, mouth, jaw, expression
+   - Rebuild skin texture naturally (pores visible, not airbrushed)
+   - Sharpen eyes, eyebrows, lips with extra precision
+   - Hair around face: individual strand detail
+   - NO beauty filters, NO skin smoothing, NO age changes
 
-═══ STRICTLY FORBIDDEN ═══
-• DO NOT change the person's identity, face, features, expression, age, or appearance
-• DO NOT change clothing, accessories, hairstyle, or any visible objects
-• DO NOT add or remove ANY elements from the scene
-• DO NOT change the art style, aesthetic, or visual mood
-• DO NOT relight, recolor, or restyle the image
-• DO NOT apply beauty filters, skin smoothing, or glamour effects
-• DO NOT generate a "similar" or "inspired" image — enhance THIS EXACT image
-• DO NOT add lens flare, bokeh, vignette, or any effects not in the original
-• DO NOT crop, rotate, or change the aspect ratio`;
+═══ INTERVENTION LIMITS (denoise ceiling: 0.25) ═══
+
+These limits ensure the output is the SAME image, not a regeneration:
+• Color shift tolerance: < 3% per channel
+• Structural deviation: 0% (edge map must match)
+• Identity deviation: 0% (same person, same expression)
+• Composition change: 0% (same framing, same crop)
+• Style change: 0% (same mood, same aesthetic)
+• Element addition/removal: STRICTLY FORBIDDEN
+
+═══ QUALITY TARGET ═══
+The output must look like it was captured natively at ${resLabel} with a Phase One IQ4 150MP — genuine sharpness and detail at every pixel, not AI-smoothed or over-processed. Think "professional remaster" not "AI enhancement".`;
 
   if (diagnosticCorrections) {
-    prompt += `\n\n═══ DIAGNOSTIC-GUIDED CORRECTIONS ═══\nBased on AI analysis of this specific image, pay extra attention to:\n${diagnosticCorrections}`;
+    prompt += `\n\n═══ DIAGNOSTIC-GUIDED CORRECTIONS ═══\nAI analysis detected these specific issues — apply targeted fixes:\n${diagnosticCorrections}`;
   }
 
-  prompt += `\n\nNEGATIVE: face morphing, identity change, different person, beauty filter, oversaturation, HDR artifacts, oversharpening, haloing, ringing, plastic skin, waxy texture, AI generation artifacts, different composition, added elements, removed elements`;
+  prompt += `\n\nNEGATIVE: face morphing, identity change, beauty filter, skin smoothing, plastic/waxy skin, oversaturation, HDR artifacts, oversharpening haloes, ringing artifacts, AI generation artifacts, different composition, added/removed elements, style change, color shift, blurry upscale, bicubic artifacts`;
 
   return prompt;
 }
 
-async function upscaleImage(imageBase64: string, googleApiKey: string, resolution: string, diagnosticCorrections?: string) {
+async function callGeminiImage(imageBase64: string, mimeType: string, prompt: string, googleApiKey: string): Promise<string> {
   const model = "gemini-3-pro-image-preview";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
 
-  // Strip data URI prefix
-  const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-  
-  // Detect mime type
-  let mimeType = "image/jpeg";
-  if (imageBase64.startsWith("data:image/png")) mimeType = "image/png";
-  else if (imageBase64.startsWith("data:image/webp")) mimeType = "image/webp";
-
-  const prompt = buildUpscalePrompt(resolution, diagnosticCorrections);
-
-  console.log(`🔍 Upscaling image to ${resolution} using ${model}...`);
-
-  const MAX_RETRIES = 2;
+  const MAX_RETRIES = 3;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const response = await fetch(url, {
       method: "POST",
@@ -108,9 +116,7 @@ async function upscaleImage(imageBase64: string, googleApiKey: string, resolutio
       body: JSON.stringify({
         contents: [{
           parts: [
-            // Image FIRST as inline data — this is critical for the model to enhance it
-            { inline_data: { mime_type: mimeType, data: base64Data } },
-            // Then the enhancement instructions
+            { inline_data: { mime_type: mimeType, data: imageBase64 } },
             { text: prompt },
           ],
         }],
@@ -123,26 +129,25 @@ async function upscaleImage(imageBase64: string, googleApiKey: string, resolutio
     if (response.ok) {
       const data = await response.json();
       const parts = data.candidates?.[0]?.content?.parts || [];
-      
+
       for (const part of parts) {
         if (part.inlineData) {
-          console.log(`✅ Upscale ${resolution} successful`);
-          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          return part.inlineData.data;
         }
       }
 
-      // No image in response
       const textResponse = parts.map((p: any) => p.text).filter(Boolean).join(" ");
       console.warn("⚠️ No image returned. Text:", textResponse?.slice(0, 200));
-      throw { status: 422, message: textResponse?.trim() ? `Modelo respondeu sem imagem: "${textResponse.slice(0, 150)}"` : "Nenhuma imagem gerada. O prompt pode ter sido bloqueado." };
+      throw { status: 422, message: textResponse?.trim() ? `Modelo respondeu sem imagem: "${textResponse.slice(0, 150)}"` : "Nenhuma imagem gerada." };
     }
 
     const errorText = await response.text();
 
-    if (response.status === 429 && attempt < MAX_RETRIES) {
+    if ((response.status === 429 || response.status === 503) && attempt < MAX_RETRIES) {
       const retryMatch = errorText.match(/"retryDelay":\s*"(\d+)s"/);
-      const waitSec = retryMatch ? Math.min(parseInt(retryMatch[1], 10), 30) : 15;
-      console.warn(`⏳ Rate limited. Retrying in ${waitSec}s... (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      const baseSec = retryMatch ? parseInt(retryMatch[1], 10) : (attempt + 1) * 5;
+      const waitSec = Math.min(baseSec, 30);
+      console.warn(`⏳ ${response.status} — retrying in ${waitSec}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
       await new Promise(r => setTimeout(r, waitSec * 1000));
       continue;
     }
@@ -153,7 +158,61 @@ async function upscaleImage(imageBase64: string, googleApiKey: string, resolutio
     throw { status: 500, message: `Erro na API: ${response.status}` };
   }
 
-  throw { status: 429, message: "Rate limit excedido após tentativas. Aguarde e tente novamente." };
+  throw { status: 429, message: "Rate limit excedido após tentativas." };
+}
+
+async function upscaleImage(imageBase64Raw: string, googleApiKey: string, resolution: string, diagnosticCorrections?: string) {
+  // Strip data URI prefix
+  const base64Data = imageBase64Raw.replace(/^data:image\/\w+;base64,/, "");
+
+  // Detect mime type
+  let mimeType = "image/jpeg";
+  if (imageBase64Raw.startsWith("data:image/png")) mimeType = "image/png";
+  else if (imageBase64Raw.startsWith("data:image/webp")) mimeType = "image/webp";
+
+  console.log(`🔬 Ultra Upscale V2 — ${resolution} — multi-pass pipeline starting...`);
+
+  // ── PASS 1: Structural upscale + detail refinement + face detailing ──
+  console.log("📐 Pass 1: Structural upscale with detail refinement...");
+  const pass1Prompt = buildPass1Prompt(resolution, diagnosticCorrections);
+  const pass1Result = await callGeminiImage(base64Data, mimeType, pass1Prompt, googleApiKey);
+
+  // ── PASS 2: Polish pass — like a second KSampler at denoise 0.10 ──
+  console.log("✨ Pass 2: Polish & micro-detail refinement...");
+  const pass2Prompt = `ROLE: Final quality polish pass on an already-upscaled image. You are the last step in a professional remastering pipeline.
+
+This image has already been upscaled. Your job is a VERY LIGHT refinement pass (equivalent to denoise 0.10 — almost invisible intervention):
+
+1. MICRO-SHARPNESS: Apply the finest level of sharpening to bring out:
+   - Eyelash detail, iris texture, pupil reflections
+   - Individual hair strands and eyebrow hairs
+   - Skin pore texture (subtle, natural)
+   - Fabric thread patterns
+   - Text and typography crispness
+
+2. NOISE CLEANUP: Remove any artifacts introduced by the upscale:
+   - Smooth any remaining banding in gradients
+   - Clean any subtle haloing around edges
+   - Remove any grain inconsistencies between regions
+
+3. TONAL POLISH:
+   - Ensure consistent tonal quality across the entire image
+   - Verify shadow-highlight transition smoothness
+   - Confirm color accuracy and natural saturation
+
+CRITICAL RULES:
+- This is a POLISH pass — changes must be nearly imperceptible individually
+- The image is already good — you are making it PERFECT
+- DO NOT change identity, composition, colors, mood, or style
+- Maximum intervention: equivalent to denoise 0.10
+- If in doubt, do LESS not more
+
+NEGATIVE: identity change, color shift, style change, composition change, over-processing, over-sharpening, smoothing, beauty filters`;
+
+  const pass2Result = await callGeminiImage(pass1Result, "image/png", pass2Prompt, googleApiKey);
+
+  console.log("✅ Ultra Upscale V2 complete — 2-pass pipeline finished");
+  return `data:image/png;base64,${pass2Result}`;
 }
 
 Deno.serve(async (req) => {
