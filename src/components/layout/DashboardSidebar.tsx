@@ -19,6 +19,7 @@ import {
   Download,
   Settings,
   MessagesSquare,
+  Megaphone,
 } from 'lucide-react';
 import logo3d from '@/assets/logo-3d.png';
 import { cn } from '@/lib/utils';
@@ -146,14 +147,26 @@ function SidebarContent({
           );
         })}
 
-        {/* Notifications */}
+        {/* Notifications & Updates */}
         <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
 
         {!collapsed && (
           <p className="px-2 mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Social</p>
         )}
 
-        
+        <NotificationBell collapsed={collapsed} />
+
+        <button
+          onClick={() => { navigate('/studio/changelog'); onClose?.(); }}
+          className={cn(
+            'group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+            collapsed && 'justify-center px-0',
+            'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+          )}
+        >
+          <Megaphone className="h-[18px] w-[18px] shrink-0" />
+          {!collapsed && <span className="truncate">Atualizações</span>}
+        </button>
 
         {socialItems.map((item) => {
           const active = activeSection === item.id;
