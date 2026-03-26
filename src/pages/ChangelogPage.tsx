@@ -42,6 +42,42 @@ interface PatchNote {
 
 const patchNotes: PatchNote[] = [
   {
+    version: '2.9.1',
+    date: '26 Mar 2026',
+    title: 'Hero Studio — Uploads Separados & UX Refinada',
+    emoji: '🦸',
+    highlights: [
+      'Uploads de Sujeito, Produto e Referência Visual agora são blocos independentes',
+      'Botão de geração unificado — removido botão duplicado',
+      'Tag de "Alta Conversão" removida para interface mais limpa',
+      'Organização lógica das seções com hierarquia clara',
+    ],
+    changes: [
+      {
+        icon: <Upload className="h-4 w-4" />,
+        category: 'Uploads Separados',
+        tag: 'melhoria',
+        items: [
+          'Foto do Sujeito: upload dedicado com preview e remoção individual',
+          'Foto do Produto: upload separado para mockups e produtos',
+          'Referência Visual: upload independente para referências de estilo',
+          'Cada bloco suporta até 3 imagens com miniaturas interativas',
+        ],
+      },
+      {
+        icon: <Layers className="h-4 w-4" />,
+        category: 'UX/UI Hero Studio',
+        tag: 'ux',
+        items: [
+          'Botão de geração único — removida duplicação de ação',
+          'Tag "Alta Conversão" removida para visual mais limpo',
+          'Seções colapsáveis reorganizadas em hierarquia lógica',
+          'Fluxo: Tipo → Elemento → Sujeito → Produto → Referência',
+        ],
+      },
+    ],
+  },
+  {
     version: '2.9.0',
     date: '26 Mar 2026',
     title: 'Animais Fantásticos — Motor Fotográfico de Fauna Brasileira',
