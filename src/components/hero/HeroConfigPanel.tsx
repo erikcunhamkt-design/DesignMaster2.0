@@ -174,10 +174,8 @@ function ChipSelector<T extends string>({
   );
 }
 
-// ── Hero Type & Element Section ────────────────────────────────────────────
+// ── Hero Type Section ──────────────────────────────────────────────────────
 function HeroTypeSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const heroTypes: { id: HeroConfig['heroType']; label: string; icon: string }[] = [
     { id: 'saas_tecnologia',      label: 'SaaS / Tech',       icon: '💻' },
     { id: 'servico_profissional', label: 'Serviço Pro',       icon: '🤝' },
@@ -187,6 +185,16 @@ function HeroTypeSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (
     { id: 'startup_vendas',       label: 'Startup',           icon: '🚀' },
   ];
 
+  return (
+    <div>
+      <Label>Tipo de Hero</Label>
+      <ChipSelector options={heroTypes} value={config.heroType} onChange={(v) => onUpdate({ heroType: v })} columns={2} />
+    </div>
+  );
+}
+
+// ── Subject Section ───────────────────────────────────────────────────────
+function SubjectSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
   const elements: { id: HeroConfig['element']; label: string; icon: string; desc: string }[] = [
     { id: 'pessoa_fundador',   label: 'Pessoa',      icon: '👤', desc: 'Fundador ou especialista' },
     { id: 'produto_mockup',    label: 'Produto',     icon: '🖥️', desc: 'App, dashboard, mockup' },
@@ -194,6 +202,18 @@ function HeroTypeSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (
     { id: 'ilustracao_tech',   label: 'Tech Art',    icon: '⚡', desc: 'Isométrico, digital' },
     { id: 'simbolo_conceito',  label: 'Símbolo',     icon: '🔷', desc: 'Metáfora visual' },
   ];
+
+  return (
+    <div>
+      <Label>Elemento Principal</Label>
+      <ChipSelector options={elements} value={config.element} onChange={(v) => onUpdate({ element: v })} columns={1} />
+    </div>
+  );
+}
+
+// ── Reference Upload Section ──────────────────────────────────────────────
+function ReferenceSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (p: Partial<HeroConfig>) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -206,49 +226,37 @@ function HeroTypeSection({ config, onUpdate }: { config: HeroConfig; onUpdate: (
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
-
-      <div>
-        <Label>Tipo de Hero</Label>
-        <ChipSelector options={heroTypes} value={config.heroType} onChange={(v) => onUpdate({ heroType: v })} columns={2} />
-      </div>
-
-      <div>
-        <Label>Elemento Principal</Label>
-        <ChipSelector options={elements} value={config.element} onChange={(v) => onUpdate({ element: v })} columns={1} />
-      </div>
-
-      {/* Upload */}
-      <div>
-        <Label>Referência visual</Label>
-        {config.referencePhotos.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {config.referencePhotos.map((url, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group"
+      {config.referencePhotos.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {config.referencePhotos.map((url, i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/30 group"
+            >
+              <img src={url} alt={`Ref ${i + 1}`} className="h-full w-full object-cover" />
+              <button
+                onClick={() => onUpdate({ referencePhotos: config.referencePhotos.filter((_, j) => j !== i) })}
+                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <img src={url} alt={`Ref ${i + 1}`} className="h-full w-full object-cover" />
-                <button
-                  onClick={() => onUpdate({ referencePhotos: config.referencePhotos.filter((_, j) => j !== i) })}
-                  className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-4 w-4 text-white" />
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        )}
-        <button onClick={() => fileInputRef.current?.click()}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/15 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span className="text-[10px] font-medium">Adicionar referência</span>
-        </button>
-      </div>
+                <X className="h-4 w-4 text-white" />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
+      <button onClick={() => fileInputRef.current?.click()}
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border/30 bg-secondary/15 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all duration-200"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        <span className="text-[10px] font-medium">Adicionar pessoa, produto ou mockup</span>
+      </button>
+      <p className="text-[8px] text-muted-foreground/35 mt-1.5 italic">
+        Até 3 imagens de referência para guiar a IA.
+      </p>
     </div>
   );
 }
