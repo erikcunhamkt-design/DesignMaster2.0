@@ -439,7 +439,7 @@ export default function ChangelogPage() {
             {/* Timeline line */}
             <div className="absolute left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-border/30 to-transparent hidden md:block" />
 
-            {patchNotes.map((note, noteIdx) => (
+            {filteredNotes.map((note, noteIdx) => (
               <motion.article
                 key={note.version}
                 variants={cardVariants}
