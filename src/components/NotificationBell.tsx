@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCheck, Sparkles } from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
+import { Bell, Check, CheckCheck, Sparkles, ArrowLeft } from 'lucide-react';
+import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -18,13 +18,25 @@ interface NotificationBellProps {
 export function NotificationBell({ collapsed = false }: NotificationBellProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Notification | null>(null);
   const navigate = useNavigate();
 
   const isChangelogNotification = (title: string) =>
     /atualiza|novidad|patch|changelog|v\d+\.\d+/i.test(title);
 
+  const handleNotificationClick = (n: Notification) => {
+    if (!n.read) markAsRead(n.id);
+    setSelected(n);
+  };
+
+  const handleGoToChangelog = () => {
+    navigate('/studio/changelog');
+    setOpen(false);
+    setSelected(null);
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSelected(null); }}>
       <PopoverTrigger asChild>
         <button
           className={cn(
@@ -54,62 +66,80 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
         align="start"
         className="w-80 p-0 bg-card border-border/60 shadow-xl"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
-          <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllAsRead}
-              className="text-[10px] text-primary hover:text-primary/80 font-medium flex items-center gap-1"
-            >
-              <CheckCheck className="h-3 w-3" />
-              Marcar todas
-            </button>
-          )}
-        </div>
-        <div className="max-h-72 overflow-y-auto">
-          {notifications.length === 0 ? (
-            <div className="px-4 py-8 text-center text-xs text-muted-foreground">
-              Nenhuma notificação
-            </div>
-          ) : (
-            notifications.map(n => (
-              <button
-                key={n.id}
-                onClick={() => {
-                  if (!n.read) markAsRead(n.id);
-                  if (isChangelogNotification(n.title)) {
-                    navigate('/studio/changelog');
-                    setTimeout(() => setOpen(false), 0);
-                  }
-                }}
-                className={cn(
-                  'w-full text-left px-4 py-3 border-b border-border/20 transition-colors hover:bg-secondary/30',
-                  !n.read && 'bg-primary/5'
-                )}
-              >
-                <div className="flex items-start gap-2">
-                  {!n.read && (
-                    <div className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
-                  )}
-                  <div className={cn('flex-1', n.read && 'pl-4')}>
-                    <p className="text-xs font-semibold text-foreground">{n.title}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
-                    {isChangelogNotification(n.title) && (
-                      <span className="inline-flex items-center gap-1 text-[10px] text-primary font-semibold mt-1">
-                        <Sparkles className="h-2.5 w-2.5" />
-                        Ver novidades
-                      </span>
-                    )}
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">
-                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
-                    </p>
-                  </div>
-                  {n.read && <Check className="h-3 w-3 text-muted-foreground/40 mt-1 shrink-0" />}
-                </div>
+        {selected ? (
+          /* Detail view */
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
+              <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
               </button>
-            ))
-          )}
-        </div>
+              <h3 className="text-sm font-semibold text-foreground truncate flex-1">{selected.title}</h3>
+            </div>
+            <div className="px-4 py-4 max-h-80 overflow-y-auto">
+              <p className="text-xs text-muted-foreground/60 mb-3">
+                {formatDistanceToNow(new Date(selected.created_at), { addSuffix: true, locale: ptBR })}
+              </p>
+              <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{selected.message}</p>
+              {isChangelogNotification(selected.title) && (
+                <button
+                  onClick={handleGoToChangelog}
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs text-primary font-semibold hover:text-primary/80 transition-colors"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  Ver changelog completo
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* List view */
+          <>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
+              <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-[10px] text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+                >
+                  <CheckCheck className="h-3 w-3" />
+                  Marcar todas
+                </button>
+              )}
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="px-4 py-8 text-center text-xs text-muted-foreground">
+                  Nenhuma notificação
+                </div>
+              ) : (
+                notifications.map(n => (
+                  <button
+                    key={n.id}
+                    onClick={() => handleNotificationClick(n)}
+                    className={cn(
+                      'w-full text-left px-4 py-3 border-b border-border/20 transition-colors hover:bg-secondary/30',
+                      !n.read && 'bg-primary/5'
+                    )}
+                  >
+                    <div className="flex items-start gap-2">
+                      {!n.read && (
+                        <div className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
+                      )}
+                      <div className={cn('flex-1', n.read && 'pl-4')}>
+                        <p className="text-xs font-semibold text-foreground">{n.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
+                        <p className="text-[10px] text-muted-foreground/60 mt-1">
+                          {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
+                        </p>
+                      </div>
+                      {n.read && <Check className="h-3 w-3 text-muted-foreground/40 mt-1 shrink-0" />}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );
