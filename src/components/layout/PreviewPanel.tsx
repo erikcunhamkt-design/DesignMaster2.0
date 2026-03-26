@@ -1,4 +1,5 @@
 import { ImageIcon, Download, ZoomIn, ZoomOut, Type, Sparkles, Check, Loader2, Droplets, Lock, Wand2 } from 'lucide-react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { Button } from '@/components/ui/button';
 import { useState, useCallback, useRef } from 'react';
 import { ProjectConfig } from '@/types/project';

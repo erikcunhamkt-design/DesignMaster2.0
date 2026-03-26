@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

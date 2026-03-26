@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
 import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
