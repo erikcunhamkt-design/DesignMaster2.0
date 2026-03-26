@@ -1,14 +1,42 @@
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Image, Mic, FileText, Copy, MessageSquare, Sparkles, MousePointerClick, Pin, Pencil, Trash2, Camera, Cpu, Upload, Layers, Palette, Share2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Eye, Image, Mic, FileText, Copy, MessageSquare, Sparkles,
+  MousePointerClick, Pin, Pencil, Trash2, Camera, Cpu, Upload,
+  Layers, Palette, Share2, Rocket, Wrench, Zap, Bug,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+/* ── Category badge colors ── */
+const categoryColors: Record<string, string> = {
+  novo: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+  melhoria: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+  fix: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+  motor: 'bg-purple-500/15 text-purple-400 border-purple-500/20',
+  ux: 'bg-pink-500/15 text-pink-400 border-pink-500/20',
+  api: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
+};
+
+type ChangeTag = keyof typeof categoryColors;
+
+const tagLabels: Record<ChangeTag, string> = {
+  novo: '✨ Novo',
+  melhoria: '🚀 Melhoria',
+  fix: '🐛 Fix',
+  motor: '⚙️ Motor',
+  ux: '🎨 UX/UI',
+  api: '🔌 API',
+};
 
 interface PatchNote {
   version: string;
   date: string;
   title: string;
+  emoji: string;
   highlights: string[];
-  changes: { icon: React.ReactNode; category: string; items: string[] }[];
+  changes: { icon: React.ReactNode; category: string; tag: ChangeTag; items: string[] }[];
 }
 
 const patchNotes: PatchNote[] = [
@@ -16,6 +44,7 @@ const patchNotes: PatchNote[] = [
     version: '2.9.0',
     date: '26 Mar 2026',
     title: 'Animais Fantásticos — Motor Fotográfico de Fauna Brasileira',
+    emoji: '🐆',
     highlights: [
       'Novo estúdio Animais Fantásticos com motor de ângulos magnéticos e iluminação cinematográfica',
       'UX/UI totalmente redesenhada com seções colapsáveis e chips visuais',
@@ -24,8 +53,9 @@ const patchNotes: PatchNote[] = [
     ],
     changes: [
       {
-        icon: <Camera className="h-4 w-4 text-primary" />,
+        icon: <Camera className="h-4 w-4" />,
         category: 'Motor Fotográfico de Fauna',
+        tag: 'motor',
         items: [
           'Ângulos magnéticos: Low Angle Heroico, Eye Level, Aerial Drone, Close-up Macro',
           'Iluminação cinematográfica: Golden Hour, Rim Light, Backlit Silhouette, Misty Atmosphere',
@@ -35,8 +65,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Palette className="h-4 w-4 text-emerald-400" />,
+        icon: <Palette className="h-4 w-4" />,
         category: 'Biomas Brasileiros',
+        tag: 'novo',
         items: [
           'Amazônia, Pantanal, Cerrado, Mata Atlântica, Caatinga, Pampas',
           'Cada bioma injeta vegetação, luz e atmosfera específicas no prompt',
@@ -44,8 +75,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Layers className="h-4 w-4 text-blue-400" />,
+        icon: <Layers className="h-4 w-4" />,
         category: 'UX/UI Redesenhada',
+        tag: 'ux',
         items: [
           'Seções colapsáveis para reduzir ruído visual',
           'Grid de animais em 3 colunas com emojis e seleção visual',
@@ -61,6 +93,7 @@ const patchNotes: PatchNote[] = [
     version: '2.8.0',
     date: '20 Mar 2026',
     title: 'VOID, Fotógrafo Profissional & Social Media Creator',
+    emoji: '🚀',
     highlights: [
       'VOID — Cockpit Criativo com tela infinita, hub de agentes e geração direta',
       'Fotógrafo Profissional com motor técnico de elite e Identity Lock',
@@ -69,8 +102,9 @@ const patchNotes: PatchNote[] = [
     ],
     changes: [
       {
-        icon: <Layers className="h-4 w-4 text-emerald-400" />,
+        icon: <Layers className="h-4 w-4" />,
         category: 'VOID — Cockpit Criativo',
+        tag: 'novo',
         items: [
           'Tela infinita com pan/zoom e reposicionamento livre de imagens',
           'Hub de Agentes integrado com transferência de prompts para o gerador',
@@ -80,8 +114,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Camera className="h-4 w-4 text-primary" />,
+        icon: <Camera className="h-4 w-4" />,
         category: 'Fotógrafo Profissional',
+        tag: 'motor',
         items: [
           'Motor interno com base de conhecimento completa de fotografia',
           'Identity Lock para preservação absoluta de traços faciais',
@@ -91,8 +126,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Palette className="h-4 w-4 text-pink-400" />,
+        icon: <Palette className="h-4 w-4" />,
         category: 'Social Media Creator',
+        tag: 'novo',
         items: [
           'Kit de Marca integrado com paleta de cores persistente',
           'Copiloto de Copy via chat com preenchimento automático',
@@ -102,8 +138,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Share2 className="h-4 w-4 text-blue-400" />,
+        icon: <Share2 className="h-4 w-4" />,
         category: 'Melhorias Gerais',
+        tag: 'melhoria',
         items: [
           'Ícone do VOID atualizado na sidebar e cards',
           'Gestão de licenças com prazo efetivo no painel admin',
@@ -116,6 +153,7 @@ const patchNotes: PatchNote[] = [
     version: '2.7.0',
     date: '18 Mar 2026',
     title: 'Fotógrafo Profissional — Motor Fotográfico',
+    emoji: '📸',
     highlights: [
       'Fotógrafo Profissional interno expande configs em prompts fotográficos ultra-detalhados',
       'Fotógrafo Profissional agora usa API Google diretamente (como todos os estúdios)',
@@ -124,8 +162,9 @@ const patchNotes: PatchNote[] = [
     ],
     changes: [
       {
-        icon: <Camera className="h-4 w-4 text-primary" />,
+        icon: <Camera className="h-4 w-4" />,
         category: 'Fotógrafo Profissional',
+        tag: 'motor',
         items: [
           'Motor interno com base de conhecimento completa de fotografia profissional',
           'Câmeras (Canon 5D, Hasselblad H6D, Sony a7R IV, Fujifilm GFX 100...)',
@@ -135,8 +174,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Cpu className="h-4 w-4 text-amber-400" />,
+        icon: <Cpu className="h-4 w-4" />,
         category: 'API Google Direta',
+        tag: 'api',
         items: [
           'Fotógrafo Profissional migrado de gateway interno para API Google direta',
           'Mesmo padrão de todos os outros estúdios (API Key do usuário)',
@@ -145,8 +185,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Upload className="h-4 w-4 text-emerald-400" />,
+        icon: <Upload className="h-4 w-4" />,
         category: 'Fix de Upload',
+        tag: 'fix',
         items: [
           'Upload de fotos no criador principal (/studio/criador) restaurado',
           'Import lazy de heic2any evita quebra silenciosa do módulo',
@@ -160,6 +201,7 @@ const patchNotes: PatchNote[] = [
     version: '2.6.0',
     date: '17 Mar 2026',
     title: 'Menu Contextual & Gestão de Conversas',
+    emoji: '🖱️',
     highlights: [
       'Menu de contexto (botão direito) em todas as conversas de chat',
       'Fixar conversas importantes no topo da sidebar',
@@ -167,8 +209,9 @@ const patchNotes: PatchNote[] = [
     ],
     changes: [
       {
-        icon: <MousePointerClick className="h-4 w-4 text-primary" />,
+        icon: <MousePointerClick className="h-4 w-4" />,
         category: 'Menu Contextual',
+        tag: 'novo',
         items: [
           'Clique com botão direito em qualquer conversa para abrir o menu',
           'Opções: Fixar, Renomear e Excluir',
@@ -176,8 +219,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Pin className="h-4 w-4 text-blue-400" />,
+        icon: <Pin className="h-4 w-4" />,
         category: 'Fixar Conversas',
+        tag: 'melhoria',
         items: [
           'Fixe conversas importantes no topo da lista',
           'Indicador visual com borda e ícone de pin',
@@ -185,24 +229,27 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Pencil className="h-4 w-4 text-amber-400" />,
+        icon: <Pencil className="h-4 w-4" />,
         category: 'Renomear Conversas',
+        tag: 'melhoria',
         items: [
           'Renomeie qualquer conversa pelo menu contextual',
           'Edição inline com confirmação por Enter ou botão',
         ],
       },
       {
-        icon: <Trash2 className="h-4 w-4 text-red-400" />,
+        icon: <Trash2 className="h-4 w-4" />,
         category: 'Excluir Conversas',
+        tag: 'melhoria',
         items: [
           'Exclua conversas individuais pelo menu contextual',
           'Botão "Apagar todas" mantido na sidebar',
         ],
       },
       {
-        icon: <Copy className="h-4 w-4 text-emerald-400" />,
+        icon: <Copy className="h-4 w-4" />,
         category: 'Cópia de Texto Liberada',
+        tag: 'fix',
         items: [
           'Seleção de texto das respostas da IA totalmente desbloqueada',
           'Botão direito do mouse e Ctrl+C funcionam normalmente',
@@ -215,6 +262,7 @@ const patchNotes: PatchNote[] = [
     version: '2.5.0',
     date: '13 Mar 2026',
     title: 'Chat dos Agentes — Upgrade Completo de Mídia',
+    emoji: '🎬',
     highlights: [
       'Visão multimodal com Gemini para análise de imagens',
       'Upload de imagens, documentos e áudio em todos os agentes',
@@ -222,8 +270,9 @@ const patchNotes: PatchNote[] = [
     ],
     changes: [
       {
-        icon: <Eye className="h-4 w-4 text-primary" />,
+        icon: <Eye className="h-4 w-4" />,
         category: 'Visão Multimodal',
+        tag: 'novo',
         items: [
           'Agentes analisam visualmente imagens enviadas (composição, cores, tipografia)',
           'Indicador "Analisando imagem..." com ícone de olho pulsante',
@@ -231,8 +280,9 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Image className="h-4 w-4 text-blue-400" />,
+        icon: <Image className="h-4 w-4" />,
         category: 'Upload de Imagens',
+        tag: 'melhoria',
         items: [
           'Envie imagens pelo botão de galeria',
           'Cole imagens do clipboard (Ctrl+V / Cmd+V)',
@@ -240,16 +290,18 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <FileText className="h-4 w-4 text-orange-400" />,
+        icon: <FileText className="h-4 w-4" />,
         category: 'Upload de Documentos',
+        tag: 'melhoria',
         items: [
           'Suporte a PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, PPTX, JSON, XML',
           'Documentos aparecem como links clicáveis na conversa',
         ],
       },
       {
-        icon: <Mic className="h-4 w-4 text-red-400" />,
+        icon: <Mic className="h-4 w-4" />,
         category: 'Gravação de Áudio',
+        tag: 'novo',
         items: [
           'Grave e envie mensagens de voz pelo microfone',
           'Player de áudio inline nas mensagens',
@@ -257,16 +309,18 @@ const patchNotes: PatchNote[] = [
         ],
       },
       {
-        icon: <Copy className="h-4 w-4 text-emerald-400" />,
+        icon: <Copy className="h-4 w-4" />,
         category: 'Copiar Mensagens',
+        tag: 'melhoria',
         items: [
           'Botão de copiar ao passar o mouse nas respostas',
           'Texto das mensagens agora é selecionável',
         ],
       },
       {
-        icon: <MessageSquare className="h-4 w-4 text-purple-400" />,
+        icon: <MessageSquare className="h-4 w-4" />,
         category: 'Agentes Atualizados',
+        tag: 'melhoria',
         items: [
           'Creator Master',
           'Carrossel Master',
@@ -279,65 +333,158 @@ const patchNotes: PatchNote[] = [
   },
 ];
 
+/* ── Tag badge component ── */
+function TagBadge({ tag }: { tag: ChangeTag }) {
+  return (
+    <span className={cn(
+      'inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
+      categoryColors[tag]
+    )}>
+      {tagLabels[tag]}
+    </span>
+  );
+}
+
+/* ── Animations ── */
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -12 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+};
+
 export default function ChangelogPage() {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <StudioTopbar title="Novidades" showApiKey={false} />
+      <StudioTopbar title="Atualizações" showApiKey={false} />
       <ScrollArea className="flex-1">
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-10">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="text-center space-y-3"
+          >
             <div className="inline-flex items-center gap-2 text-primary">
-              <Sparkles className="h-5 w-5" />
+              <Rocket className="h-5 w-5 animate-bounce" />
               <span className="text-sm font-semibold uppercase tracking-wider">Changelog</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-foreground">Novidades & Atualizações</h1>
-            <p className="text-sm text-muted-foreground">Acompanhe todas as melhorias do DesignMaster</p>
-          </div>
+            <h1 className="text-3xl md:text-4xl font-black text-foreground">
+              Novidades & Atualizações
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Acompanhe todas as melhorias do DesignMaster
+            </p>
 
-          {/* Patch notes */}
-          {patchNotes.map((note) => (
-            <article key={note.version} className="rounded-2xl border border-border/20 bg-card/40 backdrop-blur-sm overflow-hidden">
-              {/* Version header */}
-              <div className="px-6 py-4 border-b border-border/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge variant="default" className="text-xs font-mono px-2.5 py-0.5">v{note.version}</Badge>
-                  <h2 className="text-lg font-bold text-foreground">{note.title}</h2>
+            {/* Tag legend */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              {(Object.keys(categoryColors) as ChangeTag[]).map((tag) => (
+                <TagBadge key={tag} tag={tag} />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Timeline */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="relative space-y-8"
+          >
+            {/* Timeline line */}
+            <div className="absolute left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-border/30 to-transparent hidden md:block" />
+
+            {patchNotes.map((note, noteIdx) => (
+              <motion.article
+                key={note.version}
+                variants={cardVariants}
+                className="relative md:pl-12"
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-2.5 top-5 hidden md:flex h-[14px] w-[14px] items-center justify-center">
+                  <div className="h-3 w-3 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--primary)/0.5)]" />
+                  <div className="absolute h-5 w-5 rounded-full border-2 border-primary/30 animate-ping" />
                 </div>
-                <span className="text-xs text-muted-foreground">{note.date}</span>
-              </div>
 
-              {/* Highlights */}
-              <div className="px-6 py-4 bg-primary/5 border-b border-border/10">
-                <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-2">Destaques</p>
-                <ul className="space-y-1.5">
-                  {note.highlights.map((h, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
-                      <span className="text-primary mt-0.5">✦</span>
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Changes */}
-              <div className="px-6 py-5 space-y-5">
-                {note.changes.map((change, i) => (
-                  <div key={i}>
-                    <div className="flex items-center gap-2 mb-2">
-                      {change.icon}
-                      <span className="text-sm font-semibold text-foreground">{change.category}</span>
+                <div className="group rounded-2xl border border-border/20 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-primary/20 transition-colors duration-300">
+                  {/* Version header */}
+                  <div className="px-5 py-4 border-b border-border/10 flex items-center justify-between gap-3 bg-gradient-to-r from-primary/[0.03] to-transparent">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-2xl shrink-0">{note.emoji}</span>
+                      <Badge variant="default" className="text-[10px] font-mono px-2 py-0.5 shrink-0 shadow-[0_0_8px_hsl(var(--primary)/0.3)]">
+                        v{note.version}
+                      </Badge>
+                      <h2 className="text-sm md:text-base font-bold text-foreground truncate">{note.title}</h2>
                     </div>
-                    <ul className="space-y-1 pl-6">
-                      {change.items.map((item, j) => (
-                        <li key={j} className="text-xs text-muted-foreground list-disc">{item}</li>
+                    <span className="text-[10px] text-muted-foreground/60 shrink-0 font-mono">{note.date}</span>
+                  </div>
+
+                  {/* Highlights */}
+                  <div className="px-5 py-3.5 bg-primary/[0.04] border-b border-border/10">
+                    <p className="text-[9px] uppercase tracking-[0.15em] text-primary font-bold mb-2 flex items-center gap-1.5">
+                      <Zap className="h-3 w-3" />
+                      Destaques
+                    </p>
+                    <ul className="space-y-1.5">
+                      {note.highlights.map((h, i) => (
+                        <motion.li
+                          key={i}
+                          variants={itemVariants}
+                          className="flex items-start gap-2 text-[13px] text-foreground/85"
+                        >
+                          <span className="text-primary mt-0.5 text-xs">✦</span>
+                          {h}
+                        </motion.li>
                       ))}
                     </ul>
                   </div>
-                ))}
-              </div>
-            </article>
-          ))}
+
+                  {/* Changes */}
+                  <div className="px-5 py-4 space-y-4">
+                    {note.changes.map((change, i) => (
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        className="group/section"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={cn(
+                            'flex h-7 w-7 items-center justify-center rounded-lg',
+                            change.tag === 'novo' && 'bg-emerald-500/10 text-emerald-400',
+                            change.tag === 'melhoria' && 'bg-blue-500/10 text-blue-400',
+                            change.tag === 'fix' && 'bg-amber-500/10 text-amber-400',
+                            change.tag === 'motor' && 'bg-purple-500/10 text-purple-400',
+                            change.tag === 'ux' && 'bg-pink-500/10 text-pink-400',
+                            change.tag === 'api' && 'bg-cyan-500/10 text-cyan-400',
+                          )}>
+                            {change.icon}
+                          </div>
+                          <span className="text-sm font-semibold text-foreground">{change.category}</span>
+                          <TagBadge tag={change.tag} />
+                        </div>
+                        <ul className="space-y-1 pl-9">
+                          {change.items.map((item, j) => (
+                            <li key={j} className="text-xs text-muted-foreground/80 list-disc leading-relaxed">
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </motion.div>
         </div>
       </ScrollArea>
     </div>
