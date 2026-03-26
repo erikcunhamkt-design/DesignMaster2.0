@@ -492,7 +492,7 @@ export default function HeroStudioPage() {
             onModelChange={setAiModel}
           />
         </div>
-        <MobileGenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} label="Gerar Hero ✨" />
+        {/* MobileGenerateButton removed — config panel already has the generate button */}
       </div>
     </div>
   );
