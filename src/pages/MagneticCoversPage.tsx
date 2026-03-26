@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Sparkles, Camera, Sun, Eye, Zap } from 'lucide-react';
+import { Loader2, Sparkles, Camera, Sun, Eye, Zap, Leaf, Paintbrush, Wind, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { FormatSelector, getFormatPromptSuffix } from '@/components/configurator/FormatSelector';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useWatermarkDownload } from '@/hooks/useWatermarkDownload';
 import { DownloadButtons } from '@/components/DownloadButtons';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 // ── Fauna Brasileira ──
 const ANIMAL_OPTIONS = [
@@ -30,53 +31,41 @@ const ANIMAL_OPTIONS = [
 ];
 
 const ANGLE_OPTIONS = [
-  { label: 'Close-up Extremo', icon: Eye, desc: 'Detalhe facial, olhos, texturas' },
-  { label: 'Low Angle Heroico', icon: Zap, desc: 'De baixo p/ cima, dominante' },
-  { label: 'Aéreo Drone', icon: Camera, desc: 'Vista de cima, paisagem' },
-  { label: 'Eye Level', icon: Eye, desc: 'Olho no olho, conexão' },
-  { label: 'Dutch Angle', icon: Zap, desc: 'Inclinado, tensão dramática' },
-  { label: 'Over the Shoulder', icon: Camera, desc: 'Perspectiva de profundidade' },
+  { label: 'Close-up Extremo', desc: 'Olhos, texturas' },
+  { label: 'Low Angle Heroico', desc: 'De baixo, dominante' },
+  { label: 'Aéreo Drone', desc: 'Vista de cima' },
+  { label: 'Eye Level', desc: 'Olho no olho' },
+  { label: 'Dutch Angle', desc: 'Tensão dramática' },
+  { label: 'Over the Shoulder', desc: 'Profundidade' },
 ];
 
 const LIGHTING_OPTIONS = [
-  { label: 'Golden Hour', desc: 'Luz dourada 5000K, sombras longas' },
-  { label: 'Rim Light', desc: 'Contorno luminoso, fundo escuro' },
-  { label: 'Moonlight', desc: 'Azul noturno, atmosfera mística' },
-  { label: 'Neon Tropical', desc: 'Cores vibrantes, glow surrealista' },
-  { label: 'Storm Light', desc: 'Céu dramático, raios e contraste' },
-  { label: 'Bioluminescência', desc: 'Fungos e flora que brilham' },
+  { label: 'Golden Hour', desc: 'Dourada, sombras longas' },
+  { label: 'Rim Light', desc: 'Contorno luminoso' },
+  { label: 'Moonlight', desc: 'Azul noturno' },
+  { label: 'Neon Tropical', desc: 'Glow surrealista' },
+  { label: 'Storm Light', desc: 'Raios e contraste' },
+  { label: 'Bioluminescência', desc: 'Flora que brilha' },
 ];
 
 const EFFECT_OPTIONS = [
-  'Partículas flutuantes',
-  'Profundidade extrema (bokeh)',
-  'Splash de água',
-  'Fumaça / névoa',
-  'Borboletas ao redor',
-  'Folhagem tropical em 1º plano',
-  'Reflexo na água',
-  'Poeira dourada',
-  'Vagalumes',
-  'Gotas de orvalho macro',
+  'Partículas', 'Bokeh extremo', 'Splash de água', 'Névoa',
+  'Borboletas', 'Folhagem 1º plano', 'Reflexo na água', 'Poeira dourada',
+  'Vagalumes', 'Gotas de orvalho',
 ];
 
 const STYLE_OPTIONS = [
-  'Hiper-Realista 8K',
-  'National Geographic',
-  'Dark Cinematic',
-  'Fantasia Épica',
-  'Neon Surreal',
-  'Aquarela Digital',
-  'Minimalista Bold',
+  'Hiper-Realista 8K', 'National Geographic', 'Dark Cinematic',
+  'Fantasia Épica', 'Neon Surreal', 'Aquarela Digital', 'Minimalista Bold',
 ];
 
 const BIOME_OPTIONS = [
-  'Amazônia',
-  'Cerrado',
-  'Pantanal',
-  'Mata Atlântica',
-  'Caatinga',
-  'Pampas',
+  { label: 'Amazônia', emoji: '🌳' },
+  { label: 'Cerrado', emoji: '🌾' },
+  { label: 'Pantanal', emoji: '💧' },
+  { label: 'Mata Atlântica', emoji: '🌿' },
+  { label: 'Caatinga', emoji: '🌵' },
+  { label: 'Pampas', emoji: '🏔️' },
 ];
 
 export default function MagneticCoversPage() {
@@ -94,15 +83,19 @@ export default function MagneticCoversPage() {
   const { apiKey } = useGoogleApiKey();
   const { downloadState, download } = useWatermarkDownload(resultImage, 'animais-fantasticos');
   const isMobile = useIsMobile();
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const toggleEffect = (e: string) => {
     setEffects(prev => prev.includes(e) ? prev.filter(x => x !== e) : [...prev, e]);
   };
 
+  const selectionSummary = [animal, angle, lighting, biome, style, ...effects].filter(Boolean);
+
   const handleGenerate = async () => {
     if (!animal && !theme) { toast.error('Selecione um animal ou defina um tema'); return; }
     setIsGenerating(true);
     setResultImage(null);
+    if (isMobile) setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 200);
     try {
       const { data, error } = await supabase.functions.invoke('specialist-generate', {
         body: {
@@ -131,214 +124,217 @@ export default function MagneticCoversPage() {
     }
   };
 
-  const SectionTitle = ({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) => (
-    <div className="flex items-center gap-1.5 mb-2">
-      {icon}
-      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/70">{children}</p>
-    </div>
+  /* ── Reusable section wrapper with collapsible ── */
+  const Section = ({ title, icon, children, defaultOpen = true }: {
+    title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean;
+  }) => (
+    <Collapsible defaultOpen={defaultOpen}>
+      <CollapsibleTrigger className="flex items-center justify-between w-full group py-1">
+        <div className="flex items-center gap-1.5">
+          {icon}
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">{title}</span>
+        </div>
+        <ChevronDown className="h-3 w-3 text-muted-foreground/40 transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+
+  /* ── Chip component ── */
+  const Chip = ({ label, selected, onClick, size = 'md' }: {
+    label: React.ReactNode; selected: boolean; onClick: () => void; size?: 'sm' | 'md';
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        'rounded-lg border transition-all duration-200 font-medium',
+        size === 'sm' ? 'px-2 py-1 text-[9px]' : 'px-2.5 py-1.5 text-[10px]',
+        selected
+          ? 'bg-primary/12 text-primary border-primary/25 shadow-[0_0_6px_rgba(0,255,200,0.08)]'
+          : 'bg-secondary/25 text-muted-foreground border-border/10 hover:border-primary/15 hover:bg-secondary/40'
+      )}
+    >
+      {label}
+    </button>
+  );
+
+  /* ── Card chip for angle/lighting ── */
+  const CardChip = ({ label, desc, selected, onClick }: {
+    label: string; desc: string; selected: boolean; onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        'rounded-lg px-3 py-2 text-left border transition-all duration-200 w-full',
+        selected
+          ? 'bg-primary/8 border-primary/25 shadow-[0_0_6px_rgba(0,255,200,0.06)]'
+          : 'bg-secondary/15 border-border/8 hover:border-primary/12 hover:bg-secondary/25'
+      )}
+    >
+      <span className={cn("text-[10px] font-semibold block leading-tight", selected ? "text-primary" : "text-foreground/75")}>{label}</span>
+      <span className="text-[8px] text-muted-foreground/50 block mt-0.5 leading-tight">{desc}</span>
+    </button>
   );
 
   const configPanel = (
-    <div className={cn(
-      "space-y-5",
-      isMobile ? "p-4" : "p-6"
-    )}>
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent border border-primary/10">
-        <div className="absolute top-2 right-2 text-4xl opacity-20 animate-[void-pulse_3s_ease-in-out_infinite]">🐆</div>
-        <h2 className="text-base font-black text-foreground font-display tracking-tight">Animais Fantásticos</h2>
-        <p className="text-[11px] text-muted-foreground mt-0.5">Fauna brasileira em ângulos magnéticos e iluminação cinematográfica.</p>
-      </div>
-
-      {/* Animal selection */}
-      <div>
-        <SectionTitle icon={<span className="text-sm">🦁</span>}>Animal</SectionTitle>
-        <div className="flex flex-wrap gap-1.5">
+    <div className={cn("space-y-4", isMobile ? "p-4 pb-6" : "p-5")}>
+      {/* ── Animal Grid ── */}
+      <Section title="Animal" icon={<span className="text-xs">🦁</span>}>
+        <div className="grid grid-cols-3 gap-1.5">
           {ANIMAL_OPTIONS.map(a => (
-            <button
+            <Chip
               key={a.label}
+              label={<><span className="mr-1">{a.emoji}</span>{a.label}</>}
+              selected={animal === a.label}
               onClick={() => setAnimal(animal === a.label ? '' : a.label)}
-              className={cn(
-                'rounded-lg px-2.5 py-1.5 text-[10px] font-semibold border transition-all duration-200',
-                animal === a.label
-                  ? 'bg-primary/15 text-primary border-primary/30 shadow-[0_0_8px_rgba(0,255,200,0.1)]'
-                  : 'bg-secondary/30 text-muted-foreground border-border/15 hover:border-primary/20 hover:bg-secondary/50'
-              )}
-            >
-              {a.emoji} {a.label}
-            </button>
+            />
           ))}
         </div>
-      </div>
+      </Section>
 
-      {/* Angle */}
-      <div>
-        <SectionTitle icon={<Camera className="h-3 w-3 text-muted-foreground/60" />}>Ângulo Magnético</SectionTitle>
-        <div className="grid grid-cols-2 gap-1.5">
-          {ANGLE_OPTIONS.map(a => (
-            <button
-              key={a.label}
-              onClick={() => setAngle(angle === a.label ? '' : a.label)}
-              className={cn(
-                'rounded-lg px-2.5 py-2 text-left border transition-all duration-200',
-                angle === a.label
-                  ? 'bg-primary/10 border-primary/30 shadow-[0_0_8px_rgba(0,255,200,0.08)]'
-                  : 'bg-secondary/20 border-border/10 hover:border-primary/15'
-              )}
-            >
-              <span className={cn("text-[10px] font-bold block", angle === a.label ? "text-primary" : "text-foreground/80")}>{a.label}</span>
-              <span className="text-[8px] text-muted-foreground/60 block mt-0.5">{a.desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Lighting */}
-      <div>
-        <SectionTitle icon={<Sun className="h-3 w-3 text-muted-foreground/60" />}>Iluminação</SectionTitle>
-        <div className="grid grid-cols-2 gap-1.5">
-          {LIGHTING_OPTIONS.map(l => (
-            <button
-              key={l.label}
-              onClick={() => setLighting(lighting === l.label ? '' : l.label)}
-              className={cn(
-                'rounded-lg px-2.5 py-2 text-left border transition-all duration-200',
-                lighting === l.label
-                  ? 'bg-primary/10 border-primary/30 shadow-[0_0_8px_rgba(0,255,200,0.08)]'
-                  : 'bg-secondary/20 border-border/10 hover:border-primary/15'
-              )}
-            >
-              <span className={cn("text-[10px] font-bold block", lighting === l.label ? "text-primary" : "text-foreground/80")}>{l.label}</span>
-              <span className="text-[8px] text-muted-foreground/60 block mt-0.5">{l.desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Effects */}
-      <div>
-        <SectionTitle icon={<Sparkles className="h-3 w-3 text-muted-foreground/60" />}>Efeitos Visuais</SectionTitle>
-        <div className="flex flex-wrap gap-1.5">
-          {EFFECT_OPTIONS.map(e => (
-            <button
-              key={e}
-              onClick={() => toggleEffect(e)}
-              className={cn(
-                'rounded-lg px-2.5 py-1.5 text-[9px] font-medium border transition-all duration-200',
-                effects.includes(e)
-                  ? 'bg-accent/15 text-accent-foreground border-accent/30'
-                  : 'bg-secondary/20 text-muted-foreground border-border/10 hover:border-accent/20'
-              )}
-            >
-              {e}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Style */}
-      <div>
-        <SectionTitle>Estilo Visual</SectionTitle>
-        <div className="flex flex-wrap gap-1.5">
-          {STYLE_OPTIONS.map(s => (
-            <button
-              key={s}
-              onClick={() => setStyle(style === s ? '' : s)}
-              className={cn(
-                'rounded-full px-2.5 py-1 text-[9px] font-medium border transition-all',
-                style === s ? 'bg-primary/15 text-primary border-primary/30' : 'bg-secondary/30 text-muted-foreground border-border/15 hover:border-primary/20'
-              )}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Biome */}
-      <div>
-        <SectionTitle icon={<span className="text-xs">🌿</span>}>Bioma / Cenário</SectionTitle>
+      {/* ── Biome ── */}
+      <Section title="Bioma" icon={<Leaf className="h-3 w-3 text-muted-foreground/50" />}>
         <div className="flex flex-wrap gap-1.5">
           {BIOME_OPTIONS.map(b => (
-            <button
-              key={b}
-              onClick={() => setBiome(biome === b ? '' : b)}
-              className={cn(
-                'rounded-full px-2.5 py-1 text-[9px] font-medium border transition-all',
-                biome === b ? 'bg-primary/15 text-primary border-primary/30' : 'bg-secondary/30 text-muted-foreground border-border/15 hover:border-primary/20'
-              )}
-            >
-              {b}
-            </button>
+            <Chip
+              key={b.label}
+              label={<><span className="mr-0.5">{b.emoji}</span>{b.label}</>}
+              selected={biome === b.label}
+              onClick={() => setBiome(biome === b.label ? '' : b.label)}
+              size="sm"
+            />
           ))}
         </div>
-      </div>
+      </Section>
 
-      {/* Theme / Custom */}
+      {/* ── Angle ── */}
+      <Section title="Ângulo" icon={<Camera className="h-3 w-3 text-muted-foreground/50" />}>
+        <div className="grid grid-cols-2 gap-1.5">
+          {ANGLE_OPTIONS.map(a => (
+            <CardChip key={a.label} label={a.label} desc={a.desc} selected={angle === a.label} onClick={() => setAngle(angle === a.label ? '' : a.label)} />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Lighting ── */}
+      <Section title="Iluminação" icon={<Sun className="h-3 w-3 text-muted-foreground/50" />}>
+        <div className="grid grid-cols-2 gap-1.5">
+          {LIGHTING_OPTIONS.map(l => (
+            <CardChip key={l.label} label={l.label} desc={l.desc} selected={lighting === l.label} onClick={() => setLighting(lighting === l.label ? '' : l.label)} />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Style ── */}
+      <Section title="Estilo" icon={<Paintbrush className="h-3 w-3 text-muted-foreground/50" />}>
+        <div className="flex flex-wrap gap-1.5">
+          {STYLE_OPTIONS.map(s => (
+            <Chip key={s} label={s} selected={style === s} onClick={() => setStyle(style === s ? '' : s)} size="sm" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Effects ── */}
+      <Section title="Efeitos" icon={<Wind className="h-3 w-3 text-muted-foreground/50" />} defaultOpen={false}>
+        <div className="flex flex-wrap gap-1.5">
+          {EFFECT_OPTIONS.map(e => (
+            <Chip key={e} label={e} selected={effects.includes(e)} onClick={() => toggleEffect(e)} size="sm" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Theme ── */}
       <div>
-        <SectionTitle>Tema / Conceito</SectionTitle>
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <Sparkles className="h-3 w-3 text-muted-foreground/50" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/70">Tema / Conceito</span>
+        </div>
         <Input
           value={theme}
           onChange={e => setTheme(e.target.value)}
-          placeholder="Ex: força, liberdade, majestade da natureza..."
-          className="h-9 bg-secondary/40 border-border/15 text-xs rounded-lg"
+          placeholder="Ex: força, liberdade, majestade..."
+          className="h-8 bg-secondary/30 border-border/10 text-[11px] rounded-lg"
         />
       </div>
 
       <FormatSelector value={format} onChange={setFormat} />
 
-      {/* Extra */}
-      <div>
-        <SectionTitle>Detalhes Extras</SectionTitle>
-        <Textarea
-          value={extra}
-          onChange={e => setExtra(e.target.value)}
-          placeholder="Instruções adicionais, referências..."
-          className="min-h-[60px] bg-secondary/40 border-border/15 text-xs rounded-lg resize-none"
-        />
-      </div>
+      {/* ── Extra ── */}
+      <Textarea
+        value={extra}
+        onChange={e => setExtra(e.target.value)}
+        placeholder="Instruções adicionais..."
+        className="min-h-[50px] bg-secondary/30 border-border/10 text-[11px] rounded-lg resize-none"
+      />
 
-      <Button
-        onClick={handleGenerate}
-        disabled={isGenerating || (!animal && !theme) || apiKey.length < 10}
-        className="w-full h-11 gap-2.5 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md"
-      >
-        {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        {isGenerating ? 'Criando...' : 'Gerar Imagem'}
-      </Button>
+      {/* ── Selection summary ── */}
+      {selectionSummary.length > 0 && (
+        <div className="flex flex-wrap gap-1 pt-1">
+          {selectionSummary.map((s, i) => (
+            <span key={i} className="px-1.5 py-0.5 rounded bg-primary/8 text-primary text-[8px] font-medium border border-primary/10">{s}</span>
+          ))}
+        </div>
+      )}
+
+      {/* ── Generate button ── */}
+      {!isMobile && (
+        <Button
+          onClick={handleGenerate}
+          disabled={isGenerating || (!animal && !theme) || apiKey.length < 10}
+          className="w-full h-10 gap-2 rounded-xl font-bold tracking-wider text-[11px] uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md"
+        >
+          {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+          {isGenerating ? 'Criando...' : 'Gerar Imagem'}
+        </Button>
+      )}
     </div>
   );
 
   const previewPanel = (
-    <div className="flex-1 overflow-auto p-4 md:p-8 flex items-center justify-center">
+    <div ref={resultRef} className="flex-1 overflow-auto flex items-center justify-center relative">
+      {/* Ambient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-primary/[0.03] blur-[120px]" />
+      </div>
+
       {!resultImage && !isGenerating && (
-        <div className="text-center space-y-4">
-          <div className="relative inline-block">
-            <span className="text-7xl block animate-[void-pulse_3s_ease-in-out_infinite]">🐆</span>
-            <div className="absolute -inset-4 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
+        <div className="text-center space-y-5 relative z-10 px-6">
+          <div className="relative inline-flex items-center justify-center">
+            <div className="absolute w-28 h-28 rounded-full bg-primary/[0.04] blur-3xl" />
+            <span className="text-6xl md:text-7xl block animate-[void-pulse_4s_ease-in-out_infinite] relative">🐆</span>
           </div>
-          <p className="text-sm font-semibold text-foreground/30">Selecione um animal e gere sua obra</p>
-          <p className="text-[10px] text-muted-foreground/40 max-w-xs mx-auto">Combine ângulos magnéticos, iluminação cinematográfica e efeitos visuais para criar capas épicas da fauna brasileira.</p>
+          <div className="space-y-2">
+            <p className="text-sm font-bold text-foreground/25 tracking-tight">Selecione e gere</p>
+            <p className="text-[10px] text-muted-foreground/30 max-w-[260px] mx-auto leading-relaxed">
+              Escolha um animal, ângulo, iluminação e efeitos para criar imagens épicas da fauna brasileira.
+            </p>
+          </div>
         </div>
       )}
+
       {isGenerating && (
-        <div className="text-center space-y-4">
-          <div className="relative">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-            <div className="absolute -inset-6 rounded-full bg-primary/5 blur-2xl pointer-events-none animate-[void-pulse_2s_ease-in-out_infinite]" />
+        <div className="text-center space-y-4 relative z-10">
+          <div className="relative inline-flex items-center justify-center">
+            <div className="absolute w-20 h-20 rounded-full bg-primary/[0.06] blur-2xl animate-[void-pulse_2s_ease-in-out_infinite]" />
+            <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
           </div>
-          <p className="text-sm font-bold text-primary animate-pulse">Capturando a fauna...</p>
-          <p className="text-[10px] text-muted-foreground/50">Isto pode levar alguns segundos</p>
+          <div className="space-y-1">
+            <p className="text-xs font-bold text-primary">Capturando a fauna...</p>
+            <p className="text-[9px] text-muted-foreground/40">Alguns segundos</p>
+          </div>
         </div>
       )}
+
       {resultImage && (
-        <div className="relative inline-block group">
+        <div className="relative inline-block group p-4 md:p-8">
           <img
             src={resultImage}
             alt="Animal fantástico"
-            className="max-w-full max-h-[80vh] rounded-xl shadow-2xl ring-1 ring-white/[0.04] transition-transform duration-300 group-hover:scale-[1.01]"
+            className="max-w-full max-h-[82vh] rounded-xl shadow-2xl ring-1 ring-white/[0.04] transition-all duration-500 group-hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]"
           />
-          <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/[0.06] pointer-events-none" />
+          <div className="absolute inset-4 md:inset-8 rounded-xl ring-1 ring-inset ring-white/[0.05] pointer-events-none" />
           <DownloadButtons downloadState={downloadState} onDownload={download} />
         </div>
       )}
@@ -353,18 +349,16 @@ export default function MagneticCoversPage() {
           {configPanel}
           {previewPanel}
         </div>
-        {(!resultImage && !isGenerating) && (
-          <div className="fixed bottom-0 inset-x-0 p-3 bg-background/80 backdrop-blur-lg border-t border-border/10 z-50">
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating || (!animal && !theme) || apiKey.length < 10}
-              className="w-full h-11 gap-2 rounded-xl font-bold tracking-wider text-xs uppercase bg-gradient-to-r from-primary to-accent"
-            >
-              <Sparkles className="h-4 w-4" />
-              Gerar Imagem
-            </Button>
-          </div>
-        )}
+        <div className="fixed bottom-0 inset-x-0 p-3 bg-background/90 backdrop-blur-xl border-t border-border/8 z-50">
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating || (!animal && !theme) || apiKey.length < 10}
+            className="w-full h-11 gap-2 rounded-xl font-bold tracking-wider text-[11px] uppercase bg-gradient-to-r from-primary to-accent shadow-glow-md"
+          >
+            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {isGenerating ? 'Criando...' : 'Gerar Imagem'}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -373,7 +367,7 @@ export default function MagneticCoversPage() {
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Animais Fantásticos" />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-[420px] shrink-0 border-r border-border/15 bg-card/20 overflow-y-auto scrollbar-hide">
+        <div className="w-[380px] shrink-0 border-r border-border/10 bg-card/15 overflow-y-auto scrollbar-hide">
           {configPanel}
         </div>
         {previewPanel}
