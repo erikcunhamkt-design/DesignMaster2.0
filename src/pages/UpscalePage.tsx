@@ -10,35 +10,6 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const UPSCALE_PROMPT_BASE = `CRITICAL INSTRUCTION: This is an IMAGE RESTORATION task, NOT an image generation task. You MUST return the EXACT SAME image with improved resolution and quality. DO NOT reimagine, recreate, reinterpret, or generate a new version of this image. The output must be pixel-faithful to the input — same person, same face, same pose, same clothes, same background, same everything. Only the technical quality should improve.
-
-Perform a high-quality restoration and upscale to true {RESOLUTION}:
-
-ABSOLUTE PRESERVATION RULES (violations are unacceptable):
-– The subject's FACE must remain IDENTICAL — same features, same proportions, same age, same ethnicity, same skin tone
-– The subject's BODY must remain IDENTICAL — same pose, same posture, same anatomy, same clothing, same accessories
-– The BACKGROUND must remain IDENTICAL — same setting, same objects, same colors, same layout
-– The COMPOSITION must remain IDENTICAL — same framing, same camera angle, same crop, same aspect ratio
-– The LIGHTING must remain IDENTICAL — same direction, same intensity, same shadows, same highlights
-– The COLOR PALETTE must remain IDENTICAL — same hues, same saturation, same tone, same mood
-
-ALLOWED improvements (quality only):
-– Increase sharpness and clarity naturally
-– Restore fine details: skin pores, fabric weave, hair strands, material textures
-– Remove compression artifacts, noise, and blur
-– Improve dynamic range subtly without changing the mood
-– Enhance micro-textures and surface definition
-
-STRICTLY FORBIDDEN:
-– DO NOT change the person's identity, face shape, features, or appearance in ANY way
-– DO NOT change clothing, accessories, or any visible objects
-– DO NOT add or remove ANY elements from the scene
-– DO NOT change the art style or aesthetic
-– DO NOT relight, recolor, or restyle the image
-– DO NOT dramatize, beautify, or stylize
-– DO NOT generate a "similar" image — return the SAME image enhanced
-
-The output must be indistinguishable from the input except for higher resolution and cleaner details.`;
 
 type Resolution = '2K' | '4K';
 
@@ -345,10 +316,11 @@ export default function UpscalePage() {
             </div>
           )}
           {isProcessing && (
-            <div className="text-center space-y-3">
-              <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-              <p className="text-sm font-semibold text-primary">Restaurando imagem em {resolution}...</p>
-            </div>
+            <GeneratingAnimation
+              icon={ArrowUpCircle}
+              title={`Restaurando imagem em ${resolution}…`}
+              subtitle="Reconstruindo detalhes e texturas pixel a pixel"
+            />
           )}
           {resultImage && (
             <div className="relative inline-block">
