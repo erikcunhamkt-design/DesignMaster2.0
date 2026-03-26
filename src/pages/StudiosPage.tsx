@@ -187,40 +187,55 @@ export default function StudiosPage() {
 
               {/* VOID Hero */}
               <div className="relative mb-8 md:mb-10 animate-fade-up" style={{ animationDelay: '100ms' }}>
-                <div className="absolute -inset-[2px] rounded-[20px] bg-gradient-to-r from-cyan-500/40 via-primary/60 to-cyan-500/40 opacity-50 blur-[3px] pointer-events-none" />
+                {/* Animated glow border */}
+                <div className="absolute -inset-[2px] rounded-[20px] opacity-60 blur-[4px] pointer-events-none animate-[void-glow_3s_ease-in-out_infinite]"
+                  style={{ background: 'linear-gradient(90deg, rgba(0,255,200,0.3), rgba(34,211,238,0.5), rgba(0,255,200,0.3))' }} />
 
                 <button
                   onClick={() => navigateToStudio(featuredVoid.route, featuredVoid.id)}
-                  className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-300 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[140px] md:h-[160px] bg-[#050a0e]"
+                  className="group relative w-full rounded-2xl overflow-hidden text-left transition-all duration-500 active:scale-[0.998] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 h-[150px] md:h-[170px] bg-[#030810]"
                 >
-                  <img src={voidHero} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-45 transition-opacity duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#050a0e]/90 via-[#050a0e]/60 to-transparent pointer-events-none" />
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+                  {/* Background image with pulse */}
+                  <img src={voidHero} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-50 transition-opacity duration-700 group-hover:scale-105 transform" />
+
+                  {/* Radial glow center */}
+                  <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[300px] h-[300px] rounded-full opacity-20 group-hover:opacity-35 transition-opacity duration-700 pointer-events-none animate-[void-pulse_4s_ease-in-out_infinite]"
+                    style={{ background: 'radial-gradient(circle, rgba(0,255,200,0.4), transparent 70%)' }} />
+
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#030810]/95 via-[#030810]/60 to-transparent pointer-events-none" />
+
+                  {/* Top shine line */}
+                  <div className="absolute top-0 left-0 right-0 h-[1px] overflow-hidden">
+                    <div className="h-full w-full bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent animate-[shimmer_2.5s_ease-in-out_infinite]" />
+                  </div>
+                  {/* Bottom shine line */}
                   <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-                  <div className="relative flex items-center justify-between h-full px-5 md:px-10">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/70">Canvas Infinito</span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/15 px-2 py-0.5 text-[9px] font-bold text-cyan-400 border border-cyan-400/25">
-                          <Sparkles className="h-2 w-2" />
+                  <div className="relative flex items-center justify-between h-full px-6 md:px-10">
+                    <div className="flex-1 min-w-0 space-y-2.5">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400/80">Canvas Infinito</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-cyan-400/15 px-2.5 py-0.5 text-[9px] font-bold text-cyan-400 border border-cyan-400/30 shadow-[0_0_8px_rgba(0,255,200,0.15)]">
+                          <Sparkles className="h-2.5 w-2.5 animate-[void-pulse_2s_ease-in-out_infinite]" />
                           Novo
                         </span>
                       </div>
-                      <h2 className="text-xl md:text-[26px] font-extrabold text-foreground font-display tracking-tight leading-none mb-2 drop-shadow-[0_0_20px_rgba(0,255,200,0.2)]">
+                      <h2 className="text-2xl md:text-[30px] font-black text-foreground font-display tracking-tight leading-none"
+                        style={{ textShadow: '0 0 30px rgba(0,255,200,0.25), 0 0 60px rgba(0,255,200,0.1)' }}>
                         {featuredVoid.name}
                       </h2>
-                      <p className="text-xs text-muted-foreground max-w-md leading-relaxed line-clamp-2">
+                      <p className="text-[11px] md:text-xs text-muted-foreground max-w-lg leading-relaxed line-clamp-2">
                         {featuredVoid.description}
                       </p>
-                      <div className="mt-3 inline-flex items-center gap-2 rounded-xl bg-cyan-400/10 border border-cyan-400/20 px-3 py-1.5 text-[10px] font-semibold text-cyan-400 group-hover:bg-cyan-400/20 transition-all duration-300">
+                      <div className="inline-flex items-center gap-2 rounded-xl bg-cyan-400/10 border border-cyan-400/25 px-4 py-2 text-[10px] font-semibold text-cyan-400 group-hover:bg-cyan-400/20 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_16px_rgba(0,255,200,0.2)] transition-all duration-300">
                         Entrar no VOID
-                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                       </div>
                     </div>
 
-                    <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-cyan-400/20 bg-cyan-400/10 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_rgba(0,255,200,0.15)] transition-all duration-300 shrink-0 ml-8">
-                      <ArrowRight className="h-5 w-5 text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+                    <div className="hidden md:flex items-center justify-center w-14 h-14 rounded-full border border-cyan-400/20 bg-cyan-400/5 group-hover:border-cyan-400/50 group-hover:bg-cyan-400/10 group-hover:shadow-[0_0_30px_rgba(0,255,200,0.2)] transition-all duration-500 shrink-0 ml-8">
+                      <ArrowRight className="h-5 w-5 text-cyan-400 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </button>
