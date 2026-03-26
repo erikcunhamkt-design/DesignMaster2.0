@@ -363,6 +363,19 @@ const itemVariants = {
 };
 
 export default function ChangelogPage() {
+  const [activeFilter, setActiveFilter] = useState<ChangeTag | 'all'>('all');
+  const allTags = Object.keys(categoryColors) as ChangeTag[];
+
+  const filteredNotes = useMemo(() => {
+    if (activeFilter === 'all') return patchNotes;
+    return patchNotes
+      .map(note => ({
+        ...note,
+        changes: note.changes.filter(c => c.tag === activeFilter),
+      }))
+      .filter(note => note.changes.length > 0);
+  }, [activeFilter]);
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
       <StudioTopbar title="Atualizações" showApiKey={false} />
@@ -386,10 +399,32 @@ export default function ChangelogPage() {
               Acompanhe todas as melhorias do DesignMaster
             </p>
 
-            {/* Tag legend */}
+            {/* Filter chips */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-              {(Object.keys(categoryColors) as ChangeTag[]).map((tag) => (
-                <TagBadge key={tag} tag={tag} />
+              <button
+                onClick={() => setActiveFilter('all')}
+                className={cn(
+                  'inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border transition-all duration-200',
+                  activeFilter === 'all'
+                    ? 'bg-primary/20 text-primary border-primary/40 shadow-[0_0_8px_hsl(var(--primary)/0.3)]'
+                    : 'bg-secondary/50 text-muted-foreground border-border/30 hover:bg-secondary'
+                )}
+              >
+                Todos
+              </button>
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveFilter(activeFilter === tag ? 'all' : tag)}
+                  className={cn(
+                    'inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border transition-all duration-200',
+                    activeFilter === tag
+                      ? cn(categoryColors[tag], 'shadow-lg')
+                      : 'bg-secondary/50 text-muted-foreground border-border/30 hover:bg-secondary'
+                  )}
+                >
+                  {tagLabels[tag]}
+                </button>
               ))}
             </div>
           </motion.div>
