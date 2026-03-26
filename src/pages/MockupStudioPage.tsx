@@ -135,24 +135,12 @@ function MockupPreviewPanel({
         )}
 
         {state === 'gerando' && (
-          <div className="flex flex-col items-center gap-8 animate-fade-up">
-            <div className="relative h-24 w-24">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/15 to-violet-500/10 animate-breathe" />
-              <div className="absolute inset-[3px] rounded-[14px] bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                  <span className="absolute inset-0 flex items-center justify-center text-xl">📦</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="font-display text-base font-semibold tracking-tight text-foreground/60">Gerando mockup profissional…</p>
-              <p className="text-[11px] text-muted-foreground/35">IA construindo composição realista</p>
-            </div>
-            <div className="w-48 h-[1.5px] rounded-full overflow-hidden bg-border/15">
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
-            </div>
-          </div>
+          <GeneratingAnimation
+            icon={Loader2}
+            emoji="📦"
+            title="Gerando mockup profissional…"
+            subtitle="IA construindo composição realista"
+          />
         )}
 
         {state === 'concluido' && imageUrl && (

@@ -227,48 +227,25 @@ export function PreviewPanel({ state, imageUrl, config, elapsedSeconds = 0, esti
         )}
 
         {state === 'gerando' && (
-          <div className="flex flex-col items-center gap-8 animate-fade-up">
-            {/* Icon */}
-            <div className="relative h-20 w-20">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 animate-breathe" />
-              <div className="absolute inset-[3px] rounded-[14px] bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
-              </div>
-            </div>
-
-            {/* Text + timer */}
-            <div className="text-center space-y-1.5">
-              <p className="font-display text-base font-semibold tracking-tight text-foreground/60">Gerando imagem…</p>
-              <p className="text-[11px] text-muted-foreground/35">IA processando seu criativo</p>
-              {/* Elapsed + countdown */}
-              <div className="flex items-center justify-center gap-2 pt-1">
-                <span className="tabular-nums text-[11px] font-mono text-muted-foreground/40">
-                  {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:{String(elapsedSeconds % 60).padStart(2, '0')}
-                </span>
-                {elapsedSeconds < estimatedSeconds && (
-                  <>
-                    <span className="text-muted-foreground/20 text-[10px]">/</span>
-                    <span className="tabular-nums text-[11px] font-mono text-primary/50 font-semibold">
-                      ~{estimatedSeconds - elapsedSeconds}s
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="w-56 space-y-1.5">
-              <div className="w-full h-1.5 rounded-full overflow-hidden bg-border/15">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-primary/70 to-accent/80 transition-all duration-1000 ease-linear"
-                  style={{
-                    width: `${Math.min(100, (elapsedSeconds / estimatedSeconds) * 100)}%`,
-                  }}
-                />
-              </div>
-              <p className="text-center text-[9px] text-muted-foreground/25 tabular-nums">
-                {Math.min(100, Math.round((elapsedSeconds / estimatedSeconds) * 100))}%
-              </p>
+          <div className="flex flex-col items-center gap-8">
+            <GeneratingAnimation
+              icon={Sparkles}
+              title="Gerando imagem…"
+              subtitle="IA processando seu criativo"
+            />
+            {/* Elapsed timer below animation */}
+            <div className="flex items-center justify-center gap-2">
+              <span className="tabular-nums text-[11px] font-mono text-muted-foreground/40">
+                {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:{String(elapsedSeconds % 60).padStart(2, '0')}
+              </span>
+              {elapsedSeconds < estimatedSeconds && (
+                <>
+                  <span className="text-muted-foreground/20 text-[10px]">/</span>
+                  <span className="tabular-nums text-[11px] font-mono text-primary/50 font-semibold">
+                    ~{estimatedSeconds - elapsedSeconds}s
+                  </span>
+                </>
+              )}
             </div>
           </div>
         )}
