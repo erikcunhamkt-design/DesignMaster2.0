@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { useImageHistory, hasImageHistory } from '@/hooks/useImageHistory';
 import { ImageHistoryBar } from '@/components/layout/ImageHistoryBar';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
@@ -451,20 +452,11 @@ export default function PortraitStudioPage() {
               </motion.div>
             )}
             {isProcessing && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center space-y-4"
-              >
-                <div className="relative">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-                  <div className="absolute inset-0 h-12 w-12 mx-auto animate-ping opacity-20 rounded-full bg-primary" />
-                </div>
-                <p className="text-sm font-semibold text-primary">Criando retrato profissional...</p>
-                <p className="text-[10px] text-muted-foreground/60">Isso pode levar 15-30 segundos</p>
-              </motion.div>
+              <GeneratingAnimation
+                icon={Camera}
+                title="Criando retrato profissional…"
+                subtitle="Isso pode levar 15-30 segundos"
+              />
             )}
             {resultImage && (
               <motion.div

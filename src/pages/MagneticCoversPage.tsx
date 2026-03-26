@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -315,15 +316,13 @@ export default function MagneticCoversPage() {
       )}
 
       {isGenerating && (
-        <div className="text-center space-y-4 relative z-10">
-          <div className="relative inline-flex items-center justify-center">
-            <div className="absolute w-20 h-20 rounded-full bg-primary/[0.06] blur-2xl animate-[void-pulse_2s_ease-in-out_infinite]" />
-            <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs font-bold text-primary">Capturando a fauna...</p>
-            <p className="text-[9px] text-muted-foreground/40">Alguns segundos</p>
-          </div>
+        <div className="relative z-10">
+          <GeneratingAnimation
+            icon={Camera}
+            emoji="🐆"
+            title="Capturando a fauna…"
+            subtitle="IA criando fotografia wildlife profissional"
+          />
         </div>
       )}
 
