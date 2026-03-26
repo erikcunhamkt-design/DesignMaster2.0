@@ -455,9 +455,6 @@ export default function HeroStudioPage() {
         </div>
         <div className="h-4 w-px bg-border/20" />
         <span className="text-[9px] text-muted-foreground/40 uppercase tracking-widest font-semibold">Landing Page</span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[8px] font-bold text-blue-400 uppercase tracking-widest">
-          Alta Conversão
-        </span>
       </div>
 
       {/* Main */}
