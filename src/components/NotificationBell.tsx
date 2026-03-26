@@ -29,10 +29,12 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
     setSelected(n);
   };
 
-  const handleGoToChangelog = () => {
+  const handleGoToChangelog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setOpen(false);
     setSelected(null);
-    setTimeout(() => navigate('/studio/changelog'), 100);
+    window.location.href = '/studio/changelog';
   };
 
   return (
