@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Eye, Search, Bot, ChevronDown, Sparkles } from 'lucide-react';
+import { Plus, Trash2, ChevronLeft, ChevronRight, Bot, ChevronDown, Sparkles, Zap, MessageSquare } from 'lucide-react';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,7 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 
@@ -30,24 +29,63 @@ interface Conversation { id: string; title: string; created_at: string; updated_
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 const AGENT_ID = 'hub';
 
-// Available Gemini models (Google API direct)
 const MODELS = [
-  { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado' },
-  { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado' },
-  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo' },
-  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício' },
-  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido' },
+  { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Raciocínio avançado', icon: '🧠' },
+  { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash', desc: 'Rápido e equilibrado', icon: '⚡' },
+  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', desc: 'Multimodal + contexto longo', icon: '🔮' },
+  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', desc: 'Custo-benefício', icon: '💨' },
+  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', desc: 'Ultra rápido', icon: '🚀' },
 ];
 
 const AGENTS = [
-  { id: 'general', label: 'Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa' },
-  { id: 'prompt-architect', label: 'Gerador de Prompts Pro', emoji: '🧠', desc: 'Prompts cinematográficos hiper-detalhados' },
-  { id: 'design-master', label: 'Design Master', emoji: '🎨', desc: 'Mentor de design e branding' },
-  { id: 'carousel-master', label: 'Carrossel Master', emoji: '📰', desc: 'Narrativas editoriais para carrossel' },
-  { id: 'editorial', label: 'Estrategista Editorial', emoji: '📋', desc: 'Linhas editoriais estratégicas' },
-  { id: 'calendar', label: 'Calendário Master', emoji: '📅', desc: 'Calendários de conteúdo' },
-  { id: 'bio', label: 'Bio Master', emoji: '✍️', desc: 'Bios para Instagram' },
+  { id: 'general', label: 'Geral', emoji: '🤖', desc: 'IA versátil para qualquer tarefa', color: 'from-blue-500/20 to-cyan-500/20' },
+  { id: 'prompt-architect', label: 'Gerador de Prompts Pro', emoji: '🧠', desc: 'Prompts cinematográficos hiper-detalhados', color: 'from-purple-500/20 to-pink-500/20' },
+  { id: 'design-master', label: 'Design Master', emoji: '🎨', desc: 'Mentor de design e branding', color: 'from-orange-500/20 to-red-500/20' },
+  { id: 'carousel-master', label: 'Carrossel Master', emoji: '📰', desc: 'Narrativas editoriais para carrossel', color: 'from-emerald-500/20 to-teal-500/20' },
+  { id: 'editorial', label: 'Estrategista Editorial', emoji: '📋', desc: 'Linhas editoriais estratégicas', color: 'from-amber-500/20 to-yellow-500/20' },
+  { id: 'calendar', label: 'Calendário Master', emoji: '📅', desc: 'Calendários de conteúdo', color: 'from-sky-500/20 to-indigo-500/20' },
+  { id: 'bio', label: 'Bio Master', emoji: '✍️', desc: 'Bios para Instagram', color: 'from-rose-500/20 to-pink-500/20' },
 ];
+
+const QUICK_PROMPTS: Record<string, { text: string; emoji: string }[]> = {
+  general: [
+    { emoji: '📱', text: 'Me ajude a criar um plano de conteúdo para Instagram' },
+    { emoji: '🎨', text: 'Quais são as tendências de design para 2025?' },
+    { emoji: '✨', text: 'Crie um prompt de imagem para um post de luxo minimalista' },
+    { emoji: '📊', text: 'Como posso aumentar o engajamento nas redes sociais?' },
+  ],
+  'prompt-architect': [
+    { emoji: '👤', text: 'Retrato cinematográfico de uma mulher com iluminação dourada' },
+    { emoji: '🏙️', text: 'Paisagem urbana cyberpunk com neon e chuva' },
+    { emoji: '🎭', text: 'Composição editorial de moda com fundo abstrato' },
+    { emoji: '🌅', text: 'Cena épica de natureza com iluminação dramática' },
+  ],
+  'design-master': [
+    { emoji: '🎯', text: 'Me ajude a criar uma identidade visual para minha marca' },
+    { emoji: '📐', text: 'Sugira paletas de cores para um perfil de luxo' },
+    { emoji: '💡', text: 'Ideias de posts que viralizam no Instagram' },
+  ],
+  'carousel-master': [
+    { emoji: '📈', text: 'Como crescer no Instagram de forma orgânica em 2025' },
+    { emoji: '🧠', text: 'Neuromarketing: como vender sem parecer que está vendendo' },
+    { emoji: '💼', text: 'O futuro do trabalho remoto e como se preparar' },
+  ],
+  editorial: [
+    { emoji: '🏋️', text: 'Personal trainer especializado em emagrecimento feminino' },
+    { emoji: '📸', text: 'Fotógrafo de retratos e branding pessoal' },
+    { emoji: '🍰', text: 'Confeitaria artesanal com entregas na região' },
+  ],
+  calendar: [
+    { emoji: '💅', text: 'Studio de nail designer com foco em nail art autoral' },
+    { emoji: '🏠', text: 'Arquiteto de interiores residenciais de alto padrão' },
+    { emoji: '📚', text: 'Mentor de produtividade para empreendedores' },
+  ],
+  bio: [
+    { emoji: '🎨', text: 'Sou designer gráfico freelancer especializado em branding' },
+    { emoji: '📷', text: 'Fotógrafo de casamentos e ensaios externos' },
+    { emoji: '💻', text: 'Desenvolvedor web e consultor de tecnologia' },
+  ],
+};
 
 export default function CentralChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -249,31 +287,33 @@ export default function CentralChatPage() {
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   };
 
+  const agentPrompts = QUICK_PROMPTS[selectedAgent.id] || QUICK_PROMPTS.general;
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
-      {/* Dashboard sidebar */}
       <DashboardSidebar activeSection="chat-hub" onSectionChange={() => {}} />
 
       <div className="flex flex-1 min-w-0 overflow-hidden">
         {/* Chat conversations sidebar */}
         <div className={cn(
-          'flex flex-col border-r border-border/15 bg-card/30 backdrop-blur-sm transition-all duration-300 shrink-0',
-          chatSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
+          'flex flex-col border-r border-border/10 bg-card/20 backdrop-blur-sm transition-all duration-300 shrink-0',
+          chatSidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
         )}>
+          {/* Sidebar header */}
           <div className="p-3 border-b border-border/10 space-y-2">
-            <Button onClick={handleNewChat} variant="outline" className="w-full gap-2 h-9 text-xs font-semibold rounded-xl border-border/20 bg-secondary/30 hover:bg-secondary/50">
-              <Plus className="h-3.5 w-3.5" /> Nova conversa
+            <Button onClick={handleNewChat} className="w-full gap-2 h-10 text-xs font-semibold rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border-0">
+              <Plus className="h-4 w-4" /> Nova conversa
             </Button>
-            {conversations.length > 0 && (
-              <Button onClick={handleDeleteAll} variant="ghost" className="w-full gap-2 h-8 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
-                <Trash2 className="h-3 w-3" /> Apagar todas
-              </Button>
-            )}
           </div>
+
+          {/* Conversations list */}
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-0.5">
               {conversations.length === 0 ? (
-                <p className="text-[10px] text-muted-foreground/40 text-center py-8">Nenhuma conversa ainda</p>
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <MessageSquare className="h-8 w-8 text-muted-foreground/20" />
+                  <p className="text-[11px] text-muted-foreground/40 text-center">Nenhuma conversa ainda</p>
+                </div>
               ) : conversations.map(convo => (
                 <ConversationItem
                   key={convo.id}
@@ -293,38 +333,50 @@ export default function CentralChatPage() {
               ))}
             </div>
           </ScrollArea>
+
+          {/* Sidebar footer */}
+          {conversations.length > 0 && (
+            <div className="p-2 border-t border-border/10">
+              <Button onClick={handleDeleteAll} variant="ghost" className="w-full gap-2 h-8 text-[10px] text-muted-foreground/50 hover:text-destructive hover:bg-destructive/5 rounded-xl">
+                <Trash2 className="h-3 w-3" /> Limpar todas
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Chat sidebar toggle */}
         <button
           onClick={() => setChatSidebarOpen(!chatSidebarOpen)}
-          className="absolute top-1/2 -translate-y-1/2 z-20 bg-card/60 border border-border/15 rounded-r-lg p-1.5 hover:bg-card/80 transition-all"
-          style={{ left: chatSidebarOpen ? 'calc(var(--sidebar-w, 220px) + 256px)' : 'var(--sidebar-w, 220px)', transition: 'left 0.3s' }}
+          className="absolute top-1/2 -translate-y-1/2 z-20 bg-card/60 border border-border/10 rounded-r-lg p-1.5 hover:bg-card/80 transition-all"
+          style={{ left: chatSidebarOpen ? 'calc(var(--sidebar-w, 220px) + 288px)' : 'var(--sidebar-w, 220px)', transition: 'left 0.3s' }}
         >
           {chatSidebarOpen ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
         </button>
 
         {/* Main chat area */}
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-          {/* Top bar with model & agent selectors */}
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-border/15 bg-card/20">
+          {/* Top bar */}
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-card/10 backdrop-blur-sm">
             <MobileSidebarTrigger activeSection="chat-hub" onSectionChange={() => {}} />
 
             {/* Model selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium rounded-lg">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/40">
+                  <Zap className="h-3.5 w-3.5 text-primary" />
                   {selectedModel.label}
-                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  <ChevronDown className="h-3 w-3 text-muted-foreground/50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
-                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Modelo</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Modelo</DropdownMenuLabel>
                 {MODELS.map(m => (
-                  <DropdownMenuItem key={m.id} onClick={() => setSelectedModel(m)} className={cn('flex flex-col items-start gap-0.5', selectedModel.id === m.id && 'bg-primary/10')}>
-                    <span className="text-xs font-medium">{m.label}</span>
-                    <span className="text-[10px] text-muted-foreground">{m.desc}</span>
+                  <DropdownMenuItem key={m.id} onClick={() => setSelectedModel(m)} className={cn('flex items-start gap-2.5 py-2', selectedModel.id === m.id && 'bg-primary/10')}>
+                    <span className="text-base mt-0.5">{m.icon}</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-medium">{m.label}</span>
+                      <span className="text-[10px] text-muted-foreground/60">{m.desc}</span>
+                    </div>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -333,20 +385,20 @@ export default function CentralChatPage() {
             {/* Agent selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium rounded-lg">
-                  <Bot className="h-3.5 w-3.5 text-primary" />
-                  {selectedAgent.emoji} {selectedAgent.label}
-                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/40">
+                  <span className="text-sm">{selectedAgent.emoji}</span>
+                  {selectedAgent.label}
+                  <ChevronDown className="h-3 w-3 text-muted-foreground/50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-72">
-                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Agente</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Agente</DropdownMenuLabel>
                 {AGENTS.map(a => (
-                  <DropdownMenuItem key={a.id} onClick={() => setSelectedAgent(a)} className={cn('flex items-start gap-2.5', selectedAgent.id === a.id && 'bg-primary/10')}>
+                  <DropdownMenuItem key={a.id} onClick={() => setSelectedAgent(a)} className={cn('flex items-start gap-2.5 py-2', selectedAgent.id === a.id && 'bg-primary/10')}>
                     <span className="text-lg mt-0.5">{a.emoji}</span>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-xs font-medium">{a.label}</span>
-                      <span className="text-[10px] text-muted-foreground">{a.desc}</span>
+                      <span className="text-[10px] text-muted-foreground/60">{a.desc}</span>
                     </div>
                   </DropdownMenuItem>
                 ))}
@@ -359,61 +411,97 @@ export default function CentralChatPage() {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 px-4 py-6" ref={scrollRef}>
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-6 animate-fade-up">
-                <div className="text-6xl">{selectedAgent.emoji}</div>
-                <div className="text-center space-y-2">
-                  <h2 className="text-2xl font-bold font-display text-foreground">{selectedAgent.label}</h2>
-                  <p className="text-sm text-muted-foreground max-w-md">{selectedAgent.desc}</p>
-                  <p className="text-[10px] text-muted-foreground/50">Modelo: {selectedModel.label}</p>
+          <ScrollArea className="flex-1" ref={scrollRef}>
+            <div className="px-4 py-6">
+              {messages.length === 0 ? (
+                /* Empty state */
+                <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8 animate-fade-up">
+                  {/* Agent avatar */}
+                  <div className={cn("relative")}>
+                    <div className={cn(
+                      "w-20 h-20 rounded-3xl bg-gradient-to-br flex items-center justify-center text-4xl shadow-lg",
+                      selectedAgent.color
+                    )}>
+                      {selectedAgent.emoji}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-background" />
+                  </div>
+
+                  <div className="text-center space-y-2 max-w-lg">
+                    <h2 className="text-2xl font-bold font-display text-foreground">{selectedAgent.label}</h2>
+                    <p className="text-sm text-muted-foreground/70 leading-relaxed">{selectedAgent.desc}</p>
+                    <div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground/40">
+                      <Zap className="h-3 w-3" />
+                      <span>{selectedModel.label}</span>
+                    </div>
+                  </div>
+
+                  {/* Quick prompts */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl w-full">
+                    {agentPrompts.map((prompt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => send(prompt.text)}
+                        className="group/prompt flex items-start gap-3 rounded-2xl border border-border/15 bg-card/30 hover:bg-card/60 px-4 py-3 text-left transition-all duration-200 hover:border-primary/20 hover:shadow-sm"
+                      >
+                        <span className="text-lg mt-0.5">{prompt.emoji}</span>
+                        <span className="text-xs text-muted-foreground/70 group-hover/prompt:text-foreground transition-colors leading-relaxed">{prompt.text}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2 max-w-xl justify-center">
-                  {selectedAgent.id === 'general' && (
-                    <>
-                      <button onClick={() => send('Me ajude a criar um plano de conteúdo para Instagram')} className="rounded-xl border border-border/30 bg-card/50 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-card/80 transition-all">📱 Plano de conteúdo para Instagram</button>
-                      <button onClick={() => send('Quais são as tendências de design para 2025?')} className="rounded-xl border border-border/30 bg-card/50 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-card/80 transition-all">🎨 Tendências de design 2025</button>
-                      <button onClick={() => send('Crie um prompt de imagem para um post de luxo minimalista')} className="rounded-xl border border-border/30 bg-card/50 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-card/80 transition-all">✨ Prompt de imagem luxo</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto space-y-6 relative" ref={messagesContainerRef}>
-                <SelectionCopyTooltip containerRef={messagesContainerRef} />
-                {messages.map((msg, i) => (
-                  <div key={i} className={cn('group flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                    {msg.role === 'assistant' && (
-                      <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">
+              ) : (
+                /* Messages list */
+                <div className="max-w-3xl mx-auto space-y-1 relative" ref={messagesContainerRef}>
+                  <SelectionCopyTooltip containerRef={messagesContainerRef} />
+                  {messages.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        'group flex gap-3 py-4',
+                        msg.role === 'user' ? 'justify-end' : 'justify-start',
+                      )}
+                    >
+                      {msg.role === 'assistant' && (
+                        <div className={cn(
+                          "shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br flex items-center justify-center text-sm shadow-sm",
+                          selectedAgent.color
+                        )}>
+                          {selectedAgent.emoji}
+                        </div>
+                      )}
+                      <div className={cn(
+                        'rounded-2xl max-w-[85%] text-sm',
+                        msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-br-md px-4 py-3'
+                          : 'bg-transparent'
+                      )}>
+                        {msg.role === 'assistant' ? (
+                          <AssistantMessageContent
+                            content={msg.content}
+                            proseClasses="prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-3 [&>h1]:mt-6 [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:mt-5 [&>h2]:text-primary [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mb-2 [&>h3]:mt-4 [&>hr]:my-5 [&>hr]:border-border/20 [&>p]:mb-3 [&>p]:leading-[1.75] [&>p]:text-foreground/90 [&>ul]:mb-3 [&>ul]:space-y-1 [&>ol]:mb-3 [&>ol]:space-y-1 [&>li]:leading-relaxed [&>blockquote]:border-l-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-xl [&>blockquote]:py-2 [&>blockquote]:px-4 [&>blockquote]:my-3 [&>pre]:rounded-xl [&>pre]:bg-card/60 [&>pre]:border [&>pre]:border-border/20 [&>pre]:my-3 [&>strong]:text-foreground [&>strong]:font-semibold"
+                          />
+                        ) : <UserMessageContent content={msg.content} />}
+                      </div>
+                      {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
+                      {msg.role === 'user' && (
+                        <div className="shrink-0 w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">EU</div>
+                      )}
+                    </div>
+                  ))}
+                  {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
+                    <div className="flex gap-3 py-4 justify-start">
+                      <div className={cn("shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br flex items-center justify-center text-sm", selectedAgent.color)}>
                         {selectedAgent.emoji}
                       </div>
-                    )}
-                    <div className={cn(
-                      'rounded-2xl px-4 py-3 max-w-[85%] text-sm',
-                      msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-br-md'
-                        : 'bg-card/60 border border-border/20 rounded-bl-md'
-                    )}>
-                      {msg.role === 'assistant' ? (
-                        <AssistantMessageContent content={msg.content} proseClasses="prose prose-sm prose-invert max-w-none select-text cursor-text [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h2]:mt-6 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:text-base [&>h2]:font-bold [&>hr]:my-5 [&>hr]:border-border/30 [&>p]:mb-3 [&>p]:leading-relaxed [&>ul]:mb-3 [&>ol]:mb-3 [&>blockquote]:border-l-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:py-1 [&>blockquote]:px-3" />
-                      ) : <UserMessageContent content={msg.content} />}
+                      <div className="pt-2">
+                        <TypingDots />
+                      </div>
                     </div>
-                    {msg.role === 'assistant' && <CopyMessageButton content={msg.content} />}
-                    {msg.role === 'user' && (
-                      <div className="shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">EU</div>
-                    )}
-                  </div>
-                ))}
-                {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-                  <div className="flex gap-3 justify-start">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">{selectedAgent.emoji}</div>
-                    <div className="rounded-2xl px-4 py-3 bg-card/60 border border-border/20 rounded-bl-md">
-                      <TypingDots />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+            </div>
           </ScrollArea>
 
           {/* Input */}
