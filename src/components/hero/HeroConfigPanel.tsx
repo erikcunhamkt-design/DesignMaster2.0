@@ -609,8 +609,20 @@ export function HeroConfigPanel({ config, onUpdate, onGenerate, isGenerating, ap
           <HeroTypeSection config={config} onUpdate={onUpdate} />
         </CollapsibleBlock>
 
-        <CollapsibleBlock icon={Image} title="Sujeito & Referência" subtitle={config.referencePhotos.length > 0 ? `${config.referencePhotos.length} ref · ${config.element}` : config.element} defaultOpen accent>
-          <SubjectSection config={config} onUpdate={onUpdate} />
+        <CollapsibleBlock icon={Zap} title="Elemento Principal" subtitle={config.element} defaultOpen accent>
+          <ElementSection config={config} onUpdate={onUpdate} />
+        </CollapsibleBlock>
+
+        <CollapsibleBlock icon={Image} title="Foto do Sujeito" subtitle={config.subjectPhotos.length > 0 ? `${config.subjectPhotos.length} foto(s)` : 'Nenhuma'} defaultOpen>
+          <UploadBlock photos={config.subjectPhotos} onUpdate={onUpdate} fieldKey="subjectPhotos" label="Pessoa / Fundador" placeholder="Upload da pessoa" max={3} />
+        </CollapsibleBlock>
+
+        <CollapsibleBlock icon={Layers} title="Foto do Produto" subtitle={config.productPhotos.length > 0 ? `${config.productPhotos.length} foto(s)` : 'Nenhuma'}>
+          <UploadBlock photos={config.productPhotos} onUpdate={onUpdate} fieldKey="productPhotos" label="App, Dashboard, Mockup" placeholder="Upload do produto" max={3} />
+        </CollapsibleBlock>
+
+        <CollapsibleBlock icon={Plus} title="Referência Visual" subtitle={config.referencePhotos.length > 0 ? `${config.referencePhotos.length} ref` : 'Nenhuma'}>
+          <UploadBlock photos={config.referencePhotos} onUpdate={onUpdate} fieldKey="referencePhotos" label="Referência de estilo" placeholder="Upload de referência" max={3} />
         </CollapsibleBlock>
 
         <CollapsibleBlock icon={Layers} title="Composição" subtitle="Layout e posicionamento">
