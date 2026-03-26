@@ -1,8 +1,9 @@
-import { Search, Bell, LogOut, Shield, Settings, Check, X, BellOff } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Bell, LogOut, Shield, Settings, Check, X, BellOff, ArrowLeft, Sparkles, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySection';
 import { useAuth } from '@/hooks/useAuth';
@@ -126,6 +127,12 @@ export function DashboardTopbar({ searchQuery, onSearchChange, activeSection, on
 
 function NotificationPopover() {
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Notification | null>(null);
+  const navigate = useNavigate();
+
+  const isChangelog = (title: string) =>
+    /atualiza|novidad|patch|changelog|v\d+\.\d+/i.test(title);
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -140,8 +147,19 @@ function NotificationPopover() {
     return `${diffD}d`;
   };
 
+  const handleClick = (n: Notification) => {
+    if (!n.read) markAsRead(n.id);
+    setSelected(n);
+  };
+
+  const handleChangelog = () => {
+    setOpen(false);
+    setSelected(null);
+    setTimeout(() => navigate('/studio/changelog'), 50);
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSelected(null); }}>
       <PopoverTrigger asChild>
         <button className="relative flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
           <Bell className="h-4 w-4" />
@@ -153,55 +171,87 @@ function NotificationPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0 glass-card shadow-elevation-3 rounded-xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/20">
-          <span className="text-xs font-bold text-foreground">Notificações</span>
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllAsRead}
-              className="text-[10px] font-semibold text-primary hover:underline"
-            >
-              Marcar todas como lidas
-            </button>
-          )}
-        </div>
-
-        {/* List */}
-        <div className="max-h-72 overflow-y-auto">
-          {loading ? (
-            <div className="px-4 py-8 text-center text-xs text-muted-foreground">Carregando...</div>
-          ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-4 py-10 gap-2">
-              <BellOff className="h-8 w-8 text-muted-foreground/30" />
-              <span className="text-xs text-muted-foreground/60 font-medium">Nenhuma notificação</span>
-              <span className="text-[10px] text-muted-foreground/40">Você será avisado quando houver novidades</span>
-            </div>
-          ) : (
-            notifications.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => !n.read && markAsRead(n.id)}
-                className={cn(
-                  'w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/30 transition-colors',
-                  !n.read && 'bg-primary/5'
-                )}
-              >
-                <div className="flex items-start gap-2">
-                  {!n.read && (
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.5)]" />
-                  )}
-                  <div className={cn('flex-1 min-w-0', n.read && 'ml-4')}>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-foreground truncate">{n.title}</span>
-                      <span className="text-[9px] text-muted-foreground/50 shrink-0">{formatDate(n.created_at)}</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5 line-clamp-2">{n.message}</p>
-                  </div>
-                </div>
+        {selected ? (
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
+              <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
               </button>
-            ))
-          )}
-        </div>
+              <span className="text-xs font-bold text-foreground truncate flex-1">{selected.title}</span>
+              <span className="text-[9px] text-muted-foreground/50 shrink-0">{formatDate(selected.created_at)}</span>
+            </div>
+            <div className="px-4 py-4 max-h-80 overflow-y-auto">
+              <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{selected.message}</p>
+              {isChangelog(selected.title) && (
+                <button
+                  onClick={handleChangelog}
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs text-primary font-semibold hover:text-primary/80 transition-colors"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  Ver changelog completo
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/20">
+              <span className="text-xs font-bold text-foreground">Notificações</span>
+              <div className="flex items-center gap-3">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-[10px] font-semibold text-primary hover:underline"
+                  >
+                    Marcar todas
+                  </button>
+                )}
+                <button
+                  onClick={handleChangelog}
+                  className="text-[10px] font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+                >
+                  <Megaphone className="h-3 w-3" />
+                  Atualizações
+                </button>
+              </div>
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {loading ? (
+                <div className="px-4 py-8 text-center text-xs text-muted-foreground">Carregando...</div>
+              ) : notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center px-4 py-10 gap-2">
+                  <BellOff className="h-8 w-8 text-muted-foreground/30" />
+                  <span className="text-xs text-muted-foreground/60 font-medium">Nenhuma notificação</span>
+                  <span className="text-[10px] text-muted-foreground/40">Você será avisado quando houver novidades</span>
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => handleClick(n)}
+                    className={cn(
+                      'w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/30 transition-colors',
+                      !n.read && 'bg-primary/5'
+                    )}
+                  >
+                    <div className="flex items-start gap-2">
+                      {!n.read && (
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.5)]" />
+                      )}
+                      <div className={cn('flex-1 min-w-0', n.read && 'ml-4')}>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-bold text-foreground truncate">{n.title}</span>
+                          <span className="text-[9px] text-muted-foreground/50 shrink-0">{formatDate(n.created_at)}</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5 line-clamp-2">{n.message}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );
