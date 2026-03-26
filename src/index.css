@@ -317,6 +317,21 @@
   12%, 100% { transform: scale(1); }
 }
 
+@keyframes void-glow {
+  0%, 100% { opacity: 0.4; filter: blur(4px); }
+  50% { opacity: 0.7; filter: blur(6px); }
+}
+
+@keyframes void-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Enable text selection inside chat prose blocks */
 .prose.select-text,
 .prose.select-text * {
