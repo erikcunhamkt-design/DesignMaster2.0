@@ -48,7 +48,21 @@ You are performing a FACE TRANSPLANT operation. This means:
 
 8. AGE: Maintain the apparent age of the subject. Do NOT age up or down.
 
-QUALITY STANDARD: The output portrait must be so faithful that the subject's mother, partner, or close friend would IMMEDIATELY recognize them without hesitation.
+═══ CRITICAL: ORGANIC BODY-FACE INTEGRATION ═══
+
+DO NOT paste/collage the face onto a separate body. The result must look like a SINGLE CONTINUOUS PHOTOGRAPH of ONE person. Specifically:
+
+9. LIGHTING COHERENCE: The light direction, color temperature, and intensity on the FACE must EXACTLY match the light on the BODY, NECK, and BACKGROUND. If the scene has warm rim light from the right, the face must show the same warm rim light from the right with matching shadow direction. NO mismatched lighting between head and torso.
+
+10. NECK & SHOULDER TRANSITION: The neck, jawline, and shoulders must flow naturally from the face. Match skin tone continuity across face → neck → chest. No visible "seam" or tonal shift where the head meets the body.
+
+11. BODY PROPORTIONS: The head size must be anatomically proportional to the body (roughly 1/7.5 of total height). Do NOT generate an oversized or undersized head. The body build (slim, athletic, curvy, etc.) should be consistent with what is visible in the subject photo.
+
+12. SHADOW CONSISTENCY: Shadows cast BY the face (under chin, nose shadow on cheek) must align with the scene's global light source. Shadows ON the body must match shadows ON the face.
+
+13. COLOR GRADING UNITY: Apply the SAME color grading, contrast curve, and white balance to face AND body. No "cool face on warm body" or vice versa.
+
+QUALITY STANDARD: The output portrait must be so faithful that the subject's mother, partner, or close friend would IMMEDIATELY recognize them without hesitation. The image must look like ONE photograph, NOT a composite.
 
 FAILURE MODE: If you cannot preserve identity with confidence, prioritize the face/eyes/skin tone over all other creative elements.`;
 
@@ -63,11 +77,15 @@ When reference images are provided alongside a subject photo, your task is SURGI
 
 3. MERGE OPERATION: Place the subject's face/identity INTO the reference's scene, pose, and aesthetic. The result should look like the subject was the original model in the reference photo's shoot.
 
-4. LIGHTING MATCH: The lighting on the face must be consistent with the reference's lighting direction and quality. If the reference has rim light from the left, the subject's face must show the same rim light.
+4. LIGHTING MATCH: The lighting on the face must be consistent with the reference's lighting direction and quality. If the reference has rim light from the left, the subject's face must show the same rim light from the right with matching shadow direction. Apply the SAME color temperature and light modifiers to face and body.
 
-5. SCALE & PROPORTION: The subject's head size must match the proportions shown in the reference. Do not shrink or enlarge the head unnaturally.
+5. SCALE & PROPORTION: The subject's head size must match the proportions shown in the reference. Do not shrink or enlarge the head unnaturally. The body-to-head ratio must be anatomically realistic.
 
-THE GOLD STANDARD: A viewer looking at the reference and the output side by side should think "same photoshoot, same photographer, same setup — just a different model."`;
+6. SEAMLESS INTEGRATION: The final image must look like a SINGLE photograph — NOT a collage. The face must organically blend into the body with continuous skin tone, matching shadows under the chin, and coherent neck/shoulder anatomy. No "floating head" effect.
+
+7. BODY CONTEXT: Match the body type and build visible in the subject photo. If the subject has broad shoulders, keep broad shoulders. If the subject is petite, maintain that build. The body must feel like it belongs to the same person.
+
+THE GOLD STANDARD: A viewer looking at the reference and the output side by side should think "same photoshoot, same photographer, same setup — just a different model who naturally posed there."`;
 
 function buildConfigDescription(config: {
   gender: string;
