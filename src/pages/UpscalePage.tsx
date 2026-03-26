@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Upload, Loader2, ArrowUpCircle, ScanSearch, Sparkles, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
@@ -133,38 +134,31 @@ export default function UpscalePage() {
     }
   };
 
-  const buildUpscalePrompt = (diag: ImageAnalysis | null) => {
-    let prompt = UPSCALE_PROMPT_BASE.replace('{RESOLUTION}', resolution);
+  const buildDiagnosticCorrections = (diag: ImageAnalysis | null): string | undefined => {
+    if (!diag) return undefined;
+    const corrections: string[] = [];
 
-    if (diag) {
-      const corrections: string[] = [];
-
-      if (diag.details.sharpness && diag.details.sharpness !== 'boa' && diag.details.sharpness !== 'alta') {
-        corrections.push('pay special attention to recovering sharpness and fine micro-detail');
-      }
-      if (diag.details.noise_level && diag.details.noise_level !== 'baixo' && diag.details.noise_level !== 'mínimo') {
-        corrections.push('apply intelligent noise reduction preserving texture and detail');
-      }
-      if (diag.details.compression && diag.details.compression !== 'mínima' && diag.details.compression !== 'baixa') {
-        corrections.push('reconstruct areas affected by compression artifacts and blocking');
-      }
-      if (diag.details.lighting && (diag.details.lighting.includes('baixa') || diag.details.lighting.includes('flat'))) {
-        corrections.push('enhance contrast and depth while preserving the original lighting mood');
-      }
-      if (diag.details.colors && (diag.details.colors.includes('desbotad') || diag.details.colors.includes('baixa'))) {
-        corrections.push('restore natural color saturation and white balance without oversaturation');
-      }
-
-      if (corrections.length > 0) {
-        prompt += `\n\nDIAGNOSTIC-GUIDED CORRECTIONS (based on AI analysis of this specific image):\n${corrections.map((c, i) => `${i + 1}. ${c}`).join('\n')}`;
-      }
-
-      if (diag.suggestions.length > 0) {
-        prompt += `\n\nADDITIONAL GUIDANCE:\n${diag.suggestions.join('. ')}`;
-      }
+    if (diag.details.sharpness && diag.details.sharpness !== 'boa' && diag.details.sharpness !== 'alta') {
+      corrections.push('SHARPNESS is low — aggressively recover micro-detail and edge definition');
+    }
+    if (diag.details.noise_level && diag.details.noise_level !== 'baixo' && diag.details.noise_level !== 'mínimo') {
+      corrections.push('NOISE is significant — apply strong noise reduction while preserving textures');
+    }
+    if (diag.details.compression && diag.details.compression !== 'mínima' && diag.details.compression !== 'baixa') {
+      corrections.push('COMPRESSION ARTIFACTS detected — rebuild blocked areas and eliminate banding');
+    }
+    if (diag.details.lighting && (diag.details.lighting.includes('baixa') || diag.details.lighting.includes('flat'))) {
+      corrections.push('DYNAMIC RANGE is limited — enhance local contrast and shadow/highlight separation');
+    }
+    if (diag.details.colors && (diag.details.colors.includes('desbotad') || diag.details.colors.includes('baixa'))) {
+      corrections.push('COLORS are faded — restore natural saturation and white balance');
     }
 
-    return prompt;
+    if (diag.suggestions.length > 0) {
+      corrections.push(`Additional guidance: ${diag.suggestions.join('. ')}`);
+    }
+
+    return corrections.length > 0 ? corrections.map((c, i) => `${i + 1}. ${c}`).join('\n') : undefined;
   };
 
   const handleUpscale = async (useDiagnostic = false) => {
@@ -172,12 +166,13 @@ export default function UpscalePage() {
     setIsProcessing(true);
     setResultImage(null);
     try {
-      const prompt = buildUpscalePrompt(useDiagnostic ? analysis : null);
-      const { data, error } = await supabase.functions.invoke('generate-image', {
+      const diagnosticCorrections = useDiagnostic ? buildDiagnosticCorrections(analysis) : undefined;
+
+      const { data, error } = await supabase.functions.invoke('upscale-image', {
         body: {
-          prompt,
-          negativePrompt: 'low quality, artifacts, noise, blurry, watermark, text',
-          referenceImages: [imageBase64],
+          imageBase64,
+          resolution,
+          diagnosticCorrections,
           googleApiKey: apiKey,
         },
       });
