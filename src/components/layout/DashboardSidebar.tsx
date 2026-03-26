@@ -27,7 +27,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUnreadDMs } from '@/hooks/useUnreadDMs';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { NotificationBell } from '@/components/NotificationBell';
+
 
 interface SidebarItem {
   id: string;
