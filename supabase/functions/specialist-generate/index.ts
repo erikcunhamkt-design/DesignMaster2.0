@@ -28,19 +28,63 @@ Photography requirements:
 - NO real humans in the image.
 - The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding.`;
 
-const COVERS_SYSTEM = `You are a specialist in creating magnetic, attention-grabbing cover images.
-Generate a powerful cover image with the following requirements:
-- NO real human beings - use animals, characters, mascots, or graphic elements only
-- Maximum visual impact and composition
-- Bold, eye-catching design that stops scrolling
-- Clean text-safe areas in the upper or lower third for typography overlay
-- Cinematic quality with dramatic lighting
-- Rich detail on animals/characters (fur texture, scales, feathers)
-- Powerful, magnetic atmosphere
-- Professional quality suitable for social media covers, thumbnails, and banners
-- Ultra-realistic animal rendering if applicable
-- 8K quality, sharp focus, no artifacts
-- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding`;
+const COVERS_SYSTEM = `You are a WORLD-CLASS wildlife photographer and digital artist specializing in Brazilian fauna.
+Your mission: Create BREATHTAKING, MAGNETIC images of Brazilian animals that stop scrolling and mesmerize viewers.
+
+MANDATORY PHOTOGRAPHIC EXCELLENCE:
+- Forensic-level animal anatomy: every fur strand, scale, feather barb, whisker, and claw rendered with scientific accuracy
+- Skin/fur/feather textures must show micro-detail: individual hair follicles, iridescent feather barbules, reptilian scale patterns
+- Eyes MUST be the soul of the image: crystalline, reflective, with visible catchlights, iris detail, and pupil depth
+- Wet noses, visible breath in cold air, saliva on fangs — organic realism that makes the animal FEEL ALIVE
+
+MAGNETIC CAMERA ANGLES:
+- Low angle shots that make the animal look DOMINANT and POWERFUL (shooting upward)
+- Extreme close-ups that reveal texture galaxies in fur and feathers
+- Dutch angles for predatory tension and dramatic energy
+- Over-the-shoulder depth shots with bokeh-blurred environments
+- Aerial perspectives showing the animal in its vast biome landscape
+- Eye-level intimate shots creating direct emotional connection with the viewer
+
+CINEMATIC LIGHTING MASTERY:
+- Golden Hour (5000-5500K): long warm shadows, volumetric light rays through canopy
+- Rim lighting: luminous outline separating subject from dark background, hair/fur glow
+- Moonlight blue (7500K+): mystical nocturnal atmosphere with silver-blue tones
+- Storm lighting: dramatic contrast, dark clouds, selective light breaking through
+- Bioluminescent: magical glow from fungi, fireflies, or water reflections
+- Rembrandt triangle lighting on animal faces for portrait-level drama
+
+DEPTH & MOVEMENT:
+- Shallow depth of field (f/1.4-2.8 equivalent) with creamy bokeh backgrounds
+- Motion blur on water splashes, wing beats, or running legs while subject face stays tack-sharp
+- Atmospheric perspective: haze, mist, fog layers creating depth planes
+- Foreground elements (leaves, water droplets, insects) framing the subject
+- Particles: floating pollen, dust motes caught in light beams, water spray
+
+VISUAL EFFECTS & ATMOSPHERE:
+- Volumetric god rays piercing through dense jungle canopy
+- Water reflections creating mirror-image compositions
+- Morning dew/rain droplets on fur with light refracting through each drop
+- Butterflies, fireflies, or small birds around the main subject for scale and magic
+- Tropical foliage in foreground creating natural frames (selective focus)
+
+BRAZILIAN BIOME AUTHENTICITY:
+- Amazon: dense emerald canopy, river reflections, misty atmosphere, giant water lilies
+- Cerrado: golden grasslands, red earth, twisted trees, dramatic savanna sky
+- Pantanal: mirror-still waters, sunset reflections, vast wetland horizons
+- Atlantic Forest: mossy trees, orchids, misty mountain slopes, waterfalls
+- Caatinga: dramatic dry landscape, cacti, harsh beautiful light
+- Pampas: endless grasslands, dramatic clouds, wind-swept fur
+
+COMPOSITION RULES:
+- Rule of thirds with animal's eyes at power points
+- Leading lines from environment directing to subject
+- Negative space for text-safe areas (upper or lower third)
+- Frame within frame using natural elements
+- The artwork MUST fill the ENTIRE canvas edge to edge — no blur borders, no letterboxing, no empty space, no padding
+
+QUALITY STANDARD: National Geographic cover quality. 8K resolution. Phase One IQ4 / Sony A1 clarity.
+NO real humans. NO cartoon or amateur quality. This is FINE ART wildlife photography.`;
+
 
 async function generateWithGoogle(parts: any[], googleApiKey: string, model: string) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${googleApiKey}`;
@@ -106,9 +150,9 @@ Deno.serve(async (req) => {
       const { theme, character, style, elements, extra } = body;
       systemPrompt = COVERS_SYSTEM;
       userInstructions = `Theme/Concept: ${theme}`;
-      if (character) userInstructions += `\nCharacter/Animal: ${character}`;
+      if (character) userInstructions += `\nFeatured Animal: ${character} — render with ABSOLUTE anatomical accuracy, show every texture detail`;
       if (style) userInstructions += `\nVisual style: ${style}`;
-      if (elements) userInstructions += `\nGraphic elements: ${elements}`;
+      if (elements) userInstructions += `\nPhotographic direction: ${elements}`;
       if (extra) userInstructions += `\n\n⚠️ MANDATORY USER INSTRUCTIONS (YOU MUST FOLLOW THESE EXACTLY):\n${extra}`;
     } else {
       return new Response(
