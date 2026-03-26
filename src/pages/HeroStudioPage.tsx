@@ -390,6 +390,19 @@ export default function HeroStudioPage() {
     setConfig(prev => ({ ...prev, ...patch }));
   }, []);
 
+  const urlToBase64 = async (url: string): Promise<string | null> => {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch { return null; }
+  };
+
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setPreviewState('gerando');
@@ -397,28 +410,35 @@ export default function HeroStudioPage() {
     try {
       const genRequest = buildHeroRequest(config);
 
-      const referenceImages: string[] = [];
-      for (const url of config.referencePhotos.slice(0, 3)) {
-        try {
-          const resp = await fetch(url);
-          const blob = await resp.blob();
-          const base64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-          referenceImages.push(base64);
-        } catch {
-          // skip
-        }
+      // Convert all uploads to base64 in parallel
+      const [subjectImages, styleReferenceImages, productImages] = await Promise.all([
+        Promise.all(config.subjectPhotos.slice(0, 5).map(urlToBase64)),
+        Promise.all(config.referencePhotos.slice(0, 8).map(urlToBase64)),
+        Promise.all(config.productPhotos.slice(0, 3).map(urlToBase64)),
+      ]);
+
+      // Filter nulls
+      const validSubject = subjectImages.filter(Boolean) as string[];
+      const validStyleRef = styleReferenceImages.filter(Boolean) as string[];
+      const validProduct = productImages.filter(Boolean) as string[];
+
+      // Product photos go as additional style references with a note
+      const allStyleRefs = [...validStyleRef, ...validProduct];
+      const referenceNotes: string[] = [];
+      if (validProduct.length > 0) {
+        referenceNotes.push('Some references show the PRODUCT that must appear in the hero image — use its exact shape, colors, and branding');
       }
 
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
-          prompt: genRequest.prompt,
-          negativePrompt: genRequest.negative_prompt,
-          referenceImages,
+          lockedPrompt: genRequest.lockedPrompt,
+          expandablePrompt: genRequest.expandablePrompt,
+          negativePrompt: genRequest.negativePrompt,
+          aspectRatio: genRequest.aspectRatio,
+          useArchitect: genRequest.useArchitect,
+          subjectImages: validSubject,
+          styleReferenceImages: allStyleRefs,
+          referenceNotes,
           googleApiKey: apiKey,
           aiModel,
         },

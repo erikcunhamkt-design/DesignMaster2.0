@@ -1,153 +1,174 @@
 import { HeroConfig } from '@/types/heroConfig';
 
+// ══════════════════════════════════════════════════════════════════════════════
+// HERO PROMPT AGENT — Landing Page Hero Section Specialist
+// Builds structured, ultra-detailed prompts optimized for hero generation.
+// Sends separated instructions so the edge function can compose correctly.
+// ══════════════════════════════════════════════════════════════════════════════
+
 // ── Descriptor maps ──────────────────────────────────────────────────────────
 
 const HERO_TYPE_DESC: Record<HeroConfig['heroType'], string> = {
-  saas_tecnologia:      'SaaS technology product landing page, modern software company, digital workspace aesthetic',
-  servico_profissional: 'professional services firm, consulting or agency, credibility and trust visual language',
-  produto_digital:      'digital product launch, online course or ebook, premium info-product, high-value digital offering',
-  app_plataforma:       'mobile app or web platform, app store hero, clean interface showcase, startup energy',
-  marca_pessoal:        'personal brand hero, thought leader or expert positioning, authentic and premium personal identity',
-  startup_vendas:       'high-conversion sales landing page, startup growth energy, venture-backed company aesthetic',
+  saas_tecnologia:      'SaaS technology product hero section for a modern software company landing page, clean digital workspace aesthetic, professional tech startup energy',
+  servico_profissional: 'professional services firm hero, consulting agency or law firm, visual language that conveys credibility, authority and trustworthiness',
+  produto_digital:      'digital product launch hero, premium online course or ebook landing page, high-value info-product visual with aspirational quality',
+  app_plataforma:       'mobile app or web platform hero section, app store showcase energy, clean interface highlight, modern startup landing page',
+  marca_pessoal:        'personal brand hero section, thought leader positioning, expert or coach landing page, authentic premium personal identity',
+  startup_vendas:       'high-conversion sales landing page hero, aggressive startup growth energy, venture-backed company aesthetic, scroll-stopping visual impact',
 };
 
 const ELEMENT_DESC: Record<HeroConfig['element'], string> = {
-  pessoa_fundador:   'founder or expert person as hero subject, confident professional, high-end portrait lighting, authentic personal brand energy',
-  produto_mockup:    'product mockup or device screen as hero element, dashboard UI inside clean device frame, premium product showcase',
-  cena_abstrata:     'abstract visual scene, flowing gradients, geometric shapes, conceptual digital landscape',
-  ilustracao_tech:   'technological illustration, isometric design elements, data visualization nodes, circuit-like organic forms',
-  simbolo_conceito:  'bold symbolic visual concept, minimalist icon blown up as hero element, powerful visual metaphor',
+  pessoa_fundador:   'the main subject is a PERSON (founder, expert, or professional) as the hero visual element — confident, authoritative presence with premium portrait quality',
+  produto_mockup:    'the main element is a PRODUCT MOCKUP or device screen showing a dashboard/UI — clean device frame, premium product showcase, floating interface',
+  cena_abstrata:     'the main element is an ABSTRACT VISUAL SCENE — flowing gradients, geometric shapes, conceptual digital landscape, no people',
+  ilustracao_tech:   'the main element is a TECHNOLOGICAL ILLUSTRATION — isometric design elements, data visualization, circuit-like organic forms, no people',
+  simbolo_conceito:  'the main element is a BOLD SYMBOLIC VISUAL CONCEPT — minimalist icon or metaphor blown up as hero element, powerful visual metaphor, no people',
 };
 
 const COMPOSITION_DESC: Record<HeroConfig['composition'], string> = {
-  pessoa_esquerda:  'subject positioned LEFT side of frame, text space reserved on the right, asymmetric hero layout, strong visual hierarchy',
-  pessoa_direita:   'subject positioned RIGHT side of frame, text space reserved on the left, classic landing page composition',
-  centralizado:     'centered composition, subject in the middle, symmetric layout, commanding presence, grand editorial feel',
-  sem_pessoa:       'no person, full visual hero without human subject, environment or product takes center stage, abstract or conceptual hero',
-  split_layout:     'modern split-screen layout, two distinct visual zones, left vs right contrast, editorial magazine composition',
+  pessoa_esquerda:  'COMPOSITION: Subject positioned on the LEFT side of the frame. The RIGHT half must be CLEAN negative space (gradient or subtle background) reserved for text overlay. Asymmetric hero layout with strong visual hierarchy. IMPORTANT: right side must have no busy elements.',
+  pessoa_direita:   'COMPOSITION: Subject positioned on the RIGHT side of the frame. The LEFT half must be CLEAN negative space reserved for headline text overlay. Classic landing page hero composition. IMPORTANT: left side must have no busy elements.',
+  centralizado:     'COMPOSITION: Centered composition with the subject in the middle. Symmetric layout with commanding presence. Bottom portion should have gradient fade for headline text placement.',
+  sem_pessoa:       'COMPOSITION: Full visual hero WITHOUT any human subject. Environment, product, or abstract concept takes center stage. Pure visual impact composition.',
+  split_layout:     'COMPOSITION: Modern split-screen layout with two distinct visual zones (left vs right). Editorial magazine composition with contrast between zones.',
 };
 
 const STYLE_DESC: Record<HeroConfig['visualStyle'], string> = {
-  clean_premium:          'ultra-clean premium aesthetic, minimal clutter, generous whitespace, Apple-level refinement, timeless design quality',
-  tech_futurista:         'futuristic technology aesthetic, neon accents, cyber holographic elements, dark tech background, next-gen visual language',
-  editorial_sofisticado:  'editorial sophisticated style, high-fashion photography sensibility, bold typography-ready composition, luxury magazine visual',
-  minimal_moderno:        'modern minimalism, stripped-to-essence design, confident negative space usage, Scandinavian design influence, pure form',
-  cinematografico:        'cinematic photography style, film-grade color grading, wide aspect ratio sensibility, dramatic and storytelling composition',
+  clean_premium:          'VISUAL STYLE: Ultra-clean premium aesthetic — minimal clutter, generous whitespace, Apple-level refinement, timeless design quality, luxury brand feel',
+  tech_futurista:         'VISUAL STYLE: Futuristic technology aesthetic — neon accents, holographic elements, dark tech background with glowing elements, next-generation visual language',
+  editorial_sofisticado:  'VISUAL STYLE: Editorial sophisticated style — high-fashion photography sensibility, bold typography-ready composition, luxury magazine visual quality',
+  minimal_moderno:        'VISUAL STYLE: Modern minimalism — stripped-to-essence design, confident negative space, Scandinavian design influence, pure geometric form',
+  cinematografico:        'VISUAL STYLE: Cinematic photography style — film-grade color grading, wide aspect ratio sensibility, dramatic storytelling composition, movie-poster quality',
 };
 
 const LIGHTING_DESC: Record<HeroConfig['lighting'], string> = {
-  luz_suave_estudio:        'soft studio lighting, diffused fill light, gentle shadows, bright and clean, professional headshot lighting',
-  luz_dramatica_lateral:    'dramatic side lighting, strong shadows creating depth, chiaroscuro effect, bold contrast, editorial impact',
-  gradiente_tecnologico:    'tech-gradient atmospheric lighting, backlit glow, blue-purple-cyan ambient, holographic light sources, digital atmosphere',
-  glow_sutil:               'subtle glow effect, rim lighting with color, premium product lighting with soft luminous halo, luxury visual feel',
-  profundidade_elegante:    'elegant depth, multi-plane lighting separation, bokeh background rendering, painterly depth-of-field quality',
+  luz_suave_estudio:        'LIGHTING: Soft studio lighting with diffused fill, gentle shadows, bright and clean professional quality, beauty/headshot lighting setup',
+  luz_dramatica_lateral:    'LIGHTING: Dramatic side lighting with strong shadows creating depth, chiaroscuro effect, bold contrast, editorial impact, moody atmosphere',
+  gradiente_tecnologico:    'LIGHTING: Tech-gradient atmospheric lighting, backlit glow effect, blue-purple-cyan ambient light, holographic light sources, digital atmosphere',
+  glow_sutil:               'LIGHTING: Subtle luminous glow effect, rim lighting with color, premium product lighting with soft halo, luxury visual feel, warm radiance',
+  profundidade_elegante:    'LIGHTING: Elegant multi-plane lighting, bokeh background separation, painterly depth-of-field quality, cinematic depth layers',
 };
 
-const DIMENSION_SPECS: Record<string, string> = {
-  desktop:       '1920x1080 widescreen, full-width hero, desktop browser viewport proportions, landscape orientation',
-  mobile:        '1080x1920 vertical, mobile viewport hero, thumb-friendly vertical composition, above-the-fold mobile layout',
-  banner:        '1440x500 wide banner format, panoramic hero strip, high-impact header visual',
-  section_cover: '1:1 square or 4:5 portrait, section divider visual, social-media-ready crop, versatile format',
+const DIMENSION_SPECS: Record<string, { instruction: string; aspectRatio: string }> = {
+  desktop:       { instruction: 'FORMAT: 1920x1080 widescreen hero, full-width desktop browser viewport, landscape orientation', aspectRatio: '16:9' },
+  mobile:        { instruction: 'FORMAT: 1080x1920 vertical mobile hero, above-the-fold mobile layout, portrait orientation', aspectRatio: '9:16' },
+  banner:        { instruction: 'FORMAT: Wide panoramic banner strip, high-impact header visual', aspectRatio: '21:9' },
+  section_cover: { instruction: 'FORMAT: Square or 4:5 portrait section divider, social-media-ready crop, versatile format', aspectRatio: '4:5' },
 };
 
-// ── Prompt Builder ────────────────────────────────────────────────────────────
+// ── Public Interface ─────────────────────────────────────────────────────────
 
-interface HeroRequest {
-  prompt: string;
-  negative_prompt: string;
+export interface HeroRequest {
+  /** Locked prompt parts (config selections — must not be rewritten) */
+  lockedPrompt: string;
+  /** Expandable creative context (free prompt — can be enhanced by Architect) */
+  expandablePrompt: string;
+  /** Negative prompt */
+  negativePrompt: string;
+  /** Aspect ratio for image generation */
+  aspectRatio: string;
+  /** Whether to use Prompt Architect for expansion */
+  useArchitect: boolean;
 }
 
 export function buildHeroRequest(config: HeroConfig): HeroRequest {
-  // Prompt Livre — ignorar o resto
+  // ── Prompt Livre: bypass everything ──
   if (config.ignoreRest && config.freePrompt?.trim()) {
-    return { prompt: config.freePrompt.trim(), negative_prompt: '' };
+    return {
+      lockedPrompt: '',
+      expandablePrompt: config.freePrompt.trim(),
+      negativePrompt: config.negativePromptEnabled && config.negativePrompt?.trim()
+        ? config.negativePrompt.trim()
+        : '',
+      aspectRatio: config.dimension ? DIMENSION_SPECS[config.dimension]?.aspectRatio || '16:9' : '16:9',
+      useArchitect: true,
+    };
   }
-  const parts: string[] = [];
 
-  // Base quality
-  parts.push('Ultra-high-quality hero section photograph for landing page');
+  // ── Build locked prompt (non-negotiable config instructions) ──
+  const locked: string[] = [];
 
-  // Hero type context
-  parts.push(HERO_TYPE_DESC[config.heroType]);
+  // Landing page context
+  locked.push('Ultra-high-quality hero section image for a professional landing page');
+  locked.push(HERO_TYPE_DESC[config.heroType]);
+  locked.push(ELEMENT_DESC[config.element]);
+  locked.push(COMPOSITION_DESC[config.composition]);
+  locked.push(STYLE_DESC[config.visualStyle]);
+  locked.push(LIGHTING_DESC[config.lighting]);
 
-  // Main element
-  parts.push(ELEMENT_DESC[config.element]);
+  // Intensity
+  if (config.intensity < 30) {
+    locked.push('INTENSITY: Restrained and refined visual approach, subtle impact, elegant restraint');
+  } else if (config.intensity < 60) {
+    locked.push('INTENSITY: Balanced visual impact, engaging without overwhelming, professional energy');
+  } else if (config.intensity < 85) {
+    locked.push('INTENSITY: High visual impact, commanding scroll-stopping presence, bold energy');
+  } else {
+    locked.push('INTENSITY: Maximum visual impact, extremely bold and striking, unforgettable hero moment');
+  }
 
-  // Composition
-  parts.push(COMPOSITION_DESC[config.composition]);
-
-  // Visual style
-  parts.push(STYLE_DESC[config.visualStyle]);
-
-  // Intensity modifier
-  const intensityLabel = config.intensity < 30
-    ? 'restrained and refined approach, subtle visual impact'
-    : config.intensity < 60
-    ? 'balanced visual impact, engaging without overwhelming'
-    : config.intensity < 85
-    ? 'high visual impact, commanding presence, scroll-stopping quality'
-    : 'maximum visual impact, extremely bold and striking, unforgettable hero moment';
-  parts.push(intensityLabel);
-
-  // Lighting
-  parts.push(LIGHTING_DESC[config.lighting]);
-
-  // Dimension / format
+  // Format
   if (config.dimension && DIMENSION_SPECS[config.dimension]) {
-    parts.push(DIMENSION_SPECS[config.dimension]);
+    locked.push(DIMENSION_SPECS[config.dimension].instruction);
   }
 
-  // Advanced options
+  // Advanced effects
   if (config.useDepthOfField) {
-    parts.push('shallow depth of field, professional bokeh background separation, subject isolation');
+    locked.push('EFFECT: Shallow depth of field with professional bokeh background, subject isolation');
   }
   if (config.useGlow) {
-    parts.push('subtle radiant glow effect, light emanating from subject, premium luminous quality');
+    locked.push('EFFECT: Subtle radiant glow emanating from subject, premium luminous quality');
   }
   if (config.useSharpness) {
-    parts.push('razor-sharp foreground detail, crystal clarity, commercial photography precision');
+    locked.push('EFFECT: Razor-sharp foreground detail, crystal clarity, commercial photography precision');
   }
   if (config.useGrain) {
-    parts.push('subtle film grain texture, analog warmth, editorial film photography feel');
+    locked.push('EFFECT: Subtle film grain texture, analog warmth, editorial film photography feel');
   }
 
-  // Contrast modifier
+  // Contrast
   if (config.contrast > 70) {
-    parts.push('high contrast image, bold tonal separation, powerful blacks and bright highlights');
+    locked.push('CONTRAST: High contrast with bold tonal separation, powerful blacks and bright highlights');
   } else if (config.contrast < 30) {
-    parts.push('low contrast, airy and soft tonal range, ethereal and delicate mood');
+    locked.push('CONTRAST: Low contrast, airy and soft tonal range, ethereal and delicate mood');
   }
 
-  // Text safe area
-  if (config.composition === 'pessoa_esquerda') {
-    parts.push('IMPORTANT: right half of image must be clean negative space for text overlay, no busy elements on right side');
-  } else if (config.composition === 'pessoa_direita') {
-    parts.push('IMPORTANT: left half of image must be clean negative space for text overlay, no busy elements on left side');
-  } else if (config.composition === 'centralizado') {
-    parts.push('bottom portion of image clean for headline text, gradient fade at bottom to transparent');
-  }
+  // Landing page conversion rules
+  locked.push('LANDING PAGE RULES: conversion-optimized visual composition, premium brand quality');
+  locked.push('MANDATORY: No text embedded in image, no logos, no watermarks, no UI chrome elements');
+  locked.push('QUALITY: Photorealistic or hyper-realistic render, 8K quality, commercial advertising standard');
 
-  // Conversion-optimized design principles
-  parts.push('conversion-optimized visual composition, landing page design principles, premium SaaS brand quality');
-  parts.push('no text embedded in image, no logos, no watermarks, no UI chrome elements');
-  parts.push('photorealistic or hyper-realistic render, 8K quality, commercial advertising standard');
+  // ── Build expandable prompt (creative context for Architect) ──
+  const expandable: string[] = [];
 
-  // Additional prompt
   if (config.additionalPrompt?.trim()) {
-    parts.push(config.additionalPrompt.trim());
+    expandable.push(config.additionalPrompt.trim());
   }
 
-  const negative: string[] = [
-    'amateur photography, stock photo look, generic, clipart, illustration unless requested',
+  if (config.freePrompt?.trim() && !config.ignoreRest) {
+    expandable.push(config.freePrompt.trim());
+  }
+
+  // ── Negative prompt ──
+  const negParts: string[] = [
+    'amateur photography, stock photo look, generic, clipart',
     'busy cluttered composition, text overlaid on image, watermarks, logos embedded',
     'low quality, blurry, pixelated, overexposed, underexposed',
     'distorted faces, bad anatomy, extra fingers, deformed',
-    'dated or 2000s aesthetic, corporate stock photography clichés',
+    'dated aesthetic, corporate stock photography clichés',
     'multiple mismatched styles, inconsistent lighting, flat boring lighting',
+    'pasted head effect, mismatched skin tones between face and body',
   ];
 
+  if (config.negativePromptEnabled && config.negativePrompt?.trim()) {
+    negParts.push(config.negativePrompt.trim());
+  }
+
   return {
-    prompt: parts.join('. '),
-    negative_prompt: negative.join(', '),
+    lockedPrompt: locked.join('. '),
+    expandablePrompt: expandable.join('. '),
+    negativePrompt: negParts.join(', '),
+    aspectRatio: config.dimension ? DIMENSION_SPECS[config.dimension]?.aspectRatio || '16:9' : '16:9',
+    useArchitect: expandable.length > 0,
   };
 }
