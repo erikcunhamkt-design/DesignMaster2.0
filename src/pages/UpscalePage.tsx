@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { GeneratingAnimation } from '@/components/layout/GeneratingAnimation';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { Button } from '@/components/ui/button';
 import { Upload, Loader2, ArrowUpCircle, ScanSearch, Sparkles, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
@@ -9,35 +10,6 @@ import { useGoogleApiKey } from '@/components/configurator/sections/ApiKeySectio
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const UPSCALE_PROMPT_BASE = `CRITICAL INSTRUCTION: This is an IMAGE RESTORATION task, NOT an image generation task. You MUST return the EXACT SAME image with improved resolution and quality. DO NOT reimagine, recreate, reinterpret, or generate a new version of this image. The output must be pixel-faithful to the input — same person, same face, same pose, same clothes, same background, same everything. Only the technical quality should improve.
-
-Perform a high-quality restoration and upscale to true {RESOLUTION}:
-
-ABSOLUTE PRESERVATION RULES (violations are unacceptable):
-– The subject's FACE must remain IDENTICAL — same features, same proportions, same age, same ethnicity, same skin tone
-– The subject's BODY must remain IDENTICAL — same pose, same posture, same anatomy, same clothing, same accessories
-– The BACKGROUND must remain IDENTICAL — same setting, same objects, same colors, same layout
-– The COMPOSITION must remain IDENTICAL — same framing, same camera angle, same crop, same aspect ratio
-– The LIGHTING must remain IDENTICAL — same direction, same intensity, same shadows, same highlights
-– The COLOR PALETTE must remain IDENTICAL — same hues, same saturation, same tone, same mood
-
-ALLOWED improvements (quality only):
-– Increase sharpness and clarity naturally
-– Restore fine details: skin pores, fabric weave, hair strands, material textures
-– Remove compression artifacts, noise, and blur
-– Improve dynamic range subtly without changing the mood
-– Enhance micro-textures and surface definition
-
-STRICTLY FORBIDDEN:
-– DO NOT change the person's identity, face shape, features, or appearance in ANY way
-– DO NOT change clothing, accessories, or any visible objects
-– DO NOT add or remove ANY elements from the scene
-– DO NOT change the art style or aesthetic
-– DO NOT relight, recolor, or restyle the image
-– DO NOT dramatize, beautify, or stylize
-– DO NOT generate a "similar" image — return the SAME image enhanced
-
-The output must be indistinguishable from the input except for higher resolution and cleaner details.`;
 
 type Resolution = '2K' | '4K';
 
@@ -133,38 +105,31 @@ export default function UpscalePage() {
     }
   };
 
-  const buildUpscalePrompt = (diag: ImageAnalysis | null) => {
-    let prompt = UPSCALE_PROMPT_BASE.replace('{RESOLUTION}', resolution);
+  const buildDiagnosticCorrections = (diag: ImageAnalysis | null): string | undefined => {
+    if (!diag) return undefined;
+    const corrections: string[] = [];
 
-    if (diag) {
-      const corrections: string[] = [];
-
-      if (diag.details.sharpness && diag.details.sharpness !== 'boa' && diag.details.sharpness !== 'alta') {
-        corrections.push('pay special attention to recovering sharpness and fine micro-detail');
-      }
-      if (diag.details.noise_level && diag.details.noise_level !== 'baixo' && diag.details.noise_level !== 'mínimo') {
-        corrections.push('apply intelligent noise reduction preserving texture and detail');
-      }
-      if (diag.details.compression && diag.details.compression !== 'mínima' && diag.details.compression !== 'baixa') {
-        corrections.push('reconstruct areas affected by compression artifacts and blocking');
-      }
-      if (diag.details.lighting && (diag.details.lighting.includes('baixa') || diag.details.lighting.includes('flat'))) {
-        corrections.push('enhance contrast and depth while preserving the original lighting mood');
-      }
-      if (diag.details.colors && (diag.details.colors.includes('desbotad') || diag.details.colors.includes('baixa'))) {
-        corrections.push('restore natural color saturation and white balance without oversaturation');
-      }
-
-      if (corrections.length > 0) {
-        prompt += `\n\nDIAGNOSTIC-GUIDED CORRECTIONS (based on AI analysis of this specific image):\n${corrections.map((c, i) => `${i + 1}. ${c}`).join('\n')}`;
-      }
-
-      if (diag.suggestions.length > 0) {
-        prompt += `\n\nADDITIONAL GUIDANCE:\n${diag.suggestions.join('. ')}`;
-      }
+    if (diag.details.sharpness && diag.details.sharpness !== 'boa' && diag.details.sharpness !== 'alta') {
+      corrections.push('SHARPNESS is low — aggressively recover micro-detail and edge definition');
+    }
+    if (diag.details.noise_level && diag.details.noise_level !== 'baixo' && diag.details.noise_level !== 'mínimo') {
+      corrections.push('NOISE is significant — apply strong noise reduction while preserving textures');
+    }
+    if (diag.details.compression && diag.details.compression !== 'mínima' && diag.details.compression !== 'baixa') {
+      corrections.push('COMPRESSION ARTIFACTS detected — rebuild blocked areas and eliminate banding');
+    }
+    if (diag.details.lighting && (diag.details.lighting.includes('baixa') || diag.details.lighting.includes('flat'))) {
+      corrections.push('DYNAMIC RANGE is limited — enhance local contrast and shadow/highlight separation');
+    }
+    if (diag.details.colors && (diag.details.colors.includes('desbotad') || diag.details.colors.includes('baixa'))) {
+      corrections.push('COLORS are faded — restore natural saturation and white balance');
     }
 
-    return prompt;
+    if (diag.suggestions.length > 0) {
+      corrections.push(`Additional guidance: ${diag.suggestions.join('. ')}`);
+    }
+
+    return corrections.length > 0 ? corrections.map((c, i) => `${i + 1}. ${c}`).join('\n') : undefined;
   };
 
   const handleUpscale = async (useDiagnostic = false) => {
@@ -172,12 +137,13 @@ export default function UpscalePage() {
     setIsProcessing(true);
     setResultImage(null);
     try {
-      const prompt = buildUpscalePrompt(useDiagnostic ? analysis : null);
-      const { data, error } = await supabase.functions.invoke('generate-image', {
+      const diagnosticCorrections = useDiagnostic ? buildDiagnosticCorrections(analysis) : undefined;
+
+      const { data, error } = await supabase.functions.invoke('upscale-image', {
         body: {
-          prompt,
-          negativePrompt: 'low quality, artifacts, noise, blurry, watermark, text',
-          referenceImages: [imageBase64],
+          imageBase64,
+          resolution,
+          diagnosticCorrections,
           googleApiKey: apiKey,
         },
       });
@@ -350,10 +316,11 @@ export default function UpscalePage() {
             </div>
           )}
           {isProcessing && (
-            <div className="text-center space-y-3">
-              <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-              <p className="text-sm font-semibold text-primary">Restaurando imagem em {resolution}...</p>
-            </div>
+            <GeneratingAnimation
+              icon={ArrowUpCircle}
+              title={`Restaurando imagem em ${resolution}…`}
+              subtitle="Reconstruindo detalhes e texturas pixel a pixel"
+            />
           )}
           {resultImage && (
             <div className="relative inline-block">
