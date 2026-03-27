@@ -26,7 +26,7 @@ interface Conversation {
   is_pinned?: boolean;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-design-master`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 
 const SUGGESTIONS = [
 '🎨 Me dê 5 ideias criativas de posts para Instagram de um coach',
@@ -226,7 +226,7 @@ export default function DesignMasterChatPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
         },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey })
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey, agentId: 'design-master' })
       });
 
       if (!resp.ok) {

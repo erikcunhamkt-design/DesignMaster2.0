@@ -26,7 +26,8 @@ interface Conversation {
   is_pinned?: boolean;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-carousel-master`;
+const AGENT_ID = 'carousel-master';
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 
 const SUGGESTIONS = [
   '🔍 Existe "estilo brasileiro" no design, ou existe um método brasileiro?',
@@ -193,7 +194,7 @@ export default function CarouselMasterChatPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey, agentId: AGENT_ID }),
       });
 
       if (!resp.ok) {

@@ -27,7 +27,7 @@ interface Conversation {
 }
 
 const AGENT_ID = 'calendar';
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-calendar`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 
 const SUGGESTIONS = [
   '📅 Calendário quinzenal para um designer gráfico freelancer',
@@ -194,7 +194,7 @@ export default function CalendarChatPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey, agentId: AGENT_ID }),
       });
 
       if (!resp.ok) {
