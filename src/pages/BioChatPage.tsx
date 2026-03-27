@@ -20,7 +20,7 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 interface Conversation { id: string; title: string; created_at: string; updated_at: string; is_pinned?: boolean; }
 
 const AGENT_ID = 'bio';
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-bio`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 
 const SUGGESTIONS = [
   '✍️ Crie uma bio para um designer gráfico freelancer',
@@ -151,7 +151,7 @@ export default function BioChatPage() {
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey, agentId: AGENT_ID }),
       });
 
       if (!resp.ok) { const errData = await resp.json().catch(() => ({})); throw new Error(errData.error || `Erro ${resp.status}`); }

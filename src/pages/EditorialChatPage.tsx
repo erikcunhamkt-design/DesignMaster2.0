@@ -27,7 +27,7 @@ interface Conversation {
 }
 
 const AGENT_ID = 'editorial';
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-editorial`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-hub`;
 
 const SUGGESTIONS = [
   '📋 Crie linhas editoriais para um designer gráfico freelancer',
@@ -194,7 +194,7 @@ export default function EditorialChatPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey }),
+        body: JSON.stringify({ messages: allMessages, googleApiKey: apiKey, agentId: AGENT_ID }),
       });
 
       if (!resp.ok) {
