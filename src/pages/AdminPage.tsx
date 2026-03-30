@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { AdminReports } from '@/components/admin/AdminReports';
+import { AdminDataExport } from '@/components/admin/AdminDataExport';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -653,6 +654,11 @@ export default function AdminPage() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Data Export — admin only */}
+          <div className="rounded-xl border border-border/30 bg-card/50 p-5 mt-6">
+            <AdminDataExport />
           </div>
 
           {/* Ghost Reports — admin only */}
