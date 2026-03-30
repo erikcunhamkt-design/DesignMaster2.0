@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StudioTopbar } from '@/components/layout/StudioTopbar';
 import { AdminReports } from '@/components/admin/AdminReports';
+import { AdminDataExport } from '@/components/admin/AdminDataExport';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
