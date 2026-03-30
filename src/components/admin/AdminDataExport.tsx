@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   Database, Users, HardDrive, MessageSquare, Bell, Star,
-  Shield, Globe, Mail, Calendar, Download, Loader2
+  Shield, Globe, Mail, Calendar, Download, Loader2, Copy, Code, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 interface ExportItem {
