@@ -1,42 +1,46 @@
 
 
-## Plano: Gerar Relatório PDF da Infraestrutura Cloud
+# Plano: Exportar dados do backend em CSV (Painel Admin)
 
-### Objetivo
-Criar um documento PDF profissional com o panorama completo da infraestrutura backend, sem expor dados sensíveis.
+## O que será feito
 
-### Dados já coletados
-Consultei o banco de dados e o projeto para levantar todos os números:
+Adicionar uma seção "Exportar Dados" no painel Admin (`AdminPage.tsx`) com botões para exportar em CSV os dados de todas as tabelas do banco. Cada botão consulta uma tabela via Supabase client e gera um download CSV no navegador.
 
-| Métrica | Valor |
-|---------|-------|
-| Tabelas (schema public) | 21 |
-| Usuários registrados | 27 |
-| Storage Buckets | 3 (todos públicos) |
-| Edge Functions | 23 |
-| Database Functions | 6 |
-| Secrets configurados | 7 (apenas nomes) |
-| Cron Jobs | 0 |
-| Políticas RLS | 63 |
-| Tipos customizados (enums) | 2 |
+## Tabelas exportáveis
 
-### Conteúdo do PDF
-1. **Resumo Executivo** — tabela com todas as métricas acima
-2. **Tabelas do Banco** — lista das 21 tabelas com quantidade de colunas e políticas RLS
-3. **Storage Buckets** — 3 buckets com visibilidade
-4. **Edge Functions** — lista das 23 functions
-5. **Database Functions** — 6 functions com tipo e nível de segurança
-6. **Secrets** — 7 nomes (sem valores)
-7. **Cron Jobs** — nenhum configurado
-8. **Tipos Customizados** — app_role e chat_status
-9. **Observações de Segurança** — notas sobre RLS, SECURITY DEFINER, buckets públicos
+| Botão | Tabela/Fonte | Campos |
+|-------|-------------|--------|
+| Database (Licenças) | `licenses` | todos os campos |
+| Users (Perfis) | `profiles` | todos os campos |
+| Storage (Relatórios) | `admin_reports` | todos os campos |
+| Chat Conversations | `chat_conversations` | todos os campos |
+| Chat Messages | `chat_messages` | todos os campos |
+| Community Messages | `community_messages` | todos os campos |
+| Notificações | `notifications` | todos os campos |
+| Favoritos | `user_favorites` | todos os campos |
+| Roles | `user_roles` | todos os campos |
+| IPs Permitidos | `user_allowed_ips` | todos os campos |
+| DMs | `direct_messages` + `direct_conversations` | todos os campos |
+| Posts Agendados | `scheduled_posts` | todos os campos |
 
-### Implementação
-- Script Python com ReportLab para gerar o PDF
-- Tabelas estilizadas com cores roxas (identidade do projeto)
-- Saída em `/mnt/documents/relatorio_backend_cloud.pdf`
-- QA visual após geração
+> Nota: Secrets e Edge Functions não estão em tabelas acessíveis pelo client — serão omitidos ou indicados como "não exportável via frontend".
 
-### Segurança
-Nenhum valor de secret, token, senha ou chave será incluído — apenas nomes de referência.
+## Implementação
+
+### 1. Criar componente `AdminDataExport.tsx`
+- Grid de cards/botões, cada um representando uma categoria de dados
+- Ao clicar, faz `supabase.from('tabela').select('*')` (admin tem RLS permissivo para a maioria)
+- Converte o resultado em CSV (helper inline simples: headers + rows com `JSON.stringify` para campos JSON)
+- Dispara download via `Blob` + `URL.createObjectURL`
+- Indicador de loading por botão
+
+### 2. Integrar no `AdminPage.tsx`
+- Adicionar o componente `AdminDataExport` dentro da página admin, junto ao `AdminReports`
+
+### 3. Acesso restrito
+- Já protegido pelo `AdminRoute` existente — somente admin vê o painel
+
+## Arquivos modificados
+- **Novo**: `src/components/admin/AdminDataExport.tsx`
+- **Editado**: `src/pages/AdminPage.tsx` (importar e renderizar o novo componente)
 
