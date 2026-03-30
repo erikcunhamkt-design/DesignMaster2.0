@@ -71,7 +71,7 @@ export function AdminDataExport() {
         return;
       }
 
-      const csv = jsonToCsv(data as Record<string, unknown>[]);
+      const csv = jsonToCsv(data as unknown as Record<string, unknown>[]);
       const timestamp = new Date().toISOString().slice(0, 10);
       downloadCsv(csv, `${item.table}_${timestamp}.csv`);
       toast.success(`${item.label} exportado (${data.length} registros)`);
