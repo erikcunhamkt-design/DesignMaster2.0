@@ -321,6 +321,280 @@ CREATE TABLE public.void_brand_kits (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+-- ============================================
+-- ENABLE RLS em todas as tabelas
+-- ============================================
+
+ALTER TABLE public.licenses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notification_reads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_user_status ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.community_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.direct_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.friendships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_recent_tools ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_allowed_ips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scheduled_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.webhook_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.void_projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.void_canvas_nodes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.void_canvas_connections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.void_brand_kits ENABLE ROW LEVEL SECURITY;
+
+-- ============================================
+-- FUNCTIONS (Security Definer)
+-- ============================================
+
+CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role app_role)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT CASE
+    WHEN _user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+    THEN EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = _user_id AND role = _role)
+    ELSE false
+  END
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_chat_status(_user_id uuid)
+RETURNS chat_status LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT CASE
+    WHEN _user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+    THEN COALESCE(
+      (SELECT CASE WHEN status = 'muted' AND muted_until IS NOT NULL AND muted_until < now() THEN 'active'::chat_status ELSE status END
+       FROM public.chat_user_status WHERE user_id = _user_id),
+      'active'::chat_status
+    )
+    ELSE 'active'::chat_status
+  END
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_conversation_participant(_user_id uuid, _conversation_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.direct_conversations
+    WHERE id = _conversation_id AND (participant_1 = _user_id OR participant_2 = _user_id)
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_friend(_user_id uuid, _other_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.friendships
+    WHERE status = 'accepted'
+    AND ((requester_id = _user_id AND addressee_id = _other_id) OR (requester_id = _other_id AND addressee_id = _user_id))
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  INSERT INTO public.licenses (user_id, email, plan, status)
+  VALUES (NEW.id, NEW.email, 'monthly', 'inactive');
+  INSERT INTO public.notifications (title, message, created_by)
+  VALUES ('🎨 Bem-vindo ao Design Master!',
+    'Estamos muito felizes em ter você aqui! Explore nossos estúdios de criação, conecte-se com a comunidade e transforme suas ideias em designs incríveis. Qualquer dúvida, estamos por aqui. Bora criar! 🚀',
+    NEW.id);
+  RETURN NEW;
+END;
+$$;
+
+-- ============================================
+-- RLS POLICIES — licenses
+-- ============================================
+
+CREATE POLICY "Users can read own license" ON public.licenses FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can read all licenses" ON public.licenses FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can insert licenses" ON public.licenses FOR INSERT WITH CHECK (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can update all licenses" ON public.licenses FOR UPDATE TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can delete all licenses" ON public.licenses FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Service role full access on licenses" ON public.licenses FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- RLS POLICIES — profiles
+-- ============================================
+
+CREATE POLICY "Anyone can read profiles" ON public.profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
+
+-- ============================================
+-- RLS POLICIES — user_roles
+-- ============================================
+
+CREATE POLICY "Users can read own roles" ON public.user_roles FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can manage roles" ON public.user_roles FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+
+-- ============================================
+-- RLS POLICIES — notifications
+-- ============================================
+
+CREATE POLICY "Authenticated can read notifications" ON public.notifications FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins can insert notifications" ON public.notifications FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can delete notifications" ON public.notifications FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'));
+
+-- ============================================
+-- RLS POLICIES — notification_reads
+-- ============================================
+
+CREATE POLICY "Users can read own reads" ON public.notification_reads FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can mark as read" ON public.notification_reads FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — chat_conversations
+-- ============================================
+
+CREATE POLICY "Users can read own conversations" ON public.chat_conversations FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own conversations" ON public.chat_conversations FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own conversations" ON public.chat_conversations FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own conversations" ON public.chat_conversations FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — chat_messages
+-- ============================================
+
+CREATE POLICY "Users can read own messages" ON public.chat_messages FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id AND c.user_id = auth.uid()));
+CREATE POLICY "Users can insert own messages" ON public.chat_messages FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id AND c.user_id = auth.uid()));
+CREATE POLICY "Users can delete own messages" ON public.chat_messages FOR DELETE TO authenticated USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id AND c.user_id = auth.uid()));
+
+-- ============================================
+-- RLS POLICIES — chat_user_status
+-- ============================================
+
+CREATE POLICY "Users can read own status" ON public.chat_user_status FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can manage all chat status" ON public.chat_user_status FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+
+-- ============================================
+-- RLS POLICIES — community_messages
+-- ============================================
+
+CREATE POLICY "Authenticated can read community messages" ON public.community_messages FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Active users can insert community messages" ON public.community_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND get_chat_status(auth.uid()) = 'active');
+CREATE POLICY "Users can delete own community messages" ON public.community_messages FOR DELETE TO authenticated USING (auth.uid() = user_id OR has_role(auth.uid(), 'admin'));
+
+-- ============================================
+-- RLS POLICIES — direct_conversations
+-- ============================================
+
+CREATE POLICY "Participants can read own dm conversations" ON public.direct_conversations FOR SELECT TO authenticated USING (auth.uid() = participant_1 OR auth.uid() = participant_2);
+CREATE POLICY "Authenticated can create dm conversations" ON public.direct_conversations FOR INSERT TO authenticated WITH CHECK (auth.uid() = participant_1 OR auth.uid() = participant_2);
+CREATE POLICY "Participants can update dm conversations" ON public.direct_conversations FOR UPDATE TO authenticated USING (auth.uid() = participant_1 OR auth.uid() = participant_2);
+
+-- ============================================
+-- RLS POLICIES — direct_messages
+-- ============================================
+
+CREATE POLICY "Participants can read dm messages" ON public.direct_messages FOR SELECT TO authenticated USING (is_conversation_participant(auth.uid(), conversation_id));
+CREATE POLICY "Active participants can insert dm messages" ON public.direct_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = sender_id AND is_conversation_participant(auth.uid(), conversation_id) AND get_chat_status(auth.uid()) = 'active');
+CREATE POLICY "Admins can delete dm messages" ON public.direct_messages FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'));
+
+-- ============================================
+-- RLS POLICIES — friendships
+-- ============================================
+
+CREATE POLICY "Users can read own friendships" ON public.friendships FOR SELECT TO authenticated USING (auth.uid() = requester_id OR auth.uid() = addressee_id);
+CREATE POLICY "Users can send friend requests" ON public.friendships FOR INSERT TO authenticated WITH CHECK (auth.uid() = requester_id AND requester_id <> addressee_id);
+CREATE POLICY "Only addressee can update friendship" ON public.friendships FOR UPDATE TO authenticated USING (auth.uid() = addressee_id);
+CREATE POLICY "Users can delete own friendships" ON public.friendships FOR DELETE TO authenticated USING (auth.uid() = requester_id OR auth.uid() = addressee_id);
+
+-- ============================================
+-- RLS POLICIES — user_favorites
+-- ============================================
+
+CREATE POLICY "Users can read own favorites" ON public.user_favorites FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own favorites" ON public.user_favorites FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own favorites" ON public.user_favorites FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — user_recent_tools
+-- ============================================
+
+CREATE POLICY "Users can read own recents" ON public.user_recent_tools FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own recents" ON public.user_recent_tools FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own recents" ON public.user_recent_tools FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — user_allowed_ips
+-- ============================================
+
+CREATE POLICY "Users can read own ips" ON public.user_allowed_ips FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can manage all ips" ON public.user_allowed_ips FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Service role full access on user_allowed_ips" ON public.user_allowed_ips FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- RLS POLICIES — scheduled_posts
+-- ============================================
+
+CREATE POLICY "Users can read own scheduled posts" ON public.scheduled_posts FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own scheduled posts" ON public.scheduled_posts FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own scheduled posts" ON public.scheduled_posts FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own scheduled posts" ON public.scheduled_posts FOR DELETE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Service role full access on scheduled_posts" ON public.scheduled_posts FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- RLS POLICIES — admin_reports
+-- ============================================
+
+CREATE POLICY "Admins can read reports" ON public.admin_reports FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can insert reports" ON public.admin_reports FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins can delete reports" ON public.admin_reports FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'));
+CREATE POLICY "Service role full access on admin_reports" ON public.admin_reports FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- RLS POLICIES — webhook_events
+-- ============================================
+
+CREATE POLICY "Service role full access on webhook_events" ON public.webhook_events FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
+-- RLS POLICIES — void_projects
+-- ============================================
+
+CREATE POLICY "Users can read own projects" ON public.void_projects FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own projects" ON public.void_projects FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own projects" ON public.void_projects FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own projects" ON public.void_projects FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — void_canvas_nodes
+-- ============================================
+
+CREATE POLICY "Users can read own nodes" ON public.void_canvas_nodes FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own nodes" ON public.void_canvas_nodes FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own nodes" ON public.void_canvas_nodes FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own nodes" ON public.void_canvas_nodes FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — void_canvas_connections
+-- ============================================
+
+CREATE POLICY "Users can read own connections" ON public.void_canvas_connections FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own connections" ON public.void_canvas_connections FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own connections" ON public.void_canvas_connections FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- RLS POLICIES — void_brand_kits
+-- ============================================
+
+CREATE POLICY "Users can read own brand kits" ON public.void_brand_kits FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own brand kits" ON public.void_brand_kits FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own brand kits" ON public.void_brand_kits FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own brand kits" ON public.void_brand_kits FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- ============================================
+-- FIM DO SCHEMA COMPLETO
+-- ============================================
 `;
 
   const handleCopySQL = () => {
