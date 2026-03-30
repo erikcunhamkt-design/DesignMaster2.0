@@ -656,6 +656,11 @@ export default function AdminPage() {
             </Table>
           </div>
 
+          {/* Data Export — admin only */}
+          <div className="rounded-xl border border-border/30 bg-card/50 p-5 mt-6">
+            <AdminDataExport />
+          </div>
+
           {/* Ghost Reports — admin only */}
           <div className="rounded-xl border border-border/30 bg-card/50 p-5 mt-6">
             <AdminReports />
